@@ -37,7 +37,7 @@ site.hidden-edit = Change {0}
 site.no = No
 site.yes = Yes
 site.save_and_continue = Save and continue
-site.service_name = voa-bar-xml-frontend
+site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
 
 unauthorised.title = You can’t access this service with this account
@@ -52,8 +52,9 @@ councilTaxStart.heading = councilTaxStart
 councilTaxUpload.title = councilTaxUpload
 councilTaxUpload.heading = councilTaxUpload
 
-login.title = login
-login.heading = login
+login.title = Please login
+login.heading = Please login
+login.subheading = Billing Authority Reports
 login.checkYourAnswersLabel = login
 login.error.required = Enter login
 login.error.length = Login must be 100 characters or less

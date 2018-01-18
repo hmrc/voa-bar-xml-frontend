@@ -36,8 +36,6 @@ class LoginViewSpec extends StringViewBehaviours {
   "Login view" must {
     behave like normalPage(createView, messageKeyPrefix)
 
-    behave like pageWithBackLink(createView)
-
     behave like stringPage(createViewUsingForm, messageKeyPrefix, routes.LoginController.onSubmit(NormalMode).url)
   }
 }
