@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /                                            controllers.IndexController.onPageLoad
+GET        /                                            controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 
 GET        /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -12,15 +12,15 @@ GET        /check-your-answers                          controllers.CheckYourAns
 
 GET        /unauthorised                                controllers.UnauthorisedController.onPageLoad
 
-GET        /confirmation                       controllers.ConfirmationController.onPageLoad()
+GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
 
-GET        /councilTaxStart                       controllers.CouncilTaxStartController.onPageLoad()
+GET        /councilTaxStart                             controllers.CouncilTaxStartController.onPageLoad()
 
-GET        /councilTaxUpload                       controllers.CouncilTaxUploadController.onPageLoad()
+GET        /councilTaxUpload                            controllers.CouncilTaxUploadController.onPageLoad()
 
-GET        /login               controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
-POST       /login               controllers.LoginController.onSubmit(mode: Mode = NormalMode)
-GET        /changeLogin                        controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeLogin                        controllers.LoginController.onSubmit(mode: Mode = CheckMode)
+GET        /login                                       controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+POST       /login                                       controllers.LoginController.onSubmit(mode: Mode = NormalMode)
+GET        /changeLogin                                 controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeLogin                                 controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
-GET        /welcome                       controllers.WelcomeController.onPageLoad()
+GET        /welcome                                     controllers.WelcomeController.onPageLoad()

@@ -23,7 +23,7 @@ import views.html.councilTaxUpload
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CouncilTaxUploadController(frontendAppConfig, messagesApi, FakeAuthAction,
+    new CouncilTaxUploadController(frontendAppConfig, messagesApi,
       dataRetrievalAction, new DataRequiredActionImpl)
 
   def viewAsString() = councilTaxUpload(frontendAppConfig)(fakeRequest, messages).toString

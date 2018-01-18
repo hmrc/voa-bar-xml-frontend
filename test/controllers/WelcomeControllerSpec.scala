@@ -23,7 +23,7 @@ import views.html.welcome
 class WelcomeControllerSpec extends ControllerSpecBase {
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new WelcomeController(frontendAppConfig, messagesApi, FakeAuthAction,
+    new WelcomeController(frontendAppConfig, messagesApi,
       dataRetrievalAction, new DataRequiredActionImpl)
 
   def viewAsString() = welcome(frontendAppConfig)(fakeRequest, messages).toString

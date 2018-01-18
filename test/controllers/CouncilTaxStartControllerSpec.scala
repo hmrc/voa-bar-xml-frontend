@@ -23,7 +23,7 @@ import views.html.councilTaxStart
 class CouncilTaxStartControllerSpec extends ControllerSpecBase {
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CouncilTaxStartController(frontendAppConfig, messagesApi, FakeAuthAction,
+    new CouncilTaxStartController(frontendAppConfig, messagesApi,
       dataRetrievalAction, new DataRequiredActionImpl)
 
   def viewAsString() = councilTaxStart(frontendAppConfig)(fakeRequest, messages).toString
