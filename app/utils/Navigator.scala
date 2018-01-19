@@ -28,7 +28,7 @@ class Navigator @Inject()() {
 
   private val routeMap: Map[Identifier, UserAnswers => Call] = Map(
     LoginId -> (_ => routes.WelcomeController.onPageLoad()),
-    WelcomeId -> (_ => routes.WelcomeController.onPageLoad()),
+    WelcomeId -> (_ => routes.CouncilTaxStartController.onPageLoad()),
     CouncilTaxStartId -> (_ => routes.CouncilTaxStartController.onPageLoad()),
     CouncilTaxUploadId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
     ConfirmationId -> (_ => routes.ConfirmationController.onPageLoad())

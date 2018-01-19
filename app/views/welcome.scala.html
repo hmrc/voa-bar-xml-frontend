@@ -24,4 +24,12 @@
     bodyClasses = None) {
 
     @components.heading("welcome.heading")
+
+    <h3 class="heading-medium">
+        <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
+    </h3>
+
+    <p>
+    @messages("welcome.councilTax.description")
+    </p>
 }

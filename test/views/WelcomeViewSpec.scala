@@ -26,6 +26,12 @@ class WelcomeViewSpec extends ViewBehaviours {
   def createView = () => welcome(frontendAppConfig)(fakeRequest, messages)
 
   "Welcome view" must {
-    behave like normalPage(createView, messageKeyPrefix)
+    behave like normalPage(createView, messageKeyPrefix, "councilTax.url", "councilTax.description")
+  }
+
+  "The Council Tax links to the goToCouncilTaxStartPage method" in {
+    val doc = asDocument(createView())
+    val href = doc.getElementById("councilTaxLink").attr("href")
+    assert(href == controllers.routes.WelcomeController.goToCouncilTaxStartPage().url.toString)
   }
 }
