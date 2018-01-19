@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package utils
+package forms
 
-import uk.gov.hmrc.http.cache.client.CacheMap
-import identifiers._
-import models._
+import javax.inject.Inject
 
-class UserAnswers(val cacheMap: CacheMap) extends Enumerable.Implicits {
-  def login: Option[Login] = cacheMap.getEntry[Login](LoginId.toString)
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms._
+import models.Login
 
+class LoginFormProvider @Inject() extends Mappings {
 
-}
+   def apply(): Form[Login] = Form(
+     mapping(
+      "username" -> text("login.error.username.required")
+        .verifying(maxLength(100, "login.error.username.length")),
+      "password" -> text("login.error.password.required")
+        .verifying(maxLength(100, "login.error.password.length"))
+    )(Login.apply)(Login.unapply)
+   )
+ }

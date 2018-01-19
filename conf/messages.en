@@ -55,10 +55,16 @@ councilTaxUpload.heading = councilTaxUpload
 login.title = Please login
 login.heading = Please login
 login.subheading = Billing Authority Reports
-login.checkYourAnswersLabel = login
-login.error.required = Enter login
-login.error.length = Login must be 100 characters or less
-login.username.label = Username
+login.username = Username
+login.password = Password
+login.checkYourAnswersLabel = Login
+login.error.username.required = Enter username
+login.error.password.required = Enter password
+login.error.username.length = Username must be 100 characters or less
+login.error.password.length = Password must be 100 characters or less
 
 welcome.title = welcome
 welcome.heading = welcome
+
+
+

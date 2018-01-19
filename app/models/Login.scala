@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+package models
 
-import uk.gov.hmrc.http.cache.client.CacheMap
-import identifiers._
-import models._
+import play.api.libs.json._
 
-class UserAnswers(val cacheMap: CacheMap) extends Enumerable.Implicits {
-  def login: Option[Login] = cacheMap.getEntry[Login](LoginId.toString)
+case class Login (username: String, password: String)
 
-
+object Login {
+  implicit val format = Json.format[Login]
 }

@@ -27,12 +27,19 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
 
   val navigator = new Navigator
 
+  val mockUserAnswers = mock[UserAnswers]
+
   "Navigator" when {
 
     "in Normal mode" must {
-      "go to Index from an identifier that doesn't exist in the route map" in {
+      "go to Login page from an identifier that doesn't exist in the route map" in {
         case object UnknownIdentifier extends Identifier
-        navigator.nextPage(UnknownIdentifier, NormalMode)(mock[UserAnswers]) mustBe routes.WelcomeController.onPageLoad()
+        navigator.nextPage(UnknownIdentifier, NormalMode)(mock[UserAnswers]) mustBe routes.LoginController.onPageLoad(NormalMode)
+      }
+
+      "on a valid submit from Login page go to Welcome page" in {
+        when(mockUserAnswers.login) thenReturn  Some(Login("username", "pass"))
+        navigator.nextPage(LoginId, NormalMode) (mockUserAnswers) mustBe routes.WelcomeController.onPageLoad()
       }
     }
 
