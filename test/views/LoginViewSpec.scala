@@ -39,5 +39,11 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
     behave like normalPage(createView, messageKeyPrefix)
 
     behave like pageWithTextFields(createViewUsingForm, messageKeyPrefix, routes.LoginController.onSubmit(NormalMode).url, "username", "password")
+
+    "contain Login button with the value Login" in {
+      val doc = asDocument(createViewUsingForm(form))
+      val loginButton = doc.getElementById("submit").text()
+      assert(loginButton == messages("site.login"))
+    }
   }
 }
