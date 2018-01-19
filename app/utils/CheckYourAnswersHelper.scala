@@ -22,7 +22,4 @@ import viewmodels.{AnswerRow, RepeaterAnswerRow, RepeaterAnswerSection}
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers) {
 
-  def login: Option[AnswerRow] = userAnswers.login map {
-    x => AnswerRow("login.checkYourAnswersLabel", s"$x", false, routes.LoginController.onPageLoad(CheckMode).url)
-  }
 }

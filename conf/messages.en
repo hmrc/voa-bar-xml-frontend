@@ -58,6 +58,7 @@ login.subheading = Billing Authority Reports
 login.checkYourAnswersLabel = login
 login.error.required = Enter login
 login.error.length = Login must be 100 characters or less
+login.username.label = Username
 
 welcome.title = welcome
 welcome.heading = welcome

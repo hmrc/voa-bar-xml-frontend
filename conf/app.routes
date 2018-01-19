@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /                                            controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+GET        /                                            controllers.WelcomeController.onPageLoad()
 
 GET        /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -17,10 +17,5 @@ GET        /confirmation                                controllers.Confirmation
 GET        /councilTaxStart                             controllers.CouncilTaxStartController.onPageLoad()
 
 GET        /councilTaxUpload                            controllers.CouncilTaxUploadController.onPageLoad()
-
-GET        /login                                       controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
-POST       /login                                       controllers.LoginController.onSubmit(mode: Mode = NormalMode)
-GET        /changeLogin                                 controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeLogin                                 controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
 GET        /welcome                                     controllers.WelcomeController.onPageLoad()
