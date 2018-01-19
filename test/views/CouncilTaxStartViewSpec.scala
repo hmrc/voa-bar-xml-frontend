@@ -26,6 +26,19 @@ class CouncilTaxStartViewSpec extends ViewBehaviours {
   def createView = () => councilTaxStart(frontendAppConfig)(fakeRequest, messages)
 
   "CouncilTaxStart view" must {
-    behave like normalPage(createView, messageKeyPrefix)
+    behave like normalPage(createView, messageKeyPrefix, "paragraph", "submissions.url-title")
+  }
+
+
+  "contain Start button with the value Start now" in {
+    val doc = asDocument(createView())
+    val loginButton = doc.getElementById("start").text()
+    assert(loginButton == messages("site.start"))
+  }
+
+  "The Council Tax Start now button goes to the goToCouncilTaxUploadPage method" in {
+    val doc = asDocument(createView())
+    val href = doc.getElementById("start").attr("href")
+    assert(href == controllers.routes.CouncilTaxStartController.goToCouncilTaxUploadPage().url.toString)
   }
 }

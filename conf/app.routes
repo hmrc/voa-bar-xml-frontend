@@ -15,6 +15,7 @@ GET        /unauthorised                                controllers.Unauthorised
 GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
 
 GET        /councilTaxStart                             controllers.CouncilTaxStartController.onPageLoad()
+GET        /goToCouncilTaxUpload                        controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
 
 GET        /councilTaxUpload                            controllers.CouncilTaxUploadController.onPageLoad()
 

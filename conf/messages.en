@@ -40,6 +40,7 @@ site.save_and_continue = Save and continue
 site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Login
+site.start = Start now
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
@@ -47,8 +48,10 @@ unauthorised.heading = You can’t access this service with this account
 confirmation.title = confirmation
 confirmation.heading = confirmation
 
-councilTaxStart.title = councilTaxStart
-councilTaxStart.heading = councilTaxStart
+councilTaxStart.title = Council Tax
+councilTaxStart.heading = Council Tax
+councilTaxStart.paragraph = Use this service to upload your Council Tax reports.
+councilTaxStart.submissions.url-title = View your previous Council Tax submissions
 
 councilTaxUpload.title = councilTaxUpload
 councilTaxUpload.heading = councilTaxUpload
