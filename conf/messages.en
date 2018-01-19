@@ -53,8 +53,15 @@ councilTaxStart.heading = Council Tax
 councilTaxStart.paragraph = Use this service to upload your Council Tax reports.
 councilTaxStart.submissions.url-title = View your previous Council Tax submissions
 
-councilTaxUpload.title = councilTaxUpload
-councilTaxUpload.heading = councilTaxUpload
+councilTaxUpload.title = Upload your Council Tax reports
+councilTaxUpload.heading = Upload your Council Tax reports
+councilTaxUpload.info.format = Files must be in XML format
+councilTaxUpload.info.multi = Multiple reports can be contained in a single file
+councilTaxUpload.info.upload = Only one file can be selected at a time
+councilTaxUpload.info.size = Files must be less than 2Mb in size
+councilTaxUpload.info.files = Previous XML files should not be resubmitted
+councilTaxUpload.message1 = If you wish to supply additional information, please email BARS@voa.gsi.gov.uk
+councilTaxUpload.message2 = To support your reports, please include the billing authority report number in the subject of your email.
 
 login.title = Please login
 login.heading = Please login

@@ -26,6 +26,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
   def createView = () => councilTaxUpload(frontendAppConfig)(fakeRequest, messages)
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(createView, messageKeyPrefix)
+    behave like normalPage(createView, messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.size", "info.files", "message1",
+      "message2")
   }
 }
