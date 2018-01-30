@@ -21,16 +21,18 @@ import javax.inject.Inject
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, LoginConnector}
 import controllers.actions._
 import config.FrontendAppConfig
 import forms.LoginFormProvider
 import identifiers.LoginId
-import models.{Mode, Login}
+import models.{Login, Mode}
+import play.api.mvc.Result
 import utils.{Navigator, UserAnswers}
 import views.html.login
 
 import scala.concurrent.Future
+import scala.util.{Try, Success, Failure}
 
 class LoginController @Inject()(appConfig: FrontendAppConfig,
                                                   override val messagesApi: MessagesApi,
@@ -38,7 +40,8 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                                   navigator: Navigator,
                                                   getData: DataRetrievalAction,
                                                   requireData: DataRequiredAction,
-                                                  formProvider: LoginFormProvider) extends FrontendController with I18nSupport {
+                                                  formProvider: LoginFormProvider,
+                                                  loginConnector: LoginConnector) extends FrontendController with I18nSupport {
 
   val form = formProvider()
 
@@ -57,8 +60,17 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
         (formWithErrors: Form[_]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         (value) =>
-          dataCacheConnector.save[Login](request.externalId, LoginId.toString, value).map(cacheMap =>
-            Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap))))
+          dataCacheConnector.save[Login](request.externalId, LoginId.toString, value) flatMap { cacheMap =>
+            val loginResult: Future[Try[Int]] = loginConnector.send(value)
+            val result: Future[Result] = loginResult map { (lr: Try[Int]) =>
+              lr match {
+                case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+                case Failure(e) => Redirect(routes.LoginController.onPageLoad(mode).url)
+              }
+            }
+
+            result
+          }
       )
   }
 }
