@@ -32,7 +32,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
 class LoginConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
@@ -50,7 +49,7 @@ class LoginConnector @Inject()(http: HttpClient,
   def send(input: Login) = sendJson(Json.toJson(input))
 
   def sendJson(json: JsValue): Future[Try[Int]] = {
-    http.POST(s"$serviceUrl${baseSegment}validate", json, Seq(jsonContentTypeHeader))
+    http.POST(s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
       .map {
         response =>
           response.status match {

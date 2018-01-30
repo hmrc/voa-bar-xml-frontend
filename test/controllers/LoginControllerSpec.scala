@@ -20,24 +20,26 @@ import play.api.data.Form
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.FakeNavigator
-import connectors.FakeDataCacheConnector
+import connectors.{FakeDataCacheConnector, LoginConnector}
 import controllers.actions._
 import play.api.test.Helpers._
 import forms.LoginFormProvider
 import identifiers.LoginId
-import models.{NormalMode, Login}
+import models.{Login, NormalMode}
+import org.scalatest.mockito.MockitoSugar
 import views.html.login
 
-class LoginControllerSpec extends ControllerSpecBase {
+class LoginControllerSpec extends ControllerSpecBase with MockitoSugar{
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   val formProvider = new LoginFormProvider()
   val form = formProvider()
+  val loginConnector = mock[LoginConnector]
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl, formProvider)
+      dataRetrievalAction, new DataRequiredActionImpl, formProvider, loginConnector)
 
   def viewAsString(form: Form[_] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
 

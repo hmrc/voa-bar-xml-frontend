@@ -61,16 +61,13 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         (value) =>
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, value) flatMap { cacheMap =>
-            val loginResult: Future[Try[Int]] = loginConnector.send(value)
-            val result: Future[Result] = loginResult map { (lr: Try[Int]) =>
-              lr match {
+            loginConnector.send(value) map {
                 case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
-                case Failure(e) => Redirect(routes.LoginController.onPageLoad(mode).url)
-              }
+                case Failure(e) => {
+                  val formWithLoginErrors = form.withGlobalError("Invalid Login Details")
+                  BadRequest(login(appConfig, formWithLoginErrors, mode))
+                }
             }
-
-            result
-          }
-      )
+          })
   }
 }
