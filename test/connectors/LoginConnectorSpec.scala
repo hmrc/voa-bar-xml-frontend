@@ -23,14 +23,13 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import base.SpecBase
-import exceptions.JsonInvalidException
 import models._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.Helpers.{status, _}
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
@@ -53,6 +52,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
   "Login Connector" when {
 
     "provided with a Contact Login Input" must {
+
       "call the Microservice with the given JSON for username provided" in {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
@@ -61,9 +61,9 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-
         val connector = new LoginConnector(httpMock, configuration, environment)
-        connector.send(login)
+
+        await(connector.send(login))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
@@ -73,38 +73,30 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a 200 status when the send method is successfull using login model" in {
-        new LoginConnector(getHttpMock(200), configuration, environment).send(login).map {
-          case Success(status) => status mustBe 200
-          case Failure(e) => assert(false)
-        }
+        val connector= new LoginConnector(getHttpMock(200), configuration, environment)
+        val result = await(connector.send(login))
+          result match {
+            case Success(status) => status mustBe 200
+            case Failure(e) => assert(false)
+          }
       }
 
       "return a 401 status when the send method is unsuccessful due to invalid credentials" in {
-        new LoginConnector(getHttpMock(401), configuration, environment).send(login).map {
-          case Success(status) => status mustBe 401
-          case Failure(e) => assert(false)
-        }
-      }
-
-      "return a string representing the error when send method fails" in {
-        val errorResponse = JsString("Something went wrong!")
-
-        new LoginConnector(getHttpMock(500), configuration, environment).send(login).map {
-          case Failure(e) => {
-            e mustBe a[RuntimeException]
-            e.getMessage() mustBe "Received status of 500 from upstream service"
+        val connector =  new LoginConnector(getHttpMock(401), configuration, environment)
+        val result = await(connector.send(login))
+          result match {
+            case Success(status) => status mustBe 401
+            case Failure(e) => assert(false)
           }
-          case Success(_) => fail
-        }
       }
 
-      "return a failure if the backend service call fails using Login Model" in {
-        new LoginConnector(getHttpMock(500), configuration, environment).send(login). map {f =>
-          assert(f.isFailure)
-        }
+      "return a failure representing the error when send method fails" in {
+        val connector = new LoginConnector(getHttpMock(500), configuration, environment)
+        val result = await(connector.send(login))
+          assert(result.isFailure)
       }
 
-      }
+    }
 
     "provided with JSON directly" must {
 
@@ -116,9 +108,9 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-
         val connector = new LoginConnector(httpMock, configuration, environment)
-        connector.sendJson(minimalJson)
+
+        await(connector.sendJson(minimalJson))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
@@ -128,30 +120,31 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a 200 status when the send method is successful" in {
-        new LoginConnector(getHttpMock(200), configuration, environment).sendJson(minimalJson).map {
-          case Success(status) => status mustBe 200
-          case Failure(e) => assert(false)
+        val connector = new LoginConnector(getHttpMock(200), configuration, environment)
+        val result = await(connector.sendJson(minimalJson))
+          result match {
+            case Success(status) => status mustBe 200
+            case Failure(e) => assert(false)
         }
       }
 
-      "return a string representing the error when send method fails" in {
-        val errorResponse = JsString("Something went wrong!")
-
-        new LoginConnector(getHttpMock(500), configuration, environment).sendJson(minimalJson).map {
-          case Failure(exception) => {
-            exception mustBe a[JsonInvalidException]
-            exception.getMessage() mustBe "Received status of 500 from upstream service"
-          }
-          case Success(_) => fail
-        }
+      "return failure respresenting the error if the backend service call fails using minimal Json" in {
+        val connector = new LoginConnector(getHttpMock(500), configuration, environment)
+        val result = await(connector.sendJson(minimalJson))
+          assert(result.isFailure)
       }
 
-      "return failure if the backend service call fails using minimal Json" in {
-        new LoginConnector(getHttpMock(500), configuration, environment).sendJson(minimalJson). map {f =>
-          assert(f.isFailure)
-        }
+      "return a failure if the data transfer call throws an exception" in {
+        val httpMock = mock[HttpClient]
+        when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+          any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
+        val connector = new LoginConnector(httpMock, configuration, environment)
+        val result = await(connector.sendJson(minimalJson))
+        assert(result.isFailure)
       }
     }
+
   }
 }
+
 
