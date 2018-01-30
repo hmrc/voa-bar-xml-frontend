@@ -81,15 +81,6 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
           }
       }
 
-      "return a 401 status when the send method is unsuccessful due to invalid credentials" in {
-        val connector =  new LoginConnector(getHttpMock(401), configuration, environment)
-        val result = await(connector.send(login))
-          result match {
-            case Success(status) => status mustBe 401
-            case Failure(e) => assert(false)
-          }
-      }
-
       "return a failure representing the error when send method fails" in {
         val connector = new LoginConnector(getHttpMock(500), configuration, environment)
         val result = await(connector.send(login))

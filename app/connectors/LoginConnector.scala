@@ -55,7 +55,6 @@ class LoginConnector @Inject()(http: HttpClient,
         response =>
           response.status match {
             case 200 => Success(200)
-            case 401 => Success(401)
             case status => {
               Logger.warn("Received status of " + status + " from upstream service")
               Failure(new RuntimeException("Received status of " + status + " from upstream service"))
