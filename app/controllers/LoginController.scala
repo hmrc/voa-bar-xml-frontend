@@ -59,7 +59,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
-        (value) =>
+        value =>
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, value) flatMap { cacheMap =>
             loginConnector.send(value) map {
                 case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
