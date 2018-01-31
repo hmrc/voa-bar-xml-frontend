@@ -27,8 +27,9 @@ import models.{CheckMode, Mode, NormalMode}
 class Navigator @Inject()() {
 
   private val routeMap: Map[Identifier, UserAnswers => Call] = Map(
-    WelcomeId -> (_ => routes.WelcomeController.onPageLoad()),
-    CouncilTaxStartId -> (_ => routes.CouncilTaxStartController.onPageLoad()),
+    LoginId -> (_ => routes.WelcomeController.onPageLoad()),
+    WelcomeId -> (_ => routes.CouncilTaxStartController.onPageLoad()),
+    CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
     CouncilTaxUploadId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
     ConfirmationId -> (_ => routes.ConfirmationController.onPageLoad())
   )
@@ -39,7 +40,7 @@ class Navigator @Inject()() {
 
   def nextPage(id: Identifier, mode: Mode): UserAnswers => Call = mode match {
     case NormalMode =>
-      routeMap.getOrElse(id, _ => routes.WelcomeController.onPageLoad())
+      routeMap.getOrElse(id, _ => routes.LoginController.onPageLoad(NormalMode))
     case CheckMode =>
       editRouteMap.getOrElse(id, _ => routes.CheckYourAnswersController.onPageLoad())
   }

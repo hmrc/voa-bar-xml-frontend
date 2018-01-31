@@ -17,14 +17,18 @@
 package controllers
 
 import controllers.actions._
+import models.NormalMode
 import play.api.test.Helpers._
+import utils.{FakeNavigator, Navigator}
 import views.html.welcome
 
 class WelcomeControllerSpec extends ControllerSpecBase {
 
+  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     new WelcomeController(frontendAppConfig, messagesApi,
-      dataRetrievalAction, new DataRequiredActionImpl)
+      dataRetrievalAction, new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute))
 
   def viewAsString() = welcome(frontendAppConfig)(fakeRequest, messages).toString
 
@@ -35,6 +39,11 @@ class WelcomeControllerSpec extends ControllerSpecBase {
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
+    }
+
+    "return a redirect when calling goToCouncilTaxStartPage" in {
+      val result = controller().goToCouncilTaxStartPage()(fakeRequest)
+      status(result) mustBe SEE_OTHER
     }
   }
 }

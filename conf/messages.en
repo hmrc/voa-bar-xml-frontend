@@ -39,6 +39,8 @@ site.yes = Yes
 site.save_and_continue = Save and continue
 site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
+site.login = Login
+site.start = Start now
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
@@ -46,19 +48,36 @@ unauthorised.heading = You can’t access this service with this account
 confirmation.title = confirmation
 confirmation.heading = confirmation
 
-councilTaxStart.title = councilTaxStart
-councilTaxStart.heading = councilTaxStart
+councilTaxStart.title = Council Tax
+councilTaxStart.heading = Council Tax
+councilTaxStart.paragraph = Use this service to upload your Council Tax reports.
+councilTaxStart.submissions.url-title = View your previous Council Tax submissions
 
-councilTaxUpload.title = councilTaxUpload
-councilTaxUpload.heading = councilTaxUpload
+councilTaxUpload.title = Upload your Council Tax reports
+councilTaxUpload.heading = Upload your Council Tax reports
+councilTaxUpload.info.format = Files must be in XML format
+councilTaxUpload.info.multi = Multiple reports can be contained in a single file
+councilTaxUpload.info.upload = Only one file can be selected at a time
+councilTaxUpload.info.size = Files must be less than 2Mb in size
+councilTaxUpload.info.files = Previous XML files should not be resubmitted
+councilTaxUpload.message1 = If you wish to supply additional information, please email BARS@voa.gsi.gov.uk
+councilTaxUpload.message2 = To support your reports, please include the billing authority report number in the subject of your email.
 
 login.title = Please login
 login.heading = Please login
 login.subheading = Billing Authority Reports
-login.checkYourAnswersLabel = login
-login.error.required = Enter login
-login.error.length = Login must be 100 characters or less
-login.username.label = Username
+login.username = Username
+login.password = Password
+login.checkYourAnswersLabel = Login
+login.error.username.required = Enter username
+login.error.password.required = Enter password
+login.error.username.length = Username must be 100 characters or less
+login.error.password.length = Password must be 100 characters or less
 
-welcome.title = welcome
-welcome.heading = welcome
+welcome.title = Welcome
+welcome.heading = Welcome
+welcome.councilTax.url = Council Tax
+welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
+
+
+

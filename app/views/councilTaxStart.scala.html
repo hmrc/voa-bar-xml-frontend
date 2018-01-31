@@ -24,4 +24,12 @@
     bodyClasses = None) {
 
     @components.heading("councilTaxStart.heading")
+
+    <p>@messages("councilTaxStart.paragraph")</p>
+
+    <p>
+      <a href=@controllers.routes.CouncilTaxStartController.goToCouncilTaxUploadPage().url id="start" class="button button--get-started">@messages("site.start")</a>
+    </p>
+
+    <p><a href="" id="submissions">@messages("councilTaxStart.submissions.url-title")</a></p>
 }

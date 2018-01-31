@@ -24,4 +24,19 @@
     bodyClasses = None) {
 
     @components.heading("councilTaxUpload.heading")
+
+    <ul class="list list-bullet">
+        <li>@messages("councilTaxUpload.info.format")</li>
+        <li>@messages("councilTaxUpload.info.multi")</li>
+        <li>@messages("councilTaxUpload.info.upload")</li>
+        <li>@messages("councilTaxUpload.info.size")</li>
+        <li>@messages("councilTaxUpload.info.files")</li>
+    </ul>
+
+    <p><h5 class="alert">
+    @messages("councilTaxUpload.message1")
+      <br />
+      <br />
+    @messages("councilTaxUpload.message2")
+    </h5></p>
 }

@@ -22,17 +22,23 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
+import identifiers.CouncilTaxStartId
+import models.NormalMode
+import utils.Navigator
 import views.html.councilTaxStart
 
-import scala.concurrent.Future
-
 class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
-                                         override val messagesApi: MessagesApi,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction) extends FrontendController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          getData: DataRetrievalAction,
+                                          requireData: DataRequiredAction,
+                                          navigator: Navigator) extends FrontendController with I18nSupport {
 
   def onPageLoad = (getData andThen requireData) {
     implicit request =>
       Ok(councilTaxStart(appConfig))
+  }
+
+  def goToCouncilTaxUploadPage() = (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(CouncilTaxStartId, NormalMode)(request.userAnswers))
   }
 }

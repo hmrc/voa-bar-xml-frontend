@@ -1,5 +1,6 @@
 .*
 
+!.g8
 !.gitignore
 
 .cache
