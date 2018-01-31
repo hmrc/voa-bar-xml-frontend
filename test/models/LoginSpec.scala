@@ -23,8 +23,7 @@ class LoginSpec extends SpecBase {
   val username = "user"
   val password = "pass"
 
-  "Given a username and password produce a " +
-    "login model" in {
+  "Given a username and password produce a login model" in {
     val result = Login(username, password)
 
     result.username mustBe username

@@ -20,31 +20,43 @@ import play.api.data.Form
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.FakeNavigator
-import connectors.FakeDataCacheConnector
+import connectors.{FakeDataCacheConnector, LoginConnector}
 import controllers.actions._
 import play.api.test.Helpers._
 import forms.LoginFormProvider
 import identifiers.LoginId
-import models.{NormalMode, Login}
+import models.{Login, NormalMode}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
 import views.html.login
 
-class LoginControllerSpec extends ControllerSpecBase {
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
+class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   val formProvider = new LoginFormProvider()
   val form = formProvider()
 
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
+  val loginConnector = mock[LoginConnector]
+  when(loginConnector.send(any[Login])) thenReturn Future.successful(Success(200))
+
+  val loginConnectorF = mock[LoginConnector]
+  when(loginConnectorF.send(any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
+
+  def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl, formProvider)
+      dataRetrievalAction, new DataRequiredActionImpl, formProvider, connector)
 
   def viewAsString(form: Form[_] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
 
   "Login Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = controller().onPageLoad(NormalMode)(fakeRequest)
+      val result = controller(loginConnector).onPageLoad(NormalMode)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
@@ -54,7 +66,7 @@ class LoginControllerSpec extends ControllerSpecBase {
       val validData = Map(LoginId.toString -> Json.toJson(Login("value 1", "value 2")))
       val getRelevantData = new FakeDataRetrievalAction(Some(CacheMap(cacheMapId, validData)))
 
-      val result = controller(getRelevantData).onPageLoad(NormalMode)(fakeRequest)
+      val result = controller(loginConnector, getRelevantData).onPageLoad(NormalMode)(fakeRequest)
 
       contentAsString(result) mustBe viewAsString(form.fill(Login("value 1", "value 2")))
     }
@@ -62,7 +74,7 @@ class LoginControllerSpec extends ControllerSpecBase {
     "redirect to the next page when valid data is submitted" in {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
 
-      val result = controller().onSubmit(NormalMode)(postRequest)
+      val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
@@ -72,10 +84,22 @@ class LoginControllerSpec extends ControllerSpecBase {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("value", "invalid value"))
       val boundForm = form.bind(Map("value" -> "invalid value"))
 
-      val result = controller().onSubmit(NormalMode)(postRequest)
+      val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
+    "return a Bad Request and errors when the backend service call fails" in {
+      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
+      val boundForm = form.bind(Map("username" -> "value 1", "password" -> "value2"))
+
+      intercept[Exception] {
+        val result = controller(loginConnectorF).onSubmit(NormalMode)(postRequest)
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe viewAsString(boundForm)
+        redirectLocation(result) mustBe Some(onwardRoute.url)
+      }
     }
 
   }
