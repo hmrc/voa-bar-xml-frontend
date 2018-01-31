@@ -28,9 +28,10 @@ import utils.Navigator
 import views.html.councilTaxStart
 
 class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
-                                         override val messagesApi: MessagesApi,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction, navigator: Navigator) extends FrontendController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          getData: DataRetrievalAction,
+                                          requireData: DataRequiredAction,
+                                          navigator: Navigator) extends FrontendController with I18nSupport {
 
   def onPageLoad = (getData andThen requireData) {
     implicit request =>
