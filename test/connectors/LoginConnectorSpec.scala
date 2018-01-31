@@ -67,7 +67,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
-        urlCaptor.getValue must endWith(s"${connector.baseSegment}validate")
+        urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
         bodyCaptor.getValue mustBe Json.toJson(login)
         headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
       }
@@ -105,7 +105,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
-        urlCaptor.getValue must endWith(s"${connector.baseSegment}validate")
+        urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
         bodyCaptor.getValue mustBe minimalJson
         headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
       }
