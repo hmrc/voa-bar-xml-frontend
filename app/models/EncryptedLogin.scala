@@ -16,13 +16,13 @@
 
 package models
 
-import uk.gov.hmrc.crypto._
-
-case class EncryptedLogin(userName:String, encryptedPassword: String)
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+case class EncryptedLogin(username:String, encryptedPassword: String)
 
 object EncryptedLogin{
   def apply(login:Login):EncryptedLogin = {
-    EncryptedLogin(login.username, login.password )
+    lazy val crypto = ApplicationCrypto.JsonCrypto
+    EncryptedLogin(login.username, crypto.encrypt(PlainText(login.password)).value)
   }
 }
 

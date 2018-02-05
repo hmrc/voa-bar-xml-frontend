@@ -18,7 +18,7 @@ package models
 
 import base.SpecBase
 import play.api.Configuration
-import uk.gov.hmrc.crypto.{ApplicationCryptoDI, Crypted}
+import uk.gov.hmrc.crypto.{ApplicationCryptoDI, Crypted, PlainText}
 
 
 class EncryptedLoginSpec extends SpecBase {
@@ -33,7 +33,7 @@ class EncryptedLoginSpec extends SpecBase {
 
     val result = EncryptedLogin(Login(userName, password))
 
-    result.userName mustBe userName
-    result.encryptedPassword mustBe crypto.decrypt(Crypted(password))
+    result.username mustBe userName
+    password mustBe crypto.decrypt(Crypted(result.encryptedPassword)).value
   }
 }
