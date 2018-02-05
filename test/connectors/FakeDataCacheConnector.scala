@@ -16,15 +16,17 @@
 
 package connectors
 
+import models.{EncryptedLogin, Login}
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object FakeDataCacheConnector extends DataCacheConnector {
   override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
+
+  override  def saveEncryptedLogin(cachedId: String, key: String, value: Login)(implicit fmt: Format[EncryptedLogin]): Future[CacheMap] = ???
 
   override def remove(cacheId: String, key: String): Future[Boolean] = ???
 

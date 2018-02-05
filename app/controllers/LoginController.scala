@@ -49,7 +49,10 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       val preparedForm = request.userAnswers.flatMap(_.login) match {
         case None => form
-        case Some(value) => form.fill(value)
+        case Some(value) => {
+          val loginWithBlankedPassword = Login(value.username, "")
+          form.fill(loginWithBlankedPassword)
+        }
       }
       Ok(login(appConfig, preparedForm, mode))
   }
