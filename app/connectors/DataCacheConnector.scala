@@ -17,7 +17,6 @@
 package connectors
 
 import com.google.inject.{ImplementedBy, Inject}
-import models.{EncryptedLogin, Login}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import repositories.SessionRepository
@@ -34,8 +33,6 @@ class DataCacheConnectorImpl @Inject()(val sessionRepository: SessionRepository,
       sessionRepository().upsert(updatedCacheMap).map {_ => updatedCacheMap}
     }
   }
-
-  def saveEncryptedLogin(cachedId: String, key: String, value: Login)(implicit fmt: Format[EncryptedLogin]): Future[CacheMap] = ???
 
   def remove(cacheId: String, key: String): Future[Boolean] = {
     sessionRepository().get(cacheId).flatMap { optionalCacheMap =>
@@ -91,8 +88,6 @@ class DataCacheConnectorImpl @Inject()(val sessionRepository: SessionRepository,
 @ImplementedBy(classOf[DataCacheConnectorImpl])
 trait DataCacheConnector {
   def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap]
-
-  def saveEncryptedLogin(cachedId: String, key: String, value: Login)(implicit fmt: Format[EncryptedLogin]): Future[CacheMap]
 
   def remove(cacheId: String, key: String): Future[Boolean]
 

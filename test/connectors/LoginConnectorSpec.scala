@@ -32,7 +32,6 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers.{status, _}
-import uk.gov.hmrc.crypto.{ApplicationCryptoDI, PlainText}
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
@@ -48,12 +47,9 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
   val environment = injector.instanceOf[Environment]
   val minimalJson = JsObject(Map[String, JsValue]())
 
-  val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
-
   val username = "user"
   val password = "pass"
-  val login = Login(username, password)
-  val encryptedLogin = Login(username, crypto.encrypt(PlainText(password)).value)
+  val login = Login(username, password, true)
 
   "Login Connector" when {
 
@@ -74,7 +70,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
         urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
-        bodyCaptor.getValue mustBe Json.toJson(encryptedLogin)
+        bodyCaptor.getValue mustBe Json.toJson(login)
         headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
       }
 

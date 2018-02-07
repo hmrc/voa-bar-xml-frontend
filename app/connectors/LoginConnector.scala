@@ -32,7 +32,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
 class LoginConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
@@ -47,9 +46,7 @@ class LoginConnector @Inject()(http: HttpClient,
   val baseSegment = "/voa-bar/"
   val jsonContentTypeHeader = ("Content-Type", "application/json")
 
-  lazy val crypto = ApplicationCrypto.JsonCrypto
-
-  def send(input: Login) = sendJson(Json.toJson(Login(input.username, crypto.encrypt(PlainText(input.password)).value)))
+  def send(input: Login) = sendJson(Json.toJson(input))
 
 
   def sendJson(json: JsValue): Future[Try[Int]] = {

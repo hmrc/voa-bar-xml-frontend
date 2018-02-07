@@ -35,13 +35,13 @@ import scala.concurrent.Future
 import scala.util.{Try, Success, Failure}
 
 class LoginController @Inject()(appConfig: FrontendAppConfig,
-                                                  override val messagesApi: MessagesApi,
-                                                  dataCacheConnector: DataCacheConnector,
-                                                  navigator: Navigator,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  formProvider: LoginFormProvider,
-                                                  loginConnector: LoginConnector) extends FrontendController with I18nSupport {
+                                override val messagesApi: MessagesApi,
+                                dataCacheConnector: DataCacheConnector,
+                                navigator: Navigator,
+                                getData: DataRetrievalAction,
+                                requireData: DataRequiredAction,
+                                formProvider: LoginFormProvider,
+                                loginConnector: LoginConnector) extends FrontendController with I18nSupport {
 
   val form = formProvider()
 
@@ -62,15 +62,19 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
-        value =>
-          dataCacheConnector.save[Login](request.externalId, LoginId.toString, value) flatMap { cacheMap =>
-            loginConnector.send(value) map {
-                case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
-                case Failure(e) => {
-                  val formWithLoginErrors = form.withGlobalError("Invalid Login Details")
-                  BadRequest(login(appConfig, formWithLoginErrors, mode))
-                }
+        value => {
+          val encryptedLogin = Login(value.username, value.password, true)
+
+          dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
+            loginConnector.send(encryptedLogin) map {
+              case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+              case Failure(e) => {
+                val formWithLoginErrors = form.withGlobalError("Invalid Login Details")
+                BadRequest(login(appConfig, formWithLoginErrors, mode))
+              }
             }
-          })
+          }
+        }
+      )
   }
 }
