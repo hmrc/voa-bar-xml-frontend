@@ -63,7 +63,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
         (formWithErrors: Form[_]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         value => {
-          val encryptedLogin = Login(value.username, value.password, true)
+          val encryptedLogin = value.encrypt
 
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) map {

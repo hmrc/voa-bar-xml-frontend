@@ -35,7 +35,7 @@ class LoginSpec extends SpecBase {
 
   "Given a username and password and encryptionRequired set to true produce a login model containing an ecnrypted password" in {
      val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
-     val result = Login(username, password, true)
+     val result = Login(username, password).encrypt
 
     result.username mustBe username
     password mustBe crypto.decrypt(Crypted(result.password)).value
@@ -43,7 +43,7 @@ class LoginSpec extends SpecBase {
 
   "Given a username and password and encryptionRequired set to false produce a login model containing a plain text password" in {
     val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
-    val result = Login(username, password, false)
+    val result = Login(username, password)
 
     result.username mustBe username
     result.password mustBe password
