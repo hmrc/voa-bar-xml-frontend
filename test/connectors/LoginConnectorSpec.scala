@@ -49,7 +49,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
   val username = "user"
   val password = "pass"
-  val login = Login(username, password).encrypt
+  lazy val login = Login(username, password).encrypt
 
 
   "Login Connector" when {
