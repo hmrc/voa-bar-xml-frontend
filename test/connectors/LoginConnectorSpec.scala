@@ -24,10 +24,12 @@ import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import base.SpecBase
 import models._
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers.{status, _}
 
@@ -47,7 +49,8 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
   val username = "user"
   val password = "pass"
-  val login = Login(username, password)
+  lazy val login = Login(username, password).encrypt
+
 
   "Login Connector" when {
 

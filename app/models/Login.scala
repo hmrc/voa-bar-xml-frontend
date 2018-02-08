@@ -17,8 +17,14 @@
 package models
 
 import play.api.libs.json._
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
-case class Login (username: String, password: String)
+case class Login (username: String, password: String) {
+  def encrypt():Login = {
+    lazy val crypto = ApplicationCrypto.JsonCrypto
+    Login (username, crypto.encrypt (PlainText (password) ).value)
+  }
+}
 
 object Login {
   implicit val format = Json.format[Login]

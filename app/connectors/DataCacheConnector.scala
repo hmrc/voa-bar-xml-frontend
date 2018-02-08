@@ -21,8 +21,8 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import repositories.SessionRepository
 import utils.CascadeUpsert
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataCacheConnectorImpl @Inject()(val sessionRepository: SessionRepository, val cascadeUpsert: CascadeUpsert) extends DataCacheConnector {

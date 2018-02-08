@@ -63,12 +63,12 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "populate the view correctly on a GET when the question has previously been answered" in {
-      val validData = Map(LoginId.toString -> Json.toJson(Login("value 1", "value 2")))
+      val validData = Map(LoginId.toString -> Json.toJson(Login("username", "password")))
       val getRelevantData = new FakeDataRetrievalAction(Some(CacheMap(cacheMapId, validData)))
 
       val result = controller(loginConnector, getRelevantData).onPageLoad(NormalMode)(fakeRequest)
 
-      contentAsString(result) mustBe viewAsString(form.fill(Login("value 1", "value 2")))
+      contentAsString(result) mustBe viewAsString(form.fill(Login("username", "")))
     }
 
     "redirect to the next page when valid data is submitted" in {

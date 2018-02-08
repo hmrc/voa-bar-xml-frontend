@@ -17,17 +17,28 @@
 package models
 
 import base.SpecBase
+import play.api.Configuration
+import uk.gov.hmrc.crypto.{ApplicationCryptoDI, Crypted}
 
 class LoginSpec extends SpecBase {
 
+  val configuration = injector.instanceOf[Configuration]
   val username = "user"
   val password = "pass"
 
-  "Given a username and password produce a login model" in {
+  "Given a username and password produce a login model containing plain text password" in {
     val result = Login(username, password)
 
     result.username mustBe username
     result.password mustBe password
+  }
+
+  "Given a username and password, the encrypt method should return an encryted Login model" in {
+     lazy val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
+     val result = Login(username, password).encrypt
+
+    result.username mustBe username
+    password mustBe crypto.decrypt(Crypted(result.password)).value
   }
 }
 

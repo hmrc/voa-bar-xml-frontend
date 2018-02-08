@@ -28,6 +28,7 @@ class $className$Controller @Inject()(
 
   val form = formProvider()
 
+
   def onPageLoad(mode: Mode) = (authenticate andThen getData andThen requireData) {
     implicit request =>
       val preparedForm = request.userAnswers.$className;format="decap"$ match {
