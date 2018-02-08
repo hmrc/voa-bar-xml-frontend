@@ -34,7 +34,7 @@ class LoginSpec extends SpecBase {
   }
 
   "Given a username and password, the encrypt method should return an encryted Login model" in {
-     val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
+     lazy val crypto = new ApplicationCryptoDI(configuration).JsonCrypto
      val result = Login(username, password).encrypt
 
     result.username mustBe username

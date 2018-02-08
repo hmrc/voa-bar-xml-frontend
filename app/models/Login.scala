@@ -21,7 +21,7 @@ import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
 case class Login (username: String, password: String) {
   def encrypt():Login = {
-    val crypto = ApplicationCrypto.JsonCrypto
+    lazy val crypto = ApplicationCrypto.JsonCrypto
     Login (username, crypto.encrypt (PlainText (password) ).value)
   }
 }
