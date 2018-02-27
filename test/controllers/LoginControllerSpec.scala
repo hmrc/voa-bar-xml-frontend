@@ -17,24 +17,26 @@
 package controllers
 
 import play.api.data.Form
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, JsValue, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.FakeNavigator
-import connectors.{FakeDataCacheConnector, LoginConnector}
+import connectors.{DataCacheConnector, FakeDataCacheConnector, LoginConnector}
 import controllers.actions._
 import play.api.test.Helpers._
 import forms.LoginFormProvider
-import identifiers.LoginId
+import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, NormalMode}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import views.html.login
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
+  var captures = Map[String, Any]()
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -47,9 +49,11 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
   val loginConnectorF = mock[LoginConnector]
   when(loginConnectorF.send(any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
 
-  def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
+  def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
       dataRetrievalAction, new DataRequiredActionImpl, formProvider, connector)
+  }
 
   def viewAsString(form: Form[_] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
 
@@ -80,6 +84,15 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
+    "logging in must cache an authorization token" in {
+      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
+
+      val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
+      status(result) mustBe SEE_OTHER
+      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(true)
+      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(true)
+    }
+
     "return a Bad Request and errors when invalid data is submitted" in {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("value", "invalid value"))
       val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -99,8 +112,8 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe viewAsString(boundForm)
         redirectLocation(result) mustBe Some(onwardRoute.url)
+        FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe None
       }
     }
-
   }
 }
