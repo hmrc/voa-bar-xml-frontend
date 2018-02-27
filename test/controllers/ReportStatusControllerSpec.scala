@@ -16,30 +16,46 @@
 
 package controllers
 
-import connectors.FakeDataCacheConnector
+import connectors.{DataCacheConnector, FakeDataCacheConnector}
 import controllers.actions._
+import identifiers.VOAAuthorisedId
+import models.NormalMode
+import play.api.libs.json.Format
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import views.html.reportStatus
 
+import scala.concurrent.Future
+
 class ReportStatusControllerSpec extends ControllerSpecBase {
-
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
+  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap): ReportStatusController = {
+    FakeDataCacheConnector.resetCaptures()
+    FakeDataCacheConnector.save[Boolean]("", VOAAuthorisedId.toString, true)
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, dataRetrievalAction, new DataRequiredActionImpl)
+  }
 
+  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, dataRetrievalAction, new DataRequiredActionImpl)
+  }
   def viewAsString() = reportStatus(frontendAppConfig)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = controller().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
 
-    "if not authorized by VOA must go to the login page" in {}
+    "if not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageLoad()(fakeRequest)
 
-    "if authorized must request the LoginConnector for reporst currently associated with this account" in {}
+      status(result) mustBe SEE_OTHER
+    }
+
+    "if authorized must request the LoginConnector for reports currently associated with this account" in {}
   }
 }
 

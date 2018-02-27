@@ -23,6 +23,9 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
+import identifiers.{LoginId, VOAAuthorisedId}
+import models.NormalMode
+import play.api.mvc.{Action, AnyContent, Result}
 import views.html.reportStatus
 
 import scala.concurrent.Future
@@ -33,8 +36,12 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction) extends FrontendController with I18nSupport {
 
-  def onPageLoad = (getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = getData.async {
     implicit request =>
-      Ok(reportStatus(appConfig))
+      dataCacheConnector.getEntry[Boolean](request.externalId, VOAAuthorisedId.toString) map {
+        case Some(_) =>
+          Ok(reportStatus(appConfig))
+        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+      }
   }
 }
