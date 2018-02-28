@@ -77,7 +77,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       "return a 200 status when the send method is successfull using login model" in {
         val connector= new LoginConnector(getHttpMock(200), configuration, environment)
         val result = await(connector.send(login))
-          result match {
+        result match {
             case Success(status) => status mustBe 200
             case Failure(e) => assert(false)
           }

@@ -30,7 +30,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class ReportStatusConnector @Inject()(http: HttpClient,
-                                      authorisedUsername: String,
                                       val configuration: Configuration,
                                       environment: Environment) extends ServicesConfig {
   override protected def mode: Mode = environment.mode
@@ -39,7 +38,7 @@ class ReportStatusConnector @Inject()(http: HttpClient,
   val serviceUrl = baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
 
-  def request()(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
+  def request(authorisedUsername: String)(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
     http.GET(s"$serviceUrl${baseSegment}reportstatus/${authorisedUsername}")
       .map {
         response =>
