@@ -18,6 +18,42 @@ package connectors
 
 import javax.inject.Inject
 
-class ReportStatusConnector @Inject () {
+import play.api.{Configuration, Environment, Logger}
+import play.api.Mode.Mode
+import play.api.libs.json.{JsString, JsValue}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.config.ServicesConfig
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
+
+class ReportStatusConnector @Inject()(http: HttpClient,
+                                      authorisedUsername: String,
+                                      val configuration: Configuration,
+                                      environment: Environment) extends ServicesConfig {
+  override protected def mode: Mode = environment.mode
+  override protected def runModeConfiguration: Configuration = configuration
+
+  val serviceUrl = baseUrl("voa-bar")
+  val baseSegment = "/voa-bar/"
+
+  def request()(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
+    http.GET(s"$serviceUrl${baseSegment}reportstatus/${authorisedUsername}")
+      .map {
+        response =>
+          response.status match {
+            case 200 => Success(response.json)
+            case status => {
+              Logger.warn("Received status of " + status + " from upstream service when requesting report status")
+              Failure(new RuntimeException("Received status of " + status + " from upstream service when requesting report status"))
+            }
+          }
+      } recover {
+      case e =>
+        Logger.warn("Received exception " + e.getMessage + " from upstream service when requesting report status when requesting report status")
+        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when requesting report status"))
+    }
+  }
 }

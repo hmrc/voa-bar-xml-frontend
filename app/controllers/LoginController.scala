@@ -69,7 +69,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) flatMap {
               case Success(status) => {
-                dataCacheConnector.save[Boolean](request.externalId, VOAAuthorisedId.toString, true) map {
+                dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
                   cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
                 }
               }

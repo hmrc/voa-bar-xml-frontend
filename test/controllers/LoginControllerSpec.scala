@@ -89,8 +89,7 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
       status(result) mustBe SEE_OTHER
-      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(true)
-      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(true)
+      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some("value 1")
     }
 
     "return a Bad Request and errors when invalid data is submitted" in {

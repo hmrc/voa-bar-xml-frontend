@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class ReportStatusControllerSpec extends ControllerSpecBase {
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[Boolean]("", VOAAuthorisedId.toString, true)
+    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, "AUser")
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, dataRetrievalAction, new DataRequiredActionImpl)
   }
 

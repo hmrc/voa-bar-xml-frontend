@@ -38,8 +38,9 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   def onPageLoad(): Action[AnyContent] = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[Boolean](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(_) =>
+      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+        case Some(username) =>
+          // use the user name in the connector
           Ok(reportStatus(appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
