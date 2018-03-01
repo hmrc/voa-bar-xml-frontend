@@ -26,3 +26,5 @@ GET        /login                                       controllers.LoginControl
 POST       /login                                       controllers.LoginController.onSubmit(mode: Mode = NormalMode)
 GET        /changeLogin                                 controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeLogin                                 controllers.LoginController.onSubmit(mode: Mode = CheckMode)
+
+GET        /reportStatus                       controllers.ReportStatusController.onPageLoad()

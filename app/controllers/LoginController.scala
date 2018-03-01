@@ -25,14 +25,15 @@ import connectors.{DataCacheConnector, LoginConnector}
 import controllers.actions._
 import config.FrontendAppConfig
 import forms.LoginFormProvider
-import identifiers.LoginId
+import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, Mode}
 import play.api.mvc.Result
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{Navigator, UserAnswers}
 import views.html.login
 
 import scala.concurrent.Future
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 override val messagesApi: MessagesApi,
@@ -66,11 +67,15 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           val encryptedLogin = value.encrypt
 
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
-            loginConnector.send(encryptedLogin) map {
-              case Success(status) => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+            loginConnector.send(encryptedLogin) flatMap {
+              case Success(status) => {
+                dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
+                  cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+                }
+              }
               case Failure(e) => {
                 val formWithLoginErrors = form.withGlobalError("Invalid Login Details")
-                BadRequest(login(appConfig, formWithLoginErrors, mode))
+                Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
               }
             }
           }

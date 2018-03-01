@@ -48,7 +48,6 @@ class LoginConnector @Inject()(http: HttpClient,
 
   def send(input: Login) = sendJson(Json.toJson(input))
 
-
   def sendJson(json: JsValue): Future[Try[Int]] = {
     http.POST(s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
       .map {
@@ -56,8 +55,8 @@ class LoginConnector @Inject()(http: HttpClient,
           response.status match {
             case 200 => Success(200)
             case status => {
-              Logger.warn("Received status of " + status + " from upstream service")
-              Failure(new RuntimeException("Received status of " + status + " from upstream service"))
+              Logger.warn("Received status of " + status + " from upstream service when logging in")
+              Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
             }
           }
       } recover {
@@ -68,4 +67,3 @@ class LoginConnector @Inject()(http: HttpClient,
   }
 
 }
-

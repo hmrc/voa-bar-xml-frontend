@@ -35,14 +35,6 @@ import play.api.test.Helpers.{status, _}
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
-  def getHttpMock(returnedStatus: Int) = {
-    val httpMock = mock[HttpClient]
-    when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
-      any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
-    when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
-    httpMock
-  }
-
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
   val minimalJson = JsObject(Map[String, JsValue]())
@@ -51,6 +43,13 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
   val password = "pass"
   lazy val login = Login(username, password).encrypt
 
+  def getHttpMock(returnedStatus: Int) = {
+    val httpMock = mock[HttpClient]
+    when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+      any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
+    when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
+    httpMock
+  }
 
   "Login Connector" when {
 
@@ -78,7 +77,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       "return a 200 status when the send method is successfull using login model" in {
         val connector= new LoginConnector(getHttpMock(200), configuration, environment)
         val result = await(connector.send(login))
-          result match {
+        result match {
             case Success(status) => status mustBe 200
             case Failure(e) => assert(false)
           }

@@ -23,13 +23,26 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object FakeDataCacheConnector extends DataCacheConnector {
-  override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
+  var captures = Map[String, Any]()
+
+  override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = {
+    captures = captures + (key ->  value)
+    Future(CacheMap(cacheId, Map()))
+  }
+
+  def getCapture(key: String):Option[Any] = captures.get(key)
+
+  def resetCaptures() = captures = Map[String, Any]()
 
   override def remove(cacheId: String, key: String): Future[Boolean] = ???
 
   override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, Map())))
 
-  override def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] = ???
+  override def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
+    captures.get(key) match {
+      case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
+      case None => Future.successful(None)
+    }
 
   override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
 

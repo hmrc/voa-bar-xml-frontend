@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package base
+package views
 
-import config.FrontendAppConfig
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice._
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.Injector
-import play.api.test.FakeRequest
+import views.behaviours.ViewBehaviours
+import views.html.reportStatus
 
-trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
+class ReportStatusViewSpec extends ViewBehaviours {
 
-  def injector: Injector = app.injector
+  val messageKeyPrefix = "reportStatus"
 
-  def frontendAppConfig: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
+  def createView = () => reportStatus(frontendAppConfig)(fakeRequest, messages)
 
-  def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-
-  def fakeRequest = FakeRequest("", "")
-
-  def messages: Messages = messagesApi.preferred(fakeRequest)
-
-
+  "ReportStatus view" must {
+    behave like normalPage(createView, messageKeyPrefix)
+  }
 }
