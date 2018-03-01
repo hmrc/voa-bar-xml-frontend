@@ -48,7 +48,6 @@ class LoginConnector @Inject()(http: HttpClient,
 
   def send(input: Login) = sendJson(Json.toJson(input))
 
-
   def sendJson(json: JsValue): Future[Try[Int]] = {
     http.POST(s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
       .map {
@@ -68,4 +67,3 @@ class LoginConnector @Inject()(http: HttpClient,
   }
 
 }
-

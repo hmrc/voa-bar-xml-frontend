@@ -17,7 +17,6 @@
 package connectors
 
 import javax.inject.Inject
-
 import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
 import play.api.libs.json.{JsString, JsValue}
@@ -28,10 +27,10 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 class ReportStatusConnector @Inject()(http: HttpClient,
                                       val configuration: Configuration,
                                       environment: Environment) extends ServicesConfig {
+
   override protected def mode: Mode = environment.mode
   override protected def runModeConfiguration: Configuration = configuration
 

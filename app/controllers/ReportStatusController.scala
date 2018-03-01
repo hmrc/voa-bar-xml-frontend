@@ -27,15 +27,14 @@ import identifiers.{LoginId, VOAAuthorisedId}
 import models.NormalMode
 import play.api.mvc.{Action, AnyContent, Result}
 import views.html.reportStatus
-
 import scala.concurrent.Future
 
 class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
-                                         override val messagesApi: MessagesApi,
-                                         dataCacheConnector: DataCacheConnector,
-                                         reportStatusConnector: ReportStatusConnector,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction) extends FrontendController with I18nSupport {
+                                       override val messagesApi: MessagesApi,
+                                       dataCacheConnector: DataCacheConnector,
+                                       reportStatusConnector: ReportStatusConnector,
+                                       getData: DataRetrievalAction,
+                                       requireData: DataRequiredAction) extends FrontendController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = getData.async {
     implicit request =>
@@ -47,4 +46,3 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 }
-
