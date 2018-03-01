@@ -67,10 +67,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       val connector = new ReportStatusConnector(httpClient, configuration, environment)
       
       val result = await(connector.request("AnOtherUser"))
-      result match {
-        case Success(_) => assert(false)
-        case Failure(e) => assert(true)
-     }
+      assert(result.isFailure)
     }
 
   }
