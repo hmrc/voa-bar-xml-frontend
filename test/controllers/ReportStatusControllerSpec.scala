@@ -78,8 +78,10 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
     "if not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageLoad()(fakeRequest)
+      def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
       status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
     "if authorized must request the LoginConnector for reports currently associated with this account" in {}
