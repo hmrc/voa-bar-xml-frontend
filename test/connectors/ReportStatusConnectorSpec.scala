@@ -24,10 +24,8 @@ import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
 import scala.concurrent.Future
 import play.api.test.Helpers.{status, _}
-
 import scala.util.{Failure, Success, Try}
 
 class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
@@ -50,7 +48,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   val json = Json.parse(jsonStr)
 
   "Report status connector spec" must {
-    "given a username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
+    "given a baCode that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
       val httpClient = getHttpMock(200, Some(json))
       val connector = new ReportStatusConnector(httpClient, configuration, environment)
 

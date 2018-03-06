@@ -81,3 +81,10 @@ welcome.councilTax.description = Submit your Council Tax reports and view your p
 
 reportStatus.title = Report Status
 reportStatus.heading = Submission history
+
+header.links.home = Home
+header.links.logout = Logout
+header.links.council-tax = Council Tax
+header.links.upload = Upload
+header.links.confirmation = Confirmation
+header.links.status = History
