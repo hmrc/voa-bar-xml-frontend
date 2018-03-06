@@ -43,7 +43,7 @@ class WelcomeControllerSpec extends ControllerSpecBase {
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
   }
 
-  def viewAsString() = welcome(frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = welcome(username, frontendAppConfig)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

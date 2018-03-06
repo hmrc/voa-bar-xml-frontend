@@ -35,7 +35,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(councilTaxUpload(appConfig))
+        case Some(username) => Ok(councilTaxUpload(username, appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }

@@ -42,11 +42,12 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 getData: DataRetrievalAction,
                                 requireData: DataRequiredAction,
                                 formProvider: LoginFormProvider,
-                                loginConnector: LoginConnector) extends FrontendController with I18nSupport {
+                                loginConnector: LoginConnector
+                               ) extends FrontendController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode) = getData {
+  def onPageLoad(mode: Mode) = getData.async {
     implicit request =>
       val preparedForm = request.userAnswers.flatMap(_.login) match {
         case None => form
@@ -55,7 +56,9 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           form.fill(loginWithBlankedPassword)
         }
       }
-      Ok(login(appConfig, preparedForm, mode))
+      dataCacheConnector.remove(request.externalId, VOAAuthorisedId.toString) map {
+        result => Ok(login(appConfig, preparedForm, mode))
+      }
   }
 
   def onSubmit(mode: Mode) = getData.async {

@@ -42,7 +42,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
       new DataRequiredActionImpl, FakeDataCacheConnector)
   }
 
-  def viewAsString() = councilTaxUpload(frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = councilTaxUpload(username, frontendAppConfig)(fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 

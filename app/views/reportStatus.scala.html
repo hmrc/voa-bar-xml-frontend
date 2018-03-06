@@ -16,12 +16,14 @@
 
 @import config.FrontendAppConfig
 
-@(appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reportStatus.title"),
     appConfig = appConfig,
     bodyClasses = None) {
+
+    @components.service_info(baCode)
 
     @components.heading("reportStatus.heading")
 }

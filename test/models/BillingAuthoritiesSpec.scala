@@ -30,7 +30,7 @@ class BillingAuthoritiesSpec extends SpecBase{
     }
 
     "Return the Billing Authority Code if no baCode is found related to the given code even if the user is logged in" in {
-      BillingAuthorities.find(nonExistingBaCode) mustBe nonExistingBaCode.toUpperCase
+      BillingAuthorities.find(nonExistingBaCode) mustBe nonExistingBaCode
     }
   }
 }

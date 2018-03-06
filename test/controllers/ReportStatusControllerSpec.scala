@@ -38,6 +38,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   implicit val hc = mock[HeaderCarrier]
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
+  val username = "AUser"
 
   def getHttpMock(returnedStatus: Int, returnedJson: Option[JsValue]) = {
     val httpMock = mock[HttpClient]
@@ -57,7 +58,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, "AUser")
+    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
   }
 
@@ -65,7 +66,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     FakeDataCacheConnector.resetCaptures()
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
   }
-  def viewAsString() = reportStatus(frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = reportStatus(username, frontendAppConfig)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 

@@ -16,19 +16,26 @@
 
 package views
 
+import controllers.routes
+import models.NormalMode
+import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.councilTaxStart
 
 class CouncilTaxStartViewSpec extends ViewBehaviours {
 
+  val username = "BA0235"
   val messageKeyPrefix = "councilTaxStart"
 
-  def createView = () => councilTaxStart(frontendAppConfig)(fakeRequest, messages)
+  val councilTaxStartFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxStartController"))
+
+  def createView = () => councilTaxStart(username, frontendAppConfig)(councilTaxStartFakeRequest, messages)
+
+  lazy val doc = asDocument(createView())
 
   "CouncilTaxStart view" must {
     behave like normalPage(createView, messageKeyPrefix, "paragraph", "submissions.url-title")
   }
-
 
   "contain Start button with the value Start now" in {
     val doc = asDocument(createView())
@@ -40,5 +47,22 @@ class CouncilTaxStartViewSpec extends ViewBehaviours {
     val doc = asDocument(createView())
     val href = doc.getElementById("start").attr("href")
     assert(href == controllers.routes.CouncilTaxStartController.goToCouncilTaxUploadPage().url.toString)
+  }
+
+  "Include an username element displaying the BA name based on given BA Code" in {
+    val user = doc.getElementById("username-element").text
+    user mustBe "Bedford"
+  }
+
+  "Include a logout link which redirects the users to the login page" in {
+    val href = doc.getElementById("logout-link").attr("href")
+    href mustBe controllers.routes.LoginController.onPageLoad(NormalMode).url.toString
+  }
+
+  "Have a home link in the top navigation bar which links to the welcome page and display '> Council Tax' next to the home link" in {
+    val href = doc.getElementById("homelink").attr("href")
+    val currentPageName = doc.getElementById("council-tax-element").text
+    href mustBe routes.WelcomeController.onPageLoad().url.toString
+    currentPageName mustBe "> Council Tax"
   }
 }
