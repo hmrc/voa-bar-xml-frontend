@@ -16,38 +16,54 @@
 
 package controllers
 
+import connectors.FakeDataCacheConnector
 import controllers.actions._
+import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.test.Helpers._
-import utils.{FakeNavigator, Navigator}
+import utils.FakeNavigator
 import views.html.welcome
 
 class WelcomeControllerSpec extends ControllerSpecBase {
 
+  val username = "AUser"
+
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new WelcomeController(frontendAppConfig, messagesApi,
-      dataRetrievalAction, new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute))
+  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    new WelcomeController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl,
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+  }
+
+  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    new WelcomeController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl,
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+  }
 
   def viewAsString() = welcome(frontendAppConfig)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = controller().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
 
+    "if not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageLoad()(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
     "return a redirect when calling goToCouncilTaxStartPage" in {
-      val result = controller().goToCouncilTaxStartPage()(fakeRequest)
+      val result = loggedInController().goToCouncilTaxStartPage()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }
 }
-
-
-
-

@@ -45,8 +45,8 @@ site.start = Start now
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-confirmation.title = confirmation
-confirmation.heading = confirmation
+confirmation.title = Confirmation
+confirmation.heading = Confirmation
 
 councilTaxStart.title = Council Tax
 councilTaxStart.heading = Council Tax
@@ -79,8 +79,5 @@ welcome.heading = Welcome
 welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 
-
-
-
-reportStatus.title = reportStatus
-reportStatus.heading = reportStatus
+reportStatus.title = Report Status
+reportStatus.heading = Submission history

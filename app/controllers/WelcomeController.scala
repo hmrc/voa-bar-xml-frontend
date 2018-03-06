@@ -17,25 +17,29 @@
 package controllers
 
 import javax.inject.Inject
-
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
-import identifiers.WelcomeId
+import connectors.DataCacheConnector
+import identifiers.{VOAAuthorisedId, WelcomeId}
 import models.NormalMode
 import views.html.welcome
 import utils.Navigator
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
-                                         override val messagesApi: MessagesApi,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         navigator: Navigator) extends FrontendController with I18nSupport {
+                                  override val messagesApi: MessagesApi,
+                                  getData: DataRetrievalAction,
+                                  requireData: DataRequiredAction,
+                                  navigator: Navigator,
+                                  dataCacheConnector: DataCacheConnector) extends FrontendController with I18nSupport {
 
-  def onPageLoad = (getData andThen requireData) {
+  def onPageLoad = getData.async {
     implicit request =>
-      Ok(welcome(appConfig))
+      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+        case Some(username) => Ok(welcome(appConfig))
+        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+      }
   }
 
   def goToCouncilTaxStartPage() = (getData andThen requireData) { implicit request =>
