@@ -16,7 +16,9 @@
 
 package controllers
 
+import connectors.FakeDataCacheConnector
 import controllers.actions._
+import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.test.Helpers._
 import utils.FakeNavigator
@@ -24,30 +26,44 @@ import views.html.councilTaxStart
 
 class CouncilTaxStartControllerSpec extends ControllerSpecBase {
 
+  val username = "AUser"
+
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CouncilTaxStartController(frontendAppConfig, messagesApi,
-      dataRetrievalAction, new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute))
+  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    new CouncilTaxStartController(frontendAppConfig, messagesApi, dataRetrievalAction,
+      new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+  }
+
+  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    new CouncilTaxStartController(frontendAppConfig, messagesApi, dataRetrievalAction,
+      new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+  }
 
   def viewAsString() = councilTaxStart(frontendAppConfig)(fakeRequest, messages).toString
 
   "CouncilTaxStart Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = controller().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
 
+    "if not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageLoad()(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
     "return a redirect when calling goToCouncilTaxUploadPage" in {
-      val result = controller().goToCouncilTaxUploadPage()(fakeRequest)
+      val result = loggedInController().goToCouncilTaxUploadPage()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }
 }
-
-
-
-

@@ -17,22 +17,26 @@
 package controllers
 
 import javax.inject.Inject
-
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
+import connectors.DataCacheConnector
+import identifiers.VOAAuthorisedId
+import models.NormalMode
 import views.html.councilTaxUpload
 
-import scala.concurrent.Future
-
 class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
-                                         override val messagesApi: MessagesApi,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction) extends FrontendController with I18nSupport {
+                                           override val messagesApi: MessagesApi,
+                                           getData: DataRetrievalAction,
+                                           requireData: DataRequiredAction,
+                                           dataCacheConnector: DataCacheConnector) extends FrontendController with I18nSupport {
 
-  def onPageLoad = (getData andThen requireData) {
+  def onPageLoad = getData.async {
     implicit request =>
-      Ok(councilTaxUpload(appConfig))
+      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+        case Some(username) => Ok(councilTaxUpload(appConfig))
+        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+      }
   }
 }

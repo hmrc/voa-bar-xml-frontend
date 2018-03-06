@@ -16,29 +16,48 @@
 
 package controllers
 
+import connectors.FakeDataCacheConnector
 import controllers.actions._
+import identifiers.VOAAuthorisedId
+import models.NormalMode
 import play.api.test.Helpers._
 import views.html.confirmation
 
 class ConfirmationControllerSpec extends ControllerSpecBase {
 
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new ConfirmationController(frontendAppConfig, messagesApi,
-      dataRetrievalAction, new DataRequiredActionImpl)
+  val username = "AUser"
+
+  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+
+  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
+      new DataRequiredActionImpl, FakeDataCacheConnector)
+  }
+
+  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+    FakeDataCacheConnector.resetCaptures()
+    new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
+      new DataRequiredActionImpl, FakeDataCacheConnector)
+  }
 
   def viewAsString() = confirmation(frontendAppConfig)(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = controller().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
+
+    "if not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageLoad()(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
   }
 }
-
-
-
-

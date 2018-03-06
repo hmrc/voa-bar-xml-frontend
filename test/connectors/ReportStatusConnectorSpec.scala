@@ -42,10 +42,10 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   }
 
   val jsonStr =
-    """[{"BAReportNumber": 987, "Errors": [], "SubmissionDate": "1-Mar-2018 09:15:26"},
-      | {"BAReportNumber": 987, "Errors": [{"Code": 1001, "Detail": ["BAidentityNumber", "1656", "Bad formatting"]}, {"Code": 1002, "Detail": ["DateSent", "28-02-2018", "Invalid Format"]}], "SubmissionDate": "28-Feb-2018 14:28:36"},
-      | {"BAReportNumber": 985, "Errors": [{"Code": 1000, "Detail": ["Town", "", "Empty Field Town"]}, {"Code": 1003, "Detail": ["DateSent", "27-01-2018", "Invalid Format"]}], "SubmissionDate": "27-Feb-2018 11:12:45"},
-      | {"BAReportNumber": 766, "Errors": [], "SubmissionDate": "1-Jan-2018 17:08:53"}]""".stripMargin
+    """[{"Reference": "A34DF1", "Type": "CT", "FileName": "FILE1.XML", "TotalReports": 10, "FailedReports": 0, "Errors": [], "SubmissionDate": "1-Mar-2018 09:15:26"},
+        {"Reference": "B23SD1", "Type": "CT", "FileName": "FILE2.XML", "TotalReports": 16, "FailedReports": 2, "Errors": [{"Code": 1001, "Details": ["32182", "Postcode", "NW111NW"]}, {"Code": 1002, "Details": ["32183", "DateSent", "28-02-2018"]}], "SubmissionDate": "28-Feb-2018 14:28:36"},
+        {"Reference": "DFG123", "Type": "CT", "FileName": "FILE3.XML", "TotalReports": 20, "FailedReports": 2, "Errors": [{"Code": 1000, "Details": ["111", "Town", ""]}, {"Code": 1003, "Details": ["112", "DateSent", "27-01-2018"]}], "SubmissionDate": "27-Feb-2018 11:12:45"},
+        {"Reference": "G53DF1", "Type": "CT", "FileName": "FILE4.XML", "TotalReports": 45, "FailedReports": 0, "Errors": [], "SubmissionDate": "1-Jan-2018 17:08:53"}]""".stripMargin
 
   val json = Json.parse(jsonStr)
 
