@@ -55,7 +55,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
     "provided with a Contact Login Input" must {
 
-      "call the Microservice with the given JSON for baCode provided" in {
+      "call the Microservice with the given JSON for username provided" in {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
         implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])

@@ -23,7 +23,7 @@ class LoginFormProviderSpec extends StringFieldBehaviours {
 
   val form = new LoginFormProvider()()
 
-  ".baCode" must {
+  ".username" must {
 
     val fieldName = "username"
     val requiredKey = "login.error.username.required"

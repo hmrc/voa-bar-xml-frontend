@@ -48,7 +48,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   val json = Json.parse(jsonStr)
 
   "Report status connector spec" must {
-    "given a baCode that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
+    "given an username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
       val httpClient = getHttpMock(200, Some(json))
       val connector = new ReportStatusConnector(httpClient, configuration, environment)
 
