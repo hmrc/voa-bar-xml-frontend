@@ -42,7 +42,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase {
       new DataRequiredActionImpl, FakeDataCacheConnector)
   }
 
-  def viewAsString() = confirmation(frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = confirmation(username, frontendAppConfig)(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 

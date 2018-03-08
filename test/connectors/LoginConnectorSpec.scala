@@ -75,18 +75,18 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a 200 status when the send method is successfull using login model" in {
-        val connector= new LoginConnector(getHttpMock(200), configuration, environment)
+        val connector = new LoginConnector(getHttpMock(200), configuration, environment)
         val result = await(connector.send(login))
         result match {
-            case Success(status) => status mustBe 200
-            case Failure(e) => assert(false)
-          }
+          case Success(status) => status mustBe 200
+          case Failure(e) => assert(false)
+        }
       }
 
       "return a failure representing the error when send method fails" in {
         val connector = new LoginConnector(getHttpMock(500), configuration, environment)
         val result = await(connector.send(login))
-          assert(result.isFailure)
+        assert(result.isFailure)
       }
 
     }
@@ -115,16 +115,16 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       "return a 200 status when the send method is successful" in {
         val connector = new LoginConnector(getHttpMock(200), configuration, environment)
         val result = await(connector.sendJson(minimalJson))
-          result match {
-            case Success(status) => status mustBe 200
-            case Failure(e) => assert(false)
+        result match {
+          case Success(status) => status mustBe 200
+          case Failure(e) => assert(false)
         }
       }
 
       "return failure respresenting the error if the backend service call fails using minimal Json" in {
         val connector = new LoginConnector(getHttpMock(500), configuration, environment)
         val result = await(connector.sendJson(minimalJson))
-          assert(result.isFailure)
+        assert(result.isFailure)
       }
 
       "return a failure if the data transfer call throws an exception" in {
@@ -139,5 +139,3 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
   }
 }
-
-

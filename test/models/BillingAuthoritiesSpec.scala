@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
+package models
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+import base.SpecBase
 
-@main_template(
-    title = messages("welcome.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+class BillingAuthoritiesSpec extends SpecBase{
 
-    @components.service_info(baCode)
+  val existingBaCode = "BA0230"
+  val nonExistingBaCode = "ba9999"
 
-    @components.heading("welcome.heading")
+  "BillingAuthorities" must {
 
-    <h3 class="heading-medium">
-        <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
-    </h3>
+    "Return the name of the Billing Authority for an existing Billing Authority Code" in {
+      BillingAuthorities.find(existingBaCode) mustBe Some("Luton")
+    }
 
-    <p>
-    @messages("welcome.councilTax.description")
-    </p>
+    "Return None if no baCode is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(nonExistingBaCode) mustBe None
+    }
+  }
 }

@@ -16,16 +16,42 @@
 
 package views
 
+import controllers.routes
+import models.NormalMode
+import org.jsoup.nodes.Document
+import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.reportStatus
 
 class ReportStatusViewSpec extends ViewBehaviours {
 
+  val username = "BA0350"
   val messageKeyPrefix = "reportStatus"
 
-  def createView = () => reportStatus(frontendAppConfig)(fakeRequest, messages)
+  val reportStatusFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ReportStatusController"))
+
+  def createView = () => reportStatus(username, frontendAppConfig)(reportStatusFakeRequest, messages)
+
+  lazy val doc = asDocument(createView())
 
   "ReportStatus view" must {
     behave like normalPage(createView, messageKeyPrefix)
+
+    "Include an username element displaying the BA name based on given BA Code" in {
+      val user = doc.getElementById("username-element").text
+      user mustBe "Slough"
+    }
+
+    "Include a logout link which redirects the users to the login page" in {
+      val href = doc.getElementById("logout-link").attr("href")
+      href mustBe controllers.routes.LoginController.onPageLoad(NormalMode).url.toString
+    }
+
+    "Have a home link in the top navigation bar which links to the welcome page and display '> History' next to the home link" in {
+      val href = doc.getElementById("homelink").attr("href")
+      val currentPageName = doc.getElementById("status-element").text
+      href mustBe routes.WelcomeController.onPageLoad().url.toString
+      currentPageName mustBe "> History"
+    }
   }
 }

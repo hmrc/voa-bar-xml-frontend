@@ -35,3 +35,16 @@ p.font-xsmall{
 .hero__heading-small {
   display: block;
 }
+
+.breadcrumb-nav__item--trail-pipe {
+
+  &:after {
+    content: "|";
+    margin-left:.5em;
+    margin-right:.2em;
+  }
+}
+
+.language-nav{
+  padding: 8px 0 10px 0;
+}

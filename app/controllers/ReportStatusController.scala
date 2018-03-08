@@ -41,7 +41,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
         case Some(username) =>
           val reportStatuses = reportStatusConnector.request(username)
-          Ok(reportStatus(appConfig))
+          Ok(reportStatus(username, appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }

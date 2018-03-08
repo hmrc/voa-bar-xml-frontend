@@ -43,7 +43,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase {
       new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
   }
 
-  def viewAsString() = councilTaxStart(frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = councilTaxStart(username, frontendAppConfig)(fakeRequest, messages).toString
 
   "CouncilTaxStart Controller" must {
 
