@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
+package models
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+import org.scalatestplus.play.PlaySpec
 
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+class ErrorSpec extends PlaySpec {
 
-    @components.service_info(baCode)
+  val code = "code1"
+  val errorValue = Seq("testing error")
 
-    @components.heading("reportStatus.heading")
+  val error = Error(code, errorValue)
 
-    @components.submission_panel("BA0101", "CT", "ct1.xml", 120, 2, "28-Feb-2018 14:28:36", Seq(Error("1000", Seq("1001", "DateSent", "12-02-2018")),
-        Error("1001", Seq("1002", "Postcode", "AA11AA"))))
+  "Given an error code and an error value produce an Error model" in {
+    error.code mustBe code
+    error.values mustBe errorValue
+  }
 
 }

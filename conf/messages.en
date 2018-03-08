@@ -89,3 +89,17 @@ header.links.council-tax = Council Tax
 header.links.upload = Upload
 header.links.confirmation = Confirmation
 header.links.status = History
+
+status.last-submission.title = LAST SUBMISSION
+status.ba-code.title = BA Code
+status.type.title = Type
+status.filename.title = Filename
+status.total-reports.title = Total reports
+status.failed-reports.title = Failed reports
+status.submitted.title = Submitted
+status.success.paragraph = The file was submitted successfully without any errors.
+status.failed.para1 = The file was rejected because of
+status.failed.para2 = invalid reports.
+status.report.title = Report No
+status.report.para = failed with the following errors:
+
