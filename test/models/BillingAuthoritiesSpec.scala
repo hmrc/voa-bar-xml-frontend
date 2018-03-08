@@ -26,11 +26,11 @@ class BillingAuthoritiesSpec extends SpecBase{
   "BillingAuthorities" must {
 
     "Return the name of the Billing Authority for an existing Billing Authority Code" in {
-      BillingAuthorities.find(existingBaCode) mustBe "Luton"
+      BillingAuthorities.find(existingBaCode) mustBe Some("Luton")
     }
 
-    "Return the Billing Authority Code if no baCode is found related to the given code even if the user is logged in" in {
-      BillingAuthorities.find(nonExistingBaCode) mustBe nonExistingBaCode
+    "Return None if no baCode is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(nonExistingBaCode) mustBe None
     }
   }
 }

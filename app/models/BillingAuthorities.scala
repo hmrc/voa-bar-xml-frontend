@@ -17,7 +17,8 @@
 package models
 
 object BillingAuthorities {
-  def find(baCode: String) = billingAuthorities.getOrElse(baCode.toUpperCase, baCode)
+
+  def find(baCode: String) = billingAuthorities.get(baCode.toUpperCase)
 
   val billingAuthorities = Map(
     "BA0114" -> "Bath and North East Somerset",

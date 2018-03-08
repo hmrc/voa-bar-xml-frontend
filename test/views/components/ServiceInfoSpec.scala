@@ -24,7 +24,7 @@ import play.routing.Router.Tags._
 
 class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
 
-  val baCode = "AUser"
+  val baCode = "BA0116"
   val welcomeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
   val councilTaxStartRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxStartController"))
   val councilTaxUploadRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxUploadController"))
@@ -62,7 +62,7 @@ class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc1.getElementById("username-element").text
-      user mustBe baCode
+      user mustBe "Bristol"
     }
 
     "Include a logout link which redirects the users to the login page" in {

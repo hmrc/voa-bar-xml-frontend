@@ -42,6 +42,7 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val formProvider = new LoginFormProvider()
   val form = formProvider()
+  val validBACode = "ba0114"
 
   val loginConnector = mock[LoginConnector]
   when(loginConnector.send(any[Login])) thenReturn Future.successful(Success(200))
@@ -76,7 +77,7 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "redirect to the next page when valid data is submitted" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
+      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 
@@ -85,16 +86,26 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "logging in must cache an authorization token" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
+      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
       status(result) mustBe SEE_OTHER
-      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some("value 1")
+      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(validBACode)
     }
 
     "return a Bad Request and errors when invalid data is submitted" in {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("value", "invalid value"))
       val boundForm = form.bind(Map("value" -> "invalid value"))
+
+      val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
+
+      status(result) mustBe BAD_REQUEST
+      contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
+    "return a Bad Request and errors when valid bacode is submitted but no Council Name can be found related to the bacode" in {
+      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "ba0000"), ("password", "value"))
+      val boundForm = form.withGlobalError(messages("error.invalid_details"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 

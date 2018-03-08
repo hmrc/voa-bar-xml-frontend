@@ -19,21 +19,20 @@ package controllers
 import javax.inject.Inject
 
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import connectors.{DataCacheConnector, LoginConnector}
 import controllers.actions._
 import config.FrontendAppConfig
 import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.{Login, Mode}
-import play.api.mvc.Result
-import uk.gov.hmrc.http.cache.client.CacheMap
+import models.{BillingAuthorities, Login, Mode}
+import play.api.Logger
 import utils.{Navigator, UserAnswers}
 import views.html.login
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 override val messagesApi: MessagesApi,
@@ -72,12 +71,21 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) flatMap {
               case Success(status) => {
-                dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
-                  cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+                BillingAuthorities.find(value.username) match {
+                  case Some(councilName) => {
+                    dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
+                      cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+                    }
+                  }
+                  case None => {
+                    Logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
+                    val formWithLoginErrors = form.withGlobalError(Messages("error.invalid_details"))
+                    Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
+                  }
                 }
               }
               case Failure(e) => {
-                val formWithLoginErrors = form.withGlobalError("Invalid Login Details")
+                val formWithLoginErrors = form.withGlobalError(Messages("error.invalid_details"))
                 Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
               }
             }

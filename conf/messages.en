@@ -20,6 +20,7 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There’s been a problem
 error.summary.text = Check the following
+error.invalid_details = Invalid Login Details
 
 index.title = voa-bar-xml-frontend
 index.heading = voa-bar-xml-frontend
