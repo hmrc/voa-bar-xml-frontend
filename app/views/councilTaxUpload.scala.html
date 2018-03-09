@@ -15,8 +15,12 @@
  *@
 
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.play.views.html._
+@import controllers.routes._
+@import utils.FormHelpers
+@import models.Mode
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig, fileUploadForm: Form[_])(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("councilTaxUpload.title"),
@@ -35,10 +39,22 @@
         <li>@messages("councilTaxUpload.info.files")</li>
     </ul>
 
-    <p><h5 class="alert">
-    @messages("councilTaxUpload.message1")
-      <br />
-      <br />
-    @messages("councilTaxUpload.message2")
-    </h5></p>
+    @helpers.form(action = routes.CouncilTaxUploadController.onSubmit(baCode), 'enctype -> "multipart/form-data") {
+
+        @components.error_summary(fileUploadForm.errors)
+
+        @helper.inputFile(fileUploadForm("xml"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload")
+
+        @components.submit_button()
+
+        <p><h5 class="alert">
+           @messages("councilTaxUpload.message1")
+           <br />
+           <br />
+           @messages("councilTaxUpload.message2")
+        </h5></p>
+
+    }
+
+
 }

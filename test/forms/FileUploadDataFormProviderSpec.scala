@@ -14,12 +14,32 @@
  * limitations under the License.
  */
 
-package utils
+package forms
 
-import uk.gov.hmrc.http.cache.client.CacheMap
-import identifiers._
-import models._
 
-class UserAnswers(val cacheMap: CacheMap) extends Enumerable.Implicits {
-  def login: Option[Login] = cacheMap.getEntry[Login](LoginId.toString)
+import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
+
+class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
+
+  val form = new FileUploadDataFormProvider()()
+
+  ".xml" must {
+
+    val fieldName = "xml"
+    val requiredKey = "councilTaxUpload.error.xml.required"
+    val lengthKey = "councilTaxUpload.error.xml.length"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      nonEmptyString
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

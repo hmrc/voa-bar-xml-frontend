@@ -18,6 +18,7 @@ GET        /councilTaxStart                             controllers.CouncilTaxSt
 GET        /goToCouncilTaxUpload                        controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
 
 GET        /councilTaxUpload                            controllers.CouncilTaxUploadController.onPageLoad()
+POST       /councilTaxUpload                            controllers.CouncilTaxUploadController.onSubmit(mode: Mode = NormalMode, baCode: String)
 
 GET        /welcome                                     controllers.WelcomeController.onPageLoad()
 GET        /goToCouncilTaxStart                         controllers.WelcomeController.goToCouncilTaxStartPage()

@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit messages: Messages)
+package models
 
-<div class="section">
-    <button id="submit" class="button">@messages("site.submit")</button>
-</div>
+import base.SpecBase
+
+class FileUploadDataSpec extends SpecBase {
+
+  val xml = """<head><body>Some data</body></head>"""
+
+  "Given an xml string create a FileUploadData model" in {
+    val result = FileUploadData(xml)
+
+    result.xml mustBe xml
+  }
+}

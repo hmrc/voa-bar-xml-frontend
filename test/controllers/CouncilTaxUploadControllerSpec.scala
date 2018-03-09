@@ -18,9 +18,12 @@ package controllers
 
 import connectors.FakeDataCacheConnector
 import controllers.actions._
+import forms.FileUploadDataFormProvider
 import identifiers.VOAAuthorisedId
 import models.NormalMode
+import play.api.data.Form
 import play.api.test.Helpers._
+import utils.FakeNavigator
 import views.html.councilTaxUpload
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
@@ -29,20 +32,23 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
+  val formProvider = new FileUploadDataFormProvider()
+  val form = formProvider()
+
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, FakeDataCacheConnector)
+      new DataRequiredActionImpl, FakeDataCacheConnector, formProvider,new FakeNavigator(desiredRoute = onwardRoute))
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, FakeDataCacheConnector)
+      new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute))
   }
 
-  def viewAsString() = councilTaxUpload(username, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form)(fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 
