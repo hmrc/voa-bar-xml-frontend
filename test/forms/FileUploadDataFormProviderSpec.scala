@@ -16,8 +16,8 @@
 
 package forms
 
-
 import forms.behaviours.StringFieldBehaviours
+import models.FileUploadData
 import play.api.data.FormError
 
 class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
@@ -28,12 +28,11 @@ class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "xml"
     val requiredKey = "councilTaxUpload.error.xml.required"
-    val lengthKey = "councilTaxUpload.error.xml.length"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      nonEmptyString
+      "some xml"
     )
 
     behave like mandatoryField(

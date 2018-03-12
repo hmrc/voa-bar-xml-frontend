@@ -16,19 +16,23 @@
 
 package controllers
 
+import java.io.File
 import connectors.FakeDataCacheConnector
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.data.Form
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc.MultipartFormData
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.html.councilTaxUpload
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
 
-  val username = "AUser"
+  val username = "BA0114"
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -65,5 +69,80 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase {
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
+
+    "redirect to the next page when valid data is submitted" in {
+      val path = getClass.getResource("/valid.xml")
+      val file = new File(path.getPath)
+      val tempFile = new TemporaryFile(file)
+
+      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
+
+      val req = fakeRequest.withBody( MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
+
+      val result = loggedInController().onSubmit(NormalMode, username)(req)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "return a Bad Request and errors when invalid file format is submitted" in {
+      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.fileType"))
+      val path = getClass.getResource("/noXmlFile.txt")
+      val file = new File(path.getPath)
+      val tempFile = new TemporaryFile(file)
+
+      val part = FilePart[TemporaryFile](key = "xml", filename = "noXmlFile.txt", contentType = None, ref = tempFile)
+
+      val req = fakeRequest.withBody( MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
+
+      val result = loggedInController().onSubmit(NormalMode, username)(req)
+
+      status(result) mustBe BAD_REQUEST
+      contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
+    "return a Bad Request and errors when no file is submitted" in {
+      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
+
+      val req = fakeRequest.withBody( MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(), badParts = Nil))
+
+      val result = loggedInController().onSubmit(NormalMode, username)(req)
+
+      status(result) mustBe BAD_REQUEST
+      contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
+    "return a Bad Request and errors when a file over 2 Mb is submitted" in {
+      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.length"))
+      val path = getClass.getResource("/tooLarge.xml")
+      val file = new File(path.getPath)
+      val tempFile = new TemporaryFile(file)
+
+      val part = FilePart[TemporaryFile](key = "xml", filename = "tooLarge.xml", contentType = None, ref = tempFile)
+
+      val req = fakeRequest.withBody( MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
+
+      val result = loggedInController().onSubmit(NormalMode, username)(req)
+
+      status(result) mustBe BAD_REQUEST
+      contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
+    "return a Bad Request and errors when an empty file is submitted" in {
+      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
+      val path = getClass.getResource("/empty.xml")
+      val file = new File(path.getPath)
+      val tempFile = new TemporaryFile(file)
+
+      val part = FilePart[TemporaryFile](key = "xml", filename = "empty.xml", contentType = None, ref = tempFile)
+
+      val req = fakeRequest.withBody( MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
+
+      val result = loggedInController().onSubmit(NormalMode, username)(req)
+
+      status(result) mustBe BAD_REQUEST
+      contentAsString(result) mustBe viewAsString(boundForm)
+    }
+
   }
 }

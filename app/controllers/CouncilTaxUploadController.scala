@@ -27,11 +27,14 @@ import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import forms.FileUploadDataFormProvider
-import identifiers.VOAAuthorisedId
-import models.{Mode, NormalMode}
+import identifiers.{CouncilTaxUploadId, VOAAuthorisedId}
+import models.{FileUploadData, Mode, NormalMode}
 import org.apache.commons.io.IOUtils
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc.{Action, AnyContent}
+import play.mvc.BodyParser.MultipartFormData
 import views.html.{confirmation, councilTaxUpload}
-import utils.Navigator
+import utils.{Navigator, UserAnswers}
 
 import scala.concurrent.Future
 
@@ -55,19 +58,26 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   }
 
   def onSubmit(mode: Mode, baCode: String) = getData.async(parse.multipartFormData) { implicit request =>
-    request.body.file("xml").map {xml =>
-      val content = IOUtils.toString(new FileInputStream(xml.ref.file))
+    request.body.file("xml").map { xml =>
+      val fileContent = IOUtils.toString(new FileInputStream(xml.ref.file))
       val fileSize = xml.ref.file.length
-      println(">Length" + fileSize)
+      val fileName = xml.filename
 
       fileSize match {
-        case a: Long if(a <= 0) => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required"))))
-        case b: Long if(b > 0 && b <= maxFileSize) =>  Future.successful(Ok(confirmation(baCode, appConfig)))
-        case c: Long if(c > maxFileSize) => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.length"))))
+        case a: Long if (a <= 0) => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required"))))
+        case b: Long if (b > 0 && b <= maxFileSize) => {
+          if (fileName.endsWith(".xml")) {
+            dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) map {
+              cm => Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cm)))
+            }
+          }
+          else
+            Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.fileType"))))
+        }
+        case c: Long if (c > maxFileSize) => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.length"))))
       }
     }.getOrElse(Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required")))))
 
   }
-
 
 }

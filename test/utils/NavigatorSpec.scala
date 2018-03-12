@@ -51,6 +51,16 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         CouncilTaxStartId.toString mustBe "counciltaxstart"
         navigator.nextPage(CouncilTaxStartId, NormalMode) (mockUserAnswers) mustBe routes.CouncilTaxUploadController.onPageLoad()
       }
+
+      "on submit of valid xml file should redirect to Confirmation Page" in {
+        CouncilTaxUploadId.toString mustBe "counciltaxupload"
+        navigator.nextPage(CouncilTaxUploadId, NormalMode) (mockUserAnswers) mustBe routes.ConfirmationController.onPageLoad()
+      }
+
+      "confirmation page redirect when id is ConfirmationID" in {
+        ConfirmationId.toString mustBe "confirmation"
+        navigator.nextPage(ConfirmationId, NormalMode) (mockUserAnswers) mustBe routes.ConfirmationController.onPageLoad()
+      }
     }
 
     "in Check mode" must {

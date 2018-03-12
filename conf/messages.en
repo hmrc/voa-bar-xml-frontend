@@ -47,7 +47,14 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Confirmation
+confirmation.heading = Submission complete
+
+confirmation.subheading = We are processing your reports
+confirmation.file.received = We have received your file and we are processing your reports.
+confirmation.window.open = You do not need to keep this window open.
+confirmation.options.title = More Options
+confirmation.options.another = Upload more Council Tax reports
+confirmation.options.history = View your previous Council Tax submissions
 
 councilTaxStart.title = Council Tax
 councilTaxStart.heading = Council Tax
@@ -93,3 +100,4 @@ header.links.council-tax = Council Tax
 header.links.upload = Upload
 header.links.confirmation = Confirmation
 header.links.status = History
+
