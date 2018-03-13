@@ -33,7 +33,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix)
+    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title", "options.another", "options.history")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.getElementById("username-element").text
@@ -50,6 +50,16 @@ class ConfirmationViewSpec extends ViewBehaviours {
       val currentPageName = doc.getElementById("confirmation-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
       currentPageName mustBe "> Confirmation"
+    }
+
+    "Include an upload link which redirects the users to council tax upload page" in {
+      val href = doc.getElementById("upload-link").attr("href")
+      href mustBe controllers.routes.CouncilTaxUploadController.onPageLoad().url.toString
+    }
+
+    "Include a history link which redirects the users to council tax submissions history page" in {
+      val href = doc.getElementById("history-link").attr("href")
+      href mustBe controllers.routes.ReportStatusController.onPageLoad().url.toString
     }
   }
 }

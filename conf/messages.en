@@ -37,7 +37,7 @@ site.hidden-delete = Delete {0}
 site.hidden-edit = Change {0}
 site.no = No
 site.yes = Yes
-site.save_and_continue = Save and continue
+site.submit = Submit
 site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Login
@@ -47,7 +47,14 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Confirmation
+confirmation.heading = Submission complete
+
+confirmation.subheading = We are processing your reports
+confirmation.file.received = We have received your file and we are processing your reports.
+confirmation.window.open = You do not need to keep this window open.
+confirmation.options.title = More Options
+confirmation.options.another = Upload more Council Tax reports
+confirmation.options.history = View your previous Council Tax submissions
 
 councilTaxStart.title = Council Tax
 councilTaxStart.heading = Council Tax
@@ -63,6 +70,10 @@ councilTaxUpload.info.size = Files must be less than 2Mb in size
 councilTaxUpload.info.files = Previous XML files should not be resubmitted
 councilTaxUpload.message1 = If you wish to supply additional information, please email BARS@voa.gsi.gov.uk
 councilTaxUpload.message2 = To support your reports, please include the billing authority report number in the subject of your email.
+councilTaxUpload.error.xml.required = XML File Required
+councilTaxUpload.error.xml.length = Maximum file size is 2 Mb
+councilTaxUpload.error.xml.fileType =  Only XML files are permitted
+councilTaxUpload.xml = Please select an XML report
 
 login.title = Please login
 login.heading = Please login
@@ -89,3 +100,4 @@ header.links.council-tax = Council Tax
 header.links.upload = Upload
 header.links.confirmation = Confirmation
 header.links.status = History
+

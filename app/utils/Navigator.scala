@@ -30,7 +30,7 @@ class Navigator @Inject()() {
     LoginId -> (_ => routes.WelcomeController.onPageLoad()),
     WelcomeId -> (_ => routes.CouncilTaxStartController.onPageLoad()),
     CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
-    CouncilTaxUploadId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
+    CouncilTaxUploadId -> (_ => routes.ConfirmationController.onPageLoad()),
     ConfirmationId -> (_ => routes.ConfirmationController.onPageLoad())
   )
 

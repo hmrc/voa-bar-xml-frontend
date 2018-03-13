@@ -17,6 +17,7 @@
 package views
 
 import controllers.routes
+import forms.FileUploadDataFormProvider
 import models.NormalMode
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
@@ -27,15 +28,17 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
   val username = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
 
+  val form = new FileUploadDataFormProvider()()
+
   val councilTaxUploadFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxUploadController"))
 
-  def createView = () => councilTaxUpload(username, frontendAppConfig)(councilTaxUploadFakeRequest, messages)
+  def createView = () => councilTaxUpload(username, frontendAppConfig, form)(councilTaxUploadFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
     behave like normalPage(createView, messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.size", "info.files", "message1",
-      "message2")
+      "message2", "xml")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.getElementById("username-element").text
@@ -52,6 +55,12 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
       val currentPageName = doc.getElementById("upload-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
       currentPageName mustBe "> Upload"
+    }
+
+    "contain Submit button with the value Submit" in {
+      val doc = asDocument(createView())
+      val submitButton = doc.getElementById("submit").text()
+      submitButton mustBe messages("site.submit")
     }
   }
 }
