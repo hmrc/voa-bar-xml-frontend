@@ -19,19 +19,22 @@ package controllers
 
 import java.io.FileInputStream
 import javax.inject.Inject
+
 import config.FrontendAppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, UploadConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
-import identifiers.{CouncilTaxUploadId, VOAAuthorisedId}
-import models.{FileUploadData, Mode, NormalMode}
+import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
+import models.{FileUploadData, Login, Mode, NormalMode}
 import org.apache.commons.io.IOUtils
+import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.{Navigator, UserAnswers}
-import views.html.councilTaxUpload
+import views.html.{confirmation, councilTaxUpload}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
@@ -39,7 +42,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            requireData: DataRequiredAction,
                                            dataCacheConnector: DataCacheConnector,
                                            formProvider: FileUploadDataFormProvider,
-                                           navigator: Navigator) extends FrontendController with I18nSupport {
+                                           navigator: Navigator,
+                                           uploadConnector: UploadConnector) extends FrontendController with I18nSupport {
 
   val form = formProvider()
   val maxFileSize = 2 * 1024 * 1024
@@ -63,8 +67,18 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
         case a: Long if a <= 0 => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required"))))
         case b: Long if b <= maxFileSize => {
           if (fileName.endsWith(".xml")) {
-            dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) map {
-              cacheMap => Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cacheMap)))
+             dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) flatMap {
+              cacheMap =>
+                dataCacheConnector.getEntry[Login](request.externalId, LoginId.toString) map {
+                  case Some(loginDetails) => {
+                    uploadConnector.sendXml(fileContent) flatMap {
+                      case Success(submissionId) => Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cacheMap)))
+                      case Failure(e) => Redirect(routes.LoginController.onPageLoad(NormalMode))
+                    }
+                  }
+                  case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+                  //Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cacheMap)))
+                }
             }
           }
           else
@@ -72,7 +86,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
         }
         case _ => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.length"))))
       }
-    }.getOrElse(Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required")))))
+    }
+      .getOrElse(Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required")))))
 
   }
 

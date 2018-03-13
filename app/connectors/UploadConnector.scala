@@ -17,41 +17,53 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.{Configuration, Environment, Logger}
-import play.api.Mode.Mode
-import play.api.libs.json.{JsString, JsValue}
+
+import play.api.Logger
+import play.api.i18n.MessagesApi
+import play.api.libs.json._
+import models.Login
+
+import scala.util.{Failure, Success, Try}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReportStatusConnector @Inject()(http: HttpClient,
-                                      val configuration: Configuration,
-                                      environment: Environment) extends ServicesConfig {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment}
+
+class UploadConnector @Inject()(http: HttpClient,
+                               val configuration: Configuration,
+                               environment: Environment) extends ServicesConfig {
 
   override protected def mode: Mode = environment.mode
+
   override protected def runModeConfiguration: Configuration = configuration
 
+  implicit val hc: HeaderCarrier = HeaderCarrier()
   val serviceUrl = baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
+  val xmlContentTypeHeader = ("Content-Type", "application/xml")
 
-  def request(authorisedUsername: String)(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
-    http.GET(s"$serviceUrl${baseSegment}reportstatus/${authorisedUsername}")
+  //def send(input: Login) = sendJson(Json.toJson(input))
+
+  def sendXml(xml: String): Future[Try[JsValue]] = {
+    http.POST(s"$serviceUrl${baseSegment}login", xml, Seq(xmlContentTypeHeader))
       .map {
         response =>
           response.status match {
             case 200 => Success(response.json)
             case status => {
-              Logger.warn("Received status of " + status + " from upstream service when requesting report status")
-              Failure(new RuntimeException("Received status of " + status + " from upstream service when requesting report status"))
+              Logger.warn("Received status of " + status + " from upstream service when uploading am xml file")
+              Failure(new RuntimeException("Received status of " + status + " from upstream service when uploading an xml file"))
             }
           }
       } recover {
       case e =>
-        Logger.warn("Received exception " + e.getMessage + " from upstream service when requesting report status")
-        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when requesting report status"))
+        Logger.warn("Received exception " + e.getMessage + " from upstream service when uploading am xml file")
+        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when uploading am xml file"))
     }
   }
+
 }
