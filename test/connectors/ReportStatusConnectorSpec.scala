@@ -68,7 +68,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       assert(result.isFailure)
     }
 
-    "return a failure if the data transfer call throws an exception" in {
+    "return a failure if the report status connector call throws an exception" in {
       val httpMock = mock[HttpClient]
       when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
 
