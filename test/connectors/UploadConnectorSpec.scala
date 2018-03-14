@@ -76,7 +76,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         headersCaptor.getValue mustBe Seq(connector.xmlContentTypeHeader, userHeader, passHeader)
       }
 
-      "return a JsValue representing the submissionId Id when the send method is successfull using login model and xml content" in {
+      "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val connector = new UploadConnector(getHttpMock(200, Some(submissionId)), configuration, environment)
         val result = await(connector.sendXml(xmlContent, login))
         result match {
