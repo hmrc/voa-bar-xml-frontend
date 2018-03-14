@@ -25,15 +25,17 @@ import views.html.confirmation
 class ConfirmationViewSpec extends ViewBehaviours {
 
   val username = "BA0116"
+  val submissionId = "SId328473"
   val messageKeyPrefix = "confirmation"
   val confirmationFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ConfirmationController"))
 
-  def createView = () => confirmation(username, frontendAppConfig)(confirmationFakeRequest, messages)
+  def createView = () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title", "options.another", "options.history")
+    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title",
+      "options.another", "options.history", "submissionId")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.getElementById("username-element").text

@@ -16,7 +16,7 @@
 
 @import config.FrontendAppConfig
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(baCode: String, submissionId: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
     @main_template(
         title = messages("confirmation.title"),
@@ -27,6 +27,7 @@
 
         <div class="transaction-banner--complete">
             <h1 class="transaction-banner__heading">@messages("confirmation.heading")</h1>
+            <h2>@messages("confirmation.submissionId") @submissionId</h2>
             <p>@messages("confirmation.subheading")</p>
         </div>
 

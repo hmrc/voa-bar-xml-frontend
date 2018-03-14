@@ -18,20 +18,16 @@ package connectors
 
 import javax.inject.Inject
 
-import play.api.Logger
-import play.api.i18n.MessagesApi
-import play.api.libs.json._
 import models.Login
-
-import scala.util.{Failure, Success, Try}
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.Mode.Mode
-import play.api.{Configuration, Environment}
+import scala.util.{Failure, Success, Try}
 
 class UploadConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
@@ -44,16 +40,20 @@ class UploadConnector @Inject()(http: HttpClient,
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val serviceUrl = baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
-  val xmlContentTypeHeader = ("Content-Type", "application/xml")
+  val xmlContentTypeHeader = ("Content-Type", "text/plain")
 
-  //def send(input: Login) = sendJson(Json.toJson(input))
+  def generateUsernameHeader(username: String) = ("BA-Code", username)
 
-  def sendXml(xml: String): Future[Try[JsValue]] = {
-    http.POST(s"$serviceUrl${baseSegment}login", xml, Seq(xmlContentTypeHeader))
+  def generatePasswordHeader(password: String) = ("password", password)
+
+  def sendXml(xml: String, loginDetails: Login): Future[Try[String]] = {
+    val baCode = loginDetails.username
+    val password = loginDetails.password
+    http.POST(s"$serviceUrl${baseSegment}upload", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
       .map {
         response =>
           response.status match {
-            case 200 => Success(response.json)
+            case 200 => Success(response.body)
             case status => {
               Logger.warn("Received status of " + status + " from upstream service when uploading am xml file")
               Failure(new RuntimeException("Received status of " + status + " from upstream service when uploading an xml file"))

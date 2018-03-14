@@ -27,14 +27,14 @@ import forms.FileUploadDataFormProvider
 import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
 import models.{FileUploadData, Login, Mode, NormalMode}
 import org.apache.commons.io.IOUtils
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import utils.{Navigator, UserAnswers}
-import views.html.{confirmation, councilTaxUpload}
+import utils.Navigator
+import views.html.councilTaxUpload
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+
 
 class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
@@ -58,7 +58,6 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   def onSubmit(mode: Mode, baCode: String) = getData.async(parse.multipartFormData) { implicit request =>
     request.body.file("xml").map { xml =>
-      //xml fileContent will be sent to voa-bar via the upload connector (WIP)
       val fileContent = IOUtils.toString(new FileInputStream(xml.ref.file))
       val fileSize = xml.ref.file.length
       val fileName = xml.filename
@@ -67,17 +66,16 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
         case a: Long if a <= 0 => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required"))))
         case b: Long if b <= maxFileSize => {
           if (fileName.endsWith(".xml")) {
-             dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) flatMap {
+            dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) flatMap {
               cacheMap =>
-                dataCacheConnector.getEntry[Login](request.externalId, LoginId.toString) map {
+                dataCacheConnector.getEntry[Login](request.externalId, LoginId.toString) flatMap {
                   case Some(loginDetails) => {
-                    uploadConnector.sendXml(fileContent) flatMap {
-                      case Success(submissionId) => Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cacheMap)))
-                      case Failure(e) => Redirect(routes.LoginController.onPageLoad(NormalMode))
+                    uploadConnector.sendXml(fileContent, loginDetails) map {
+                      case Success(submissionId) => Redirect(routes.ConfirmationController.onPageLoad(submissionId))
+                      case Failure(ex) => throw new RuntimeException("Uploading xml file failed with message: " + ex.getMessage)
                     }
                   }
-                  case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
-                  //Redirect(navigator.nextPage(CouncilTaxUploadId, mode)(new UserAnswers(cacheMap)))
+                  case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
                 }
             }
           }
