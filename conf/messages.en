@@ -42,13 +42,14 @@ site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Login
 site.start = Start now
+site.print.button = Download receipt
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
 confirmation.heading = Submission complete
-
+confirmation.submissionId = Submission ID: 
 confirmation.subheading = We are processing your reports
 confirmation.file.received = We have received your file and we are processing your reports.
 confirmation.window.open = You do not need to keep this window open.

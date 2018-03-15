@@ -25,15 +25,17 @@ import views.html.confirmation
 class ConfirmationViewSpec extends ViewBehaviours {
 
   val username = "BA0116"
+  val submissionId = "SId328473"
   val messageKeyPrefix = "confirmation"
   val confirmationFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ConfirmationController"))
 
-  def createView = () => confirmation(username, frontendAppConfig)(confirmationFakeRequest, messages)
+  def createView = () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title", "options.another", "options.history")
+    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title",
+      "options.another", "options.history", "submissionId")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.getElementById("username-element").text
@@ -60,6 +62,16 @@ class ConfirmationViewSpec extends ViewBehaviours {
     "Include a history link which redirects the users to council tax submissions history page" in {
       val href = doc.getElementById("history-link").attr("href")
       href mustBe controllers.routes.ReportStatusController.onPageLoad().url.toString
+    }
+
+    "Include a Download receipt button" in {
+      val downloadButton = doc.getElementById("print-button").text
+      downloadButton mustBe messages("site.print.button")
+    }
+
+    "Include a hidden VOA Logo and have the aria-hidden attribute set to true" in {
+      val logoHiddenAttribute = doc.getElementsByClass("voa-logo").attr("aria-hidden")
+      logoHiddenAttribute mustBe "true"
     }
   }
 }
