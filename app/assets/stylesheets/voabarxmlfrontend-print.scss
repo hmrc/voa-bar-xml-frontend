@@ -1,0 +1,35 @@
+.transaction-banner__heading,
+.header__menu__proposition-name{
+  color: rgb(11, 12, 12);
+}
+html{
+  background-color: #fff
+}
+#logo{
+  color: #0b0c0c;
+}
+/* hide the unnecessary page elements */
+#footer,
+#global-header,
+#service-info-navbar,
+#more-options,
+.language-nav,
+.service-info,
+.button,
+.label--inline-right,
+.print-hide {
+  display: none !important;
+}
+html {
+  #wrapper, #content {
+    padding: 0 !important;
+  }
+}
+
+span.voa-logo{
+  margin-left: -2px;
+  width: 200px;
+  height: 24px;
+  display: inline-block;
+  margin-top: 3px;
+}

@@ -18,29 +18,35 @@
 
 @(baCode: String, submissionId: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
-    @main_template(
-        title = messages("confirmation.title"),
-        appConfig = appConfig,
-        bodyClasses = None) {
+@main_template(
+    title = messages("confirmation.title"),
+    appConfig = appConfig,
+    bodyClasses = None) {
 
-        @components.service_info(baCode)
+    @components.service_info(baCode)
 
-        <div class="transaction-banner--complete">
-            <h1 class="transaction-banner__heading">@messages("confirmation.heading")</h1>
-            <h2>@messages("confirmation.submissionId") @submissionId</h2>
-            <p>@messages("confirmation.subheading")</p>
-        </div>
+    <span class="voa-logo" aria-hidden="true"><img src="/voa-bar-xml-frontend/assets/images/voalogo.png" alt="Valuation Office Agency"></span>
 
-        <p class="lede">@messages("confirmation.file.received")</p>
+    <div class="transaction-banner--complete">
+        <h1 class="transaction-banner__heading">@messages("confirmation.heading")</h1>
+        <h2>@messages("confirmation.submissionId") @submissionId</h2>
+        <p class="print-hide">@messages("confirmation.subheading")</p>
+    </div>
 
-        <p>@messages("confirmation.window.open")</p>
+    <p class="lede">@messages("confirmation.file.received")</p>
 
-        <h2 class="heading-large">
-        @messages("confirmation.options.title")
-        </h2>
-        <ul class="list">
-            <li><a id="upload-link" href="@routes.CouncilTaxUploadController.onPageLoad()">@messages("confirmation.options.another")</a></li>
-            <li><a id="history-link" href="@routes.ReportStatusController.onPageLoad()">@messages("confirmation.options.history")</a></li>
-        </ul>
+    <p class="print-hide">@messages("confirmation.window.open")</p>
 
-    }
+    @components.button_link(messageKey = "site.print.button", href = "javascript:window.print()", id = "print-button", className = "button print-hidden js-visible")
+
+    <div id="more-options">
+    <h2 class="heading-large">
+    @messages("confirmation.options.title")
+    </h2>
+    <ul class="list">
+        <li><a id="upload-link" href="@routes.CouncilTaxUploadController.onPageLoad()">@messages("confirmation.options.another")</a></li>
+        <li><a id="history-link" href="@routes.ReportStatusController.onPageLoad()">@messages("confirmation.options.history")</a></li>
+    </ul>
+    </div>
+
+}

@@ -63,5 +63,15 @@ class ConfirmationViewSpec extends ViewBehaviours {
       val href = doc.getElementById("history-link").attr("href")
       href mustBe controllers.routes.ReportStatusController.onPageLoad().url.toString
     }
+
+    "Include a Download receipt button" in {
+      val downloadButton = doc.getElementById("print-button").text
+      downloadButton mustBe messages("site.print.button")
+    }
+
+    "Include a hidden VOA Logo and have the aria-hidden attribute set to true" in {
+      val logoHiddenAttribute = doc.getElementsByClass("voa-logo").attr("aria-hidden")
+      logoHiddenAttribute mustBe "true"
+    }
   }
 }
