@@ -26,6 +26,7 @@ import views.html.confirmation
 class ConfirmationControllerSpec extends ControllerSpecBase {
 
   val username = "AUser"
+  val submissionId = "SID372463"
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -42,19 +43,19 @@ class ConfirmationControllerSpec extends ControllerSpecBase {
       new DataRequiredActionImpl, FakeDataCacheConnector)
   }
 
-  def viewAsString() = confirmation(username, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad(submissionId)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
 
     "if not authorized by VOA must go to the login page" in {
-      val result = notLoggedInController().onPageLoad()(fakeRequest)
+      val result = notLoggedInController().onPageLoad(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)

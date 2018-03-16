@@ -1,30 +1,31 @@
 # microservice specific routes
 
-GET        /                                            controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+GET         /                                   controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 
-GET        /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 
-GET        /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET        /this-service-has-been-reset                 controllers.SessionExpiredController.onPageLoad
+GET         /this-service-has-been-reset        controllers.SessionExpiredController.onPageLoad
 
-GET        /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
 
-GET        /unauthorised                                controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                       controllers.UnauthorisedController.onPageLoad
 
-GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
+GET         /confirmation                       controllers.ConfirmationController.onPageLoad(submissionId: String)
 
-GET        /councilTaxStart                             controllers.CouncilTaxStartController.onPageLoad()
-GET        /goToCouncilTaxUpload                        controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
+GET         /councilTaxStart                    controllers.CouncilTaxStartController.onPageLoad()
+GET         /goToCouncilTaxUpload               controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
 
-GET        /councilTaxUpload                            controllers.CouncilTaxUploadController.onPageLoad()
+GET         /councilTaxUpload                   controllers.CouncilTaxUploadController.onPageLoad()
+POST        /councilTaxUpload                   controllers.CouncilTaxUploadController.onSubmit(mode: Mode = NormalMode, baCode: String)
 
-GET        /welcome                                     controllers.WelcomeController.onPageLoad()
-GET        /goToCouncilTaxStart                         controllers.WelcomeController.goToCouncilTaxStartPage()
+GET         /welcome                            controllers.WelcomeController.onPageLoad()
+GET         /goToCouncilTaxStart                controllers.WelcomeController.goToCouncilTaxStartPage()
 
-GET        /login                                       controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
-POST       /login                                       controllers.LoginController.onSubmit(mode: Mode = NormalMode)
-GET        /changeLogin                                 controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeLogin                                 controllers.LoginController.onSubmit(mode: Mode = CheckMode)
+GET         /login                              controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+POST        /login                              controllers.LoginController.onSubmit(mode: Mode = NormalMode)
+GET         /changeLogin                        controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeLogin                        controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
-GET        /reportStatus                       controllers.ReportStatusController.onPageLoad()
+GET         /reportStatus                       controllers.ReportStatusController.onPageLoad()

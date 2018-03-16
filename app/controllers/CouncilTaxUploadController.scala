@@ -16,27 +16,77 @@
 
 package controllers
 
+
+import java.io.FileInputStream
 import javax.inject.Inject
+
+import config.FrontendAppConfig
+import connectors.{DataCacheConnector, UploadConnector}
+import controllers.actions._
+import forms.FileUploadDataFormProvider
+import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
+import models.{FileUploadData, Login, Mode, NormalMode}
+import org.apache.commons.io.IOUtils
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import controllers.actions._
-import config.FrontendAppConfig
-import connectors.DataCacheConnector
-import identifiers.VOAAuthorisedId
-import models.NormalMode
+import utils.Navigator
 import views.html.councilTaxUpload
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
 
 class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
-                                           dataCacheConnector: DataCacheConnector) extends FrontendController with I18nSupport {
+                                           dataCacheConnector: DataCacheConnector,
+                                           formProvider: FileUploadDataFormProvider,
+                                           navigator: Navigator,
+                                           uploadConnector: UploadConnector) extends FrontendController with I18nSupport {
+
+  val form = formProvider()
+  val maxFileSize = 2 * 1024 * 1024
 
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(councilTaxUpload(username, appConfig))
+        case Some(username) => Ok(councilTaxUpload(username, appConfig, form))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
+
+  def onSubmit(mode: Mode, baCode: String) = getData.async(parse.multipartFormData) { implicit request =>
+    request.body.file("xml").map { xml =>
+      val fileContent = IOUtils.toString(new FileInputStream(xml.ref.file))
+      val fileSize = xml.ref.file.length
+      val fileName = xml.filename
+
+      fileSize match {
+        case a: Long if a <= 0 => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required"))))
+        case b: Long if b <= maxFileSize => {
+          if (fileName.endsWith(".xml")) {
+            dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) flatMap {
+              cacheMap =>
+                dataCacheConnector.getEntry[Login](request.externalId, LoginId.toString) flatMap {
+                  case Some(loginDetails) => {
+                    uploadConnector.sendXml(fileContent, loginDetails) map {
+                      case Success(submissionId) => Redirect(routes.ConfirmationController.onPageLoad(submissionId))
+                      case Failure(ex) => throw new RuntimeException("Uploading xml file failed with message: " + ex.getMessage)
+                    }
+                  }
+                  case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
+                }
+            }
+          }
+          else
+            Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.fileType"))))
+        }
+        case _ => Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.length"))))
+      }
+    }
+      .getOrElse(Future.successful(BadRequest(councilTaxUpload(baCode, appConfig, form.withGlobalError("councilTaxUpload.error.xml.required")))))
+
+  }
+
 }

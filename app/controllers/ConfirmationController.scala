@@ -33,10 +33,10 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        requireData: DataRequiredAction,
                                        dataCacheConnector: DataCacheConnector) extends FrontendController with I18nSupport {
 
-  def onPageLoad = getData.async {
+  def onPageLoad(submissionId: String) = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(confirmation(username, appConfig))
+        case Some(username) => Ok(confirmation(username, submissionId, appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }

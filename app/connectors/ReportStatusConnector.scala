@@ -50,7 +50,7 @@ class ReportStatusConnector @Inject()(http: HttpClient,
           }
       } recover {
       case e =>
-        Logger.warn("Received exception " + e.getMessage + " from upstream service when requesting report status when requesting report status")
+        Logger.warn("Received exception " + e.getMessage + " from upstream service when requesting report status")
         Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when requesting report status"))
     }
   }

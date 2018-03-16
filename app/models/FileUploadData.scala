@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(
-        messageKey: String = "",
-        href: String,
-        id: String = "",
-        className: String = "button"
-)(implicit messages: Messages)
+package models
 
-<div class="section">
-    <a href="@href" class="@className" id="@id">@messages(messageKey)</a>
-</div>
+import play.api.libs.json.Json
+
+case class FileUploadData(xml: String)
+
+object FileUploadData {
+  implicit val format = Json.format[FileUploadData]
+}

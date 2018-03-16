@@ -53,7 +53,15 @@ p.font-xsmall{
   background-color: #28a197;
 }
 
-.submission-error{
+.submission-error {
   border-left: 5px solid #b10e1e;
   padding-left: 15px;
+}
+
+.transaction-banner--complete {
+  margin-top: 1em;
+}
+
+.voa-logo{
+  display: none;
 }

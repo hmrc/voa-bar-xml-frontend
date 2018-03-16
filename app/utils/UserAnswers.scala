@@ -22,6 +22,4 @@ import models._
 
 class UserAnswers(val cacheMap: CacheMap) extends Enumerable.Implicits {
   def login: Option[Login] = cacheMap.getEntry[Login](LoginId.toString)
-
-
 }

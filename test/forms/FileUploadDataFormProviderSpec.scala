@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(
-        messageKey: String = "",
-        href: String,
-        id: String = "",
-        className: String = "button"
-)(implicit messages: Messages)
+package forms
 
-<div class="section">
-    <a href="@href" class="@className" id="@id">@messages(messageKey)</a>
-</div>
+import forms.behaviours.StringFieldBehaviours
+import models.FileUploadData
+import play.api.data.FormError
+
+class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
+
+  val form = new FileUploadDataFormProvider()()
+
+  ".xml" must {
+
+    val fieldName = "xml"
+    val requiredKey = "councilTaxUpload.error.xml.required"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      "some xml"
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+}
