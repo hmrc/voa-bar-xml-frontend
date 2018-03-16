@@ -26,9 +26,8 @@ import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{NormalMode, ReportStatus}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, Result}
-import play.libs.Json
 import views.html.reportStatus
 
 import scala.concurrent.Future
@@ -39,7 +38,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
                                        getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
+                                       requireData: DataRequiredAction
                                       ) extends FrontendController with I18nSupport {
 
   def onPageLoad() = getData.async {
@@ -47,10 +46,10 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
         case Some(username) =>
           val reportStatuses = reportStatusConnector.request(username) map {
-            case Success(jsValue) => Json.fromJson(jsValue)
+            case Success(jsValue) => jsValue.as[Map[String, List[ReportStatus]]]
             case Failure(ex) => throw new RuntimeException("")
           }
-          Ok(reportStatus(username, appConfig, None))
+          Ok(reportStatus(username, appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }

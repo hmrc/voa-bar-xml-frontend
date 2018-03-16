@@ -16,7 +16,7 @@
 
 @import config.FrontendAppConfig
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Option[Map[String, List[ReportStatus]]])(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map())(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reportStatus.title"),
@@ -27,11 +27,6 @@
 
     @components.heading("reportStatus.heading")
 
-    @reportStatus match {
-        case Some(statuses) => {
-            @statuses.map(elem => components.submission_block(elem._1, elem._2))
-        }
-        case None => {}
-    }
-}
+    @reportStatus.map(elem => components.submission_block(elem._1, elem._2))
 
+}
