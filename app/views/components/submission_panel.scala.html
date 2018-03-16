@@ -14,34 +14,26 @@
  * limitations under the License.
  *@
 
-@(baCode: String, submissionType: String = "CT", fileName: String, totalReports: Int, failedReports: Int,
-        submissionDate: String, errors: Seq[Error])(implicit messages: Messages)
-<div class="bordered-box">
+@(reportStatus: ReportStatus)(implicit messages: Messages)
 
-    @if(failedReports == 0) {
-        <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.last-submission.title")</span>
-    } else {
-        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.last-submission.title")</span>
+<div class="bordered-box submission-panel">
+    @reportStatus.status match {
+        case "SUBMITTED" => {
+            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.submitted.title")</span>
+            @components.submission_body(reportStatus)
+        }
+        case "VALIDATED" => {
+            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.validated.title")</span>
+            @components.submission_body(reportStatus)
+        }
+        case "INVALIDATED" => {
+            <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.invalidated.title")</span>
+            @reportStatus.errors.map(error => error)
+        }
+        case "FORWARDED" => {
+            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.forwarded.title")</span>
+            @components.submission_body(reportStatus)
+        }
     }
-
-<div id="submission-body">
-    <br />
-    <p><b class="bold">@messages("status.ba-code.title")</b>: @baCode.toUpperCase</p>
-    <p><b class="bold">@messages("status.type.title")</b>: @submissionType</p>
-    <p><b class="bold">@messages("status.filename.title")</b>: @fileName</p>
-    <p><b class="bold">@messages("status.total-reports.title")</b>: @totalReports</p>
-    <p><b class="bold">@messages("status.failed-reports.title")</b>: @failedReports</p>
-    <p><b class="bold">@messages("status.submitted.title")</b>: @submissionDate</p>
-
-    @if(failedReports == 0) {
-        <p>@messages("status.success.paragraph")</p>
-    } else {
-        <p>@messages("status.failed.para1") @failedReports @messages("status.failed.para2")</p>
-    }
-
-    @if(failedReports > 0) {
-        @components.submission_error(errors)
-    }
-</div>
 
 </div>

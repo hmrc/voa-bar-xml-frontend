@@ -20,28 +20,37 @@ import javax.inject.Inject
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import play.api.mvc.Result
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.NormalMode
+import models.{NormalMode, ReportStatus}
+import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent, Result}
+import play.libs.Json
 import views.html.reportStatus
+
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        override val messagesApi: MessagesApi,
                                        dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
                                        getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction) extends FrontendController with I18nSupport {
+                                       requireData: DataRequiredAction,
+                                      ) extends FrontendController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = getData.async {
+  def onPageLoad() = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
         case Some(username) =>
-          val reportStatuses = reportStatusConnector.request(username)
-          Ok(reportStatus(username, appConfig))
+          val reportStatuses = reportStatusConnector.request(username) map {
+            case Success(jsValue) => Json.fromJson(jsValue)
+            case Failure(ex) => throw new RuntimeException("")
+          }
+          Ok(reportStatus(username, appConfig, None))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }

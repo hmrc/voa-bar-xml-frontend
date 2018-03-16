@@ -38,7 +38,7 @@ class ReportStatusConnector @Inject()(http: HttpClient,
   val baseSegment = "/voa-bar/"
 
   def request(authorisedUsername: String)(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
-    http.GET(s"$serviceUrl${baseSegment}reportstatus/${authorisedUsername}")
+    http.GET(s"$serviceUrl${baseSegment}reports/${authorisedUsername}")
       .map {
         response =>
           response.status match {

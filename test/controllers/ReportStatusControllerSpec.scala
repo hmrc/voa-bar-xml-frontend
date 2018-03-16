@@ -19,7 +19,7 @@ package controllers
 import connectors.{DataCacheConnector, FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.VOAAuthorisedId
-import models.NormalMode
+import models.{NormalMode, ReportStatus}
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -46,15 +46,13 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     httpMock
   }
 
-  val jsonStr =
-    """[{"Reference": "A34DF1", "Type": "CT", "FileName": "FILE1.XML", "TotalReports": 10, "FailedReports": 0, "Errors": [], "SubmissionDate": "1-Mar-2018 09:15:26"},
-        {"Reference": "B23SD1", "Type": "CT", "FileName": "FILE2.XML", "TotalReports": 16, "FailedReports": 2, "Errors": [{"Code": 1001, "Details": ["32182", "Postcode", "NW111NW"]}, {"Code": 1002, "Details": ["32183", "DateSent", "28-02-2018"]}], "SubmissionDate": "28-Feb-2018 14:28:36"},
-        {"Reference": "DFG123", "Type": "CT", "FileName": "FILE3.XML", "TotalReports": 20, "FailedReports": 2, "Errors": [{"Code": 1000, "Details": ["111", "Town", ""]}, {"Code": 1003, "Details": ["112", "DateSent", "27-01-2018"]}], "SubmissionDate": "27-Feb-2018 11:12:45"},
-        {"Reference": "G53DF1", "Type": "CT", "FileName": "FILE4.XML", "TotalReports": 45, "FailedReports": 0, "Errors": [], "SubmissionDate": "1-Jan-2018 17:08:53"}]""".stripMargin
+  val baCode = "ba1221"
+  val submissionId = "1234-XX"
+  val rs = ReportStatus(baCode, submissionId, "SUBMITTED")
+  val fakeMap = Map(submissionId -> List(rs))
+  val fakeMapAsJson = Json.toJson(fakeMap)
 
-  val json = Json.parse(jsonStr)
-
-  val fakeReportStatusConnector = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
+  val fakeReportStatusConnector = new ReportStatusConnector(getHttpMock(200, Some(fakeMapAsJson)), configuration, environment)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
@@ -66,7 +64,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     FakeDataCacheConnector.resetCaptures()
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
   }
-  def viewAsString() = reportStatus(username, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = reportStatus(username, frontendAppConfig, Some(fakeMap))(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 

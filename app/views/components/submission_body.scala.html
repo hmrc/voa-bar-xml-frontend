@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models
-
-import play.api.libs.json.Json
-
-case class Error(code: String, values: Seq[String] = Seq())
-
-object Error{
-  implicit val format = Json.format[Error]
-}
+@(reportStatus: ReportStatus)(implicit messages: Messages)
+<div id="submission-body">
+    <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.baCode.toUpperCase</p>
+    <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+    <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
+        @reportStatus.created.toLocalTime</i></p>
+</div>
