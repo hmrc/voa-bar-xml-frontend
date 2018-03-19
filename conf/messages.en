@@ -114,7 +114,6 @@ status.submissionType.CT = CT
 status.created.para1 = Created on
 status.created.para2 = at
 status.last-submission.title = LAST SUBMISSION
-status.filename.title = Filename
 status.total-reports.title = Total reports
 status.failed-reports.title = Failed reports
 status.success.paragraph = The file was submitted successfully without any errors.

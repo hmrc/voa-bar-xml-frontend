@@ -24,7 +24,7 @@ import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.{Configuration, Environment}
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.{Format, JsValue, Json, Writes}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -46,30 +46,38 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     httpMock
   }
 
+  val httpMockFailed = mock[HttpClient]
+  when(httpMockFailed.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+    any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
+
   val baCode = "ba1221"
   val submissionId = "1234-XX"
   val rs = ReportStatus(baCode, submissionId, "SUBMITTED")
   val fakeMap = Map(submissionId -> List(rs))
   val fakeMapAsJson = Json.toJson(fakeMap)
+  val wrongJson = Json.toJson("""{"someID": "hhewfwe777"}""")
 
-  val fakeReportStatusConnector = new ReportStatusConnector(getHttpMock(200, Some(fakeMapAsJson)), configuration, environment)
+  def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
 
-  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap): ReportStatusController = {
+  def fakeReportStatusConnectorFailed() = new ReportStatusConnector(httpMockFailed, configuration, environment)
+
+  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(expectedJson), dataRetrievalAction, new DataRequiredActionImpl)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnectorFailed(), dataRetrievalAction, new DataRequiredActionImpl)
   }
+
   def viewAsString() = reportStatus(username, frontendAppConfig, fakeMap)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController().onPageLoad()(fakeRequest)
+      val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
@@ -77,16 +85,37 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
     "if not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageLoad()(fakeRequest)
+
       def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
+    "Given some Json representing a Report Status result, the verify response method creates a Right(Map[String, List[ReportStatus])" in {
+      val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).verifyResponse(fakeMapAsJson)
+
+      result.isRight mustBe true
+      result.right.get == fakeMap mustBe true
+    }
+
+    "Give some wrong Json, the verify response method returns a Left representing the exception to be thrown at Runtime" in {
+      val result = loggedInController(getEmptyCacheMap, wrongJson).verifyResponse(wrongJson)
+
+      result.isLeft mustBe true
+      result mustBe Left("Unable to parse the response from the Report Status Connector")
+    }
+
+    "Throw a runtime exception when the received json value from the Report Status Connector cannot be parsed to a Map[String, List[ReportStatus]]" in {
+      intercept[Exception] {
+        val result = loggedInController(getEmptyCacheMap, wrongJson).onPageLoad()(fakeRequest)
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
     "if authorized must request the LoginConnector for reports currently associated with this account" in {}
   }
 }
-
 
 
 
