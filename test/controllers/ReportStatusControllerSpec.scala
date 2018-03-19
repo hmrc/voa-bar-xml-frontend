@@ -64,7 +64,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     FakeDataCacheConnector.resetCaptures()
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector, dataRetrievalAction, new DataRequiredActionImpl)
   }
-  def viewAsString() = reportStatus(username, frontendAppConfig, Some(fakeMap))(fakeRequest, messages).toString
+  def viewAsString() = reportStatus(username, frontendAppConfig, fakeMap)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 

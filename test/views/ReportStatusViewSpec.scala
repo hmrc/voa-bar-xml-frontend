@@ -30,7 +30,7 @@ class ReportStatusViewSpec extends ViewBehaviours {
 
   val reportStatusFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ReportStatusController"))
 
-  def createView = () => reportStatus(username, frontendAppConfig, None)(reportStatusFakeRequest, messages)
+  def createView = () => reportStatus(username, frontendAppConfig)(reportStatusFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 

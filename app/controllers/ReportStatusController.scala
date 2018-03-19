@@ -18,20 +18,17 @@ package controllers
 
 import javax.inject.Inject
 
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import play.api.mvc.Result
-import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import identifiers.{LoginId, VOAAuthorisedId}
+import controllers.actions._
+import identifiers.VOAAuthorisedId
 import models.{NormalMode, ReportStatus}
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.reportStatus
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        override val messagesApi: MessagesApi,
@@ -43,14 +40,13 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   def onPageLoad() = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) flatMap {
         case Some(username) =>
-          val reportStatuses = reportStatusConnector.request(username) map {
-            case Success(jsValue) => jsValue.as[Map[String, List[ReportStatus]]]
+          reportStatusConnector.request(username) map {
+            case Success(jsValue) => Ok(reportStatus(username, appConfig, jsValue.as[Map[String, List[ReportStatus]]]))
             case Failure(ex) => throw new RuntimeException("")
           }
-          Ok(reportStatus(username, appConfig))
-        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+        case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
       }
   }
 }
