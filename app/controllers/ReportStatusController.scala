@@ -23,6 +23,7 @@ import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import models.{NormalMode, ReportStatus}
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -40,6 +41,8 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        requireData: DataRequiredAction
                                       ) extends FrontendController with I18nSupport {
 
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
+
   def verifyResponse(json: JsValue): Either[String, Map[String, List[ReportStatus]]] = {
 
     val reportStatuses = json.asOpt[Map[String, List[ReportStatus]]]
@@ -56,13 +59,16 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
           reportStatusConnector.request(username) map {
             case Success(jsValue) =>
               verifyResponse(jsValue) match {
-                case Right(response) => Ok(reportStatus(username, appConfig, jsValue.as[Map[String, List[ReportStatus]]]))
+                case Right(response) => {
+                  val sorted = response.map(x => (x._1, x._2.sortBy(_.created)))
+                  Ok(reportStatus(username, appConfig, sorted))
+                }
                 case Left(ex) => {
                   Logger.warn(ex)
                   throw new RuntimeException(ex)
                 }
               }
-            case Failure(ex) => throw new RuntimeException("")
+            case Failure(ex) => throw new RuntimeException(ex)
           }
         case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
       }

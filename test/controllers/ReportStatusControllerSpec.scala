@@ -16,22 +16,22 @@
 
 package controllers
 
-import connectors.{DataCacheConnector, FakeDataCacheConnector, ReportStatusConnector}
+import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import models.{NormalMode, ReportStatus}
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import play.api.{Configuration, Environment}
-import play.api.libs.json.{Format, JsValue, Json, Writes}
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
 
 import scala.concurrent.Future
+import scala.util.Failure
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -46,10 +46,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     httpMock
   }
 
-  val httpMockFailed = mock[HttpClient]
-  when(httpMockFailed.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
-    any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
-
   val baCode = "ba1221"
   val submissionId = "1234-XX"
   val rs = ReportStatus(baCode, submissionId, "SUBMITTED")
@@ -59,8 +55,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
 
-  def fakeReportStatusConnectorFailed() = new ReportStatusConnector(httpMockFailed, configuration, environment)
-
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
@@ -69,7 +63,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnectorFailed(), dataRetrievalAction, new DataRequiredActionImpl)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(fakeMapAsJson), dataRetrievalAction, new DataRequiredActionImpl)
   }
 
   def viewAsString() = reportStatus(username, frontendAppConfig, fakeMap)(fakeRequest, messages).toString
@@ -113,9 +107,18 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       }
     }
 
-    "if authorized must request the LoginConnector for reports currently associated with this account" in {}
+    "Throw a runtime exception when  the Report Status returns an exception" in {
+      val httpMock = mock[HttpClient]
+      when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(Failure(new RuntimeException("Report status connector failed")))
+
+      val connector = new ReportStatusConnector(httpMock, configuration, environment)
+      val controller = new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, connector, getEmptyCacheMap, new DataRequiredActionImpl)
+
+      intercept[Exception] {
+        val result = controller.onPageLoad()(fakeRequest)
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
   }
 }
-
-
-
