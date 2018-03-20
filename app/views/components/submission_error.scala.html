@@ -19,8 +19,9 @@
 @(errors: Seq[Error])(implicit messages: Messages)
 
 @for(error <- errors) {
-    <div class="submission-error"><h2 class="heading-medium">@messages("status.report.title") @error.values(0) @messages("status.report.para")</h2>
-        <li>The @error.values(1) @error.values(2) is invalid</li>
-    </div>
+    @if(error.values.size >= 3) {
+        <div class="submission-error"><h2 class="heading-medium">@messages("status.report.title") @error.values(0) @messages("status.report.para")</h2>
+            <li>The @error.values(1) @error.values(2) is invalid</li>
+        </div>
+    }
 }
-

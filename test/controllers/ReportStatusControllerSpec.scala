@@ -20,6 +20,7 @@ import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import models.{NormalMode, ReportStatus}
+import org.joda.time.DateTime
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -47,11 +48,30 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   }
 
   val baCode = "ba1221"
-  val submissionId = "1234-XX"
-  val rs = ReportStatus(baCode, submissionId, "SUBMITTED")
-  val fakeMap = Map(submissionId -> List(rs))
+  val submissionId1 = "1234-XX"
+  val submissionId2 = "1235-XX"
+  val submissionId3 = "1236-XX"
+
+  val rs1 = ReportStatus(baCode, submissionId1, "SUBMITTED")
+  val rs2 = ReportStatus(baCode, submissionId1, "VALIDATED")
+  val rs3 = ReportStatus(baCode, submissionId1, "FORWARDED")
+
+  Thread.sleep(1000)
+  val rs11 = ReportStatus(baCode, submissionId2, "SUBMITTED")
+  val rs22 = ReportStatus(baCode, submissionId2, "VALIDATED")
+  val rs33 = ReportStatus(baCode, submissionId2, "FORWARDED")
+  Thread.sleep(1000)
+  val rs111 = ReportStatus(baCode, submissionId3, "SUBMITTED")
+  val rs222 = ReportStatus(baCode, submissionId3, "VALIDATED")
+  val rs333 = ReportStatus(baCode, submissionId3, "FORWARDED")
+
+  val fakeMap = Map(submissionId1 -> List(rs1, rs2, rs3), submissionId2 -> List(rs11, rs22, rs33), submissionId3 -> List(rs111, rs222, rs333))
   val fakeMapAsJson = Json.toJson(fakeMap)
   val wrongJson = Json.toJson("""{"someID": "hhewfwe777"}""")
+
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
+
+  val sortedMap = fakeMap.map(x => (x._1, x._2.sortBy(_.created)))
 
   def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
 
@@ -66,7 +86,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(fakeMapAsJson), dataRetrievalAction, new DataRequiredActionImpl)
   }
 
-  def viewAsString() = reportStatus(username, frontendAppConfig, fakeMap)(fakeRequest, messages).toString
+  def viewAsString() = reportStatus(username, frontendAppConfig, sortedMap)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
@@ -120,5 +140,13 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       }
     }
 
+    "The createDisplayOrder method should return a sorted List of submission Ids by their created time" in {
+      val controller = loggedInController(getEmptyCacheMap, fakeMapAsJson)
+      val result = controller.createDisplayOrder(fakeMap)
+      println("Sorted: " + result)
+      result.head mustBe submissionId3
+      result.last mustBe submissionId1
+
+    }
   }
 }

@@ -28,7 +28,13 @@
         }
         case "INVALIDATED" => {
             <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.invalidated.title")</span>
-            @reportStatus.errors.map(error => error)
+            <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.baCode.toUpperCase</p>
+            <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+            <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
+                @reportStatus.created.toLocalTime</i>
+            </p>
+
+            @components.submission_error(reportStatus.errors)
         }
         case "FORWARDED" => {
             <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.forwarded.title")</span>
@@ -37,3 +43,4 @@
     }
 
 </div>
+<br />
