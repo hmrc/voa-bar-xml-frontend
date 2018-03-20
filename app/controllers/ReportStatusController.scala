@@ -26,7 +26,7 @@ import models.{NormalMode, ReportStatus}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.reportStatus
 
@@ -43,7 +43,8 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  def sortStatuses(reportStatuses: Map[String, List[ReportStatus]]): Map[String, List[ReportStatus]] = reportStatuses.map(x => (x._1, x._2.sortBy(_.created)))
+  def sortStatuses(reportStatuses: Map[String, List[ReportStatus]]): Map[String, List[ReportStatus]] =
+    reportStatuses.map(x => (x._1, x._2.sortBy(_.created)))
 
   def createDisplayOrder(submissions: Map[String, List[ReportStatus]]): List[String] = {
     submissions.map(elem => (elem._1, elem._2.head.created))
@@ -52,7 +53,6 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
   }
 
   def verifyResponse(json: JsValue): Either[String, Map[String, List[ReportStatus]]] = {
-
     val reportStatuses = json.asOpt[Map[String, List[ReportStatus]]]
     reportStatuses match {
       case Some(response) => Right(response)

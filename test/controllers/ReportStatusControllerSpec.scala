@@ -55,17 +55,19 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val rs1 = ReportStatus(baCode, submissionId1, "SUBMITTED")
   val rs2 = ReportStatus(baCode, submissionId1, "VALIDATED")
   val rs3 = ReportStatus(baCode, submissionId1, "FORWARDED")
-
   Thread.sleep(1000)
+
   val rs11 = ReportStatus(baCode, submissionId2, "SUBMITTED")
   val rs22 = ReportStatus(baCode, submissionId2, "VALIDATED")
   val rs33 = ReportStatus(baCode, submissionId2, "FORWARDED")
   Thread.sleep(1000)
+
   val rs111 = ReportStatus(baCode, submissionId3, "SUBMITTED")
   val rs222 = ReportStatus(baCode, submissionId3, "VALIDATED")
   val rs333 = ReportStatus(baCode, submissionId3, "FORWARDED")
 
-  val fakeMap = Map(submissionId1 -> List(rs1, rs2, rs3), submissionId2 -> List(rs11, rs22, rs33), submissionId3 -> List(rs111, rs222, rs333))
+  val fakeMap = Map(submissionId1 -> List(rs1, rs2, rs3), submissionId2 -> List(rs11, rs22, rs33),
+    submissionId3 -> List(rs111, rs222, rs333))
   val fakeMapAsJson = Json.toJson(fakeMap)
   val wrongJson = Json.toJson("""{"someID": "hhewfwe777"}""")
 
@@ -146,15 +148,17 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = controller.sortStatuses(fakeMap)
 
       result.head._2.head.created mustBe rs3.created
+      result.get(submissionId2).get.head.created mustBe rs33.created
       result.last._2.head.created mustBe rs333.created
     }
 
-    "The createDisplayOrder method should return a sorted List of submission Ids by their created time" in {
+    "The createDisplayOrder method should return a List of submission Ids sorted by their created time" in {
       val controller = loggedInController(getEmptyCacheMap, fakeMapAsJson)
       val sortedStatuses = controller.sortStatuses(fakeMap)
       val result = controller.createDisplayOrder(sortedStatuses)
 
       result.head mustBe submissionId3
+      result(1) mustBe submissionId2
       result.last mustBe submissionId1
     }
   }
