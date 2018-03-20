@@ -43,9 +43,10 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
+  def sortStatuses(reportStatuses: Map[String, List[ReportStatus]]): Map[String, List[ReportStatus]] = reportStatuses.map(x => (x._1, x._2.sortBy(_.created)))
+
   def createDisplayOrder(submissions: Map[String, List[ReportStatus]]): List[String] = {
-    submissions.map(x => (x._1, x._2.sortBy(_.created)))
-      .map(elem => (elem._1, elem._2.head.created))
+    submissions.map(elem => (elem._1, elem._2.head.created))
       .toList.sortBy(elem => elem._2)
       .map(elem => elem._1)
   }
@@ -67,9 +68,9 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
             case Success(jsValue) =>
               verifyResponse(jsValue) match {
                 case Right(response) => {
-                  val sortedReportStatuses = ???
-                  val sortedSubmissions = ???
-                  Ok(reportStatus(username, appConfig, response))
+                  val sortedReportStatuses = sortStatuses(response)
+                  val displayOrder = createDisplayOrder(sortedReportStatuses)
+                  Ok(reportStatus(username, appConfig, sortedReportStatuses, displayOrder))
                 }
                 case Left(ex) => {
                   Logger.warn(ex)

@@ -72,6 +72,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
   val sortedMap = fakeMap.map(x => (x._1, x._2.sortBy(_.created)))
+  val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
   def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
 
@@ -86,7 +87,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(fakeMapAsJson), dataRetrievalAction, new DataRequiredActionImpl)
   }
 
-  def viewAsString() = reportStatus(username, frontendAppConfig, sortedMap)(fakeRequest, messages).toString
+  def viewAsString() = reportStatus(username, frontendAppConfig, sortedMap, sortedSubmissionIds)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
@@ -140,13 +141,21 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       }
     }
 
+    "The sortStatuses method should sort the List of Report Statuses by their creation time" in {
+      val controller = loggedInController(getEmptyCacheMap, fakeMapAsJson)
+      val result = controller.sortStatuses(fakeMap)
+
+      result.head._2.head.created mustBe rs3.created
+      result.last._2.head.created mustBe rs333.created
+    }
+
     "The createDisplayOrder method should return a sorted List of submission Ids by their created time" in {
       val controller = loggedInController(getEmptyCacheMap, fakeMapAsJson)
-      val result = controller.createDisplayOrder(fakeMap)
-      println("Sorted: " + result)
+      val sortedStatuses = controller.sortStatuses(fakeMap)
+      val result = controller.createDisplayOrder(sortedStatuses)
+
       result.head mustBe submissionId3
       result.last mustBe submissionId1
-
     }
   }
 }

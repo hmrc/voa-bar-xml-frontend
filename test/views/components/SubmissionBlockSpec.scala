@@ -26,7 +26,7 @@ class SubmissionBlockSpec extends ViewBehaviours {
   val reportStatus = ReportStatus("BA0121", submissionId, "SUBMITTED")
   val reports = List(reportStatus)
 
-  def submission = () => submission_block(submissionId, reports)(messages)
+  def submission = () => submission_block(submissionId, Some(reports))(messages)
   lazy val doc = asDocument(submission())
 
   "Submission Block " must {
@@ -44,6 +44,18 @@ class SubmissionBlockSpec extends ViewBehaviours {
     "Contain a submission history title" in {
       val sHistory = doc.getElementById("submission-history").text
       sHistory mustBe messages("status.history.title")
+    }
+
+    "Contain a submission panel if the report statuses is not empty" in {
+      val panels = doc.getElementsByClass("submission-panel")
+      panels.size mustBe 1
+    }
+
+    "Contain no submission panel if the report statuses is None" in {
+      def submission = () => submission_block(submissionId, None)(messages)
+      lazy val doc = asDocument(submission())
+      val panels = doc.getElementsByClass("submission-panel")
+      panels.size mustBe 0
     }
   }
 
