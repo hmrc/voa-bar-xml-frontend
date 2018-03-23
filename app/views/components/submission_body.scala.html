@@ -14,19 +14,10 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
-
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
-
-    @components.service_info(baCode)
-
-    @components.heading("reportStatus.heading")
-
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
-
-}
+@(reportStatus: ReportStatus)(implicit messages: Messages)
+<div id="submission-body">
+    <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.baCode.toUpperCase</p>
+    <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+    <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
+        @reportStatus.created.toLocalTime</i></p>
+</div>

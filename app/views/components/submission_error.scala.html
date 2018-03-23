@@ -14,19 +14,14 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import models.Error
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
+@(errors: Seq[Error])(implicit messages: Messages)
 
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
-
-    @components.service_info(baCode)
-
-    @components.heading("reportStatus.heading")
-
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
-
+@for(error <- errors) {
+    @if(error.values.size >= 3) {
+        <div class="submission-error"><h2 class="heading-medium">@messages("status.report.title") @error.values(0) @messages("status.report.para")</h2>
+            <li>The @error.values(1) @error.values(2) is invalid</li>
+        </div>
+    }
 }

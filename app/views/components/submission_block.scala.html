@@ -14,19 +14,19 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@(submissionId: String, reports: Option[List[ReportStatus]])(implicit messages: Messages)
+<div id ="submission-block" class="bordered-box">
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
+    <h2 id="submission-id" class="hero__heading-large">@messages("status.submissionId.title") @submissionId</h2>
 
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+    <h2 id="submission-history" class="hero__heading-large">@messages("status.history.title")</h2>
 
-    @components.service_info(baCode)
+    @{
+        reports match {
+            case Some(rep) => rep.map(elem => components.submission_panel(elem))
+            case None => {}
+        }
+    }
 
-    @components.heading("reportStatus.heading")
-
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
-
-}
+</div>
+<br />

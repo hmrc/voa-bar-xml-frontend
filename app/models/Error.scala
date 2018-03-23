@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
+package models
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
+import play.api.libs.json.Json
 
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+case class Error(code: String, values: Seq[String] = Seq())
 
-    @components.service_info(baCode)
-
-    @components.heading("reportStatus.heading")
-
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
-
+object Error{
+  implicit val format = Json.format[Error]
 }

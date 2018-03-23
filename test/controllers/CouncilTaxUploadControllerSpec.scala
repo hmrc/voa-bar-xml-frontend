@@ -28,7 +28,6 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.json.Json
 import play.api.mvc.MultipartFormData
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
@@ -48,6 +47,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   val username = "BA0114"
   val password = "pass"
   lazy val login = Login(username, password).encrypt
+  lazy val pathForValidFile = getClass.getResource("/valid.xml")
 
   val submissionId = "SID38273"
 
@@ -92,8 +92,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     }
 
     "redirect to the next page when valid data is submitted and backend service returns a submission Id" in {
-      val path = getClass.getResource("/valid.xml")
-      val file = new File(path.getPath)
+      val file = new File(pathForValidFile.getPath)
       val tempFile = new TemporaryFile(file)
 
       val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
@@ -166,8 +165,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     }
 
     "throw an exception when the upload backend service call fails" in {
-      val path = getClass.getResource("/valid.xml")
-      val file = new File(path.getPath)
+      val file = new File(pathForValidFile.getPath)
       val tempFile = new TemporaryFile(file)
 
       val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
@@ -181,8 +179,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     }
 
     "on submit redirect to login page if no login details can be retrieved from the user answers" in {
-      val path = getClass.getResource("/valid.xml")
-      val file = new File(path.getPath)
+      val file = new File(pathForValidFile.getPath)
       val tempFile = new TemporaryFile(file)
 
       val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)

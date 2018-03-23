@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
+package models
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.json._
+import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
-@main_template(
-    title = messages("reportStatus.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+case class ReportStatus(baCode: String, submissionId: String, status: String, errors: Seq[Error] = Seq(), created: DateTime = DateTime.now(DateTimeZone.UTC))
 
-    @components.service_info(baCode)
-
-    @components.heading("reportStatus.heading")
-
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
-
+object ReportStatus {
+  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+  implicit val format = Json.format[ReportStatus]
 }

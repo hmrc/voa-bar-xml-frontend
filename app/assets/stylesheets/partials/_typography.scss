@@ -49,6 +49,19 @@ p.font-xsmall{
   padding: 8px 0 10px 0;
 }
 
+.flag-success{
+  background-color: #28a197;
+}
+
+.submission-error {
+  border-left: 5px solid #b10e1e;
+  padding-left: 15px;
+}
+
+.submission-panel {
+  padding-left: 0px;
+  padding-top: 0px;
+}
 .transaction-banner--complete {
   margin-top: 1em;
 }
