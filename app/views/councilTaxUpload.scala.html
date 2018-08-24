@@ -19,8 +19,9 @@
 @import controllers.routes._
 @import utils.FormHelpers
 @import models.Mode
+@import models.UpScanRequests._
 
-@(baCode: String, appConfig: FrontendAppConfig, fileUploadForm: Form[_])(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig, fileUploadForm: Form[_], initiateResponse: Option[InitiateResponse] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("councilTaxUpload.title"),
@@ -39,21 +40,34 @@
         <li>@messages("councilTaxUpload.info.files")</li>
     </ul>
 
-    @helpers.form(action = routes.CouncilTaxUploadController.onSubmit(baCode), 'enctype -> "multipart/form-data") {
+    <!--@helpers.form(action = routes.CouncilTaxUploadController.onSubmit(), 'enctype -> "multipart/form-data") {-->
+    <form method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
 
         @components.error_summary(fileUploadForm.errors)
 
-        @helper.inputFile(fileUploadForm("xml"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload")
+        @if(initiateResponse.isDefined) {
+            <input type="hidden" name="x-amz-algorithm" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-algorithm`)>
+            <input type="hidden" name="x-amz-meta-callback-url" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-callback-url`)>
+            <input type="hidden" name="x-amz-date" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-date`)>
+            <input type="hidden" name="x-amz-credential" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-credential`)>
+            <input type="hidden" name="x-amz-meta-consuming-service" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-consuming-service`)>
+            <input type="hidden" name="x-amz-signature" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-signature`)>
+            <input type="hidden" name="policy" value=@(initiateResponse.get.uploadRequest.fields.policy)>
+            <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
+            <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
 
-        @components.submit_button()
+            @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload")
 
-        <p><h5 class="alert">
-           @messages("councilTaxUpload.message1")
-           <br />
-           <br />
-           @messages("councilTaxUpload.message2")
-        </h5></p>
+            @components.submit_button()
 
-    }
+            <p><h5 class="alert">
+               @messages("councilTaxUpload.message1")
+               <br />
+               <br />
+               @messages("councilTaxUpload.message2")
+            </h5></p>
+        }
+    </form>
+    <!--}-->
 
 }

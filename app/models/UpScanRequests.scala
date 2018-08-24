@@ -13,31 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package models
 
-case class InitiateRequest(
-  callbackUrl: String,
-  maximumFileSize: Int
-)
+import play.api.libs.json.Json
 
-case class InitiateResponse(
-  reference: String,
-  uploadRequest: UploadRequest
-)
+object UpScanRequests {
+  implicit val initiateRequest = Json.format[InitiateRequest]
+  implicit val uploadRequestFields = Json.format[UploadRequestFields]
+  implicit val uploadRequests = Json.format[UploadRequest]
+  implicit val initialResponse = Json.format[InitiateResponse]
+  case class InitiateRequest(
+                              callbackUrl: String,
+                              maxFileSize: Int
+                            )
 
-case class UploadRequest(
-  href: String,
-  fields: UploadRequestFields
-)
+  case class InitiateResponse(
+                               reference: String,
+                               uploadRequest: UploadRequest
+                             )
 
-case class UploadRequestFields(
-  `content-type`: String,
-  acl: String,
-  key: String,
-  policy: String,
-  `x-amz-algorithm`: String,
-  `x-amz-credential`: String,
-  `x-amz-date`: String,
-  `x-amz-meta-callback-url`: String,
-  `x-amz-signature`: String
-)
+  case class UploadRequest(
+                            href: String,
+                            fields: UploadRequestFields
+                          )
+
+  case class UploadRequestFields(
+                                  `x-amz-meta-consuming-service`: String,
+                                  acl: String,
+                                  key: String,
+                                  policy: String,
+                                  `x-amz-algorithm`: String,
+                                  `x-amz-credential`: String,
+                                  `x-amz-date`: String,
+                                  `x-amz-meta-callback-url`: String,
+                                  `x-amz-signature`: String
+                                )
+
+}

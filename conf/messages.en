@@ -74,6 +74,7 @@ councilTaxUpload.message2 = To support your reports, please include the billing 
 councilTaxUpload.error.xml.required = XML File Required
 councilTaxUpload.error.xml.length = Maximum file size is 2 Mb
 councilTaxUpload.error.xml.fileType =  Only XML files are permitted
+councilTaxUpload.error.fileUploadService = Issues with upload service. Please, contact BARS@voa.gsi.gov.uk.
 councilTaxUpload.xml = Please select an XML report
 
 login.title = Please login

@@ -16,13 +16,20 @@
 
 package connectors
 
+import java.io.File
+
 import base.SpecBase
+import com.typesafe.config.ConfigException
+import models.UpScanRequests._
 import models._
+import org.apache.commons.io.FileUtils
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.mockito.MockitoSugar
+import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
@@ -30,13 +37,44 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
 
-  val xmlContent = """<sample>xml</sample>"""
+  val path = getClass.getResource("/valid.xml")
+  val file = new File(path.getPath)
+  val tempFile = new TemporaryFile(file)
+
+  val voaBarConfigPath = "microservice.services.voa-bar"
+  val voaBarConfig = configuration.getConfig(voaBarConfigPath)
+    .getOrElse(throw new ConfigException.Missing(voaBarConfigPath))
+  val upScanConfigPath = "microservice.services.upscan"
+  val upScanConfig = configuration.getConfig(upScanConfigPath)
+    .getOrElse(throw new ConfigException.Missing(upScanConfigPath))
+  val upScanCallBackUrlPath = "callback-url"
+  val upScanCallBackUrl = upScanConfig.getString(upScanCallBackUrlPath)
+    .getOrElse(throw new ConfigException.Missing(upScanCallBackUrlPath))
+  val hostPath = "host"
+  val portPath = "port"
+  val voaBarHost = voaBarConfig.getString(hostPath)
+    .getOrElse(throw new ConfigException.Missing(hostPath))
+  val voaBarPort = voaBarConfig.getString(portPath)
+    .getOrElse(throw new ConfigException.Missing(portPath))
+  val maximumFileSizePath = "max-file-size"
+  val maximumFileSize = upScanConfig.getInt(maximumFileSizePath)
+    .getOrElse(throw new ConfigException.Missing(maximumFileSizePath))
+  val upscanHost = upScanConfig.getString(hostPath)
+    .getOrElse(throw new ConfigException.Missing(hostPath))
+  val upscanPort = upScanConfig.getString(portPath)
+    .getOrElse(throw new ConfigException.Missing(voaBarPort))
+  val initiateUrlPath = "initiate.url"
+  val initiateUrl = upScanConfig.getString(initiateUrlPath)
+    .getOrElse(throw new ConfigException.Missing(initiateUrlPath))
+
+  val xmlFile = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
   val username = "user"
   val password = "pass"
   lazy val login = Login(username, password).encrypt
@@ -67,18 +105,18 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
-        await(connector.sendXml(xmlContent, login))
+        await(connector.sendXml(xmlFile, login))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
           httpReadsNapper.capture, headerCarrierNapper.capture, any())
         urlCaptor.getValue must endWith(s"${connector.baseSegment}upload")
-        bodyCaptor.getValue mustBe xmlContent
+        bodyCaptor.getValue mustBe FileUtils.readFileToByteArray(xmlFile.ref.file)
         headersCaptor.getValue mustBe Seq(connector.xmlContentTypeHeader, userHeader, passHeader)
       }
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val connector = new UploadConnector(getHttpMock(200, Some(submissionId)), configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlFile, login))
         result match {
           case Success(submissionValue) => submissionValue mustBe submissionId
           case Failure(e) => assert(false)
@@ -87,7 +125,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
       "return a failure representing the error when send method fails" in {
         val connector = new UploadConnector(getHttpMock(500, None), configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlFile, login))
         assert(result.isFailure)
       }
 
@@ -96,10 +134,48 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
         val connector = new UploadConnector(httpMock, configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlFile, login))
         assert(result.isFailure)
       }
     }
 
+    "provided with the proper file restrictions" must {
+      "call UpScan initiate endpoint" in {
+        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+        implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[InitiateResponse]])
+        implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[InitiateRequest]])
+        val reference = "11370e18-6e24-453e-b45a-76d3e32ea33d"
+        val initiateRequest = InitiateRequest(upScanCallBackUrl, maximumFileSize)
+        val uploadUrl = "http://upload.url"
+        val initiateResponse = InitiateResponse(
+          reference = reference,
+          uploadRequest = UploadRequest(
+            href = uploadUrl,
+            fields = UploadRequestFields(
+              `content-type` = "application/xml",
+              acl = "private",
+              key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+              policy = "xxxxxxxx==",
+              `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
+              `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
+              `x-amz-date` =  "yyyyMMddThhmmssZ",
+              `x-amz-meta-callback-url` =  "https://myservice.com/callback",
+              `x-amz-signature` =  "xxxx"
+            )
+          )
+        )
+        val httpMock = mock[HttpClient]
+        when(httpMock.POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])
+          (jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())) thenReturn Future.successful(initiateResponse)
+        val connector = new UploadConnector(httpMock, configuration, environment)
+
+        val response = await(connector.initiate(initiateRequest))
+
+        assert(response.isRight)
+        response.right.map(_.reference mustBe reference)
+        verify(httpMock, times(1))
+          .POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])(jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())
+      }
+    }
   }
 }

@@ -17,39 +17,47 @@
 package connectors
 
 import javax.inject.Inject
-
-import models.Login
+import models.UpScanRequests._
+import models.{Error, Login}
+import org.apache.commons.io.FileUtils
 import play.api.Mode.Mode
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class UploadConnector @Inject()(http: HttpClient,
-                               val configuration: Configuration,
-                               environment: Environment) extends ServicesConfig {
+                                val configuration: Configuration,
+                                environment: Environment)
+                               (implicit ec: ExecutionContext)
+  extends ServicesConfig {
 
   override protected def mode: Mode = environment.mode
 
   override protected def runModeConfiguration: Configuration = configuration
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val serviceUrl = baseUrl("voa-bar")
-  val baseSegment = "/voa-bar/"
-  val xmlContentTypeHeader = ("Content-Type", "text/plain")
+  private[connectors] val serviceUrl = baseUrl("voa-bar")
+  private[connectors] val baseSegment = "/voa-bar/"
+  private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
+  private[connectors] val upScanConfig = configuration.getConfig("microservice.services.upscan").get
+  private[connectors] val upScanPort = upScanConfig.getString("port").get
+  private[connectors] val upScanHost = upScanConfig.getString("host").get
+  private[connectors] val initiateUrl = s"http://$upScanHost:$upScanPort${upScanConfig.getString("initiate.url").get}"
 
   def generateUsernameHeader(username: String) = ("BA-Code", username)
 
   def generatePasswordHeader(password: String) = ("password", password)
 
-  def sendXml(xml: String, loginDetails: Login): Future[Try[String]] = {
+  def sendXml(xmlFile: FilePart[TemporaryFile], loginDetails: Login): Future[Try[String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
-    http.POST(s"$serviceUrl${baseSegment}upload", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
+    http.POST(s"$serviceUrl${baseSegment}upload", FileUtils.readFileToByteArray(xmlFile.ref.file), Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
       .map {
         response =>
           response.status match {
@@ -64,6 +72,18 @@ class UploadConnector @Inject()(http: HttpClient,
         Logger.warn("Received exception " + e.getMessage + " from upstream service when uploading am xml file")
         Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when uploading am xml file"))
     }
+  }
+
+  def initiate(request: InitiateRequest): Future[Either[Error, InitiateResponse]] = {
+    http.POST[InitiateRequest, InitiateResponse](initiateUrl, request)
+      .map(Right(_))
+      .recover {
+        case ex: Throwable => {
+          val errorMessage = "Failed to get UpScan file upload details"
+          Logger.error(errorMessage, ex)
+          Left(Error("UPSCAN-INIT", Seq(errorMessage)))
+        }
+      }
   }
 
 }

@@ -36,6 +36,7 @@ import views.html.councilTaxUpload
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -52,10 +53,10 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   val submissionId = "SID38273"
 
   val uploadConnector = mock[UploadConnector]
-  when(uploadConnector.sendXml(any[String], any[Login])) thenReturn Future.successful(Success(submissionId))
+  when(uploadConnector.sendXml(any[FilePart[TemporaryFile]], any[Login])) thenReturn Future.successful(Success(submissionId))
 
   val uploadConnectorF = mock[UploadConnector]
-  when(uploadConnectorF.sendXml(any[String], any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
+  when(uploadConnectorF.sendXml(any[FilePart[TemporaryFile]], any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
 
   def loggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
@@ -99,7 +100,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = loggedInController(uploadConnector).onSubmit(NormalMode)(req)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.onPageLoad(submissionId).url)
@@ -115,7 +116,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = loggedInController(uploadConnector).onSubmit(NormalMode)(req)
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe viewAsString(boundForm)
@@ -126,7 +127,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(), badParts = Nil))
 
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = loggedInController(uploadConnector).onSubmit(NormalMode )(req)
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe viewAsString(boundForm)
@@ -142,7 +143,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = loggedInController(uploadConnector).onSubmit(NormalMode )(req)
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe viewAsString(boundForm)
@@ -158,7 +159,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = loggedInController(uploadConnector).onSubmit(NormalMode )(req)
 
       status(result) mustBe BAD_REQUEST
       contentAsString(result) mustBe viewAsString(boundForm)
@@ -173,7 +174,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
       intercept[Exception] {
-        val result = loggedInController(uploadConnectorF).onSubmit(NormalMode, username)(req)
+        val result = loggedInController(uploadConnectorF).onSubmit(NormalMode )(req)
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
@@ -186,7 +187,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
 
-      val result = notLoggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
+      val result = notLoggedInController(uploadConnector).onSubmit(NormalMode )(req)
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
