@@ -22,20 +22,20 @@ import connectors.{DataCacheConnector, UploadConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
-import models.{FileUploadData, Login, Mode, NormalMode}
+import models.{Error, FileUploadData, Login, Mode, NormalMode}
 import cats.data.EitherT
 import cats.implicits._
-import models.UpScanRequests.{InitiateRequest, InitiateResponse}
+import models.UpScanRequests._
 import models.requests.OptionalDataRequest
+import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Request, Result}
+import play.api.libs.json.{JsSuccess, JsValue}
+import play.api.mvc.{Action, Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
-
 
 class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
@@ -62,8 +62,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   }
 
   private[controllers] def fileUploadDetails(username: String)
-                                            (implicit request: Request[_]): Future[Either[Result, InitiateResponse]] = {
-    EitherT(uploadConnector.initiate(InitiateRequest(callBackUrl, maxFileSize)))
+                                            (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
+    EitherT(uploadConnector.initiate(InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize)))
       .fold(
         _ => Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError("councilTaxUpload.error.fileUploadService")))),
         r => Right(r)
@@ -93,36 +93,51 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  def onSubmit(mode: Mode) = getData.async(parse.multipartFormData) { implicit request =>
-    request.body.file("xml").map { xmlFile =>
-      val fileSize = xmlFile.ref.file.length
-      val fileName = xmlFile.filename
-
-      fileSize match {
-        case a: Long if a <= 0 => badRequest("councilTaxUpload.error.xml.required")
-        case b: Long if b <= maxFileSize => {
-          if (fileName.endsWith(".xml")) {
-            dataCacheConnector.save[FileUploadData](request.externalId, CouncilTaxUploadId.toString, FileUploadData(fileName)) flatMap {
-              cacheMap =>
-                dataCacheConnector.getEntry[Login](request.externalId, LoginId.toString) flatMap {
-                  case Some(loginDetails) => {
-                    uploadConnector.sendXml(xmlFile, loginDetails) map {
-                      case Success(submissionId) => Redirect(routes.ConfirmationController.onPageLoad(submissionId))
-                      case Failure(ex) => throw new RuntimeException("Uploading xml file failed with message: " + ex.getMessage)
-                    }
-                  }
-                  case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
-                }
-            }
-          }
-          else
-            badRequest(("councilTaxUpload.error.xml.fileType"))
-        }
-        case _ => badRequest("councilTaxUpload.error.xml.length")
+  private def parseUploadConfirmation(request: Request[JsValue], externalId: String): Future[Either[Error, UploadConfirmation]] = {
+    Future(request.body.validate[UploadConfirmation] match {
+      case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
+      case _ => {
+        val errorMsg = s"Couldn't parse: \n${request.body}"
+        Logger.warn(errorMsg)
+        Left(Error("PARSE_ERROR", Seq(errorMsg)))
       }
-    }
-      .getOrElse(badRequest("councilTaxUpload.error.xml.required"))
-
+    })
   }
 
+  private def extractExternalId(request: Request[_]) = {
+    val queryStringParam = request.queryString.get("external-id")
+    val containsExternalId = queryStringParam.isDefined && !queryStringParam.get.isEmpty
+    Future(Either.cond(containsExternalId, queryStringParam.get.head, Error("EXT-ID-ND", Seq("External Id not defined."))))
+  }
+
+  def onConfirmation = Action.async(parse.tolerantJson) { implicit request =>
+    (for {
+      externalId <- EitherT(extractExternalId(request))
+      uploadConfirmation <- EitherT(parseUploadConfirmation(request, externalId))
+      xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
+      _ <- EitherT(sendContent(externalId, xml, uploadConfirmation))
+    } yield NoContent)
+      .valueOr(error => {
+        val errorMsg = s"Error ${error.code}: ${error.values.mkString("\n")}"
+        Logger.error(errorMsg)
+        InternalServerError(errorMsg)
+      })
+  }
+
+  private def sendContent(externalId: String, content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
+    val fileUploadData = FileUploadData(content)
+    dataCacheConnector.save[FileUploadData](externalId, CouncilTaxUploadId.toString, fileUploadData) flatMap {
+      cacheMap =>
+        dataCacheConnector.getEntry[Login](externalId, LoginId.toString) flatMap {
+          case Some(loginDetails) => {
+            uploadConnector.sendXml(content, loginDetails)
+          }
+          case None => Future(Left(Error("NOAUTH", Seq("Couldn't send file because expired login"))))
+        }
+    }
+  }
+
+  def onSubmit(mode: Mode) = getData.async(parse.multipartFormData) { implicit request =>
+    Future(Redirect(routes.ConfirmationController.onPageLoad("File uploading to upscan")))
+  }
 }

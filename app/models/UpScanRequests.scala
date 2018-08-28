@@ -16,6 +16,8 @@
 
 package models
 
+import java.time.OffsetDateTime
+
 import play.api.libs.json.Json
 
 object UpScanRequests {
@@ -23,6 +25,8 @@ object UpScanRequests {
   implicit val uploadRequestFields = Json.format[UploadRequestFields]
   implicit val uploadRequests = Json.format[UploadRequest]
   implicit val initialResponse = Json.format[InitiateResponse]
+  implicit val uploadDetails = Json.format[UploadDetails]
+  implicit val uploadConfirmation = Json.format[UploadConfirmation]
   case class InitiateRequest(
                               callbackUrl: String,
                               maxFileSize: Int
@@ -50,4 +54,17 @@ object UpScanRequests {
                                   `x-amz-signature`: String
                                 )
 
+  case class UploadConfirmation (
+                                reference: String,
+                                downloadUrl: String,
+                                fileStatus: String,
+                                uploadDetails: UploadDetails
+                                )
+
+  case class UploadDetails (
+                           uploadTimestamp: OffsetDateTime,
+                           checksum: String,
+                           fileMimeType: String,
+                           fileName: String
+                           )
 }

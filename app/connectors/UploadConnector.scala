@@ -19,11 +19,10 @@ package connectors
 import javax.inject.Inject
 import models.UpScanRequests._
 import models.{Error, Login}
-import org.apache.commons.io.FileUtils
+import org.asynchttpclient.util.HttpConstants.ResponseStatusCodes
 import play.api.Mode.Mode
-import play.api.libs.Files.TemporaryFile
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.{Configuration, Environment, Logger}
+import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -54,23 +53,24 @@ class UploadConnector @Inject()(http: HttpClient,
 
   def generatePasswordHeader(password: String) = ("password", password)
 
-  def sendXml(xmlFile: FilePart[TemporaryFile], loginDetails: Login): Future[Try[String]] = {
+  def sendXml(xml: String, loginDetails: Login): Future[Either[Error, String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
-    http.POST(s"$serviceUrl${baseSegment}upload", FileUtils.readFileToByteArray(xmlFile.ref.file), Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
+    http.POST(s"$serviceUrl${baseSegment}upload", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
       .map {
         response =>
           response.status match {
-            case 200 => Success(response.body)
+            case Status.OK => Right(response.body)
             case status => {
-              Logger.warn("Received status of " + status + " from upstream service when uploading am xml file")
-              Failure(new RuntimeException("Received status of " + status + " from upstream service when uploading an xml file"))
+              val errorMsg = s"Received status of $status from upstream service when uploading am xml file"
+              Logger.warn(errorMsg)
+              Left(Error("SEND-XML-ERROR", Seq(errorMsg)))
             }
           }
       } recover {
       case e =>
-        Logger.warn("Received exception " + e.getMessage + " from upstream service when uploading am xml file")
-        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when uploading am xml file"))
+        val errorMsg = s"Received status of ${e.getMessage} from upstream service when uploading am xml file"
+        Left(Error("SEND-XML-ERROR", Seq(errorMsg)))
     }
   }
 
@@ -86,4 +86,16 @@ class UploadConnector @Inject()(http: HttpClient,
       }
   }
 
+  def downloadFile(request: UploadConfirmation): Future[Either[Error, String]] = {
+    http.doGet(request.downloadUrl)
+      .map{ response =>
+        Right(response.body)
+      }
+      .recover {
+        case ex: Throwable => {
+          Logger.error(s"Error downloading file from ${request.downloadUrl}", ex)
+          Left(Error("UPSCAT-DOWN", Seq(ex.toString)))
+        }
+      }
+  }
 }

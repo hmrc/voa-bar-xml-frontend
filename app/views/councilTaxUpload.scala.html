@@ -40,8 +40,7 @@
         <li>@messages("councilTaxUpload.info.files")</li>
     </ul>
 
-    <!--@helpers.form(action = routes.CouncilTaxUploadController.onSubmit(), 'enctype -> "multipart/form-data") {-->
-    <form method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
+    <form id="councilTaxUploadForm" method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
 
         @components.error_summary(fileUploadForm.errors)
 
@@ -56,7 +55,7 @@
             <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
             <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
 
-            @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload")
+            @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
 
             @components.submit_button()
 
@@ -68,6 +67,6 @@
             </h5></p>
         }
     </form>
-    <!--}-->
-
+    @helpers.form(action = routes.CouncilTaxUploadController.onSubmit(), 'enctype -> "multipart/form-data", 'id -> "upload-complete-form") {
+    }
 }
