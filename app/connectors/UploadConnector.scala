@@ -44,7 +44,6 @@ class UploadConnector @Inject()(http: HttpClient,
                                (implicit ec: ExecutionContext)
   extends ServicesConfig {
 
-
   override protected def mode: Mode = environment.mode
 
   override protected def runModeConfiguration: Configuration = configuration
@@ -110,31 +109,17 @@ class UploadConnector @Inject()(http: HttpClient,
       }
   }
 
-  //TODO: to be removed when play 2.6
-  import utils.MultipartFormDataWritable
-  implicit val mpfw = MultipartFormDataWritable.writeable
+  private val validStatuses = Seq(Status.OK, Status.NO_CONTENT)
   def uploadFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]]): Future[Either[Error, Unit.type]] = {
-    // http.doPost(request.body.dataParts.get("uploadUrl").get.head, request.body, request.headers.headers)
-//    requestBuilder.buildRequest(request.body.dataParts.get("uploadUrl").get.head)
-//      .withHeaders(request.headers.headers:_*)
-//      .withMethod(request.method)
-//      .withBody(request.body)
-//      .withQueryString(request.queryString.toSeq:_*)
-//      .post(request.body.files.head)
-//      new RequestBuilder().s(request.headers.toMap)
       val file = request.body.files.head
       val uploadUrl = request.body.dataParts.get("uploadUrl").get.head
+      val filePart = FilePart(file.key, file.filename, file.contentType, FileIO.fromPath(file.ref.file.toPath))
+      val dataParts = request.body.dataParts.map{case (key, value) => DataPart(key, value.head)}
+      val parts = filePart :: dataParts.toList
       ws.url(uploadUrl)
-        .post(Source(FilePart(file.key, file.filename, file.contentType, FileIO.fromPath(file.ref.file.toPath)) :: DataPart("key", "value") :: List()))
-//      ws.url(uploadUrl)
-//      .withHeaders(request.headers.headers:_*)
-//      .withRequestFilter(AhcCurlRequestLogger())
-//      .post(Source.fromIterator(() => request.body.files.toIterator))
-//      .post(MultipartFormData(request.body.dataParts, request.body.files, request.body.badParts))//:: request.body.dataParts :: List()))
-//      .post(Source(FilePart("hello", "hello.txt", Option("text/plain"), file) :: DataPart("key", "value") :: List()))
-//      .post(file.ref.file)
+        .post(Source(parts))
       .map (response =>
-        if (response.status == Status.OK) {
+        if (validStatuses.contains(response.status)) {
           Right(Unit)
         } else {
           val file = request.body.files.head
