@@ -16,11 +16,19 @@
 
 package connectors
 
+import akka.stream.scaladsl.{FileIO, Source}
+import akka.util.ByteString
 import javax.inject.Inject
 import models.UpScanRequests._
+import models.requests.OptionalDataRequest
 import models.{Error, Login}
-import org.asynchttpclient.util.HttpConstants.ResponseStatusCodes
 import play.api.Mode.Mode
+import play.api.libs.Files
+import play.api.libs.Files.TemporaryFile
+import play.api.libs.ws.ahc.AhcCurlRequestLogger
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.mvc.MultipartFormData
+import play.api.mvc.MultipartFormData.{DataPart, FilePart}
 import play.api.{Configuration, Environment, Logger}
 import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,13 +36,14 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 
 class UploadConnector @Inject()(http: HttpClient,
+                                ws: WSClient,
                                 val configuration: Configuration,
                                 environment: Environment)
                                (implicit ec: ExecutionContext)
   extends ServicesConfig {
+
 
   override protected def mode: Mode = environment.mode
 
@@ -70,6 +79,7 @@ class UploadConnector @Inject()(http: HttpClient,
       } recover {
       case e =>
         val errorMsg = s"Received status of ${e.getMessage} from upstream service when uploading am xml file"
+        Logger.error(errorMsg, e)
         Left(Error("SEND-XML-ERROR", Seq(errorMsg)))
     }
   }
@@ -93,9 +103,52 @@ class UploadConnector @Inject()(http: HttpClient,
       }
       .recover {
         case ex: Throwable => {
-          Logger.error(s"Error downloading file from ${request.downloadUrl}", ex)
-          Left(Error("UPSCAT-DOWN", Seq(ex.toString)))
+          val errorMsg = s"Error downloading file from ${request.downloadUrl}"
+          Logger.error(errorMsg, ex)
+          Left(Error("UPSCAT-DOWN", Seq(ex.getMessage)))
         }
       }
+  }
+
+  //TODO: to be removed when play 2.6
+  import utils.MultipartFormDataWritable
+  implicit val mpfw = MultipartFormDataWritable.writeable
+  def uploadFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]]): Future[Either[Error, Unit.type]] = {
+    // http.doPost(request.body.dataParts.get("uploadUrl").get.head, request.body, request.headers.headers)
+//    requestBuilder.buildRequest(request.body.dataParts.get("uploadUrl").get.head)
+//      .withHeaders(request.headers.headers:_*)
+//      .withMethod(request.method)
+//      .withBody(request.body)
+//      .withQueryString(request.queryString.toSeq:_*)
+//      .post(request.body.files.head)
+//      new RequestBuilder().s(request.headers.toMap)
+      val file = request.body.files.head
+      val uploadUrl = request.body.dataParts.get("uploadUrl").get.head
+      ws.url(uploadUrl)
+        .post(Source(FilePart(file.key, file.filename, file.contentType, FileIO.fromPath(file.ref.file.toPath)) :: DataPart("key", "value") :: List()))
+//      ws.url(uploadUrl)
+//      .withHeaders(request.headers.headers:_*)
+//      .withRequestFilter(AhcCurlRequestLogger())
+//      .post(Source.fromIterator(() => request.body.files.toIterator))
+//      .post(MultipartFormData(request.body.dataParts, request.body.files, request.body.badParts))//:: request.body.dataParts :: List()))
+//      .post(Source(FilePart("hello", "hello.txt", Option("text/plain"), file) :: DataPart("key", "value") :: List()))
+//      .post(file.ref.file)
+      .map (response =>
+        if (response.status == Status.OK) {
+          Right(Unit)
+        } else {
+          val file = request.body.files.head
+          val errorMsg = s"Error Uploading file ${file.filename}"
+          Logger.warn(s"$errorMsg\n${response.body}")
+          Left(Error("ERR_UPL_UPS", Seq(errorMsg)))
+        }
+      ).recover{
+        case ex: Throwable => {
+          val errorMsg = "Error while uploading to upscan."
+          Logger.error(errorMsg, ex)
+          Left(Error("ERR_UPL_UPS", Seq(errorMsg)))
+        }
+      }
+
   }
 }

@@ -133,15 +133,4 @@ $(document).ready(function() {
           if ( e.which == 38 || e.which == 40 || e.which == 188 )
               e.preventDefault();
       });
-
-      // =====================================================
-      // Continue with the processing of the file after it's uploaded to upscan.
-      // =====================================================
-      //TODO: maybe shouldn't wrap the form submission and instead use websockets
-      $("#councilTaxUploadForm").submit(function(e){
-        setTimeout(function() {
-            $("#upload-complete-form").submit();
-        }, 20000);
-        return true;
-      });
   }

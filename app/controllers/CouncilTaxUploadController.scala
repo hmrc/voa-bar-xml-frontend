@@ -81,7 +81,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   private[controllers] def badRequest(message: String)(implicit request: OptionalDataRequest[_]): Future[Result] = {
     def badRequestResult(username: String, initiateResponse: InitiateResponse) =
-      BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError(message)))
+      BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError(message), Some(initiateResponse)))
     loadPage(badRequestResult)
   }
 
@@ -93,7 +93,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private def parseUploadConfirmation(request: Request[JsValue], externalId: String): Future[Either[Error, UploadConfirmation]] = {
+  private[controllers] def parseUploadConfirmation(request: Request[JsValue], externalId: String): Future[Either[Error, UploadConfirmation]] = {
     Future(request.body.validate[UploadConfirmation] match {
       case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
       case _ => {
@@ -104,7 +104,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     })
   }
 
-  private def extractExternalId(request: Request[_]) = {
+  private[controllers] def extractExternalId(request: Request[_]) = {
     val queryStringParam = request.queryString.get("external-id")
     val containsExternalId = queryStringParam.isDefined && !queryStringParam.get.isEmpty
     Future(Either.cond(containsExternalId, queryStringParam.get.head, Error("EXT-ID-ND", Seq("External Id not defined."))))
@@ -124,7 +124,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       })
   }
 
-  private def sendContent(externalId: String, content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
+  private[controllers] def sendContent(externalId: String, content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
     val fileUploadData = FileUploadData(content)
     dataCacheConnector.save[FileUploadData](externalId, CouncilTaxUploadId.toString, fileUploadData) flatMap {
       cacheMap =>
@@ -138,6 +138,9 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   }
 
   def onSubmit(mode: Mode) = getData.async(parse.multipartFormData) { implicit request =>
-    Future(Redirect(routes.ConfirmationController.onPageLoad("File uploading to upscan")))
+    (for {
+      _ <- EitherT(uploadConnector.uploadFile(request))
+    } yield Redirect(routes.ConfirmationController.onPageLoad("File uploading to upscan")))
+      .valueOrF(_ => badRequest("councilTaxUpload.error.fileUploadService"))
   }
 }
