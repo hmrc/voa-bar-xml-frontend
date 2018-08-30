@@ -29,8 +29,11 @@ import models.UpScanRequests._
 import models.requests.OptionalDataRequest
 import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.Files
+import play.api.libs.Files.TemporaryFile
 import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.mvc.{Action, Request, Result}
+import play.api.mvc.MultipartFormData.FilePart
+import play.api.mvc.{Action, MultipartFormData, Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -63,11 +66,12 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   private[controllers] def fileUploadDetails(username: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
-    EitherT(uploadConnector.initiate(InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize)))
-      .fold(
+    uploadConnector.initiate(InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize))
+      .map(_.fold(
         _ => Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError("councilTaxUpload.error.fileUploadService")))),
         r => Right(r)
       )
+    )
   }
 
   private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)
@@ -137,10 +141,28 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
+  private[controllers] def validateFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]])
+    : Future[Either[Error, Unit.type]] = {
+    def validateThereIsAFile: Either[Error, FilePart[TemporaryFile]] = {
+      val file = request.body.files.headOption
+      Either.cond(file.isDefined && file.get.ref.file.length > 0, file.get, Error("XML_REQUIRED", Seq("councilTaxUpload.error.xml.required")))
+    }
+    def validateFileIsXml(file: FilePart[TemporaryFile]) =
+      Either.cond(file.contentType == Some("text/xml"), file, Error("WRONG_FILE_TYPE", Seq("councilTaxUpload.error.xml.fileType")))
+    def validateFileSize(file: FilePart[TemporaryFile]) =
+      Either.cond(file.ref.file.length <= maxFileSize, file, Error("FILE_TOO_BIG", Seq("councilTaxUpload.error.xml.length")))
+    Future(for {
+      file <- validateThereIsAFile
+      _ <- validateFileIsXml(file)
+      _ <- validateFileSize(file)
+    } yield(Unit))
+  }
+
   def onSubmit(mode: Mode) = getData.async(parse.multipartFormData) { implicit request =>
     (for {
-      _ <- EitherT(uploadConnector.uploadFile(request))
-    } yield Redirect(routes.ConfirmationController.onPageLoad("File uploading to upscan")))
-      .valueOrF(_ => badRequest("councilTaxUpload.error.fileUploadService"))
+      _ <- EitherT(validateFile(request))
+      reference <- EitherT(uploadConnector.uploadFile(request))
+    } yield Redirect(routes.ConfirmationController.onPageLoad(reference)))
+      .valueOrF(error => badRequest(error.values.head))
   }
 }

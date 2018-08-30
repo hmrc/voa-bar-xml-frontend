@@ -1,0 +1,56 @@
+<BAreports xmlns="http://www.govtalk.gov.uk/LG/Valuebill" xmlns:bs7666="http://www.govtalk.gov.uk/people/bs7666"
+           xmlns:pdt="http://www.govtalk.gov.uk/people/PersonDescriptives"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.govtalk.gov.uk/LG/Valuebill ../xsd/ValuebillBAtoVOA-v3-1d.xsd"
+           SchemaId="VbBAtoVOA"
+           SchemaVersion="4-0">
+    <BAreportHeader>
+        <BillingAuthority>Valid Council</BillingAuthority>
+        <BillingAuthorityIdentityCode>9999</BillingAuthorityIdentityCode>
+        <ProcessDate>2018-01-30</ProcessDate>
+        <EntryDateTime>2018-01-30T23:00:22</EntryDateTime>
+    </BAreportHeader>
+    <BApropertyReport>
+        <DateSent>2018-01-30</DateSent>
+        <TransactionIdentityBA>22121746115111</TransactionIdentityBA>
+        <BAidentityNumber>9999</BAidentityNumber>
+        <BAreportNumber>211909</BAreportNumber>
+        <TypeOfTax>
+            <CtaxReasonForReport>
+                <ReasonForReportCode>CR03</ReasonForReportCode>
+                <ReasonForReportDescription>New</ReasonForReportDescription>
+            </CtaxReasonForReport>
+        </TypeOfTax>
+        <ProposedEntries>
+            <AssessmentProperties>
+                <PropertyIdentity>
+                    <bs7666:UniquePropertyReferenceNumber>121102276285</bs7666:UniquePropertyReferenceNumber>
+                    <TextAddress>
+                        <AddressLine>5 VALID STREET</AddressLine>
+                        <AddressLine>AREA</AddressLine>
+                        <AddressLine>TOWN</AddressLine>
+                        <Postcode>AA11 1AA</Postcode>
+                    </TextAddress>
+                    <BAreference>22121746115611</BAreference>
+                </PropertyIdentity>
+                <OccupierContact>
+                    <OccupierName>
+                        <pdt:PersonNameTitle>MR</pdt:PersonNameTitle>
+                        <pdt:PersonGivenName>NAME</pdt:PersonGivenName>
+                        <pdt:PersonFamilyName>SURNAME</pdt:PersonFamilyName>
+                        <pdt:PersonRequestedName>MR NAME SURNAME</pdt:PersonRequestedName>
+                    </OccupierName>
+                </OccupierContact>
+            </AssessmentProperties>
+        </ProposedEntries>
+        <IndicatedDateOfChange>2018-05-01</IndicatedDateOfChange>
+        <Remarks>THIS IS A BLUEPRINT TEST PLEASE DELETE / NO ACTION THIS REPORT</Remarks>
+    </BApropertyReport>
+
+    <BAreportTrailer>
+        <RecordCount>8</RecordCount>
+        <EntryDateTime>2018-01-30T23:01:43</EntryDateTime>
+        <TotalNNDRreportCount>0</TotalNNDRreportCount>
+        <TotalCtaxReportCount>8</TotalCtaxReportCount>
+    </BAreportTrailer>
+</BAreports>

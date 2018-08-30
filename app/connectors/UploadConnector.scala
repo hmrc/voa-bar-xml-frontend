@@ -17,23 +17,20 @@
 package connectors
 
 import akka.stream.scaladsl.{FileIO, Source}
-import akka.util.ByteString
 import javax.inject.Inject
 import models.UpScanRequests._
-import models.requests.OptionalDataRequest
-import models.{Error, Login}
-import play.api.Mode.Mode
-import play.api.libs.Files
-import play.api.libs.Files.TemporaryFile
-import play.api.libs.ws.ahc.AhcCurlRequestLogger
-import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.mvc.MultipartFormData
-import play.api.mvc.MultipartFormData.{DataPart, FilePart}
 import play.api.{Configuration, Environment, Logger}
 import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
+import models.requests.OptionalDataRequest
+import models.{Error, Login}
+import play.api.Mode.Mode
+import play.api.libs.Files
+import play.api.libs.ws.WSClient
+import play.api.mvc.MultipartFormData
+import play.api.mvc.MultipartFormData.{DataPart, FilePart}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -110,9 +107,10 @@ class UploadConnector @Inject()(http: HttpClient,
   }
 
   private val validStatuses = Seq(Status.OK, Status.NO_CONTENT)
-  def uploadFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]]): Future[Either[Error, Unit.type]] = {
+  def uploadFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]]): Future[Either[Error, String]] = {
       val file = request.body.files.head
       val uploadUrl = request.body.dataParts.get("uploadUrl").get.head
+      val reference = request.body.dataParts.get("reference").get.head
       val filePart = FilePart(file.key, file.filename, file.contentType, FileIO.fromPath(file.ref.file.toPath))
       val dataParts = request.body.dataParts.map{case (key, value) => DataPart(key, value.head)}
       val parts = filePart :: dataParts.toList
@@ -120,18 +118,18 @@ class UploadConnector @Inject()(http: HttpClient,
         .post(Source(parts))
       .map (response =>
         if (validStatuses.contains(response.status)) {
-          Right(Unit)
+          Right(reference)
         } else {
           val file = request.body.files.head
           val errorMsg = s"Error Uploading file ${file.filename}"
           Logger.warn(s"$errorMsg\n${response.body}")
-          Left(Error("ERR_UPL_UPS", Seq(errorMsg)))
+          Left(Error("ERR_UPL_UPS", Seq("councilTaxUpload.error.fileUploadService")))
         }
       ).recover{
         case ex: Throwable => {
           val errorMsg = "Error while uploading to upscan."
           Logger.error(errorMsg, ex)
-          Left(Error("ERR_UPL_UPS", Seq(errorMsg)))
+          Left(Error("ERR_UPL_UPS", Seq("councilTaxUpload.error.fileUploadService")))
         }
       }
 

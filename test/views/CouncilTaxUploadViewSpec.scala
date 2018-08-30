@@ -19,6 +19,7 @@ package views
 import controllers.routes
 import forms.FileUploadDataFormProvider
 import models.NormalMode
+import models.UpScanRequests.{InitiateResponse, UploadRequest, UploadRequestFields}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.councilTaxUpload
@@ -32,12 +33,32 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
 
   val councilTaxUploadFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxUploadController"))
 
-  def createView = () => councilTaxUpload(username, frontendAppConfig, form)(councilTaxUploadFakeRequest, messages)
+  val initiateResponse = InitiateResponse(
+    reference = "foo",
+    uploadRequest = UploadRequest(
+      href = "http://www.bar.foo",
+      fields = UploadRequestFields(
+        acl = "private",
+        key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        policy = "xxxxxxxx==",
+        `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
+        `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
+        `x-amz-date` =  "yyyyMMddThhmmssZ",
+        `x-amz-meta-callback-url` =  "https://myservice.com/callback",
+        `x-amz-signature` =  "xxxx",
+        `x-amz-meta-consuming-service` = "something"
+      )
+    )
+  )
+  private def createView(displayInitiateResponse: Boolean = true) = {
+    val initiateResponseParam = if (displayInitiateResponse) Some(initiateResponse) else None
+    councilTaxUpload(username, frontendAppConfig, form, initiateResponseParam)(councilTaxUploadFakeRequest, messages)
+  }
 
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(createView, messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.size", "info.files", "message1",
+    behave like normalPage(() => createView(), messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.size", "info.files", "message1",
       "message2", "xml")
 
     "Include an username element displaying the BA name based on given BA Code" in {
@@ -61,6 +82,12 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
       val doc = asDocument(createView())
       val submitButton = doc.getElementById("submit").text()
       submitButton mustBe messages("site.submit")
+    }
+
+    "do not contain Submit button when there is not initiate response" in {
+      val doc = asDocument(createView(false))
+      val submitButton = Option(doc.getElementById("submit"))
+      submitButton mustBe None
     }
   }
 }

@@ -40,12 +40,11 @@
         <li>@messages("councilTaxUpload.info.files")</li>
     </ul>
 
-    <!--<form id="councilTaxUploadForm" method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">-->
-
     @helpers.form(action = routes.CouncilTaxUploadController.onSubmit(), 'enctype -> "multipart/form-data", 'id -> "upload-complete-form") {
         @components.error_summary(fileUploadForm.errors)
 
         @if(initiateResponse.isDefined) {
+            <input type="hidden" name="reference" value=@(initiateResponse.get.reference)>
             <input type="hidden" name="uploadUrl" value=@(initiateResponse.get.uploadRequest.href)>
             <input type="hidden" name="x-amz-algorithm" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-algorithm`)>
             <input type="hidden" name="x-amz-meta-callback-url" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-callback-url`)>
@@ -68,6 +67,5 @@
                @messages("councilTaxUpload.message2")
             </h5></p>
         }
-    <!--</form>-->
     }
 }
