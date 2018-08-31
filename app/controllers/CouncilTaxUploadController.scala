@@ -22,18 +22,15 @@ import connectors.{DataCacheConnector, UploadConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
-import models.{Error, FileUploadData, Login, Mode, NormalMode}
+import models.{Error, FileUploadData, Login, NormalMode}
 import cats.data.EitherT
 import cats.implicits._
 import models.UpScanRequests._
 import models.requests.OptionalDataRequest
 import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.Files
-import play.api.libs.Files.TemporaryFile
 import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.mvc.MultipartFormData.FilePart
-import play.api.mvc.{Action, MultipartFormData, Request, Result}
+import play.api.mvc.{Action, Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -121,25 +118,6 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private[controllers] def validateThereIsAFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]]):
-    Either[Error, FilePart[TemporaryFile]] = {
-    val file = request.body.files.headOption
-    val isFileDefined = file.isDefined && file.get.ref.file.length > 0
-    Either.cond(isFileDefined, file.get, Error("councilTaxUpload.error.xml.required", Seq()))
-  }
-  private[controllers] def validateFileIsXml(file: FilePart[TemporaryFile]) =
-    Either.cond(file.contentType == Some("text/xml"), file, Error("councilTaxUpload.error.xml.fileType", Seq()))
-  private[controllers] def validateFileSize(file: FilePart[TemporaryFile]) =
-    Either.cond(file.ref.file.length <= maxFileSize, file, Error("councilTaxUpload.error.xml.length", Seq()))
-  private[controllers] def validateFile(request: OptionalDataRequest[MultipartFormData[Files.TemporaryFile]])
-    : Future[Either[Error, Unit.type]] = {
-    Future(for {
-      file <- validateThereIsAFile(request)
-      _ <- validateFileIsXml(file)
-      _ <- validateFileSize(file)
-    } yield(Unit))
-  }
-
   def onPageLoad = getData.async {
     implicit request => {
       def okResult(username: String, initiateResponse: InitiateResponse) =
@@ -160,13 +138,5 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
         Logger.error(errorMsg)
         InternalServerError(errorMsg)
       })
-  }
-
-  def onSubmit(mode: Mode) = getData.async(parse.multipartFormData) { implicit request =>
-    (for {
-      _ <- EitherT(validateFile(request))
-      reference <- EitherT(uploadConnector.uploadFile(request))
-    } yield Redirect(routes.ConfirmationController.onPageLoad(reference)))
-      .valueOrF(error => badRequest(error.code))
   }
 }

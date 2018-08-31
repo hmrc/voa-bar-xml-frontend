@@ -16,8 +16,6 @@
 
 package controllers
 
-import java.io.File
-
 import connectors.{FakeDataCacheConnector, UploadConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
@@ -31,10 +29,6 @@ import play.api.data.Form
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.html.councilTaxUpload
-import models.requests.OptionalDataRequest
-import play.api.libs.Files.TemporaryFile
-import play.api.mvc.MultipartFormData
-import play.api.mvc.MultipartFormData.FilePart
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -75,14 +69,11 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   val uploadConnector = mock[UploadConnector]
   when(uploadConnector.sendXml(any[String], any[Login])) thenReturn Future(Right(submissionId))
   when(uploadConnector.initiate(any[InitiateRequest])) thenReturn Future(Right(initiateResponse))
-  when(uploadConnector.uploadFile(any[OptionalDataRequest[MultipartFormData[TemporaryFile]]])) thenReturn Future(Right(submissionId))
   when(uploadConnector.downloadFile(any[UploadConfirmation])) thenReturn Future(Right("All good"))
 
   val uploadConnectorF = mock[UploadConnector]
   when(uploadConnectorF.sendXml(any[String], any[Login])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
   when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
-  when(uploadConnectorF.uploadFile(any[OptionalDataRequest[MultipartFormData[TemporaryFile]]])) thenReturn
-    Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
   when(uploadConnectorF.downloadFile(any[UploadConfirmation])) thenReturn Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
 
   def loggedInController(connector: UploadConnector) = {
@@ -118,106 +109,5 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
-
-    "redirect to the next page when valid data is submitted and backend service returns a submission Id" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "file", filename = "valid.xml", contentType = Some("text/xml"), ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode)(req)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.onPageLoad(submissionId).url)
-    }
-
-    "return a Bad Request and errors when invalid file format is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.fileType"))
-      val path = getClass.getResource("/noXmlFile.txt")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "noXmlFile.txt", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when no file is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode )(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when a file over 2 Mb is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.length"))
-      val path = getClass.getResource("/tooLarge.xml")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "tooLarge.xml", contentType = Some("text/xml"), ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode )(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when an empty file is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
-      val path = getClass.getResource("/empty.xml")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "empty.xml", contentType = Some("text/xml"), ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "throw an exception when the upload backend service call fails" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      intercept[Exception] {
-        val result = loggedInController(uploadConnectorF).onSubmit(NormalMode )(req)
-        status(result) mustBe INTERNAL_SERVER_ERROR
-      }
-    }
-
-    "on submit redirect to login page if no login details can be retrieved from the user answers" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = notLoggedInController(uploadConnector).onSubmit(NormalMode )(req)
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(onwardRoute.url)
-    }
-
   }
 }

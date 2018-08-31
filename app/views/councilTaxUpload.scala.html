@@ -40,32 +40,34 @@
         <li>@messages("councilTaxUpload.info.files")</li>
     </ul>
 
-    @helpers.form(action = routes.CouncilTaxUploadController.onSubmit(), 'enctype -> "multipart/form-data", 'id -> "upload-complete-form") {
-        @components.error_summary(fileUploadForm.errors)
+    @components.error_summary(fileUploadForm.errors)
 
-        @if(initiateResponse.isDefined) {
-            <input type="hidden" name="reference" value=@(initiateResponse.get.reference)>
-            <input type="hidden" name="uploadUrl" value=@(initiateResponse.get.uploadRequest.href)>
-            <input type="hidden" name="x-amz-algorithm" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-algorithm`)>
-            <input type="hidden" name="x-amz-meta-callback-url" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-callback-url`)>
-            <input type="hidden" name="x-amz-date" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-date`)>
-            <input type="hidden" name="x-amz-credential" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-credential`)>
-            <input type="hidden" name="x-amz-meta-consuming-service" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-consuming-service`)>
-            <input type="hidden" name="x-amz-signature" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-signature`)>
-            <input type="hidden" name="policy" value=@(initiateResponse.get.uploadRequest.fields.policy)>
-            <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
-            <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
+    @if(initiateResponse.isDefined) {
+        <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(initiateResponse.get.reference)) />
+        <form id="councilTaxUploadForm" method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
 
-            @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
+                <input type="hidden" name="reference" value=@(initiateResponse.get.reference)>
+                <input type="hidden" name="uploadUrl" value=@(initiateResponse.get.uploadRequest.href)>
+                <input type="hidden" name="x-amz-algorithm" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-algorithm`)>
+                <input type="hidden" name="x-amz-meta-callback-url" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-callback-url`)>
+                <input type="hidden" name="x-amz-date" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-date`)>
+                <input type="hidden" name="x-amz-credential" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-credential`)>
+                <input type="hidden" name="x-amz-meta-consuming-service" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-consuming-service`)>
+                <input type="hidden" name="x-amz-signature" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-signature`)>
+                <input type="hidden" name="policy" value=@(initiateResponse.get.uploadRequest.fields.policy)>
+                <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
+                <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
 
-            @components.submit_button()
+                @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
 
-            <p><h5 class="alert">
-               @messages("councilTaxUpload.message1")
-               <br />
-               <br />
-               @messages("councilTaxUpload.message2")
-            </h5></p>
-        }
+                @components.submit_button()
+
+                <p><h5 class="alert">
+                   @messages("councilTaxUpload.message1")
+                   <br />
+                   <br />
+                   @messages("councilTaxUpload.message2")
+                </h5></p>
+        </form>
     }
 }

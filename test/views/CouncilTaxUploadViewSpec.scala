@@ -52,8 +52,11 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
     )
   )
   private def createView(displayInitiateResponse: Boolean = true) = {
-    val initiateResponseParam = if (displayInitiateResponse) Some(initiateResponse) else None
-    councilTaxUpload(username, frontendAppConfig, form, initiateResponseParam)(councilTaxUploadFakeRequest, messages)
+    if (displayInitiateResponse) {
+      councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
+    } else {
+      councilTaxUpload(username, frontendAppConfig, form)(councilTaxUploadFakeRequest, messages)
+    }
   }
 
   lazy val doc = asDocument(createView())
@@ -87,7 +90,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
 
     "contain Upscan expected hidden inputs" in {
       val doc = asDocument(createView())
-      val upscanInputs = doc.getElementById("upload-complete-form").getElementsByAttributeValue("type", "hidden")
+      val upscanInputs = doc.getElementById("councilTaxUploadForm").getElementsByAttributeValue("type", "hidden")
       Option(upscanInputs.select("[name='policy']")) mustBe defined
       upscanInputs.select("[name='policy']").`val` mustBe initiateResponse.uploadRequest.fields.policy
       Option(upscanInputs.select("[name='x-amz-algorithm']")) mustBe defined

@@ -18,7 +18,6 @@ GET         /councilTaxStart                    controllers.CouncilTaxStartContr
 GET         /goToCouncilTaxUpload               controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
 
 GET         /councilTaxUpload                   controllers.CouncilTaxUploadController.onPageLoad()
-POST        /councilTaxUpload                   controllers.CouncilTaxUploadController.onSubmit(mode: Mode = NormalMode)
 POST        /councilTaxUpload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
 
 GET         /welcome                            controllers.WelcomeController.onPageLoad()

@@ -133,4 +133,13 @@ $(document).ready(function() {
           if ( e.which == 38 || e.which == 40 || e.which == 188 )
               e.preventDefault();
       });
+      // =====================================================
+      // Continue with the processing of the file after it's uploaded to upscan.
+      // =====================================================
+      $("#councilTaxUploadForm").submit(function(e){
+        setTimeout(function() {
+            window.location = $("#councilTaxUploadFormRedirect").val();
+        }, 5000);
+        return true;
+      });
   }
