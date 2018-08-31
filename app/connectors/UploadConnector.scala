@@ -69,14 +69,14 @@ class UploadConnector @Inject()(http: HttpClient,
             case status => {
               val errorMsg = s"Received status of $status from upstream service when uploading am xml file"
               Logger.warn(errorMsg)
-              Left(Error("SEND-XML-ERROR", Seq(errorMsg)))
+              Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
             }
           }
       } recover {
       case e =>
         val errorMsg = s"Received status of ${e.getMessage} from upstream service when uploading am xml file"
         Logger.error(errorMsg, e)
-        Left(Error("SEND-XML-ERROR", Seq(errorMsg)))
+        Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
     }
   }
 
@@ -87,7 +87,7 @@ class UploadConnector @Inject()(http: HttpClient,
         case ex: Throwable => {
           val errorMessage = "Failed to get UpScan file upload details"
           Logger.error(errorMessage, ex)
-          Left(Error("UPSCAN-INIT", Seq(errorMessage)))
+          Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMessage)))
         }
       }
   }
@@ -101,7 +101,7 @@ class UploadConnector @Inject()(http: HttpClient,
         case ex: Throwable => {
           val errorMsg = s"Error downloading file from ${request.downloadUrl}"
           Logger.error(errorMsg, ex)
-          Left(Error("UPSCAT-DOWN", Seq(ex.getMessage)))
+          Left(Error("councilTaxUpload.error.fileUploadService", Seq(ex.getMessage)))
         }
       }
   }
@@ -123,13 +123,13 @@ class UploadConnector @Inject()(http: HttpClient,
           val file = request.body.files.head
           val errorMsg = s"Error Uploading file ${file.filename}"
           Logger.warn(s"$errorMsg\n${response.body}")
-          Left(Error("ERR_UPL_UPS", Seq("councilTaxUpload.error.fileUploadService")))
+          Left(Error("councilTaxUpload.error.fileUploadService", Seq()))
         }
       ).recover{
         case ex: Throwable => {
           val errorMsg = "Error while uploading to upscan."
           Logger.error(errorMsg, ex)
-          Left(Error("ERR_UPL_UPS", Seq("councilTaxUpload.error.fileUploadService")))
+          Left(Error("councilTaxUpload.error.fileUploadService", Seq()))
         }
       }
 
