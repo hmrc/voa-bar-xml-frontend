@@ -25,12 +25,10 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import models.{Error, Login}
 import play.api.Mode.Mode
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UploadConnector @Inject()(http: HttpClient,
-                                ws: WSClient,
                                 val configuration: Configuration,
                                 environment: Environment)
                                (implicit ec: ExecutionContext)
