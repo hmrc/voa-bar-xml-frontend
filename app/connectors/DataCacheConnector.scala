@@ -16,7 +16,6 @@
 
 package connectors
 
-import cats.data.OptionT
 import com.google.inject.{ImplementedBy, Inject}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -49,9 +48,7 @@ class DataCacheConnectorImpl @Inject()(val sessionRepository: SessionRepository,
 
   def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] = {
     fetch(cacheId).map { optionalCacheMap =>
-      optionalCacheMap.flatMap { cacheMap =>
-        cacheMap.getEntry(key)
-      }
+      optionalCacheMap.flatMap { cacheMap => cacheMap.getEntry(key)}
     }
   }
 
