@@ -16,26 +16,22 @@
 
 package controllers
 
-import java.io.File
-
 import connectors.{FakeDataCacheConnector, UploadConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.{Login, NormalMode}
+import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest, UploadRequestFields}
+import models.{Error, Login, NormalMode}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.libs.Files.TemporaryFile
-import play.api.mvc.MultipartFormData
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.html.councilTaxUpload
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -50,12 +46,35 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   lazy val pathForValidFile = getClass.getResource("/valid.xml")
 
   val submissionId = "SID38273"
+  val reference = submissionId
+  val uploadUrl = "http://foo.bar"
+  val initiateResponse = InitiateResponse(
+    reference = reference,
+    uploadRequest = UploadRequest(
+      href = uploadUrl,
+      fields = UploadRequestFields(
+        acl = "private",
+        key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        policy = "xxxxxxxx==",
+        `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
+        `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
+        `x-amz-date` =  "yyyyMMddThhmmssZ",
+        `x-amz-meta-callback-url` =  "https://myservice.com/callback",
+        `x-amz-signature` =  "xxxx",
+        `x-amz-meta-consuming-service` = "something"
+      )
+    )
+  )
 
   val uploadConnector = mock[UploadConnector]
-  when(uploadConnector.sendXml(any[String], any[Login])) thenReturn Future.successful(Success(submissionId))
+  when(uploadConnector.sendXml(any[String], any[Login])) thenReturn Future(Right(submissionId))
+  when(uploadConnector.initiate(any[InitiateRequest])) thenReturn Future(Right(initiateResponse))
+  when(uploadConnector.downloadFile(any[UploadConfirmation])) thenReturn Future(Right("All good"))
 
   val uploadConnectorF = mock[UploadConnector]
-  when(uploadConnectorF.sendXml(any[String], any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
+  when(uploadConnectorF.sendXml(any[String], any[Login])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
+  when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
+  when(uploadConnectorF.downloadFile(any[UploadConfirmation])) thenReturn Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
 
   def loggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
@@ -73,7 +92,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       connector)
   }
 
-  def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form)(fakeRequest, messages).toString
+  def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 
@@ -90,106 +109,5 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
-
-    "redirect to the next page when valid data is submitted and backend service returns a submission Id" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.onPageLoad(submissionId).url)
-    }
-
-    "return a Bad Request and errors when invalid file format is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.fileType"))
-      val path = getClass.getResource("/noXmlFile.txt")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "noXmlFile.txt", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when no file is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when a file over 2 Mb is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.length"))
-      val path = getClass.getResource("/tooLarge.xml")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "tooLarge.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "return a Bad Request and errors when an empty file is submitted" in {
-      val boundForm = form.withGlobalError(messages("councilTaxUpload.error.xml.required"))
-      val path = getClass.getResource("/empty.xml")
-      val file = new File(path.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "empty.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = loggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-
-      status(result) mustBe BAD_REQUEST
-      contentAsString(result) mustBe viewAsString(boundForm)
-    }
-
-    "throw an exception when the upload backend service call fails" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      intercept[Exception] {
-        val result = loggedInController(uploadConnectorF).onSubmit(NormalMode, username)(req)
-        status(result) mustBe INTERNAL_SERVER_ERROR
-      }
-    }
-
-    "on submit redirect to login page if no login details can be retrieved from the user answers" in {
-      val file = new File(pathForValidFile.getPath)
-      val tempFile = new TemporaryFile(file)
-
-      val part = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
-
-      val req = fakeRequest.withBody(MultipartFormData[TemporaryFile](dataParts = Map.empty, files = Seq(part), badParts = Nil))
-
-      val result = notLoggedInController(uploadConnector).onSubmit(NormalMode, username)(req)
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(onwardRoute.url)
-    }
-
   }
 }
