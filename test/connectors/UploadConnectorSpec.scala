@@ -70,6 +70,8 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
     val httpMock = mock[HttpClient]
     when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
       any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None, Map(), returnedString))
+    when(httpMock.POSTString(anyString, any[String], any[Seq[(String, String)]])(any[HttpReads[Any]],
+      any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None, Map(), returnedString))
     httpMock
   }
 
@@ -82,7 +84,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
         implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])
         val urlCaptor = ArgumentCaptor.forClass(classOf[String])
-        val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
+        val bodyCaptor = ArgumentCaptor.forClass(classOf[String])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200, Some(submissionId))
         val wsClientMock = mock[WSClient]
@@ -93,8 +95,8 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
         await(connector.sendXml(xmlContent, login))
 
-        verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
-          httpReadsNapper.capture, headerCarrierNapper.capture, any())
+        verify(httpMock)
+          .POSTString(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(httpReadsNapper.capture, headerCarrierNapper.capture, any())
         urlCaptor.getValue must endWith(s"${connector.baseSegment}upload")
         bodyCaptor.getValue mustBe Source.fromFile(xmlFile.ref.file).getLines.mkString("\n")
         headersCaptor.getValue mustBe Seq(connector.xmlContentTypeHeader, userHeader, passHeader)
@@ -119,7 +121,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
       "return a failure if the upload call throws an exception" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+        when(httpMock.POSTString(anyString, any[String], any[Seq[(String, String)]])(any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
         val wsClientMock = mock[WSClient]
         val connector = new UploadConnector(httpMock, configuration, environment)
