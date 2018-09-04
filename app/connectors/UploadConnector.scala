@@ -54,7 +54,7 @@ class UploadConnector @Inject()(http: HttpClient,
   def sendXml(xml: String, loginDetails: Login): Future[Either[Error, String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
-    http.POST(s"$serviceUrl${baseSegment}upload", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
+    http.POSTString(s"$serviceUrl${baseSegment}upload", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
       .map {
         response =>
           response.status match {
