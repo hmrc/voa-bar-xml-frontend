@@ -20,7 +20,6 @@ import controllers.routes
 import forms.FileUploadDataFormProvider
 import models.NormalMode
 import models.UpScanRequests.{InitiateResponse, UploadRequest, UploadRequestFields}
-import org.jsoup.nodes.Element
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.councilTaxUpload
@@ -62,7 +61,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(() => createView(), messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.size", "info.files", "message1",
+    behave like normalPage(() => createView(), messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.files", "message1",
       "message2", "xml")
 
     "Include an username element displaying the BA name based on given BA Code" in {
