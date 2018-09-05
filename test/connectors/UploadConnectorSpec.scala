@@ -93,11 +93,11 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
-        await(connector.sendXml(xmlContent, login))
+        await(connector.sendXml(xmlContent, login, submissionId))
 
         verify(httpMock)
           .POSTString(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(httpReadsNapper.capture, headerCarrierNapper.capture, any())
-        urlCaptor.getValue must endWith(s"${connector.baseSegment}upload")
+        urlCaptor.getValue must endWith(s"${connector.baseSegment}upload?reference=$submissionId")
         bodyCaptor.getValue mustBe Source.fromFile(xmlFile.ref.file).getLines.mkString("\n")
         headersCaptor.getValue mustBe Seq(connector.xmlContentTypeHeader, userHeader, passHeader)
       }
@@ -105,7 +105,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val wsClientMock = mock[WSClient]
         val connector = new UploadConnector(getHttpMock(200, Some(submissionId)), configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlContent, login, submissionId))
         result match {
           case Right(submissionValue) => submissionValue mustBe submissionId
           case Left(e) => assert(false)
@@ -115,7 +115,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       "return a failure representing the error when send method fails" in {
         val wsClientMock = mock[WSClient]
         val connector = new UploadConnector(getHttpMock(500, None), configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
 
@@ -125,7 +125,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
         val wsClientMock = mock[WSClient]
         val connector = new UploadConnector(httpMock, configuration, environment)
-        val result = await(connector.sendXml(xmlContent, login))
+        val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
     }

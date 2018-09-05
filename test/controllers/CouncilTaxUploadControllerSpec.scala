@@ -67,12 +67,12 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   )
 
   val uploadConnector = mock[UploadConnector]
-  when(uploadConnector.sendXml(any[String], any[Login])) thenReturn Future(Right(submissionId))
+  when(uploadConnector.sendXml(any[String], any[Login], any[String])) thenReturn Future(Right(submissionId))
   when(uploadConnector.initiate(any[InitiateRequest])) thenReturn Future(Right(initiateResponse))
   when(uploadConnector.downloadFile(any[UploadConfirmation])) thenReturn Future(Right("All good"))
 
   val uploadConnectorF = mock[UploadConnector]
-  when(uploadConnectorF.sendXml(any[String], any[Login])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
+  when(uploadConnectorF.sendXml(any[String], any[Login], any[String])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
   when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
   when(uploadConnectorF.downloadFile(any[UploadConfirmation])) thenReturn Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
 

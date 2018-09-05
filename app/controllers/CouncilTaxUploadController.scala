@@ -111,7 +111,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       cacheMap =>
         dataCacheConnector.getEntry[Login](externalId, LoginId.toString) flatMap {
           case Some(loginDetails) => {
-            uploadConnector.sendXml(content, loginDetails)
+            uploadConnector.sendXml(content, loginDetails, uploadConfirmation.reference)
           }
           case None => Future(Left(Error("login.error.auth", Seq("Couldn't send file because expired login"))))
         }
