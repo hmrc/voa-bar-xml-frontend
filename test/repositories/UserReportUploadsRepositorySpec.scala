@@ -15,23 +15,81 @@
  */
 package repositories
 
+import models.Error
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import play.api.test.Helpers._
+import reactivemongo.api.ReadPreference
+import reactivemongo.api.commands.WriteResult
+import reactivemongo.bson.BSONObjectID
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
-class UserReportUploadsRepositorySpec extends PlaySpec {
+class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
+  private val reference = "0123456789ab0123456789ab"
+  private val invalidReference = "nope"
+  private val userName = "foo"
+  private val password = "bar"
+  private val userReportUpload = UserReportUpload(reference, userName, password)
+  private val errorMessage = "error message :("
+  private val exception = new Exception(errorMessage)
+  private val error = Error(exception.getMessage)
   "DefaultUserReportUploadsRepository" must {
-    "have a method that save user and report information" when {
-      "valid arguments are provided" in {
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(???)
+    "have a method that save user and report information that" must {
+      "return a successful result when valid arguments are provided" in {
+        val writeResult = mock[WriteResult]
+        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
+        when(userReportUploadsReactiveRepositoryMock.insert(userReportUpload)).thenReturn(Future.successful(writeResult))
+        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
 
-        userReportUploadsRepository.save(???)
+        val result = await(userReportUploadsRepository.save(userReportUpload))
+
+        result mustBe Right(Unit)
+      }
+      "return a failed result when the repository fails" in {
+        val writeResult = mock[WriteResult]
+        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
+        when(userReportUploadsReactiveRepositoryMock.insert(userReportUpload)).thenReturn(Future.failed(exception))
+        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+
+        val result = await(userReportUploadsRepository.save(userReportUpload))
+
+        result mustBe Left(error)
       }
     }
-    "have a method that get user and report information" when {
-      "a valid reference id is provided" in {
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(???)
+    "have a method that get user and report information that" must {
+      "a successful result when a valid reference id is provided" in {
+        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
+        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
+          .thenReturn(Future.successful(Some(userReportUpload)))
+        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
 
-        userReportUploadsRepository.getByReference(???)
+        val result = await(userReportUploadsRepository.getByReference(reference))
+
+        result mustBe Right(Some(userReportUpload))
+      }
+      "a failed result when an invalid reference id is provided" in {
+        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
+        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
+          .thenReturn(Future.successful(Some(userReportUpload)))
+        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+
+        val result = await(userReportUploadsRepository.getByReference(invalidReference))
+
+        result mustBe Left(Error(s"$invalidReference could not be parsed as Id" ,Seq()))
+      }
+      "return a failed result when the repository fails" in {
+        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
+        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
+          .thenReturn(Future.failed(exception))
+        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+
+        val result = await(userReportUploadsRepository.getByReference(reference))
+
+        result mustBe Left(error)
       }
     }
   }

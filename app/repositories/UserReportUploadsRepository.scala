@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.Error
 import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
-import reactivemongo.api.DefaultDB
+import reactivemongo.api.{DefaultDB, ReadPreference}
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import uk.gov.hmrc.mongo.ReactiveRepository
@@ -46,7 +46,7 @@ class UserReportUploadsReactiveRepository @Inject() (
   private val indexName = UserReportUpload.name
   private val key = "reference"
   private val expireAfterSeconds = "expireAfterSeconds"
-  private val ttlPath = s"${UserReportUpload.name}.ttl"
+  private val ttlPath = s"${UserReportUpload.name}.timeToLiveInSeconds"
   private val ttl = config.getInt(ttlPath)
     .getOrElse(throw new ConfigException.Missing(ttlPath))
   createIndex()
@@ -69,7 +69,7 @@ class DefaultUserReportUploadsRepository @Inject() (
   userReportUploadsReactiveRepository: UserReportUploadsReactiveRepository
 )(implicit executionContext: ExecutionContext) extends  UserReportUploadsRepository {
   override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
-    userReportUploadsReactiveRepository.save(userReportUpload)
+    userReportUploadsReactiveRepository.insert(userReportUpload)
       .map(_ => Right(Unit))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
@@ -77,15 +77,20 @@ class DefaultUserReportUploadsRepository @Inject() (
   }
 
   override def getByReference(reference: String): Future[Either[Error, Option[UserReportUpload]]] = {
-    userReportUploadsReactiveRepository.findById(???, ???)
-      .map(Right(_))
-      .recover {
-        case e: Throwable => Left(Error(e.getMessage, Seq()))
-      }
+    val parsedReference = BSONObjectID.parse(reference)
+    if(parsedReference.isFailure) {
+      Future.successful(Left(Error(s"$reference could not be parsed as Id", Seq())))
+    } else {
+      userReportUploadsReactiveRepository.findById(parsedReference.get, ReadPreference.primary)
+        .map(Right(_))
+        .recover {
+          case e: Throwable => Left(Error(e.getMessage, Seq()))
+        }
+    }
   }
 }
 
-@ImplementedBy[DefaultUserReportUploadsRepository]
+@ImplementedBy(classOf[DefaultUserReportUploadsRepository])
 trait UserReportUploadsRepository {
   def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]]
   def getByReference(reference: String): Future[Either[Error, Option[UserReportUpload]]]
