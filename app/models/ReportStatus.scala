@@ -20,6 +20,13 @@ import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
+sealed trait ReportStatusType { val value: String = getClass.asSubclass(getClass).getSimpleName }
+case object Pending extends ReportStatusType
+case object UpScanUploaded extends ReportStatusType
+case object UpScanVerified extends ReportStatusType
+case object UpScanVerificationFailed extends ReportStatusType
+case object XmlValidationFailed extends ReportStatusType
+
 case class ReportStatus(baCode: String, submissionId: String, status: String, errors: Seq[Error] = Seq(), created: DateTime = DateTime.now(DateTimeZone.UTC))
 
 object ReportStatus {

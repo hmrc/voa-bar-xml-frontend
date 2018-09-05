@@ -54,23 +54,26 @@ class UploadConnector @Inject()(http: HttpClient,
   def sendXml(xml: String, loginDetails: Login, id: String): Future[Either[Error, String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
-    http.POSTString(s"$serviceUrl${baseSegment}upload?reference=$id", xml, Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password)))
+    val headers = Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password))
+    http.POSTString(s"$serviceUrl${baseSegment}upload?reference=$id", xml, headers)
       .map {
         response =>
           response.status match {
             case Status.OK => Right(response.body)
             case status => {
-              val errorMsg = s"Received status of $status from upstream service when uploading am xml file"
-              Logger.warn(errorMsg)
-              Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
+              handleSendXmlError(response.body)
             }
           }
       } recover {
       case e =>
-        val errorMsg = s"Received status of ${e.getMessage} from upstream service when uploading am xml file"
-        Logger.error(errorMsg, e)
-        Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
+        handleSendXmlError(e.getMessage)
     }
+  }
+
+  private def handleSendXmlError(message: String) = {
+    val errorMsg = s"Error when uploading am xml file\n$message"
+    Logger.warn(errorMsg)
+    Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
   }
 
   def initiate(request: InitiateRequest): Future[Either[Error, InitiateResponse]] = {
