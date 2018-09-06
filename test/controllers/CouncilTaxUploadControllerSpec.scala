@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{FakeDataCacheConnector, UploadConnector}
+import connectors.{FakeDataCacheConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
@@ -27,6 +27,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.test.Helpers._
+import repositories.UserReportUpload
 import utils.FakeNavigator
 import views.html.councilTaxUpload
 
@@ -76,20 +77,23 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
   when(uploadConnectorF.downloadFile(any[UploadConfirmation])) thenReturn Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
 
+  val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
+  when(userReportUploadsConnectorMock.save(any[UserReportUpload])) thenReturn Future(Right(Unit))
+
   def loggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector)
+      connector, userReportUploadsConnectorMock)
   }
 
   def notLoggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector)
+      connector, userReportUploadsConnectorMock)
   }
 
   def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(fakeRequest, messages).toString

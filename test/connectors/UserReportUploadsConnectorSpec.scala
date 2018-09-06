@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package repositories
+package connectors
 
 import models.Error
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.BSONObjectID
+import repositories.{UserReportUpload, UserReportUploadsReactiveRepository}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
+class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar {
   private val reference = "0123456789ab0123456789ab"
   private val invalidReference = "nope"
   private val userName = "foo"
@@ -37,13 +38,13 @@ class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
   private val errorMessage = "error message :("
   private val exception = new Exception(errorMessage)
   private val error = Error(exception.getMessage)
-  "DefaultUserReportUploadsRepository" must {
+  "DefaultUserReportUploadsConnector" must {
     "have a method that save user and report information that" must {
       "return a successful result when valid arguments are provided" in {
         val writeResult = mock[WriteResult]
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
         when(userReportUploadsReactiveRepositoryMock.insert(userReportUpload)).thenReturn(Future.successful(writeResult))
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
         val result = await(userReportUploadsRepository.save(userReportUpload))
 
@@ -53,7 +54,7 @@ class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
         val writeResult = mock[WriteResult]
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
         when(userReportUploadsReactiveRepositoryMock.insert(userReportUpload)).thenReturn(Future.failed(exception))
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
         val result = await(userReportUploadsRepository.save(userReportUpload))
 
@@ -65,7 +66,7 @@ class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
         when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
           .thenReturn(Future.successful(Some(userReportUpload)))
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
         val result = await(userReportUploadsRepository.getByReference(reference))
 
@@ -75,7 +76,7 @@ class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
         when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
           .thenReturn(Future.successful(Some(userReportUpload)))
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
         val result = await(userReportUploadsRepository.getByReference(invalidReference))
 
@@ -85,7 +86,7 @@ class UserReportUploadsRepositorySpec extends PlaySpec with MockitoSugar {
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
         when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
           .thenReturn(Future.failed(exception))
-        val userReportUploadsRepository = new DefaultUserReportUploadsRepository(userReportUploadsReactiveRepositoryMock)
+        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
         val result = await(userReportUploadsRepository.getByReference(reference))
 

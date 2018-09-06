@@ -63,35 +63,3 @@ class UserReportUploadsReactiveRepository @Inject() (
     }
   }
 }
-
-@Singleton
-class DefaultUserReportUploadsRepository @Inject() (
-  userReportUploadsReactiveRepository: UserReportUploadsReactiveRepository
-)(implicit executionContext: ExecutionContext) extends  UserReportUploadsRepository {
-  override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
-    userReportUploadsReactiveRepository.insert(userReportUpload)
-      .map(_ => Right(Unit))
-      .recover {
-        case e: Throwable => Left(Error(e.getMessage, Seq()))
-      }
-  }
-
-  override def getByReference(reference: String): Future[Either[Error, Option[UserReportUpload]]] = {
-    val parsedReference = BSONObjectID.parse(reference)
-    if(parsedReference.isFailure) {
-      Future.successful(Left(Error(s"$reference could not be parsed as Id", Seq())))
-    } else {
-      userReportUploadsReactiveRepository.findById(parsedReference.get, ReadPreference.primary)
-        .map(Right(_))
-        .recover {
-          case e: Throwable => Left(Error(e.getMessage, Seq()))
-        }
-    }
-  }
-}
-
-@ImplementedBy(classOf[DefaultUserReportUploadsRepository])
-trait UserReportUploadsRepository {
-  def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]]
-  def getByReference(reference: String): Future[Either[Error, Option[UserReportUpload]]]
-}

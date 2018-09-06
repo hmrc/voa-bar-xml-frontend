@@ -18,10 +18,10 @@ package controllers
 
 import javax.inject.Inject
 import config.FrontendAppConfig
-import connectors.{DataCacheConnector, UploadConnector}
+import connectors.{DataCacheConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
-import identifiers.{CouncilTaxUploadId, LoginId, VOAAuthorisedId}
+import identifiers.{CouncilTaxUploadId, LoginId}
 import models.{Error, FileUploadData, Login, NormalMode}
 import cats.data.EitherT
 import cats.implicits._
@@ -31,6 +31,7 @@ import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{Action, Request, Result}
+import repositories.UserReportUpload
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -44,7 +45,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            dataCacheConnector: DataCacheConnector,
                                            formProvider: FileUploadDataFormProvider,
                                            navigator: Navigator,
-                                           uploadConnector: UploadConnector)
+                                           uploadConnector: UploadConnector,
+                                           userReportUploadsConnector: UserReportUploadsConnector)
                                           (implicit ec: ExecutionContext)
   extends FrontendController with I18nSupport {
 
@@ -54,31 +56,32 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private[controllers] val callBackUrl = appConfig.runModeConfiguration
     .getString("microservice.services.upscan.callback-url").get
 
-  private[controllers] def cachedUserName(externalId: String): Future[Either[Result, String]] = {
-    dataCacheConnector.getEntry[String](externalId, VOAAuthorisedId.toString) map {
-      case Some(username) => {
-        Right(username)
+  private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
+    dataCacheConnector.getEntry[Login](externalId, LoginId.toString) map {
+      case Some(login) => {
+        Right(login)
       }
       case None => Left(Redirect(routes.LoginController.onPageLoad(NormalMode)))
     }
   }
 
-  private[controllers] def fileUploadDetails(username: String)
+  private[controllers] def fileUploadDetails(username: String, password: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
-    uploadConnector.initiate(InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize))
-      .map(_.fold(
-        _ => Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError("councilTaxUpload.error.fileUploadService")))),
-        r => Right(r)
-      )
-    )
+    val initiateRequest = InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize)
+    val errorResult = Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError("councilTaxUpload.error.fileUploadService"))))
+    (for {
+      uploadResponse <- EitherT(uploadConnector.initiate(initiateRequest))
+      _ <- EitherT(userReportUploadsConnector.save(UserReportUpload(uploadResponse.reference, username, password)))
+    } yield Right(uploadResponse))
+      .valueOr(_ => errorResult)
   }
 
   private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)
                                    (implicit request: OptionalDataRequest[_]): Future[Result] = {
     (for {
-      username <- EitherT(cachedUserName(request.externalId))
-      initiateResponse <- EitherT(fileUploadDetails(username))
-    } yield expectedPage(username, initiateResponse))
+      login <- EitherT(cachedLogin(request.externalId))
+      initiateResponse <- EitherT(fileUploadDetails(login.username, login.password))
+    } yield expectedPage(login.username, initiateResponse))
       .valueOr(fallBackPage => fallBackPage)
   }
 
