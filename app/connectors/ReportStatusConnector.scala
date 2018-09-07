@@ -66,7 +66,7 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
   }
 
   def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] =
-    reportStatusRepository.atomicSaveOrUpdate(reportStatus, true).map(_ => Right(Unit))
+    reportStatusRepository.atomicSaveOrUpdate(reportStatus, true)
   def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] =
     reportStatusRepository.atomicSaveOrUpdate(userId, reference,true)
 }
