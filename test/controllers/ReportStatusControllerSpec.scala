@@ -24,15 +24,17 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
-import scala.util.Failure
+import scala.util.{Failure, Success}
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -73,10 +75,15 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  val sortedMap = fakeMap.map(x => (x._1, x._2.sortBy(_.created)))
+  val sortedMap = fakeMap.map(x => (x._1, x._2.sortBy(_.date)))
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
-  def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(200, Some(json)), configuration, environment)
+//  def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(Status.OK, Some(json)), configuration, environment)
+  def fakeReportStatusConnector(json: JsValue) = {
+    val reportStatusConnectorMock = mock[ReportStatusConnector]
+    when(reportStatusConnectorMock.request(anyString)).thenReturn(Future(Success(JsValue(json))))
+    reportStatusConnectorMock
+  }
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()

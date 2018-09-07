@@ -98,7 +98,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     Future.successful(request.body.validate[UploadConfirmation] match {
       case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
       case _ => {
-        val errorMsg = s"Couldn't parse: \n${request.body}"
+        val errorMsg = s"Couldn't pSubmissionPanelSpecarse: \n${request.body}"
         Logger.warn(errorMsg)
         Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
       }

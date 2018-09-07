@@ -23,7 +23,6 @@ import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
 import play.api.http.Status
 import play.api.libs.json.JsValue
-import ReportStatus._
 import repositories.ReportStatusRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
