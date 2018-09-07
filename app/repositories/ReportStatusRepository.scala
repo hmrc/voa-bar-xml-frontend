@@ -21,7 +21,7 @@ import java.time.OffsetDateTime
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
 import models.{Error, ReportStatus}
-import play.api.libs.json.{Format, Reads}
+import play.api.libs.json.Format
 import play.api.{Configuration, Logger}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -66,7 +66,7 @@ class ReportStatusRepository @Inject()
   }
 
   def atomicSaveOrUpdate(reportStatus: ReportStatus, upsert: Boolean)
-    (implicit ec: ExecutionContext, reads: Reads[ReportStatus])
+    (implicit ec: ExecutionContext)
   : Future[Either[Error, Unit.type]] = {
     val finder = BSONDocument(ReportStatus.key -> reportStatus._id)
     val modifierBson = set(BSONDocument(
@@ -85,7 +85,7 @@ class ReportStatusRepository @Inject()
   }
 
   def atomicSaveOrUpdate(userId: String, reference: String, upsert: Boolean)
-                        (implicit ec: ExecutionContext, reads: Reads[ReportStatus])
+                        (implicit ec: ExecutionContext)
   : Future[Either[Error, Unit.type]] = {
     val finder = BSONDocument(ReportStatus.key -> reference)
     val modifierBson = set(BSONDocument(
