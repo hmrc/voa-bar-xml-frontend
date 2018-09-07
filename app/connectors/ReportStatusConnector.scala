@@ -69,21 +69,7 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
 
   import ReportStatus._
   def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] = {
-    reportStatusRepository().atomicUpsert(
-      BSONDocument("_id"  -> reportStatus._id),
-      BSONDocument("$set" -> BSONDocument(
-        "date" -> reportStatus.date.toString,
-        "checksum" -> reportStatus.checksum,
-        "url" -> reportStatus.url,
-        "errors" -> reportStatus.errors.map(e => BSONDocument(
-          "detail" -> e.detail,
-          "message" -> e.errorCode,
-          "error_code" -> e.errorCode
-        )),
-        "status" -> reportStatus.status)
-      ),
-      ReportStatus.key
-    ).map(_ => Right(Unit))
+    reportStatusRepository.atomicSaveOrUpdate(reportStatus, true).map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
           Logger.warn(s"Received exception while saving reportStatus.\n${ex.getMessage}")
@@ -92,15 +78,7 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
       }
   }
   def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] = {
-    reportStatusRepository().atomicUpsert(
-      BSONDocument("_id"  -> reference),
-      BSONDocument("$set" -> BSONDocument(
-        "user_id" -> userId,
-        "date" -> OffsetDateTime.now.toString,
-        "errors" -> Seq[BSONDocument]()
-      )),
-      ReportStatus.key
-    ).map(_ =>Right(Unit))
+    reportStatusRepository.atomicSaveOrUpdate(userId, reference,true).map(_ =>Right(Unit))
       .recover {
         case ex: Throwable => {
           Logger.warn(s"Received exception while saving reportStatus user info.\n${ex.getMessage}")

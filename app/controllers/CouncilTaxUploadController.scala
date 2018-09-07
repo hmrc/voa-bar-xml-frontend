@@ -137,7 +137,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       url = Some(uploadConfirmation.downloadUrl),
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
-      errors = errors
+      errors = Some(errors)
     )
     reportStatusConnector.save(reportStatus)
       .map(_.fold(

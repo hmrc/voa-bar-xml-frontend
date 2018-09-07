@@ -44,7 +44,7 @@ final case class ReportStatus(
                                date: OffsetDateTime,
                                url: Option[String] = None,
                                checksum: Option[String] = None,
-                               errors: Seq[ReportStatusError] = Seq(),
+                               errors: Option[Seq[ReportStatusError]] = Some(Seq()),
                                userId: Option[String] = None,
                                status: Option[String] = Some(Pending.value)
                              )

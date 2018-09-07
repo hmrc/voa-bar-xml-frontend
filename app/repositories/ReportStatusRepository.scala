@@ -16,26 +16,36 @@
 
 package repositories
 
+import java.time.OffsetDateTime
+
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
-import models.ReportStatus
+import models.{Error, ReportStatus}
+import play.api.libs.json.{Format, Reads}
 import play.api.{Configuration, Logger}
-import play.modules.reactivemongo.MongoDbConnection
-import reactivemongo.api.DefaultDB
+import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import uk.gov.hmrc.mongo.{AtomicUpdate, ReactiveRepository}
+import reactivemongo.bson.BSONDocument
+import reactivemongo.play.json._
+import reactivemongo.play.json.collection.JSONBatchCommands.FindAndModifyCommand
+import uk.gov.hmrc.mongo.{BSONBuilderHelpers, ReactiveRepository}
 
-import scala.concurrent.ExecutionContext
-import scala.util.Try
+import scala.concurrent.{ExecutionContext, Future}
 
-class DefaultReportStatusRepository
+@Singleton
+class ReportStatusRepository @Inject()
 (
-  config: Configuration,
-  defaultDB: () => DefaultDB
+  mongo: ReactiveMongoComponent,
+  config: Configuration
 )(implicit ec: ExecutionContext)
-  extends ReactiveRepository[ReportStatus, String](ReportStatus.name, defaultDB, ReportStatus.format)
-  with AtomicUpdate[ReportStatus]
+  extends
+    ReactiveRepository[ReportStatus, String](
+      collectionName = ReportStatus.name,
+      mongo = mongo.mongoConnector.db,
+      domainFormat = ReportStatus.format,
+      idFormat = implicitly[Format[String]]
+    )
+    with BSONBuilderHelpers
 {
   private val indexName = ReportStatus.name
   private val expireAfterSeconds = "expireAfterSeconds"
@@ -44,7 +54,7 @@ class DefaultReportStatusRepository
     .getOrElse(throw new ConfigException.Missing(ttlPath))
   createIndex()
   private def createIndex(): Unit = {
-    collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Hashed)), Some(indexName),
+    collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Text)), Some(indexName),
       options = BSONDocument(expireAfterSeconds -> ttl))) map {
       result => {
         Logger.debug(s"set [$indexName] with value $ttl -> result : $result")
@@ -56,26 +66,63 @@ class DefaultReportStatusRepository
     }
   }
 
-  override def isInsertion(newRecordId: BSONObjectID, oldRecord: ReportStatus): Boolean =
-    false
-}
+  def atomicSaveOrUpdate(reportStatus: ReportStatus, upsert: Boolean)
+    (implicit ec: ExecutionContext, reads: Reads[ReportStatus])
+  : Future[Either[Error, Unit.type]] = {
+    val finder = BSONDocument(ReportStatus.key -> reportStatus._id)
+    val modifierBson = set(BSONDocument(
+      "date" -> reportStatus.date.toString,
+      "checksum" -> reportStatus.checksum,
+      "url" -> reportStatus.url,
+      "errors" -> reportStatus.errors.getOrElse(Seq()).map(e => BSONDocument(
+        "detail" -> e.detail,
+        "message" -> e.errorCode,
+        "error_code" -> e.errorCode
+      )),
+      "status" -> reportStatus.status)
+    )
 
-@Singleton
-class ReportStatusRepository @Inject()
-  (config: Configuration)
-  (implicit ec: ExecutionContext)
-{
-  class DbConnection extends MongoDbConnection
+    atomicSaveOrUpdate(reportStatus._id, upsert, finder, modifierBson)
+  }
 
-  private lazy val reportStatusRepository = new DefaultReportStatusRepository(config, new DbConnection().db)
+  def atomicSaveOrUpdate(userId: String, reference: String, upsert: Boolean)
+                        (implicit ec: ExecutionContext, reads: Reads[ReportStatus])
+  : Future[Either[Error, Unit.type]] = {
+    val finder = BSONDocument(ReportStatus.key -> reference)
+    val modifierBson = set(BSONDocument(
+      "date" -> OffsetDateTime.now.toString,
+      "user_id" -> userId)
+    )
 
-  def apply(): DefaultReportStatusRepository = {
-    Try(reportStatusRepository)
-      .recover{
-      case ex: Throwable => {
-        Logger.error(s"Error when creating DefaultReportStatusRepository\n${ex.getMessage}")
-        throw ex
+    atomicSaveOrUpdate(reference, upsert, finder, modifierBson)
+  }
+
+  protected def atomicSaveOrUpdate(reference: String, upsert: Boolean, finder: BSONDocument, modifierBson: BSONDocument) = {
+    val updateDocument = if (upsert) {
+      modifierBson ++ setOnInsert(BSONDocument(ReportStatus.key -> reference))
+    } else {
+      modifierBson
+    }
+    val modifier = collection.updateModifier(updateDocument, upsert = upsert)
+    collection.findAndModify(finder, modifier)
+      .map(response => Either.cond(
+        !response.lastError.isDefined,
+        Unit,
+        getError(response.lastError.get))
+      )
+      .recover {
+        case ex: Throwable => Left(Error(ex.getMessage, Seq()))
       }
-    }.get
+  }
+
+  private def getError(lastError: FindAndModifyCommand.UpdateLastError): Error = {
+    val errorMsg = "Error while saving report status"
+    Logger.warn(errorMsg)
+    if (lastError.err.isDefined) {
+      Logger.warn(lastError.err.get)
+      Error(lastError.err.get, Seq())
+    } else {
+      Error(errorMsg, Seq())
+    }
   }
 }
