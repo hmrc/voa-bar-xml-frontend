@@ -153,14 +153,18 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       _ <- EitherT(sendContent(xml, uploadConfirmation))
     } yield NoContent)
       .valueOrF(error => {
-        val errorMsg = s"Error ${error.code}: ${error.values.mkString("\n")}"
-        Logger.error(errorMsg)
-        (for {
-          uploadInfo <- EitherT(parseUploadConfirmation(request))
-          reportStatusError = ReportStatusError(error.code, errorMsg, "")
-          _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), UpscanFailed))
-        } yield InternalServerError(errorMsg))
-          .valueOr(_ => InternalServerError(errorMsg))
+        handleConfirmationError(request, error)
       })
+  }
+
+  private def handleConfirmationError(request: Request[JsValue], error: Error) = {
+    val errorMsg = s"Error ${error.code}: ${error.values.mkString("\n")}"
+    Logger.error(errorMsg)
+    (for {
+      uploadInfo <- EitherT(parseUploadConfirmation(request))
+      reportStatusError = ReportStatusError(error.code, errorMsg, "")
+      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), UpscanFailed))
+    } yield InternalServerError(errorMsg))
+      .valueOr(_ => InternalServerError(errorMsg))
   }
 }
