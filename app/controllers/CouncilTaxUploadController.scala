@@ -33,7 +33,6 @@ import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{Action, Request, Result}
-import reactivemongo.bson.BSONObjectID
 import repositories.UserReportUpload
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
@@ -108,7 +107,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
     (for {
-      userDataByReference <- EitherT(userReportUploadsConnector.getByReference(uploadConfirmation.reference))
+      userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference))
       userData <- EitherT.fromOption[Future](userDataByReference,
         Error("login.error.auth", Seq("Couldn't send file because of expired submission.")))
       loginDetails = Login(userData.userId, userData.userPassword)

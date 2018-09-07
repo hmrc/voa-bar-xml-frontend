@@ -27,7 +27,6 @@ import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
-import reactivemongo.play.json.collection.JSONBatchCommands.FindAndModifyCommand
 import uk.gov.hmrc.mongo.{BSONBuilderHelpers, ReactiveRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -106,23 +105,18 @@ class ReportStatusRepository @Inject()
     val modifier = collection.updateModifier(updateDocument, upsert = upsert)
     collection.findAndModify(finder, modifier)
       .map(response => Either.cond(
-        !response.lastError.isDefined,
+        !response.lastError.isDefined || !response.lastError.get.err.isDefined,
         Unit,
-        getError(response.lastError.get))
+        getError(response.lastError.get.err.get))
       )
       .recover {
         case ex: Throwable => Left(Error(ex.getMessage, Seq()))
       }
   }
 
-  private def getError(lastError: FindAndModifyCommand.UpdateLastError): Error = {
+  private def getError(error: String): Error = {
     val errorMsg = "Error while saving report status"
-    Logger.warn(errorMsg)
-    if (lastError.err.isDefined) {
-      Logger.warn(lastError.err.get)
-      Error(lastError.err.get, Seq())
-    } else {
-      Error(errorMsg, Seq())
-    }
+    Logger.warn(s"$errorMsg\n$error")
+    Error(error, Seq())
   }
 }

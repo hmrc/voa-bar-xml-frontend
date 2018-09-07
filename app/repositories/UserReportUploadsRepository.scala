@@ -19,31 +19,35 @@ package repositories
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
-import play.api.libs.json.Json
-import play.modules.reactivemongo.MongoDbConnection
-import reactivemongo.api.DefaultDB
+import play.api.libs.json.{Format, Json}
+import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
+import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
-final case class UserReportUpload(reference: String, userId: String, userPassword: String)
+final case class UserReportUpload(_id: String, userId: String, userPassword: String)
 
 object UserReportUpload {
-  implicit val formats = Json.format[UserReportUpload]
+  implicit val format = Json.format[UserReportUpload]
   final val name = classOf[UserReportUpload].getSimpleName.toLowerCase
 }
 
-class DefaultUserReportUploadsReactiveRepository (
-                                   config: Configuration,
-                                   defaultDB: () => DefaultDB
+@Singleton
+class UserReportUploadsReactiveRepository @Inject() (
+                                                   mongo: ReactiveMongoComponent,
+                                                   config: Configuration
                                  )(implicit ec: ExecutionContext)
-  extends ReactiveRepository[UserReportUpload, BSONObjectID](UserReportUpload.name, defaultDB, UserReportUpload.formats)
+  extends ReactiveRepository[UserReportUpload, String](
+    collectionName = UserReportUpload.name,
+    mongo = mongo.mongoConnector.db,
+    domainFormat = UserReportUpload.format,
+    idFormat = implicitly[Format[String]]
+    )
 {
   private val indexName = UserReportUpload.name
-  private val key = "reference"
+  private val key = "_id"
   private val expireAfterSeconds = "expireAfterSeconds"
   private val ttlPath = s"${UserReportUpload.name}.timeToLiveInSeconds"
   private val ttl = config.getInt(ttlPath)
@@ -61,24 +65,4 @@ class DefaultUserReportUploadsReactiveRepository (
         false
     }
   }
-}
-
-@Singleton
-class UserReportUploadsReactiveRepository @Inject()
-  (config: Configuration)
-  (implicit ec: ExecutionContext)
-{
-  class DbConnection extends MongoDbConnection
-
-  private lazy val userReportUploadsReactiveRepository =
-    new DefaultUserReportUploadsReactiveRepository(config, new DbConnection().db)
-
-  def apply(): DefaultUserReportUploadsReactiveRepository =
-    Try(userReportUploadsReactiveRepository)
-      .recover{
-        case ex: Throwable => {
-          Logger.error(s"Error when creating DefaultUserReportUploadsReactiveRepository\n${ex.getMessage}")
-          throw ex
-        }
-      }.get
 }
