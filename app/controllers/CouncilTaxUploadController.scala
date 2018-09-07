@@ -163,7 +163,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     (for {
       uploadInfo <- EitherT(parseUploadConfirmation(request))
       reportStatusError = ReportStatusError(error.code, errorMsg, "")
-      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), UpscanFailed))
+      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), UpscanFailed)(request))
     } yield InternalServerError(errorMsg))
       .valueOr(_ => InternalServerError(errorMsg))
   }
