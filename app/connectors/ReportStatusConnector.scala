@@ -16,8 +16,6 @@
 
 package connectors
 
-import java.time.OffsetDateTime
-
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import models.{Error, ReportStatus}
@@ -25,7 +23,7 @@ import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
 import play.api.http.Status
 import play.api.libs.json.JsValue
-import reactivemongo.bson.BSONDocument
+import ReportStatus._
 import repositories.ReportStatusRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -67,25 +65,10 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
     }
   }
 
-  import ReportStatus._
-  def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] = {
+  def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] =
     reportStatusRepository.atomicSaveOrUpdate(reportStatus, true).map(_ => Right(Unit))
-      .recover {
-        case ex: Throwable => {
-          Logger.warn(s"Received exception while saving reportStatus.\n${ex.getMessage}")
-          Left(Error(ex.getMessage, Seq()))
-        }
-      }
-  }
-  def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] = {
-    reportStatusRepository.atomicSaveOrUpdate(userId, reference,true).map(_ =>Right(Unit))
-      .recover {
-        case ex: Throwable => {
-          Logger.warn(s"Received exception while saving reportStatus user info.\n${ex.getMessage}")
-          Left(Error(ex.getMessage, Seq()))
-        }
-      }
-  }
+  def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] =
+    reportStatusRepository.atomicSaveOrUpdate(userId, reference,true)
 }
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
