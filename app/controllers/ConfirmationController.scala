@@ -16,28 +16,48 @@
 
 package controllers
 
+import cats.data.EitherT
 import javax.inject.Inject
-
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.VOAAuthorisedId
 import models.NormalMode
+import play.api.mvc.{Request, Result}
 import views.html.confirmation
+import cats.implicits._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        override val messagesApi: MessagesApi,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
-                                       dataCacheConnector: DataCacheConnector) extends FrontendController with I18nSupport {
+                                       dataCacheConnector: DataCacheConnector,
+                                       reportStatusConnector: ReportStatusConnector)
+                                      (implicit ec: ExecutionContext)
+  extends FrontendController with I18nSupport {
 
-  def onPageLoad(submissionId: String) = getData.async {
+  private def getUsername(externalId: String): Future[Either[Result, String]] = {
+    dataCacheConnector.getEntry[String](externalId, VOAAuthorisedId.toString)
+      .map(entry => Either.cond(entry.isDefined, entry.get, Redirect(routes.LoginController.onPageLoad(NormalMode))))
+  }
+  private def saveReportStatus(username: String, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+    reportStatusConnector.saveUserInfo(reference, username)
+      .map(_.fold(
+        _ => Left(InternalServerError),
+        _ => Right(Unit)
+      ))
+  }
+
+  def onPageLoad(reference: String) = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(confirmation(username, submissionId, appConfig))
-        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
-      }
+      (for {
+        username <- EitherT(getUsername(request.externalId))
+        _ <- EitherT(saveReportStatus(username, reference))
+      } yield Ok(confirmation(username, reference, appConfig)))
+        .valueOr(failPage => failPage)
   }
 }

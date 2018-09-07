@@ -139,7 +139,7 @@ $(document).ready(function() {
       $("#councilTaxUploadForm").submit(function(e){
         setTimeout(function() {
             window.location = $("#councilTaxUploadFormRedirect").val();
-        }, 5000);
+        }, 50);
         return true;
       });
   }

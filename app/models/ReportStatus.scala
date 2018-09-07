@@ -16,20 +16,35 @@
 
 package models
 
-import org.joda.time.{DateTime, DateTimeZone}
+import java.time.OffsetDateTime
+
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
-sealed trait ReportStatusType { val value: String = getClass.asSubclass(getClass).getSimpleName }
+sealed trait ReportStatusType { val value: String = getClass.asSubclass(getClass).getSimpleName.replace("$", "") }
 case object Pending extends ReportStatusType
-case object UpScanUploaded extends ReportStatusType
 case object UpScanVerified extends ReportStatusType
-case object UpScanVerificationFailed extends ReportStatusType
+case object UpscanFailed extends ReportStatusType
 case object XmlValidationFailed extends ReportStatusType
-
-case class ReportStatus(baCode: String, submissionId: String, status: String, errors: Seq[Error] = Seq(), created: DateTime = DateTime.now(DateTimeZone.UTC))
 
 object ReportStatus {
   implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+  implicit val errorFormat = Json.format[ReportStatusError]
   implicit val format = Json.format[ReportStatus]
+  val name = classOf[ReportStatus].getSimpleName.toLowerCase
+  val key = "_id"
 }
+final case class ReportStatusError(
+                                    errorCode: String,
+                                    message: String,
+                                    detail: String
+                                  )
+final case class ReportStatus(
+                               _id: String,
+                               date: OffsetDateTime,
+                               url: Option[String] = None,
+                               checksum: Option[String] = None,
+                               errors: Seq[ReportStatusError] = Seq(),
+                               userId: Option[String] = None,
+                               status: Option[String] = Some(Pending.value)
+                             )

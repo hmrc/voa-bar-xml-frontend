@@ -16,7 +16,7 @@
 
 package connectors
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.UpScanRequests._
 import play.api.{Configuration, Environment, Logger}
 import play.mvc.Http.Status
@@ -28,6 +28,7 @@ import play.api.Mode.Mode
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class UploadConnector @Inject()(http: HttpClient,
                                 val configuration: Configuration,
                                 environment: Environment)

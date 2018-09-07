@@ -18,39 +18,33 @@ package repositories
 
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
+import models.ReportStatus
 import play.api.{Configuration, Logger}
-import play.api.libs.json.Json
 import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import uk.gov.hmrc.mongo.ReactiveRepository
+import uk.gov.hmrc.mongo.{AtomicUpdate, ReactiveRepository}
 
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-final case class UserReportUpload(reference: String, userId: String, userPassword: String)
-
-object UserReportUpload {
-  implicit val formats = Json.format[UserReportUpload]
-  final val name = classOf[UserReportUpload].getSimpleName.toLowerCase
-}
-
-class DefaultUserReportUploadsReactiveRepository (
-                                   config: Configuration,
-                                   defaultDB: () => DefaultDB
-                                 )(implicit ec: ExecutionContext)
-  extends ReactiveRepository[UserReportUpload, BSONObjectID](UserReportUpload.name, defaultDB, UserReportUpload.formats)
+class DefaultReportStatusRepository
+(
+  config: Configuration,
+  defaultDB: () => DefaultDB
+)(implicit ec: ExecutionContext)
+  extends ReactiveRepository[ReportStatus, String](ReportStatus.name, defaultDB, ReportStatus.format)
+  with AtomicUpdate[ReportStatus]
 {
-  private val indexName = UserReportUpload.name
-  private val key = "reference"
+  private val indexName = ReportStatus.name
   private val expireAfterSeconds = "expireAfterSeconds"
-  private val ttlPath = s"${UserReportUpload.name}.timeToLiveInSeconds"
+  private val ttlPath = s"${ReportStatus.name}.timeToLiveInSeconds"
   private val ttl = config.getInt(ttlPath)
     .getOrElse(throw new ConfigException.Missing(ttlPath))
   createIndex()
   private def createIndex(): Unit = {
-    collection.indexesManager.ensure(Index(Seq((key, IndexType.Hashed)), Some(indexName),
+    collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Hashed)), Some(indexName),
       options = BSONDocument(expireAfterSeconds -> ttl))) map {
       result => {
         Logger.debug(s"set [$indexName] with value $ttl -> result : $result")
@@ -61,24 +55,27 @@ class DefaultUserReportUploadsReactiveRepository (
         false
     }
   }
+
+  override def isInsertion(newRecordId: BSONObjectID, oldRecord: ReportStatus): Boolean =
+    false
 }
 
 @Singleton
-class UserReportUploadsReactiveRepository @Inject()
+class ReportStatusRepository @Inject()
   (config: Configuration)
   (implicit ec: ExecutionContext)
 {
   class DbConnection extends MongoDbConnection
 
-  private lazy val userReportUploadsReactiveRepository =
-    new DefaultUserReportUploadsReactiveRepository(config, new DbConnection().db)
+  private lazy val reportStatusRepository = new DefaultReportStatusRepository(config, new DbConnection().db)
 
-  def apply(): DefaultUserReportUploadsReactiveRepository =
-    Try(userReportUploadsReactiveRepository)
+  def apply(): DefaultReportStatusRepository = {
+    Try(reportStatusRepository)
       .recover{
-        case ex: Throwable => {
-          Logger.error(s"Error when creating DefaultUserReportUploadsReactiveRepository\n${ex.getMessage}")
-          throw ex
-        }
-      }.get
+      case ex: Throwable => {
+        Logger.error(s"Error when creating DefaultReportStatusRepository\n${ex.getMessage}")
+        throw ex
+      }
+    }.get
+  }
 }

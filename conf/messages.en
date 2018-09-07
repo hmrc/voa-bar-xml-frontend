@@ -110,6 +110,7 @@ status.submitted.title = SUBMITTED
 status.validated.title = VALIDATED
 status.invalidated.title = INVALIDATED
 status.forwarded.title = FORWARDED
+status.pending.title = PENDING
 status.baCode.title = BA Code
 status.type.title = Type
 status.submissionType.CT = CT

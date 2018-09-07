@@ -16,8 +16,8 @@
 
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 <div id="submission-body">
-    <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.baCode.toUpperCase</p>
+    <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.userId.get.toUpperCase</p>
     <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
-    <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
-        @reportStatus.created.toLocalTime</i></p>
+    <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
+        @reportStatus.date.toLocalTime</i></p>
 </div>

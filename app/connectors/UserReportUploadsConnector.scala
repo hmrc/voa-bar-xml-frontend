@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package connectors
 
 import com.google.inject.ImplementedBy
@@ -29,7 +30,7 @@ class DefaultUserReportUploadsConnector @Inject() (
                                                      userReportUploadsReactiveRepository: UserReportUploadsReactiveRepository
                                                    )(implicit executionContext: ExecutionContext) extends  UserReportUploadsConnector {
   override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
-    userReportUploadsReactiveRepository.insert(userReportUpload)
+    userReportUploadsReactiveRepository().insert(userReportUpload)
       .map(_ => Right(Unit))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
@@ -41,7 +42,7 @@ class DefaultUserReportUploadsConnector @Inject() (
     if(parsedReference.isFailure) {
       Future.successful(Left(Error(s"$reference could not be parsed as Id", Seq())))
     } else {
-      userReportUploadsReactiveRepository.findById(parsedReference.get, ReadPreference.primary)
+      userReportUploadsReactiveRepository().findById(parsedReference.get, ReadPreference.primary)
         .map(Right(_))
         .recover {
           case e: Throwable => Left(Error(e.getMessage, Seq()))
