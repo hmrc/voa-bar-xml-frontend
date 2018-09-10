@@ -29,6 +29,12 @@ home.reports.last = Last uploaded
 report.status.UNKNOWN = unknown
 report.status.CANCELLED = cancelled
 
+report.details.summary.first.line = Your file <span class="summary-filename">{0}</span> contained <span id="total">{1}</span> {1, choice, 0#report| 1#report|1<reports}.
+report.details.summary.successful = {0, choice, 0#No reports | 1#1 report |1<{0} reports were} uploaded successfully{1, choice, 0#.|0< and}
+report.details.summary.failed = <a href="{1}"><span id="fail">{0}</span> {0, choice, 0#report| 1#report|1<reports} failed</a>.
+report.details.summary.cancelled = {0, choice, 0#No reports were | 1#1 report was|1<{0} reports were} uploaded successfully, {1, choice, 0#no reports | 1#1 report |1<{1} reports} failed and {2, choice, 0#no reports | 1#1 report was|1<{2} reports were} cancelled.
+report.details.summary.unknown = The status of this submission is unknown.
+
 reports.active.title = Active submissions
 reports.active.none = No active submissions
 reports.active.waiting = waiting...

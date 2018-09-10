@@ -24,6 +24,7 @@ import models.{Error, ReportStatus}
 import play.api.libs.json.Format
 import play.api.{Configuration, Logger}
 import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
@@ -53,7 +54,10 @@ class ReportStatusRepository @Inject()
     .getOrElse(throw new ConfigException.Missing(ttlPath))
   createIndex()
   private def createIndex(): Unit = {
-    collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Text)), Some(indexName),
+    collection.indexesManager.ensure(Index(Seq(
+        (ReportStatus.key, IndexType.Text),
+        ("user_id", IndexType.Text)
+      ), Some(indexName),
       options = BSONDocument(expireAfterSeconds -> ttl),
       background = true)) map {
       result => {
@@ -97,6 +101,20 @@ class ReportStatusRepository @Inject()
     atomicSaveOrUpdate(reference, upsert, finder, modifierBson)
   }
 
+  def getByUser(userId: String)(implicit ec: ExecutionContext)
+  : Future[Either[Error, Seq[ReportStatus]]] = {
+    val finder = BSONDocument("user_id" -> userId)
+    collection.find(finder).cursor[ReportStatus](ReadPreference.primary)
+      .collect[Seq](-1, Cursor.FailOnError[Seq[ReportStatus]]())
+      .map(Right(_))
+      .recover {
+        case ex: Throwable => {
+          val errorMsg = "Couldn't retrieve BA reports"
+          Logger.warn(s"$errorMsg\n${ex.getMessage}")
+          Left(Error(errorMsg, Seq()))
+        }
+      }
+  }
   protected def atomicSaveOrUpdate(reference: String, upsert: Boolean, finder: BSONDocument, modifierBson: BSONDocument) = {
     val updateDocument = if (upsert) {
       modifierBson ++ setOnInsert(BSONDocument(ReportStatus.key -> reference))
