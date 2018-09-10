@@ -25,11 +25,12 @@ import views.html.components.submission_panel
 class SubmissionPanelSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
+  val baCode = "baCode"
   val date = OffsetDateTime.now
-  val reportStatus1 = ReportStatus(submissionId, date, status = Some("SUBMITTED"))
-  val reportStatus2 = ReportStatus(submissionId, date, status = Some("VALIDATED"))
-  val reportStatus3 = ReportStatus(submissionId, date, status = Some("INVALIDATED"))
-  val reportStatus4 = ReportStatus(submissionId, date, status = Some("FORWARDED"))
+  val reportStatus1 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
+  val reportStatus2 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("VALIDATED"))
+  val reportStatus3 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("INVALIDATED"))
+  val reportStatus4 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("FORWARDED"))
 
 
   def submission1 = () => submission_panel(reportStatus1)(messages)

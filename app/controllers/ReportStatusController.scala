@@ -44,11 +44,11 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
   def sortStatuses(reportStatuses: Map[String, List[ReportStatus]]): Map[String, List[ReportStatus]] =
-    reportStatuses.map(x => (x._1, x._2.sortBy(_.date)))
+    reportStatuses.map(x => (x._1, x._2.sortWith{ case (r, r2) => r.date.compareTo(r2.date) >= 0 }))
 
   def createDisplayOrder(submissions: Map[String, List[ReportStatus]]): List[String] = {
     submissions.map(elem => (elem._1, elem._2.head.date))
-      .toList.sortBy(elem => elem._2)
+      .toList.sortWith{ case ((_, date), (_, otherDate)) => date.compareTo(otherDate) >= 0 }
       .map(elem => elem._1)
   }
 

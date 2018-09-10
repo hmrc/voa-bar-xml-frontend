@@ -25,7 +25,8 @@ import views.html.components.submission_body
 class SubmissionBodySpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, status = Some("SUBMITTED"))
+  val baCode = "baCode"
+  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(baCode), status = Some("SUBMITTED"))
 
   def submission = () => submission_body(reportStatus)(messages)
 

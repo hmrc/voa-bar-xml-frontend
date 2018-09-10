@@ -16,7 +16,9 @@
 
 package controllers
 
-import connectors.{FakeDataCacheConnector, ReportStatusConnector}
+import java.time.OffsetDateTime
+
+import connectors.{DefaultReportStatusConnector, FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import models.{NormalMode, ReportStatus}
@@ -24,16 +26,16 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
+import repositories.ReportStatusRepository
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
@@ -53,20 +55,21 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val submissionId1 = "1234-XX"
   val submissionId2 = "1235-XX"
   val submissionId3 = "1236-XX"
+  val date = () => OffsetDateTime.now
 
-  val rs1 = ReportStatus(baCode, submissionId1, "SUBMITTED")
-  val rs2 = ReportStatus(baCode, submissionId1, "VALIDATED")
-  val rs3 = ReportStatus(baCode, submissionId1, "FORWARDED")
+  val rs1 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some("SUBMITTED"))
+  val rs2 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some("VALIDATED"))
+  val rs3 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some("FORWARDED"))
   Thread.sleep(1000)
 
-  val rs11 = ReportStatus(baCode, submissionId2, "SUBMITTED")
-  val rs22 = ReportStatus(baCode, submissionId2, "VALIDATED")
-  val rs33 = ReportStatus(baCode, submissionId2, "FORWARDED")
+  val rs11 = ReportStatus(submissionId2, date(), userId = Some(baCode), status = Some("SUBMITTED"))
+  val rs22 = ReportStatus(submissionId2, date(), userId = Some(baCode), status = Some("VALIDATED"))
+  val rs33 = ReportStatus(submissionId2, date(), userId = Some(baCode), status = Some("FORWARDED"))
   Thread.sleep(1000)
 
-  val rs111 = ReportStatus(baCode, submissionId3, "SUBMITTED")
-  val rs222 = ReportStatus(baCode, submissionId3, "VALIDATED")
-  val rs333 = ReportStatus(baCode, submissionId3, "FORWARDED")
+  val rs111 = ReportStatus(submissionId3, date(), userId = Some(baCode), status = Some("SUBMITTED"))
+  val rs222 = ReportStatus(submissionId3, date(), userId = Some(baCode), status = Some("VALIDATED"))
+  val rs333 = ReportStatus(submissionId3, date(), userId = Some(baCode), status = Some("FORWARDED"))
 
   val fakeMap = Map(submissionId1 -> List(rs1, rs2, rs3), submissionId2 -> List(rs11, rs22, rs33),
     submissionId3 -> List(rs111, rs222, rs333))
@@ -75,13 +78,13 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  val sortedMap = fakeMap.map(x => (x._1, x._2.sortBy(_.date)))
+  val sortedMap = fakeMap.map(x => (x._1, x._2.sortWith{ case (r, r2) => r.date.compareTo(r2.date) >= 0 }))
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
 //  def fakeReportStatusConnector(json: JsValue) = new ReportStatusConnector(getHttpMock(Status.OK, Some(json)), configuration, environment)
   def fakeReportStatusConnector(json: JsValue) = {
     val reportStatusConnectorMock = mock[ReportStatusConnector]
-    when(reportStatusConnectorMock.request(anyString)).thenReturn(Future(Success(JsValue(json))))
+    when(reportStatusConnectorMock.request(anyString)(any[HeaderCarrier])).thenReturn(Future(Success(json)))
     reportStatusConnectorMock
   }
 
@@ -140,8 +143,10 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     "Throw a runtime exception when  the Report Status returns an exception" in {
       val httpMock = mock[HttpClient]
       when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(Failure(new RuntimeException("Report status connector failed")))
+      val reportStatusRepositoryMock = mock[ReportStatusRepository]
+      when(reportStatusRepositoryMock.atomicSaveOrUpdate(any[ReportStatus], any[Boolean])(any[ExecutionContext])) thenReturn Future(Right(Unit))
 
-      val connector = new ReportStatusConnector(httpMock, configuration, environment)
+      val connector = new DefaultReportStatusConnector(httpMock, configuration, reportStatusRepositoryMock, environment)
       val controller = new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, connector, getEmptyCacheMap, new DataRequiredActionImpl)
 
       intercept[Exception] {
@@ -154,9 +159,9 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       val controller = loggedInController(getEmptyCacheMap, fakeMapAsJson)
       val result = controller.sortStatuses(fakeMap)
 
-      result.head._2.head.created mustBe rs3.created
-      result.get(submissionId2).get.head.created mustBe rs33.created
-      result.last._2.head.created mustBe rs333.created
+      result.head._2.head.date mustBe rs3.date
+      result.get(submissionId2).get.head.date mustBe rs33.date
+      result.last._2.head.date mustBe rs333.date
     }
 
     "The createDisplayOrder method should return a List of submission Ids sorted by their created time" in {

@@ -31,17 +31,17 @@ class ReportStatusSpec extends PlaySpec {
 
     "Produce a ReportStatus model with no errors" in {
       val result = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
-      result.userId mustBe baCode
+      result.userId mustBe Some(baCode)
       result._id mustBe submissionId
       result.status mustBe Some("SUBMITTED")
     }
 
     "Produce a ReportStatus model with errors" in {
       val result = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("INVALIDATED"), errors = Some(reportStatusError))
-      result.userId mustBe baCode
+      result.userId mustBe Some(baCode)
       result._id mustBe submissionId
-      result.status mustBe "INVALIDATED"
-      result.errors mustBe reportStatusError
+      result.status mustBe Some("INVALIDATED")
+      result.errors mustBe Some(reportStatusError)
     }
   }
 }

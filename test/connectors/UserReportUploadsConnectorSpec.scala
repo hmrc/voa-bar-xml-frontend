@@ -65,31 +65,21 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar {
     "have a method that get user and report information that" must {
       "a successful result when a valid reference id is provided" in {
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
-        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
+        when(userReportUploadsReactiveRepositoryMock.findById(any[String], any[ReadPreference])(any[ExecutionContext]))
           .thenReturn(Future.successful(Some(userReportUpload)))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
-        val result = await(userReportUploadsRepository.getByReference(reference))
+        val result = await(userReportUploadsRepository.getById(reference))
 
         result mustBe Right(Some(userReportUpload))
       }
-      "a failed result when an invalid reference id is provided" in {
-        val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
-        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
-          .thenReturn(Future.successful(Some(userReportUpload)))
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
-
-        val result = await(userReportUploadsRepository.getByReference(invalidReference))
-
-        result mustBe Left(Error(s"$invalidReference could not be parsed as Id" ,Seq()))
-      }
       "return a failed result when the repository fails" in {
         val userReportUploadsReactiveRepositoryMock = mock[UserReportUploadsReactiveRepository]
-        when(userReportUploadsReactiveRepositoryMock.findById(any[BSONObjectID], any[ReadPreference])(any[ExecutionContext]))
+        when(userReportUploadsReactiveRepositoryMock.findById(any[String], any[ReadPreference])(any[ExecutionContext]))
           .thenReturn(Future.failed(exception))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(userReportUploadsReactiveRepositoryMock)
 
-        val result = await(userReportUploadsRepository.getByReference(reference))
+        val result = await(userReportUploadsRepository.getById(reference))
 
         result mustBe Left(error)
       }

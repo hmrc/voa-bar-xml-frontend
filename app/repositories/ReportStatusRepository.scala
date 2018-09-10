@@ -54,7 +54,8 @@ class ReportStatusRepository @Inject()
   createIndex()
   private def createIndex(): Unit = {
     collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Text)), Some(indexName),
-      options = BSONDocument(expireAfterSeconds -> ttl))) map {
+      options = BSONDocument(expireAfterSeconds -> ttl),
+      background = true)) map {
       result => {
         Logger.debug(s"set [$indexName] with value $ttl -> result : $result")
         result
