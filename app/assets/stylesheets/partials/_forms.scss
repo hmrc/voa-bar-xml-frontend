@@ -151,3 +151,53 @@ override character count display
         display: block;
     }
 }
+
+/*
+    Report status screens
+*/
+.example::before {
+  background: #bfc1c3 none repeat scroll 0 0;
+  color: white;
+  content: "EXAMPLE";
+  font-size: 14px;
+  font-weight: 400;
+  left: 0;
+  line-height: 1.42857;
+  padding: 0.4em 0.5em 0.3em 0.5em;
+  position: absolute;
+  text-transform: none;
+  top: 0;
+}
+
+.example {
+  border: 1px solid #bfc1c3;
+  margin-bottom: 45px;
+  margin-top: 15px;
+  overflow: hidden;
+  padding: 45px 30px 30px;
+  position: relative;
+}
+div#content {
+    .example.info-box {
+      margin-top: 3.5em;
+
+      &:before {
+        content: "INFO";
+      }
+    }
+
+    div.current-activity {
+      p {
+        &.current-activity-filename {
+          margin-bottom: 0;
+          max-width: 258px;
+          word-wrap: break-word;
+        }
+
+        &.current-activity-info {
+          margin-bottom: 0;
+          max-width: 258px;
+        }
+      }
+    }
+}

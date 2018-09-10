@@ -17,20 +17,20 @@
 @import config.FrontendAppConfig
 @import models.ReportStatus
 
-@(
-    baCode: String,
-    appConfig: FrontendAppConfig,
-    activeReports: Seq[ReportStatus] = Seq(),
-    lastReport: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
+@(baCode: String,
+appConfig: FrontendAppConfig,
+activeReports: Seq[ReportStatus] = Seq(),
+lastReport: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("councilTaxStart.title"),
     appConfig = appConfig,
     bodyClasses = None) {
 
+    @components.service_info(baCode)
+
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @components.service_info(baCode)
 
             @components.heading("councilTaxStart.heading")
 
