@@ -15,23 +15,35 @@
  *@
 
 @import config.FrontendAppConfig
+@import models.ReportStatus
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(
+    baCode: String,
+    appConfig: FrontendAppConfig,
+    activeReports: Seq[ReportStatus] = Seq(),
+    lastReport: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("councilTaxStart.title"),
     appConfig = appConfig,
     bodyClasses = None) {
 
-    @components.service_info(baCode)
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--2-3">
+            @components.service_info(baCode)
 
-    @components.heading("councilTaxStart.heading")
+            @components.heading("councilTaxStart.heading")
 
-    <p>@messages("councilTaxStart.paragraph")</p>
+            <p>@messages("councilTaxStart.paragraph")</p>
 
-    <p>
-        <a href=@controllers.routes.CouncilTaxStartController.goToCouncilTaxUploadPage().url id="start" class="button button--get-started">@messages("site.start")</a>
-    </p>
+            <p>
+                <a href=@controllers.routes.CouncilTaxStartController.goToCouncilTaxUploadPage().url id="start" class="button button--get-started">@messages("site.start")</a>
+            </p>
 
-    <p><a href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("councilTaxStart.submissions.url-title")</a></p>
+            <p><a href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("councilTaxStart.submissions.url-title")</a></p>
+        </div>
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @components.report_status_info(activeReports, lastReport)
+        </div>
+    </div>
 }

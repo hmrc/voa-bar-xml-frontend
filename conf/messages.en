@@ -22,6 +22,27 @@ error.summary.title = There’s been a problem
 error.summary.text = Check the following
 error.invalid_details = Invalid Login Details
 
+home.reports.current.progress = Current progress
+home.reports.no.current.progress = No submissions currently in progress.
+home.reports.last = Last uploaded
+
+report.status.UNKNOWN = unknown
+report.status.CANCELLED = cancelled
+
+reports.active.title = Active submissions
+reports.active.none = No active submissions
+reports.active.waiting = waiting...
+reports.active.timestamp = {0}
+report.active.details.in.progress.details = {0} {1, choice, 0#report| 1#report|1<reports} out of {1} submitted.
+
+reports.history.page.title = Submission history
+reports.history.title = Submission history
+reports.history.subtitle = Council Tax
+reports.history.timestamp = Submitted on {0}
+reports.history.total.reports = Your file <b>{0}</b> contained {1} {1, choice, 0#report| 1#report|1<reports}.
+reports.history.total.success = {0} {0, choice, 0#report| 1#report|1<reports} were uploaded successfully and {1} {1, choice, 0#report| 1#report|1<reports} <a href="{2}">failed</a>.
+reports.history.last.days = {0, choice, 1#Today| 1<Last {0} days}
+
 index.title = voa-bar-xml-frontend
 index.heading = voa-bar-xml-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.

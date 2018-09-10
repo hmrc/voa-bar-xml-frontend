@@ -26,6 +26,9 @@ case object Pending extends ReportStatusType
 case object UpScanVerified extends ReportStatusType
 case object UpscanFailed extends ReportStatusType
 case object XmlValidationFailed extends ReportStatusType
+case object Unknown extends ReportStatusType
+case object Cancelled extends ReportStatusType
+case object Done extends ReportStatusType
 
 object ReportStatus {
   implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats

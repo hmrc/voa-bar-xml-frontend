@@ -1,0 +1,66 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.{ReportStatus, Done, Cancelled, Unknown}
+@import utils.DateFormatter._
+
+@(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
+
+<div class="example info-box current-activity">
+    <h4 class="heading-small">@Messages("home.reports.current.progress")</h4>
+
+    @if(activeReports.isEmpty) {
+    @Messages("home.reports.no.current.progress")
+    }
+
+    @activeReports.map { report =>
+    <p class="current-activity-filename"><a href="routes.EbarsController.lookup(report._id, purpose)">report.fileName</a></p>
+    <p class="current-activity-info">
+        @* @Html(Messages("report.active.details.in.progress.details", report.successes + report.failures, report.total)) *@
+    </p>
+    }
+
+    @if(lastReport.nonEmpty) {
+    <h4 class="heading-small">@Messages("home.reports.last")</h4>
+    }
+
+    @lastReport.map { report =>
+    <p class="current-activity-filename">
+
+        @defining((report.status, report.errors.getOrElse(Seq()).length > 0)) {
+        case (Some(Done.value), true) => {
+        @* <a href="routes.EbarsController.details(report._id, purpose)">report.fileName</a> *@
+        }
+
+        case (Some(Done.value) | Some(Cancelled.value) | Some(Unknown.value), _) => {
+        @* <a href="routes.EbarsController.jobComplete(report._id, purpose)">report.fileName</a> *@
+        }
+
+        case (_, _) => {}
+        }
+
+        @report.status match {
+        case Some(Cancelled.value) | Some(Unknown.value) => {
+        <i>(@Messages(s"report.status.${report.status}"))</i>
+        }
+
+        case _ => {}
+        }
+    </p>
+
+    <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.date))</p>
+    }
+</div>
