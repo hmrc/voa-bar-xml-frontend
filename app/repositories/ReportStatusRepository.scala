@@ -56,7 +56,7 @@ class ReportStatusRepository @Inject()
   private def createIndex(): Unit = {
     collection.indexesManager.ensure(Index(Seq(
         (ReportStatus.key, IndexType.Text),
-        ("user_id", IndexType.Text)
+        ("userId", IndexType.Text)
       ), Some(indexName),
       options = BSONDocument(expireAfterSeconds -> ttl),
       background = true)) map {
@@ -81,8 +81,9 @@ class ReportStatusRepository @Inject()
       "errors" -> reportStatus.errors.getOrElse(Seq()).map(e => BSONDocument(
         "detail" -> e.detail,
         "message" -> e.errorCode,
-        "error_code" -> e.errorCode
+        "errorCode" -> e.errorCode
       )),
+      "filename" -> reportStatus.filename.getOrElse(""),
       "status" -> reportStatus.status)
     )
 
@@ -95,7 +96,7 @@ class ReportStatusRepository @Inject()
     val finder = BSONDocument(ReportStatus.key -> reference)
     val modifierBson = set(BSONDocument(
       "date" -> OffsetDateTime.now.toString,
-      "user_id" -> userId)
+      "userId" -> userId)
     )
 
     atomicSaveOrUpdate(reference, upsert, finder, modifierBson)
@@ -103,7 +104,7 @@ class ReportStatusRepository @Inject()
 
   def getByUser(userId: String)(implicit ec: ExecutionContext)
   : Future[Either[Error, Seq[ReportStatus]]] = {
-    val finder = BSONDocument("user_id" -> userId)
+    val finder = BSONDocument("userId" -> userId)
     collection.find(finder).cursor[ReportStatus](ReadPreference.primary)
       .collect[Seq](-1, Cursor.FailOnError[Seq[ReportStatus]]())
       .map(Right(_))

@@ -1,3 +1,5 @@
+@import '_variables';
+
 /*
 ====================================
 this fixes a specificity issue with content__body p selectors
@@ -49,8 +51,16 @@ p.font-xsmall{
   padding: 8px 0 10px 0;
 }
 
+.flag {
+    background-color: $default;
+}
+
 .flag-success{
-  background-color: #28a197;
+  background-color: $success;
+}
+
+.flag-error{
+  background-color: $failure;
 }
 
 .submission-error {
@@ -61,6 +71,9 @@ p.font-xsmall{
 .submission-panel {
   padding-left: 0px;
   padding-top: 0px;
+  > .submission-body {
+    padding: 20px;
+  }
 }
 .transaction-banner--complete {
   margin-top: 1em;

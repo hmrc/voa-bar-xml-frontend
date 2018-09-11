@@ -67,7 +67,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
             reportStatuses => {
 //              val sortedReportStatuses = sortStatuses(reportStatuses)
 //              val displayOrder = createDisplayOrder(sortedReportStatuses)
-              Ok(reportStatus(username, appConfig, reportStatuses, reportStatuses.map(_.userId.getOrElse(""))))
+              Ok(reportStatus(username, appConfig, reportStatuses))
             }
           ))
         case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))

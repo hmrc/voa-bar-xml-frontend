@@ -25,13 +25,15 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import models.{Error, Login}
 import play.api.Mode.Mode
+import play.api.i18n.MessagesApi
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UploadConnector @Inject()(http: HttpClient,
                                 val configuration: Configuration,
-                                environment: Environment)
+                                environment: Environment,
+                                messages: MessagesApi)
                                (implicit ec: ExecutionContext)
   extends ServicesConfig {
 
@@ -74,7 +76,7 @@ class UploadConnector @Inject()(http: HttpClient,
   private def handleSendXmlError(message: String) = {
     val errorMsg = s"Error when uploading am xml file\n$message"
     Logger.warn(errorMsg)
-    Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
+    Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
   }
 
   def initiate(request: InitiateRequest): Future[Either[Error, InitiateResponse]] = {
@@ -84,7 +86,7 @@ class UploadConnector @Inject()(http: HttpClient,
         case ex: Throwable => {
           val errorMessage = "Failed to get UpScan file upload details"
           Logger.error(errorMessage, ex)
-          Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMessage)))
+          Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
         }
       }
   }
@@ -98,7 +100,7 @@ class UploadConnector @Inject()(http: HttpClient,
         case ex: Throwable => {
           val errorMsg = s"Error downloading file from ${request.downloadUrl}"
           Logger.error(errorMsg, ex)
-          Left(Error("councilTaxUpload.error.fileUploadService", Seq(ex.getMessage)))
+          Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
         }
       }
   }
