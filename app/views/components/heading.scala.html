@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@(headingKey: String, headingSize: String = "heading-xlarge")(implicit messages: Messages)
+@(headingKey: String, baCode: String = "", headingSize: String = "heading-xlarge")(implicit messages: Messages)
 
 <h1 class="@headingSize">
  <span class="heading-secondary">@messages("welcome.BA")</span>
- @messages(headingKey)
+ @messages(headingKey) @BillingAuthorities.find(baCode)
 </h1>

@@ -25,7 +25,7 @@
 
     @components.service_info(baCode)
 
-    @components.heading("reportStatus.heading")
+    @components.heading("reportStatus.heading", baCode)
 
     @reportStatuses.map(reportStatus => components.submission_panel(reportStatus))
 

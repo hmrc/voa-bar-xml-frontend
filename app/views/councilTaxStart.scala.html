@@ -32,7 +32,7 @@ lastReport: Option[ReportStatus] = None)(implicit request: Request[_], messages:
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
 
-            @components.heading("councilTaxStart.heading")
+            @components.heading("councilTaxStart.heading", baCode)
 
             <p>@messages("councilTaxStart.paragraph")</p>
 

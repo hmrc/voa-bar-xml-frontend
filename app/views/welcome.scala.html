@@ -25,7 +25,7 @@
 
     @components.service_info(baCode)
 
-    @components.heading("welcome.heading")
+    @components.heading("welcome.heading", baCode)
 
     <h3 class="heading-medium">
         <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
