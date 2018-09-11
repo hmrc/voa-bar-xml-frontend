@@ -18,26 +18,31 @@
 
 <div class="bordered-box submission-panel">
     @reportStatus.status match {
-        case "SUBMITTED" => {
+        case Some("SUBMITTED") => {
             <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.submitted.title")</span>
             @components.submission_body(reportStatus)
         }
-        case "VALIDATED" => {
+        case Some("VALIDATED") => {
             <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.validated.title")</span>
             @components.submission_body(reportStatus)
         }
-        case "INVALIDATED" => {
+        case Some("INVALIDATED") => {
             <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.invalidated.title")</span>
-            <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.baCode.toUpperCase</p>
+            <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.userId.getOrElse("").toUpperCase</p>
             <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
-            <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
-                @reportStatus.created.toLocalTime</i>
+            <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
+                @reportStatus.date.toLocalTime</i>
             </p>
 
-            @components.submission_error(reportStatus.errors)
+        @* TODO: map the errors?
+        * @components.submission_error(reportStatus.errors)--> *@
         }
-        case "FORWARDED" => {
+        case Some("FORWARDED") => {
             <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.forwarded.title")</span>
+            @components.submission_body(reportStatus)
+        }
+        case _ => {
+            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.pending.title")</span>
             @components.submission_body(reportStatus)
         }
     }

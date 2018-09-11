@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.time.OffsetDateTime
+
 import base.SpecBase
 import models.{Error, ReportStatus}
 import org.mockito.Matchers._
@@ -28,13 +30,18 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
 import play.api.test.Helpers.{status, _}
+import play.mvc.Http.Status
+import repositories.ReportStatusRepository
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   implicit val hc = mock[HeaderCarrier]
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
+  val date = OffsetDateTime.now
+  val reportStatusRepositoryMock = mock[ReportStatusRepository]
 
   def getHttpMock(returnedStatus: Int, returnedJson: Option[JsValue]) = {
     val httpMock = mock[HttpClient]
@@ -44,14 +51,14 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
 
   val baCode = "ba1221"
   val submissionId = "1234-XX"
-  val rs = ReportStatus(baCode, submissionId, "SUBMITTED")
+  val rs = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
   val fakeMap = Map(submissionId -> List(rs))
   val fakeMapAsJson = Json.toJson(fakeMap)
 
   "Report status connector spec" must {
     "given an username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
-      val httpClient = getHttpMock(200, Some(fakeMapAsJson))
-      val connector = new ReportStatusConnector(httpClient, configuration, environment)
+      val httpClient = getHttpMock(Status.OK, Some(fakeMapAsJson))
+      val connector = new DefaultReportStatusConnector(httpClient, configuration, reportStatusRepositoryMock, environment)
 
       val result = await(connector.request("AUser"))
 
@@ -62,8 +69,8 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
     
     "return a failure representing the error when send method fails" in {
-      val httpClient = getHttpMock(500, None)
-      val connector = new ReportStatusConnector(httpClient, configuration, environment)
+      val httpClient = getHttpMock(Status.INTERNAL_SERVER_ERROR, None)
+      val connector = new DefaultReportStatusConnector(httpClient, configuration, reportStatusRepositoryMock, environment)
       
       val result = await(connector.request("AnOtherUser"))
       assert(result.isFailure)
@@ -73,7 +80,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       val httpMock = mock[HttpClient]
       when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
 
-      val connector = new ReportStatusConnector(httpMock, configuration, environment)
+      val connector = new DefaultReportStatusConnector(httpMock, configuration, reportStatusRepositoryMock, environment)
       val result = await(connector.request("AUSer"))
       assert(result.isFailure)
     }

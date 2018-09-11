@@ -16,17 +16,18 @@
 
 package controllers
 
-import connectors.{FakeDataCacheConnector, UploadConnector}
+import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest, UploadRequestFields}
-import models.{Error, Login, NormalMode}
+import models.{Error, Login, NormalMode, ReportStatus}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.test.Helpers._
+import repositories.UserReportUpload
 import utils.FakeNavigator
 import views.html.councilTaxUpload
 
@@ -76,20 +77,27 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
   when(uploadConnectorF.downloadFile(any[UploadConfirmation])) thenReturn Future(Left(Error("UPLOAD-ERROR", Seq("Received exception from upscan service"))))
 
+  val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
+  when(userReportUploadsConnectorMock.save(any[UserReportUpload])) thenReturn Future(Right(Unit))
+
+  val reportStatusConnectorMock = mock[ReportStatusConnector]
+  when(reportStatusConnectorMock.save(any[ReportStatus])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[String])) thenReturn Future(Right(Unit))
+
   def loggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector)
+      connector, userReportUploadsConnectorMock, reportStatusConnectorMock)
   }
 
   def notLoggedInController(connector: UploadConnector) = {
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector)
+      connector, userReportUploadsConnectorMock, reportStatusConnectorMock)
   }
 
   def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(fakeRequest, messages).toString

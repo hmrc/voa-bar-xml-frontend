@@ -17,7 +17,6 @@
 package controllers
 
 import javax.inject.Inject
-
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -67,7 +66,6 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         value => {
           val encryptedLogin = value.encrypt
-
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) flatMap {
               case Success(status) => {

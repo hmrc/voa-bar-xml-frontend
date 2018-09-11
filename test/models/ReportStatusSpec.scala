@@ -16,29 +16,32 @@
 
 package models
 
+import java.time.OffsetDateTime
+
 import org.scalatestplus.play.PlaySpec
 
 class ReportStatusSpec extends PlaySpec {
 
   val baCode = "ba1221"
   val submissionId = "sId999"
-  val errors = Seq(Error("BAD-CHAR", Seq("ba1221")))
+  val reportStatusError = Seq(ReportStatusError("BAD-CHAR", "", "ba1221"))
+  val date = OffsetDateTime.now
 
   "ReportStatus model" must {
 
     "Produce a ReportStatus model with no errors" in {
-      val result = ReportStatus(baCode, submissionId, "SUBMITTED")
-      result.baCode mustBe baCode
-      result.submissionId mustBe submissionId
-      result.status mustBe "SUBMITTED"
+      val result = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
+      result.userId mustBe Some(baCode)
+      result._id mustBe submissionId
+      result.status mustBe Some("SUBMITTED")
     }
 
     "Produce a ReportStatus model with errors" in {
-      val result = ReportStatus(baCode, submissionId, "INVALIDATED", errors)
-      result.baCode mustBe baCode
-      result.submissionId mustBe submissionId
-      result.status mustBe "INVALIDATED"
-      result.errors mustBe errors
+      val result = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("INVALIDATED"), errors = Some(reportStatusError))
+      result.userId mustBe Some(baCode)
+      result._id mustBe submissionId
+      result.status mustBe Some("INVALIDATED")
+      result.errors mustBe Some(reportStatusError)
     }
   }
 }

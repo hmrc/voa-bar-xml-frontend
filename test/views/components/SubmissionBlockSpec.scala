@@ -16,6 +16,8 @@
 
 package views.components
 
+import java.time.OffsetDateTime
+
 import models.ReportStatus
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_block
@@ -23,7 +25,7 @@ import views.html.components.submission_block
 class SubmissionBlockSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
-  val reportStatus = ReportStatus("BA0121", submissionId, "SUBMITTED")
+  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, status = Some("SUBMITTED"), userId = Some("BA0121"))
   val reports = List(reportStatus)
 
   def submission = () => submission_block(submissionId, Some(reports))(messages)
