@@ -27,7 +27,7 @@
     }
 
     @activeReports.map { report =>
-    <p class="current-activity-filename"><a href="routes.EbarsController.lookup(report._id, purpose)">report.fileName</a></p>
+    <p class="current-activity-filename"><a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a></p>
     <p class="current-activity-info">
         @* @Html(Messages("report.active.details.in.progress.details", report.successes + report.failures, report.total)) *@
     </p>
@@ -42,11 +42,11 @@
 
         @defining((report.status, report.errors.getOrElse(Seq()).length > 0)) {
         case (Some(Done.value), true) => {
-        @* <a href="routes.EbarsController.details(report._id, purpose)">report.fileName</a> *@
+        @* <a href="controllers.ReportStatusController.onPageLoad()">@report.filename</a> *@
         }
 
         case (Some(Done.value) | Some(Cancelled.value) | Some(Unknown.value), _) => {
-        @* <a href="routes.EbarsController.jobComplete(report._id, purpose)">report.fileName</a> *@
+        @* <a href="controllers.ReportStatusController.onPageLoad()">@report.filename</a> *@
         }
 
         case (_, _) => {}

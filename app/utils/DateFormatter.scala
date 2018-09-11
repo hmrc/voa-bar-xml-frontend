@@ -17,8 +17,9 @@
 package utils
 
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 object DateFormatter {
   def formatDate(dateTime: OffsetDateTime) =
-    s"""${dateTime.formatted("dd MMMM yyyy 'at' kk:mm")}"""
+    s"""${dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))}"""
 }

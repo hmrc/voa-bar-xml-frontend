@@ -16,4 +16,7 @@
 
 @(headingKey: String, headingSize: String = "heading-xlarge")(implicit messages: Messages)
 
-<h1 class="@headingSize">@messages(headingKey)</h1>
+<h1 class="@headingSize">
+ <span class="heading-secondary">@messages("welcome.BA")</span>
+ @messages(headingKey)
+</h1>
