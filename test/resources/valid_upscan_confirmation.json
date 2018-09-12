@@ -1,0 +1,11 @@
+{
+  "reference": "1234567890",
+  "downloadUrl": "http://download.url",
+  "fileStatus": "ok",
+  "uploadDetails": {
+    "uploadTimestamp": "2016-10-03T15:10:40Z",
+    "checksum": "checksum",
+    "fileMimeType": "text/plain",
+    "fileName": "foo.xml"
+  }
+}

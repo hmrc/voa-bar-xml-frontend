@@ -80,7 +80,7 @@ class ReportStatusRepository @Inject()
       "url" -> reportStatus.url,
       "errors" -> reportStatus.errors.getOrElse(Seq()).map(e => BSONDocument(
         "detail" -> e.detail,
-        "message" -> e.errorCode,
+        "message" -> e.message,
         "errorCode" -> e.errorCode
       )),
       "filename" -> reportStatus.filename.getOrElse(""),

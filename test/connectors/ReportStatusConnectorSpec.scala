@@ -24,25 +24,20 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.{Configuration, Environment}
-import play.api.libs.json._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.test.Helpers._
-import play.mvc.Http.Status
 import repositories.ReportStatusRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
-  val baCode = "ba1221"
+  val userId = "ba1221"
   val date = OffsetDateTime.now
   val submissionId = "1234-XX"
-  val rs = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Submitted.value))
+  val rs = ReportStatus(submissionId, date, userId = Some(userId), status = Some(Submitted.value))
   val error = Error("Error", Seq())
 
-  implicit val hc = mock[HeaderCarrier]
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
   val reportStatusRepositoryMock = mock[ReportStatusRepository]
@@ -60,12 +55,6 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   when(reportStatusRepositoryFailMock.atomicSaveOrUpdate(any[String], any[String], any[Boolean])(any[ExecutionContext]))
     .thenReturn(Future(Left(error)))
 
-  def getHttpMock(returnedStatus: Int, returnedJson: Option[JsValue]) = {
-    val httpMock = mock[HttpClient]
-    when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, returnedJson))
-    httpMock
-  }
-
   "Report status connector spec" must {
     "given an username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
       val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
@@ -78,20 +67,43 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       }
     }
     
-    "return a failure representing the error when send method fails" in {
-      val httpClient = getHttpMock(Status.INTERNAL_SERVER_ERROR, None)
+    "return a failure when the repository encounters an issue" in {
       val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
       
       val result = await(connector.get("AnOtherUser"))
+
       assert(result.isLeft)
     }
 
-    "return a failure if the report status connector call throws an exception" in {
-      val httpMock = mock[HttpClient]
-      when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
+    "returns a valid result when saving a new report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
 
+      val result = await(connector.saveUserInfo(submissionId, userId))
+
+      assert(result.isRight)
+    }
+
+    "returns an error when saving a new report" in {
       val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
-      val result = await(connector.get("AUSer"))
+
+      val result = await(connector.saveUserInfo(submissionId, userId))
+
+      assert(result.isLeft)
+    }
+
+    "returns a valid result when saving a report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
+
+      val result = await(connector.save(rs))
+
+      assert(result.isRight)
+    }
+
+    "returns an error when saving a report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
+
+      val result = await(connector.save(rs))
+
       assert(result.isLeft)
     }
   }
