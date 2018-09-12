@@ -18,7 +18,7 @@ package views.components
 
 import java.time.OffsetDateTime
 
-import models.ReportStatus
+import models.{ReportStatus, Submitted}
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_body
 
@@ -26,7 +26,7 @@ class SubmissionBodySpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
   val baCode = "baCode"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(baCode), status = Some("SUBMITTED"))
+  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(baCode), status = Some(Submitted.value))
 
   def submission = () => submission_body(reportStatus)(messages)
 
@@ -35,10 +35,11 @@ class SubmissionBodySpec extends ViewBehaviours {
   "Submission Body " must {
 
     "Contain the following keys" in {
-      assertContainsText(doc, messages("status.baCode.title"))
+      assertContainsText(doc, messages("submission"))
       assertContainsText(doc, messages("status.type.title"))
       assertContainsText(doc, messages("status.created.para1"))
       assertContainsText(doc, messages("status.created.para1"))
+      assertContainsText(doc, messages("site.print.button"))
     }
   }
 

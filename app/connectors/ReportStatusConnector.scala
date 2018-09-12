@@ -22,14 +22,13 @@ import models.{Error, ReportStatus}
 import play.api.{Configuration, Environment}
 import play.api.Mode.Mode
 import repositories.ReportStatusRepository
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class DefaultReportStatusConnector @Inject()(http: HttpClient,
+class DefaultReportStatusConnector @Inject()(
                                       val configuration: Configuration,
                                       reportStatusRepository: ReportStatusRepository,
                                       environment: Environment)

@@ -26,6 +26,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.Status
+import play.api.i18n.MessagesApi
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
@@ -83,13 +85,14 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
         implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])
+        val messagesApi = injector.instanceOf[MessagesApi]
         val urlCaptor = ArgumentCaptor.forClass(classOf[String])
         val bodyCaptor = ArgumentCaptor.forClass(classOf[String])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200, Some(submissionId))
         val wsClientMock = mock[WSClient]
 
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
@@ -104,7 +107,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(getHttpMock(200, Some(submissionId)), configuration, environment)
+        val connector = new UploadConnector(getHttpMock(Status.OK, Some(submissionId)), configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         result match {
           case Right(submissionValue) => submissionValue mustBe submissionId
@@ -114,7 +117,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
       "return a failure representing the error when send method fails" in {
         val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(getHttpMock(500, None), configuration, environment)
+        val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR, None), configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
@@ -124,7 +127,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         when(httpMock.POSTString(anyString, any[String], any[Seq[(String, String)]])(any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
         val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
@@ -159,7 +162,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         when(httpMock.POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])
           (jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())) thenReturn Future.successful(initiateResponse)
         val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
 
         val response = await(connector.initiate(initiateRequest))
 
