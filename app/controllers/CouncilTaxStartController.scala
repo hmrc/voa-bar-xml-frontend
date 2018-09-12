@@ -48,7 +48,7 @@ class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
         username <- EitherT(getUsername(request))
         reportStatus <- EitherT(getReportStatuses(username))
       } yield(Ok(councilTaxStart(username, appConfig, reportStatus, reportStatus.headOption))))
-        .valueOr(_ => BadRequest)
+        .valueOr(fallbackPage => fallbackPage)
   }
 
   private def getReportStatuses(username: String): Future[Either[Result, Seq[ReportStatus]]]  = {

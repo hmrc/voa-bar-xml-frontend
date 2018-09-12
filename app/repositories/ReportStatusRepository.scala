@@ -21,7 +21,7 @@ import java.time.OffsetDateTime
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
 import models.{Error, ReportStatus}
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, Json}
 import play.api.{Configuration, Logger}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.{Cursor, ReadPreference}
@@ -105,7 +105,7 @@ class ReportStatusRepository @Inject()
   def getByUser(userId: String)(implicit ec: ExecutionContext)
   : Future[Either[Error, Seq[ReportStatus]]] = {
     val finder = BSONDocument("userId" -> userId)
-    collection.find(finder).cursor[ReportStatus](ReadPreference.primary)
+    collection.find(finder).sort(Json.obj("date" -> -1)).cursor[ReportStatus](ReadPreference.primary)
       .collect[Seq](-1, Cursor.FailOnError[Seq[ReportStatus]]())
       .map(Right(_))
       .recover {

@@ -51,5 +51,7 @@ final case class ReportStatus(
                                userId: Option[String] = None,
                                status: Option[String] = Some(Pending.value),
                                filename: Option[String] = None,
-                               totalEntries: Option[Int] = None
+                               totalEntries: Option[Int] = None,
+                               successes: Option[Int] = None,
+                               failures: Option[Int] = None
                              )

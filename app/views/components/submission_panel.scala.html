@@ -27,6 +27,22 @@
         <span id="submission-title" class="flag flag--on-left-side">@messages("status.submitted.title")</span>
         @components.submission_body(reportStatus)
         }
+        case Some(Failed.value) => {
+        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
+        <div class="submission-body">
+            <p><b class="bold">@messages("submission")</b>: @reportStatus._id</p>
+            <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+            @if(reportStatus.filename.isDefined) {
+            <p>@messages("file") <b class="bold">@reportStatus.filename</b> @Html(messages("report.details.summary.first.line", reportStatus.totalEntries.getOrElse(0)))</p>
+            }
+            <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
+                @reportStatus.date.toLocalTime</i>
+            </p>
+            <p>
+                @components.submission_error(reportStatus.errors)
+            </p>
+        </div>
+        }
         case _ if(reportStatus.date.compareTo(java.time.OffsetDateTime.now.minusHours(3)) < 0) => {
         <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
         <div class="submission-body">
@@ -54,22 +70,6 @@
                 <p>
                     @messages("status.verified.description")
                 </p>
-            </div>
-        }
-        case Some(Failed.value) => {
-            <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
-            <div class="submission-body">
-                    <p><b class="bold">@messages("submission")</b>: @reportStatus._id</p>
-                    <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
-                    @if(reportStatus.filename.isDefined) {
-                    <p>@messages("file") <b class="bold">@reportStatus.filename</b> @Html(messages("report.details.summary.first.line", reportStatus.totalEntries.getOrElse(0)))</p>
-                    }
-                    <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
-                        @reportStatus.date.toLocalTime</i>
-                    </p>
-                    <p>
-                        @components.submission_error(reportStatus.errors)
-                    </p>
             </div>
         }
         case _ => {

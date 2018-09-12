@@ -30,6 +30,7 @@ home.reports.last = Last uploaded
 
 report.status.UNKNOWN = unknown
 report.status.CANCELLED = cancelled
+report.status.failed = failed
 
 report.details.summary.first.line = contained <span id="total">{0}</span> reports.
 report.details.summary.successful = {0, choice, 0#No reports | 1#1 report |1<{0} reports were} uploaded successfully{1, choice, 0#.|0< and}

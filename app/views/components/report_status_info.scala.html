@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.{ReportStatus, Done, Cancelled, Unknown}
+@import models.{ReportStatus, Done, Cancelled, Unknown, Pending}
 @import utils.DateFormatter._
 
 @(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
@@ -23,44 +23,31 @@
     <h4 class="heading-small">@Messages("home.reports.current.progress")</h4>
 
     @if(activeReports.isEmpty) {
-    @Messages("home.reports.no.current.progress")
+        @Messages("home.reports.no.current.progress")
     }
 
     @activeReports.map { report =>
-    <p class="current-activity-filename"><a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a></p>
-    <p class="current-activity-info">
-        @* @Html(Messages("report.active.details.in.progress.details", report.successes + report.failures, report.total)) *@
-    </p>
-    }
-
-    @if(lastReport.nonEmpty) {
-    <h4 class="heading-small">@Messages("home.reports.last")</h4>
-    }
-
-    @lastReport.map { report =>
     <p class="current-activity-filename">
-
-        @defining((report.status, report.errors.getOrElse(Seq()).length > 0)) {
-        case (Some(Done.value), true) => {
-        @* <a href="controllers.ReportStatusController.onPageLoad()">@report.filename</a> *@
-        }
-
-        case (Some(Done.value) | Some(Cancelled.value) | Some(Unknown.value), _) => {
-        @* <a href="controllers.ReportStatusController.onPageLoad()">@report.filename</a> *@
-        }
-
-        case (_, _) => {}
-        }
-
-        @report.status match {
-        case Some(Cancelled.value) | Some(Unknown.value) => {
-        <i>(@Messages(s"report.status.${report.status}"))</i>
-        }
-
-        case _ => {}
-        }
+        <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+        @components.report_status_message(report)
     </p>
 
-    <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.date))</p>
+        @if(report.totalEntries.isDefined && (report.successes.isDefined || report.failures.isDefined)){
+            <p class="current-activity-info">
+                @Html(Messages("report.active.details.in.progress.details", report.successes.getOrElse(0) + report.failures.getOrElse(0), report.totalEntries.get))
+            </p>
+        }
+    }
+
+    @if(lastReport.isDefined) {
+        @defining(lastReport.get) { report =>
+            <h4 class="heading-small">@Messages("home.reports.last")</h4>
+            <p class="current-activity-filename">
+                <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+                    @components.report_status_message(report)
+            </p>
+
+            <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.date))</p>
+        }
     }
 </div>
