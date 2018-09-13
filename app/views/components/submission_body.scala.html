@@ -14,10 +14,15 @@
  * limitations under the License.
  *@
 
+@import models.{Done, Failed, Pending}
 @(reportStatus: ReportStatus)(implicit messages: Messages)
-<div id="submission-body">
-    <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.userId.get.toUpperCase</p>
+<div class="submission-body">
+    <p><b class="bold">@messages("submission")</b>: @reportStatus._id</p>
     <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+    @if(reportStatus.filename.isDefined) {
+    <p>@messages("file") <b class="bold">@reportStatus.filename</b> @Html(messages("report.details.summary.first.line", reportStatus.totalEntries.getOrElse(0)))</p>
+    }
     <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
         @reportStatus.date.toLocalTime</i></p>
+    @components.button_link(messageKey = "site.print.button", href = "javascript:window.print()", id = "print-button", className = "button print-hidden js-visible")
 </div>

@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package identifiers
+package utils
 
-case object ConfirmationId extends Identifier {
-  override def toString: String = "confirmation"
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+
+object DateFormatter {
+  def formatDate(dateTime: OffsetDateTime) =
+    s"""${dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))}"""
 }

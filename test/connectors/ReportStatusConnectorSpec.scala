@@ -19,70 +19,92 @@ package connectors
 import java.time.OffsetDateTime
 
 import base.SpecBase
-import models.{Error, ReportStatus}
+import models.{Error, ReportStatus, Submitted}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.{Configuration, Environment}
-import play.api.libs.json._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
-import play.api.test.Helpers.{status, _}
-import play.mvc.Http.Status
+import scala.concurrent.{ExecutionContext, Future}
+import play.api.test.Helpers._
 import repositories.ReportStatusRepository
 
-import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
-  implicit val hc = mock[HeaderCarrier]
+  val userId = "ba1221"
+  val date = OffsetDateTime.now
+  val submissionId = "1234-XX"
+  val rs = ReportStatus(submissionId, date, userId = Some(userId), status = Some(Submitted.value))
+  val error = Error("Error", Seq())
+
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
-  val date = OffsetDateTime.now
   val reportStatusRepositoryMock = mock[ReportStatusRepository]
-
-  def getHttpMock(returnedStatus: Int, returnedJson: Option[JsValue]) = {
-    val httpMock = mock[HttpClient]
-    when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, returnedJson))
-    httpMock
-  }
-
-  val baCode = "ba1221"
-  val submissionId = "1234-XX"
-  val rs = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
-  val fakeMap = Map(submissionId -> List(rs))
-  val fakeMapAsJson = Json.toJson(fakeMap)
+  when(reportStatusRepositoryMock.getByUser(any[String])(any[ExecutionContext]))
+    .thenReturn(Future(Right(Seq(rs))))
+  when(reportStatusRepositoryMock.atomicSaveOrUpdate(any[ReportStatus], any[Boolean])(any[ExecutionContext]))
+    .thenReturn(Future(Right(Unit)))
+  when(reportStatusRepositoryMock.atomicSaveOrUpdate(any[String], any[String], any[Boolean])(any[ExecutionContext]))
+    .thenReturn(Future(Right(Unit)))
+  val reportStatusRepositoryFailMock = mock[ReportStatusRepository]
+  when(reportStatusRepositoryFailMock.getByUser(any[String])(any[ExecutionContext]))
+    .thenReturn(Future(Left(error)))
+  when(reportStatusRepositoryFailMock.atomicSaveOrUpdate(any[ReportStatus], any[Boolean])(any[ExecutionContext]))
+    .thenReturn(Future(Left(error)))
+  when(reportStatusRepositoryFailMock.atomicSaveOrUpdate(any[String], any[String], any[Boolean])(any[ExecutionContext]))
+    .thenReturn(Future(Left(error)))
 
   "Report status connector spec" must {
     "given an username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
-      val httpClient = getHttpMock(Status.OK, Some(fakeMapAsJson))
-      val connector = new DefaultReportStatusConnector(httpClient, configuration, reportStatusRepositoryMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
 
-      val result = await(connector.request("AUser"))
+      val result = await(connector.get("AUser"))
 
       result match {
-        case Success(jsValue) => jsValue mustBe fakeMapAsJson
-        case Failure(e) => assert(false)
+        case Right(reportStatuses) => reportStatuses mustBe Seq(rs)
+        case Left(_) => assert(false)
       }
     }
     
-    "return a failure representing the error when send method fails" in {
-      val httpClient = getHttpMock(Status.INTERNAL_SERVER_ERROR, None)
-      val connector = new DefaultReportStatusConnector(httpClient, configuration, reportStatusRepositoryMock, environment)
+    "return a failure when the repository encounters an issue" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
       
-      val result = await(connector.request("AnOtherUser"))
-      assert(result.isFailure)
+      val result = await(connector.get("AnOtherUser"))
+
+      assert(result.isLeft)
     }
 
-    "return a failure if the report status connector call throws an exception" in {
-      val httpMock = mock[HttpClient]
-      when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
+    "returns a valid result when saving a new report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
 
-      val connector = new DefaultReportStatusConnector(httpMock, configuration, reportStatusRepositoryMock, environment)
-      val result = await(connector.request("AUSer"))
-      assert(result.isFailure)
+      val result = await(connector.saveUserInfo(submissionId, userId))
+
+      assert(result.isRight)
+    }
+
+    "returns an error when saving a new report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
+
+      val result = await(connector.saveUserInfo(submissionId, userId))
+
+      assert(result.isLeft)
+    }
+
+    "returns a valid result when saving a report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
+
+      val result = await(connector.save(rs))
+
+      assert(result.isRight)
+    }
+
+    "returns an error when saving a report" in {
+      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryFailMock, environment)
+
+      val result = await(connector.save(rs))
+
+      assert(result.isLeft)
     }
   }
 }

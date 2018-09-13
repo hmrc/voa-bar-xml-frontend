@@ -5,6 +5,8 @@ checkYourAnswers.guidance = Guidance for check your answers
 date.day = Day
 date.month = Month
 date.year = Year
+file = File
+submission = Submission
 
 error.boolean = Please give an answer
 error.invalid_date = Give a correct date
@@ -21,6 +23,34 @@ error.required = Please enter a value
 error.summary.title = There’s been a problem
 error.summary.text = Check the following
 error.invalid_details = Invalid Login Details
+
+home.reports.current.progress = Current progress
+home.reports.no.current.progress = No submissions currently in progress.
+home.reports.last = Last uploaded
+
+report.status.UNKNOWN = unknown
+report.status.CANCELLED = cancelled
+report.status.failed = failed
+
+report.details.summary.first.line = contained <span id="total">{0}</span> reports.
+report.details.summary.successful = {0, choice, 0#No reports | 1#1 report |1<{0} reports were} uploaded successfully{1, choice, 0#.|0< and}
+report.details.summary.failed = <a href="{1}"><span id="fail">{0}</span> {0, choice, 0#report| 1#report|1<reports} failed</a>.
+report.details.summary.cancelled = {0, choice, 0#No reports were | 1#1 report was|1<{0} reports were} uploaded successfully, {1, choice, 0#no reports | 1#1 report |1<{1} reports} failed and {2, choice, 0#no reports | 1#1 report was|1<{2} reports were} cancelled.
+report.details.summary.unknown = The status of this submission is unknown.
+
+reports.active.title = Active submissions
+reports.active.none = No active submissions
+reports.active.waiting = waiting...
+reports.active.timestamp = {0}
+report.active.details.in.progress.details = {0} {1, choice, 0#report| 1#report|1<reports} out of {1} submitted.
+
+reports.history.page.title = Submission history
+reports.history.title = Submission history
+reports.history.subtitle = Council Tax
+reports.history.timestamp = Submitted on {0}
+reports.history.total.reports = Your file <b>{0}</b> contained {1} {1, choice, 0#report| 1#report|1<reports}.
+reports.history.total.success = {0} {0, choice, 0#report| 1#report|1<reports} were uploaded successfully and {1} {1, choice, 0#report| 1#report|1<reports} <a href="{2}">failed</a>.
+reports.history.last.days = {0, choice, 1#Today| 1<Last {0} days}
 
 index.title = voa-bar-xml-frontend
 index.heading = voa-bar-xml-frontend
@@ -76,6 +106,7 @@ councilTaxUpload.error.xml.fileType =  Only XML files are permitted
 councilTaxUpload.error.fileUploadService = Issues with the upload service. Please, contact BARS@voa.gsi.gov.uk.
 councilTaxUpload.xml = Please select an XML report
 councilTaxUpload.download.error = Error while downloading file
+councilTaxUpload.error.transferXml = Error while uploading file
 
 login.title = Please login
 login.heading = Please login
@@ -91,6 +122,7 @@ login.error.auth = Needs to login
 
 welcome.title = Welcome
 welcome.heading = Welcome
+welcome.BA = Billing Authority Reports submission
 welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 
@@ -107,8 +139,12 @@ header.links.status = History
 status.submissionId.title = Submission ID:
 status.history.title = History
 status.submitted.title = SUBMITTED
+status.done.title = DONE
+status.verified.title = VERIFIED
+status.verified.description = The file has been verified for viruses and other vulnerabilities successfully.
 status.validated.title = VALIDATED
 status.invalidated.title = INVALIDATED
+status.failed.title = FAILED
 status.forwarded.title = FORWARDED
 status.pending.title = PENDING
 status.baCode.title = BA Code
@@ -122,5 +158,7 @@ status.failed-reports.title = Failed reports
 status.success.paragraph = The file was submitted successfully without any errors.
 status.failed.para1 = The file was rejected because of
 status.failed.para2 = invalid reports.
+status.failed.timeout = The submission hasn't been processed properly, please send it again.
+status.failed.description = The submission hasn't been processed properly, please contact BARS@voa.gsi.gov.uk.
 status.report.title = Report No
 status.report.para = failed with the following errors:

@@ -14,24 +14,18 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import models.ReportStatus
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(report: ReportStatus)(implicit messages: Messages)
 
-@main_template(
-    title = messages("welcome.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+@report.status match {
+    case Some(Failed.value) => {
+    <i>(@Messages(s"report.status.failed"))</i>
+    }
 
-    @components.service_info(baCode)
+    case Some(Pending.value) if(report.date.compareTo(java.time.OffsetDateTime.now.minusHours(3)) < 0) => {
+    <i>(@Messages(s"report.status.failed"))</i>
+    }
 
-    @components.heading("welcome.heading", baCode)
-
-    <h3 class="heading-medium">
-        <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
-    </h3>
-
-    <p>
-    @messages("welcome.councilTax.description")
-    </p>
+    case _ => {}
 }

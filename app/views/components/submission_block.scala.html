@@ -14,19 +14,12 @@
  * limitations under the License.
  *@
 
-@(submissionId: String, reports: Option[List[ReportStatus]])(implicit messages: Messages)
+@(reportStatus: ReportStatus)(implicit messages: Messages)
 <div id ="submission-block" class="bordered-box">
 
-    <h2 id="submission-id" class="hero__heading-large">@messages("status.submissionId.title") @submissionId</h2>
+    <h2 id="submission-id" class="hero__heading-large">@messages("status.submissionId.title") @reportStatus._id</h2>
 
-    <h2 id="submission-history" class="hero__heading-large">@messages("status.history.title")</h2>
-
-    @{
-        reports match {
-            case Some(rep) => rep.map(elem => components.submission_panel(elem))
-            case None => {}
-        }
-    }
+    @{components.submission_panel(reportStatus)}
 
 </div>
 <br />

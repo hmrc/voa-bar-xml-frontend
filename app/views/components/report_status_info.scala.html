@@ -1,0 +1,53 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.{ReportStatus, Done, Cancelled, Unknown, Pending}
+@import utils.DateFormatter._
+
+@(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
+
+<div class="example info-box current-activity">
+    <h4 class="heading-small">@Messages("home.reports.current.progress")</h4>
+
+    @if(activeReports.isEmpty) {
+        @Messages("home.reports.no.current.progress")
+    }
+
+    @activeReports.map { report =>
+    <p class="current-activity-filename">
+        <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+        @components.report_status_message(report)
+    </p>
+
+        @if(report.totalEntries.isDefined && (report.successes.isDefined || report.failures.isDefined)){
+            <p class="current-activity-info">
+                @Html(Messages("report.active.details.in.progress.details", report.successes.getOrElse(0) + report.failures.getOrElse(0), report.totalEntries.get))
+            </p>
+        }
+    }
+
+    @if(lastReport.isDefined) {
+        @defining(lastReport.get) { report =>
+            <h4 class="heading-small">@Messages("home.reports.last")</h4>
+            <p class="current-activity-filename">
+                <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+                    @components.report_status_message(report)
+            </p>
+
+            <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.date))</p>
+        }
+    }
+</div>

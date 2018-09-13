@@ -24,7 +24,7 @@ import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, U
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.LoginId
-import models.{Error, Login, NormalMode, ReportStatus, ReportStatusError, ReportStatusType, UpScanVerified, UpscanFailed}
+import models.{Error, Login, NormalMode, ReportStatus, ReportStatusError, ReportStatusType, Submitted, Verified, Failed}
 import cats.data.EitherT
 import cats.implicits._
 import models.UpScanRequests._
@@ -70,8 +70,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   private[controllers] def fileUploadDetails(username: String, password: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
-    val initiateRequest = InitiateRequest(s"$callBackUrl?external-id=${request.externalId}", maxFileSize)
-    val errorResult = Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError("councilTaxUpload.error.fileUploadService"))))
+    val initiateRequest = InitiateRequest(callBackUrl, maxFileSize)
+    val errorResult = Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
     (for {
       uploadResponse <- EitherT(uploadConnector.initiate(initiateRequest))
       _ <- EitherT(userReportUploadsConnector.save(UserReportUpload(uploadResponse.reference, username, password)))
@@ -94,22 +94,22 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     loadPage(badRequestResult)
   }
 
-  private[controllers] def parseUploadConfirmation(request: Request[JsValue]): Future[Either[Error, UploadConfirmation]] = {
-    Future.successful(request.body.validate[UploadConfirmation] match {
+  private[controllers] def parseUploadConfirmation(request: Request[JsValue]): Either[Error, UploadConfirmation] = {
+    request.body.validate[UploadConfirmation] match {
       case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
       case _ => {
-        val errorMsg = s"Couldn't pSubmissionPanelSpecarse: \n${request.body}"
+        val errorMsg = s"Couldn't parse: \n${request.body}"
         Logger.warn(errorMsg)
-        Left(Error("councilTaxUpload.error.fileUploadService", Seq(errorMsg)))
+        Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
       }
-    })
+    }
   }
 
   private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
     (for {
       userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference))
       userData <- EitherT.fromOption[Future](userDataByReference,
-        Error("login.error.auth", Seq("Couldn't send file because of expired submission.")))
+        Error(messagesApi("login.error.auth"), Seq("Couldn't send file because of expired submission.")))
       loginDetails = Login(userData.userId, userData.userPassword)
       result <- EitherT(uploadConnector.sendXml(content, loginDetails, uploadConfirmation.reference))
     } yield Right(result))
@@ -127,7 +127,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private def saveReportStatus(
                                 uploadConfirmation: UploadConfirmation,
                                 errors: Seq[ReportStatusError] = Seq(),
-                                status: ReportStatusType = UpScanVerified
+                                status: ReportStatusType = Verified
                               )
                               (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
     val reportStatus = ReportStatus(
@@ -136,6 +136,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       url = Some(uploadConfirmation.downloadUrl),
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
+      filename = Some(uploadConfirmation.uploadDetails.fileName),
       errors = Some(errors)
     )
     reportStatusConnector.save(reportStatus)
@@ -147,10 +148,11 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   def onConfirmation = Action.async(parse.tolerantJson) { implicit request =>
     (for {
-      uploadConfirmation <- EitherT(parseUploadConfirmation(request))
+      uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation))
       _ <- EitherT(sendContent(xml, uploadConfirmation))
+      _ <- EitherT(saveReportStatus(uploadConfirmation, status = Submitted))
     } yield NoContent)
       .valueOrF(error => {
         handleConfirmationError(request, error)
@@ -158,12 +160,12 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   }
 
   private def handleConfirmationError(request: Request[JsValue], error: Error) = {
-    val errorMsg = s"Error ${error.code}: ${error.values.mkString("\n")}"
+    val errorMsg = s"Error: ${error.values.mkString("\n")}"
     Logger.error(errorMsg)
     (for {
-      uploadInfo <- EitherT(parseUploadConfirmation(request))
+      uploadInfo <- EitherT(Future(parseUploadConfirmation(request)))
       reportStatusError = ReportStatusError(error.code, errorMsg, "")
-      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), UpscanFailed)(request))
+      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), Failed)(request))
     } yield InternalServerError(errorMsg))
       .valueOr(_ => InternalServerError(errorMsg))
   }

@@ -19,21 +19,16 @@ package connectors
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import models.{Error, ReportStatus}
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment}
 import play.api.Mode.Mode
-import play.api.http.Status
-import play.api.libs.json.JsValue
 import repositories.ReportStatusRepository
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class DefaultReportStatusConnector @Inject()(http: HttpClient,
+class DefaultReportStatusConnector @Inject()(
                                       val configuration: Configuration,
                                       reportStatusRepository: ReportStatusRepository,
                                       environment: Environment)
@@ -46,24 +41,8 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
   val serviceUrl = baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
 
-  def request(authorisedUsername: String)(implicit hc: HeaderCarrier): Future[Try[JsValue]] = {
-    http.GET(s"$serviceUrl${baseSegment}reports/${authorisedUsername}")
-      .map {
-        response =>
-          response.status match {
-            case Status.OK => Success(response.json)
-            case status => {
-              Logger.warn("Received status of " + status + " from upstream service when requesting report status")
-              Failure(new RuntimeException("Received status of " + status + " from upstream service when requesting report status"))
-            }
-          }
-      } recover {
-      case e =>
-        Logger.warn("Received exception " + e.getMessage + " from upstream service when requesting report status")
-        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service when requesting report status"))
-    }
-  }
-
+  def get(userId: String): Future[Either[Error, Seq[ReportStatus]]] =
+    reportStatusRepository.getByUser(userId)
   def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] =
     reportStatusRepository.atomicSaveOrUpdate(reportStatus, true)
   def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] =
@@ -74,5 +53,5 @@ class DefaultReportStatusConnector @Inject()(http: HttpClient,
 trait ReportStatusConnector {
   def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]]
   def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]]
-  def request(authorisedUsername: String)(implicit hc: HeaderCarrier): Future[Try[JsValue]]
+  def get(userId: String): Future[Either[Error, Seq[ReportStatus]]]
 }

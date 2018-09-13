@@ -14,35 +14,66 @@
  * limitations under the License.
  *@
 
+@import models.{Submitted, Done, Verified, Failed}
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 
-<div class="bordered-box submission-panel">
+<div class="bordered-box submission-panel" id="@reportStatus._id">
     @reportStatus.status match {
-        case Some("SUBMITTED") => {
-            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.submitted.title")</span>
-            @components.submission_body(reportStatus)
+        case Some(Done.value) => {
+        <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>
+        @components.submission_body(reportStatus)
         }
-        case Some("VALIDATED") => {
-            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.validated.title")</span>
-            @components.submission_body(reportStatus)
+        case Some(Submitted.value) => {
+        <span id="submission-title" class="flag flag--on-left-side">@messages("status.submitted.title")</span>
+        @components.submission_body(reportStatus)
         }
-        case Some("INVALIDATED") => {
-            <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.invalidated.title")</span>
-            <p><b class="bold">@messages("status.baCode.title")</b>: @reportStatus.userId.getOrElse("").toUpperCase</p>
+        case Some(Failed.value) => {
+        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
+        <div class="submission-body">
+            <p><b class="bold">@messages("submission")</b>: @reportStatus._id</p>
+            <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+            @if(reportStatus.filename.isDefined) {
+            <p>@messages("file") <b class="bold">@reportStatus.filename</b> @Html(messages("report.details.summary.first.line", reportStatus.totalEntries.getOrElse(0)))</p>
+            }
+            <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
+                @reportStatus.date.toLocalTime</i>
+            </p>
+            <p>
+                @components.submission_error(reportStatus.errors)
+            </p>
+        </div>
+        }
+        case _ if(reportStatus.date.compareTo(java.time.OffsetDateTime.now.minusHours(3)) < 0) => {
+        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
+        <div class="submission-body">
+            <p><b class="bold">@messages("submission")</b>: @reportStatus._id</p>
             <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
             <p><i>@messages("status.created.para1") @reportStatus.date.toLocalDate @messages("status.created.para2")
                 @reportStatus.date.toLocalTime</i>
             </p>
-
-        @* TODO: map the errors?
-        * @components.submission_error(reportStatus.errors)--> *@
+            <p>
+            <div class="notice">
+                <i class="icon icon-important">
+                    <span class="visually-hidden">Warning</span>
+                </i>
+                <strong class="bold-small">
+                    @messages("status.failed.timeout")
+                </strong>
+            </div>
+            </p>
+        </div>
         }
-        case Some("FORWARDED") => {
-            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.forwarded.title")</span>
+        case Some(Verified.value) => {
+            <span id="submission-title" class="flag flag--on-left-side">@messages("status.verified.title")</span>
             @components.submission_body(reportStatus)
+            <div class="panel panel-border-wide">
+                <p>
+                    @messages("status.verified.description")
+                </p>
+            </div>
         }
         case _ => {
-            <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.pending.title")</span>
+            <span id="submission-title" class="flag flag--on-left-side">@messages("status.pending.title")</span>
             @components.submission_body(reportStatus)
         }
     }

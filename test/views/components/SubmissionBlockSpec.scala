@@ -18,17 +18,16 @@ package views.components
 
 import java.time.OffsetDateTime
 
-import models.ReportStatus
+import models.{ReportStatus, Submitted}
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_block
 
 class SubmissionBlockSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, status = Some("SUBMITTED"), userId = Some("BA0121"))
-  val reports = List(reportStatus)
+  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, status = Some(Submitted.value), userId = Some("BA0121"))
 
-  def submission = () => submission_block(submissionId, Some(reports))(messages)
+  def submission = () => submission_block(reportStatus)(messages)
   lazy val doc = asDocument(submission())
 
   "Submission Block " must {
@@ -43,21 +42,9 @@ class SubmissionBlockSpec extends ViewBehaviours {
       sId mustBe messages("status.submissionId.title") + s" $submissionId"
     }
 
-    "Contain a submission history title" in {
-      val sHistory = doc.getElementById("submission-history").text
-      sHistory mustBe messages("status.history.title")
-    }
-
     "Contain a submission panel if the report statuses is not empty" in {
       val panels = doc.getElementsByClass("submission-panel")
       panels.size mustBe 1
-    }
-
-    "Contain no submission panel if the report statuses is None" in {
-      def submission = () => submission_block(submissionId, None)(messages)
-      lazy val doc = asDocument(submission())
-      val panels = doc.getElementsByClass("submission-panel")
-      panels.size mustBe 0
     }
   }
 

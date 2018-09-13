@@ -14,14 +14,25 @@
  * limitations under the License.
  *@
 
-@import models.Error
+@import models.ReportStatusError
 
-@(errors: Seq[Error])(implicit messages: Messages)
+@(errors: Option[Seq[ReportStatusError]])(implicit messages: Messages)
 
-@for(error <- errors) {
-    @if(error.values.size >= 3) {
-        <div class="submission-error"><h2 class="heading-medium">@messages("status.report.title") @error.values(0) @messages("status.report.para")</h2>
-            <li>The @error.values(1) @error.values(2) is invalid</li>
+@if(errors.isDefined) {
+    @for(error <- errors.get) {
+        <div class="submission-error">
+            <h2 class="heading-medium">
+                @if(error.errorCode.length>0){
+                    @error.errorCode: @error.message
+                }else{
+                    @error.message
+                }
+            </h2>
+            <ul class="list list-bullet ">
+                @if(error.detail.length>0){
+                <li>@error.detail</li>
+                }
+            </ul>
         </div>
     }
 }

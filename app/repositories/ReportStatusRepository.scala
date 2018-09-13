@@ -21,9 +21,10 @@ import java.time.OffsetDateTime
 import com.typesafe.config.ConfigException
 import javax.inject.{Inject, Singleton}
 import models.{Error, ReportStatus}
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, Json}
 import play.api.{Configuration, Logger}
 import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
@@ -53,7 +54,10 @@ class ReportStatusRepository @Inject()
     .getOrElse(throw new ConfigException.Missing(ttlPath))
   createIndex()
   private def createIndex(): Unit = {
-    collection.indexesManager.ensure(Index(Seq((ReportStatus.key, IndexType.Text)), Some(indexName),
+    collection.indexesManager.ensure(Index(Seq(
+        (ReportStatus.key, IndexType.Text),
+        ("userId", IndexType.Text)
+      ), Some(indexName),
       options = BSONDocument(expireAfterSeconds -> ttl),
       background = true)) map {
       result => {
@@ -76,9 +80,10 @@ class ReportStatusRepository @Inject()
       "url" -> reportStatus.url,
       "errors" -> reportStatus.errors.getOrElse(Seq()).map(e => BSONDocument(
         "detail" -> e.detail,
-        "message" -> e.errorCode,
-        "error_code" -> e.errorCode
+        "message" -> e.message,
+        "errorCode" -> e.errorCode
       )),
+      "filename" -> reportStatus.filename.getOrElse(""),
       "status" -> reportStatus.status)
     )
 
@@ -91,12 +96,26 @@ class ReportStatusRepository @Inject()
     val finder = BSONDocument(ReportStatus.key -> reference)
     val modifierBson = set(BSONDocument(
       "date" -> OffsetDateTime.now.toString,
-      "user_id" -> userId)
+      "userId" -> userId)
     )
 
     atomicSaveOrUpdate(reference, upsert, finder, modifierBson)
   }
 
+  def getByUser(userId: String)(implicit ec: ExecutionContext)
+  : Future[Either[Error, Seq[ReportStatus]]] = {
+    val finder = BSONDocument("userId" -> userId)
+    collection.find(finder).sort(Json.obj("date" -> -1)).cursor[ReportStatus](ReadPreference.primary)
+      .collect[Seq](-1, Cursor.FailOnError[Seq[ReportStatus]]())
+      .map(Right(_))
+      .recover {
+        case ex: Throwable => {
+          val errorMsg = "Couldn't retrieve BA reports"
+          Logger.warn(s"$errorMsg\n${ex.getMessage}")
+          Left(Error(errorMsg, Seq()))
+        }
+      }
+  }
   protected def atomicSaveOrUpdate(reference: String, upsert: Boolean, finder: BSONDocument, modifierBson: BSONDocument) = {
     val updateDocument = if (upsert) {
       modifierBson ++ setOnInsert(BSONDocument(ReportStatus.key -> reference))

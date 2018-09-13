@@ -23,9 +23,12 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 sealed trait ReportStatusType { val value: String = getClass.asSubclass(getClass).getSimpleName.replace("$", "") }
 case object Pending extends ReportStatusType
-case object UpScanVerified extends ReportStatusType
-case object UpscanFailed extends ReportStatusType
-case object XmlValidationFailed extends ReportStatusType
+case object Verified extends ReportStatusType
+case object Failed extends ReportStatusType
+case object Unknown extends ReportStatusType
+case object Submitted extends ReportStatusType
+case object Cancelled extends ReportStatusType
+case object Done extends ReportStatusType
 
 object ReportStatus {
   implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
@@ -46,5 +49,9 @@ final case class ReportStatus(
                                checksum: Option[String] = None,
                                errors: Option[Seq[ReportStatusError]] = Some(Seq()),
                                userId: Option[String] = None,
-                               status: Option[String] = Some(Pending.value)
+                               status: Option[String] = Some(Pending.value),
+                               filename: Option[String] = None,
+                               totalEntries: Option[Int] = None,
+                               successes: Option[Int] = None,
+                               failures: Option[Int] = None
                              )

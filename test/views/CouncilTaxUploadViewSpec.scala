@@ -18,7 +18,7 @@ package views
 
 import controllers.routes
 import forms.FileUploadDataFormProvider
-import models.NormalMode
+import models.{NormalMode}
 import models.UpScanRequests.{InitiateResponse, UploadRequest, UploadRequestFields}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
@@ -28,6 +28,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
 
   val username = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
+  val submissionId = "SId9324832"
 
   val form = new FileUploadDataFormProvider()()
 

@@ -16,6 +16,8 @@
 
 package controllers
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
@@ -26,6 +28,8 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.UserReportUpload
 import utils.FakeNavigator
@@ -33,6 +37,7 @@ import views.html.councilTaxUpload
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -40,6 +45,8 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
   val formProvider = new FileUploadDataFormProvider()
   val form = formProvider()
+  implicit val actorSystem = ActorSystem()
+  implicit val materializer = ActorMaterializer()
 
   val username = "BA0114"
   val password = "pass"
@@ -49,6 +56,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   val submissionId = "SID38273"
   val reference = submissionId
   val uploadUrl = "http://foo.bar"
+  val userReport = UserReportUpload(reference, username, password)
   val initiateResponse = InitiateResponse(
     reference = reference,
     uploadRequest = UploadRequest(
@@ -66,6 +74,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       )
     )
   )
+  val error = Error("error", Seq())
 
   val uploadConnector = mock[UploadConnector]
   when(uploadConnector.sendXml(any[String], any[Login], any[String])) thenReturn Future(Right(submissionId))
@@ -79,25 +88,40 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
   val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
   when(userReportUploadsConnectorMock.save(any[UserReportUpload])) thenReturn Future(Right(Unit))
+  when(userReportUploadsConnectorMock.getById(any[String])) thenReturn Future(Right(Some(userReport)))
+
+  val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
+  when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])) thenReturn Future(Left(error))
+  when(userReportUploadsConnectorFailMock.getById(any[String])) thenReturn Future(Left(error))
 
   val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.save(any[ReportStatus])) thenReturn Future(Right(Unit))
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[String])) thenReturn Future(Right(Unit))
 
-  def loggedInController(connector: UploadConnector) = {
+  val reportStatusConnectorFailMock = mock[ReportStatusConnector]
+  when(reportStatusConnectorFailMock.save(any[ReportStatus])) thenReturn Future(Left(error))
+  when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[String])) thenReturn Future(Left(error))
+
+  def loggedInController(
+                      connector: UploadConnector,
+                      userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
+                      reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, userReportUploadsConnectorMock, reportStatusConnectorMock)
+      connector, userReportUploadsConnector, reportStatusConnector)
   }
 
-  def notLoggedInController(connector: UploadConnector) = {
+  def notLoggedInController(
+                             connector: UploadConnector,
+                             userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
+                             reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock) = {
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl, FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, userReportUploadsConnectorMock, reportStatusConnectorMock)
+      connector, userReportUploadsConnector, reportStatusConnector)
   }
 
   def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(fakeRequest, messages).toString
@@ -116,6 +140,39 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "return valid response on the upscan confirmation endpoint" in {
+      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
+        .getLines
+        .mkString("\n")
+      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+
+      val result = call(loggedInController(uploadConnector).onConfirmation, request)
+
+      status(result) mustBe NO_CONTENT
+    }
+
+    "return invalid response on the upscan confirmation endpoint when the user upload information fails" in {
+      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
+        .getLines
+        .mkString("\n")
+      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+
+      val result = call(loggedInController(uploadConnector, userReportUploadsConnector = userReportUploadsConnectorFailMock).onConfirmation, request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+    }
+
+    "return invalid response on the upscan confirmation endpoint when the submission fails" in {
+      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
+        .getLines
+        .mkString("\n")
+      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+
+      val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
     }
   }
 }

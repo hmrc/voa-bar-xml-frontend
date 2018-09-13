@@ -16,7 +16,7 @@
 
 @import config.FrontendAppConfig
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatus: Map[String, List[ReportStatus]] = Map(), displayOrder: List[String] = List())(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig, reportStatuses: Seq[ReportStatus] = Seq())(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reportStatus.title"),
@@ -25,8 +25,8 @@
 
     @components.service_info(baCode)
 
-    @components.heading("reportStatus.heading")
+    @components.heading("reportStatus.heading", baCode)
 
-    @displayOrder.map(submissionId => components.submission_block(submissionId, reportStatus.get(submissionId)))
+    @reportStatuses.map(reportStatus => components.submission_panel(reportStatus))
 
 }

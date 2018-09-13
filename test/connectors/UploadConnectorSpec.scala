@@ -17,18 +17,20 @@
 package connectors
 
 import java.io.File
+import java.time.OffsetDateTime
 
 import base.SpecBase
 import com.typesafe.config.ConfigException
-import models.UpScanRequests._
+import models.UpScanRequests.{UploadDetails, _}
 import models._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.Status
+import play.api.i18n.MessagesApi
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json._
-import play.api.libs.ws.WSClient
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
@@ -83,13 +85,13 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
         implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])
+        val messagesApi = injector.instanceOf[MessagesApi]
         val urlCaptor = ArgumentCaptor.forClass(classOf[String])
         val bodyCaptor = ArgumentCaptor.forClass(classOf[String])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
-        val httpMock = getHttpMock(200, Some(submissionId))
-        val wsClientMock = mock[WSClient]
+        val httpMock = getHttpMock(Status.OK, Some(submissionId))
 
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
@@ -103,8 +105,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
-        val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(getHttpMock(200, Some(submissionId)), configuration, environment)
+        val connector = new UploadConnector(getHttpMock(Status.OK, Some(submissionId)), configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         result match {
           case Right(submissionValue) => submissionValue mustBe submissionId
@@ -113,8 +114,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a failure representing the error when send method fails" in {
-        val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(getHttpMock(500, None), configuration, environment)
+        val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR, None), configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
@@ -123,8 +123,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val httpMock = mock[HttpClient]
         when(httpMock.POSTString(anyString, any[String], any[Seq[(String, String)]])(any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
-        val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
         val result = await(connector.sendXml(xmlContent, login, submissionId))
         assert(result.isLeft)
       }
@@ -158,8 +157,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val httpMock = mock[HttpClient]
         when(httpMock.POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])
           (jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())) thenReturn Future.successful(initiateResponse)
-        val wsClientMock = mock[WSClient]
-        val connector = new UploadConnector(httpMock, configuration, environment)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
 
         val response = await(connector.initiate(initiateRequest))
 
@@ -167,6 +165,48 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         response.right.map(_.reference mustBe reference)
         verify(httpMock, times(1))
           .POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])(jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())
+      }
+    }
+
+    "provided with upscan information" must {
+      val reference = "11370e18-6e24-453e-b45a-76d3e32ea33d"
+      val downloadUrl = "http://download.url"
+      val downloadRequest = UploadConfirmation (
+        reference = reference,
+        downloadUrl = downloadUrl,
+        fileStatus = "fine",
+        uploadDetails = UploadDetails(
+          uploadTimestamp = OffsetDateTime.now,
+          checksum = "checksum",
+          fileMimeType = "text/plain",
+          fileName = "filename.xml"))
+      "download a file succesfully" in {
+        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+        val content = "<foo/>"
+        val httpResponse = mock[HttpResponse]
+        when(httpResponse.body) thenReturn(content)
+        val httpMock = mock[HttpClient]
+        when(httpMock.doGet(any[String])(headerCarrierNapper.capture)) thenReturn Future.successful(httpResponse)
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
+
+        val response = await(connector.downloadFile(downloadRequest))
+
+        assert(response.isRight)
+        response.right.map(_ mustBe content)
+        verify(httpMock, times(1))
+          .doGet(any[String])(headerCarrierNapper.capture)
+      }
+      "fail when attmpting to download a file when there is a problem with upscan" in {
+        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+        val httpMock = mock[HttpClient]
+        when(httpMock.doGet(any[String])(headerCarrierNapper.capture)) thenReturn Future.failed(new Exception())
+        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
+
+        val response = await(connector.downloadFile(downloadRequest))
+
+        assert(response.isLeft)
+        verify(httpMock, times(1))
+          .doGet(any[String])(headerCarrierNapper.capture)
       }
     }
   }

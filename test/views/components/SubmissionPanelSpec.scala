@@ -18,7 +18,7 @@ package views.components
 
 import java.time.OffsetDateTime
 
-import models.ReportStatus
+import models._
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_panel
 
@@ -27,16 +27,18 @@ class SubmissionPanelSpec extends ViewBehaviours {
   val submissionId = "SId9324832"
   val baCode = "baCode"
   val date = OffsetDateTime.now
-  val reportStatus1 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("SUBMITTED"))
-  val reportStatus2 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("VALIDATED"))
-  val reportStatus3 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("INVALIDATED"))
-  val reportStatus4 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some("FORWARDED"))
+  val reportStatus1 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Submitted.value))
+  val reportStatus2 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Verified.value))
+  val reportStatus3 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Failed.value))
+  val reportStatus4 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Done.value))
+  val reportStatus5 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Pending.value))
 
 
   def submission1 = () => submission_panel(reportStatus1)(messages)
   def submission2 = () => submission_panel(reportStatus2)(messages)
   def submission3 = () => submission_panel(reportStatus3)(messages)
   def submission4 = () => submission_panel(reportStatus4)(messages)
+  def submission5 = () => submission_panel(reportStatus5)(messages)
 
   "Submission Panel" must {
 
@@ -46,22 +48,28 @@ class SubmissionPanelSpec extends ViewBehaviours {
       status mustBe messages("status.submitted.title")
     }
 
-    "Contain a submission title equal to 'VALIDATED' if the report status is validated" in {
+    "Contain a submission title equal to 'VERIFIED' if the report status is validated" in {
       lazy val doc = asDocument(submission2())
       val status = doc.getElementById("submission-title").text
-      status mustBe messages("status.validated.title")
+      status mustBe messages("status.verified.title")
     }
 
-    "Contain a submission title equal to 'INVALIDATED' if the report status is invalidated" in {
+    "Contain a submission title equal to 'FAILED' if the report status is invalidated" in {
       lazy val doc = asDocument(submission3())
       val status = doc.getElementById("submission-title").text
-      status mustBe messages("status.invalidated.title")
+      status mustBe messages("status.failed.title")
     }
 
-    "Contain a submission title equal to 'FORWARDED' if the report status is forwarded" in {
+    "Contain a submission title equal to 'DONE' if the report status is forwarded" in {
       lazy val doc = asDocument(submission4())
       val status = doc.getElementById("submission-title").text
-      status mustBe messages("status.forwarded.title")
+      status mustBe messages("status.done.title")
+    }
+
+    "Contain a submission title equal to 'PENDING' if the report status is forwarded" in {
+      lazy val doc = asDocument(submission5())
+      val status = doc.getElementById("submission-title").text
+      status mustBe messages("status.pending.title")
     }
   }
 
