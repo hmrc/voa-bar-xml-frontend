@@ -148,7 +148,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   def onConfirmation = Action.async(parse.tolerantJson) { implicit request =>
     (for {
-      uploadConfirmation <- EitherT(Future(parseUploadConfirmation(request)))
+      uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation))
       _ <- EitherT(sendContent(xml, uploadConfirmation))
