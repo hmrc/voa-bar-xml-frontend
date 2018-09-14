@@ -48,7 +48,8 @@ class UploadConnector @Inject()(http: HttpClient,
   private[connectors] val upScanConfig = configuration.getConfig("microservice.services.upscan").get
   private[connectors] val upScanPort = upScanConfig.getString("port").get
   private[connectors] val upScanHost = upScanConfig.getString("host").get
-  private[connectors] val initiateUrl = s"http://$upScanHost:$upScanPort${upScanConfig.getString("initiate.url").get}"
+  private[connectors] val upScanProtocol = upScanConfig.getString("protocol").get
+  private[connectors] val initiateUrl = s"$upScanProtocol://$upScanHost:$upScanPort${upScanConfig.getString("initiate.url").get}"
 
   def generateUsernameHeader(username: String) = ("BA-Code", username)
 
