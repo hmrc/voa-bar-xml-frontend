@@ -1,16 +1,7 @@
 import sbt._
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
-object FrontendBuild extends Build with MicroService {
 
-  val appName = "voa-bar-xml-frontend"
-
-  override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
-}
-
-private object AppDependencies {
+object Dependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
@@ -33,7 +24,7 @@ private object AppDependencies {
   private val guiceUtilsVersion = "4.1.0"
 
 
-  val compile = Seq(
+  val compileDependencies = Seq(
     ws,
     "uk.gov.hmrc"    %% "play-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc"    %% "logback-json-logger" % logbackJsonLoggerVersion,
@@ -48,25 +39,16 @@ private object AppDependencies {
     "net.codingwell" %% "scala-guice" % guiceUtilsVersion
   )
 
-  trait TestDependencies {
-    lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
-  }
-
-  object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % scope,
-        "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "org.jsoup" % "jsoup" % "1.10.3" % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.mockito" % "mockito-all" % mockitoAllVersion % scope,
-        "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope
+  lazy val testDependencies = Seq(
+        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % Test,
+        "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+        "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % Test,
+        "org.pegdown" % "pegdown" % pegdownVersion % Test,
+        "org.jsoup" % "jsoup" % "1.10.3" % Test,
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % Test,
+        "org.mockito" % "mockito-all" % mockitoAllVersion % Test,
+        "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test
       )
-    }.test
-  }
 
-  def apply() = compile ++ Test()
+  val appDependencies = compileDependencies ++ testDependencies
 }
