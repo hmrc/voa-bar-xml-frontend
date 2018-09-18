@@ -46,7 +46,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
 
-  lazy val path = getClass.getResource("/valid2.xml")
+  lazy val path = getClass.getResource("/valid.xml")
   lazy val file = new File(path.getPath)
   lazy val tempFile = new TemporaryFile(file)
 
@@ -60,7 +60,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
   val maximumFileSize = upScanConfig.getInt(maximumFileSizePath)
     .getOrElse(throw new ConfigException.Missing(maximumFileSizePath))
 
-  lazy val xmlFile = FilePart[TemporaryFile](key = "xml", filename = "valid2.xml", contentType = None, ref = tempFile)
+  lazy val xmlFile = FilePart[TemporaryFile](key = "xml", filename = "valid.xml", contentType = None, ref = tempFile)
   lazy val xmlContent = Source.fromFile(file).getLines.mkString("\n")
   val username = "user"
   val password = "pass"
