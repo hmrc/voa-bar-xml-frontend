@@ -16,7 +16,7 @@
 
 package connectors
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.time.OffsetDateTime
 
 import base.SpecBase
@@ -46,8 +46,8 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
 
-  val path = getClass.getResource("/valid.xml")
-  val file = new File(path.getPath)
+  val file = File.createTempFile("foo", "bar")
+  val path = new PrintWriter(file) { write("<xml />"); close }
   val tempFile = new TemporaryFile(file)
 
   val upScanConfigPath = "microservice.services.upscan"
