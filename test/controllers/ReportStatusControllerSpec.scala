@@ -29,7 +29,6 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
-import repositories.ReportStatusRepository
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus

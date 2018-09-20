@@ -20,7 +20,7 @@ import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import models.{Error, Login}
 import play.api.Configuration
-import repositories.UserReportUpload
+import models.UserReportUpload
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 

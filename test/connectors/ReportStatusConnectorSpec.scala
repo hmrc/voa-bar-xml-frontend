@@ -27,7 +27,6 @@ import play.api.{Configuration, Environment}
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.test.Helpers._
-import repositories.ReportStatusRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
