@@ -16,42 +16,77 @@
 
 package connectors
 
+import java.time.OffsetDateTime
+
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
-import models.{Error, ReportStatus}
-import play.api.{Configuration, Environment}
+import models.{Error, Login, ReportStatus}
+import models.ReportStatus._
+import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
-import repositories.ReportStatusRepository
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class DefaultReportStatusConnector @Inject()(
                                       val configuration: Configuration,
-                                      reportStatusRepository: ReportStatusRepository,
+                                      http: HttpClient,
                                       environment: Environment)
                                      (implicit ec: ExecutionContext)
-  extends ServicesConfig with ReportStatusConnector {
+  extends ServicesConfig with ReportStatusConnector with BaseConnector {
 
   override protected def mode: Mode = environment.mode
   override protected def runModeConfiguration: Configuration = configuration
 
-  val serviceUrl = baseUrl("voa-bar")
-  val baseSegment = "/voa-bar/"
+  val serviceUrl = s"${baseUrl("voa-bar")}/voa-bar"
+  val hc: HeaderCarrier = HeaderCarrier()
 
-  def get(userId: String): Future[Either[Error, Seq[ReportStatus]]] =
-    reportStatusRepository.getByUser(userId)
-  def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]] =
-    reportStatusRepository.atomicSaveOrUpdate(reportStatus, true)
-  def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]] =
-    reportStatusRepository.atomicSaveOrUpdate(userId, reference,true)
+  def get(login: Login): Future[Either[Error, Seq[ReportStatus]]] = {
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions")
+      .map(Right(_))
+      .recover{
+        case ex: Throwable => {
+          Logger.error(ex.getMessage)
+          Left(Error("", Seq("Couldn't get submissions")))
+        }
+      }
+  }
+
+  def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]] = {
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
+    http.PUT(s"$serviceUrl/submissions", reportStatus)
+      .map(_ => Right(Unit))
+      .recover {
+        case ex: Throwable => {
+          Logger.error(ex.getMessage)
+          Left(Error("", Seq("Couldn't get submissions")))
+        }
+      }
+  }
+
+  def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]] = {
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
+    http.PUT(s"$serviceUrl/submissions/user-info", ReportStatus(reference, OffsetDateTime.now, userId = Some(login.username)))
+      .map(_ => Right(Unit))
+      .recover {
+        case ex: Throwable => {
+          Logger.error(ex.getMessage)
+          Left(Error("", Seq("Couldn't get submissions")))
+        }
+      }
+  }
 }
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
 trait ReportStatusConnector {
-  def saveUserInfo(reference: String, userId: String): Future[Either[Error, Unit.type]]
-  def save(reportStatus: ReportStatus): Future[Either[Error, Unit.type]]
-  def get(userId: String): Future[Either[Error, Seq[ReportStatus]]]
+  def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]]
+  def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]]
+  def get(login: Login): Future[Either[Error, Seq[ReportStatus]]]
 }

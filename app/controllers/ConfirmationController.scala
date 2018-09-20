@@ -24,7 +24,7 @@ import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.VOAAuthorisedId
-import models.NormalMode
+import models.{Login, NormalMode}
 import play.api.mvc.{Request, Result}
 import views.html.confirmation
 import cats.implicits._
@@ -35,17 +35,17 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        override val messagesApi: MessagesApi,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
-                                       dataCacheConnector: DataCacheConnector,
+                                       val dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector)
-                                      (implicit ec: ExecutionContext)
-  extends FrontendController with I18nSupport {
+                                      (implicit val ec: ExecutionContext)
+  extends FrontendController with BaseBarController with I18nSupport {
 
   private def getUsername(externalId: String): Future[Either[Result, String]] = {
     dataCacheConnector.getEntry[String](externalId, VOAAuthorisedId.toString)
       .map(entry => Either.cond(entry.isDefined, entry.get, Redirect(routes.LoginController.onPageLoad(NormalMode))))
   }
-  private def saveReportStatus(username: String, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
-    reportStatusConnector.saveUserInfo(reference, username)
+  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+    reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(
         _ => Left(InternalServerError),
         _ => Right(Unit)
@@ -55,9 +55,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad(reference: String) = getData.async {
     implicit request =>
       (for {
-        username <- EitherT(getUsername(request.externalId))
-        _ <- EitherT(saveReportStatus(username, reference))
-      } yield Ok(confirmation(username, reference, appConfig)))
+        login <- EitherT(cachedLogin(request.externalId))
+        _ <- EitherT(saveReportStatus(login, reference))
+      } yield Ok(confirmation(login.username, reference, appConfig)))
         .valueOr(failPage => failPage)
   }
 }
