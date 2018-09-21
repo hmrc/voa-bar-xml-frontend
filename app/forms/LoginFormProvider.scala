@@ -29,8 +29,9 @@ class LoginFormProvider @Inject() extends Mappings {
      mapping(
       "username" -> text("login.error.username.required")
         .verifying(maxLength(100, "login.error.username.length")),
-      "password" -> text("login.error.password.required")
-        .verifying(maxLength(100, "login.error.password.length"))
+     "password" -> text("login.error.password.required")
+       .verifying(maxLength(100, "login.error.password.length")),
+     "reference" -> optional(text())
     )(Login.apply)(Login.unapply)
    )
  }

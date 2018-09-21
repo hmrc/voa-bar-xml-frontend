@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import identifiers.LoginId
 import models.{Error, Login, NormalMode}
+import play.api.Logger
 import play.api.mvc.{Controller, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,5 +40,22 @@ trait BaseBarController extends Controller {
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
       Error("Couldn't get user session", Seq())
     ).value
+  }
+  private[controllers] def cachedLoginByReference(reference: String): Future[Either[Error, Login]] = {
+    EitherT.fromOptionF(
+      dataCacheConnector.getEntryByField[Login]("data.login.reference", reference, LoginId.toString),
+      Error("Couldn't get user session", Seq())
+    ).value
+  }
+  private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit.type]] = {
+    dataCacheConnector.save[Login](externalId, LoginId.toString, login)
+        .map(_ => Right(Unit))
+        .recover{
+          case ex: Throwable => {
+            val errorMessage = "Error while saving login"
+            Logger.error(s"$errorMessage\n${ex.getMessage}")
+            Left(InternalServerError)
+          }
+        }
   }
 }

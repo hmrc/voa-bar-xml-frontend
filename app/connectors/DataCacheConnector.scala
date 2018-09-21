@@ -52,6 +52,12 @@ class DataCacheConnectorImpl @Inject()(val sessionRepository: SessionRepository,
     }
   }
 
+  def getEntryByField[A](field: String, value: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] = {
+    sessionRepository().getByField(field, value).map { optionalCacheMap =>
+      optionalCacheMap.flatMap { cacheMap => cacheMap.getEntry(key)}
+    }
+  }
+
   def addToCollection[A](cacheId: String, collectionKey: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = {
     sessionRepository().get(cacheId).flatMap { optionalCacheMap =>
       val updatedCacheMap = cascadeUpsert.addRepeatedValue(collectionKey, value, optionalCacheMap.getOrElse(new CacheMap(cacheId, Map())))
@@ -94,6 +100,8 @@ trait DataCacheConnector {
   def fetch(cacheId: String): Future[Option[CacheMap]]
 
   def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]]
+
+  def getEntryByField[A](field: String, value: String, key: String)(implicit fmt: Format[A]): Future[Option[A]]
 
   def addToCollection[A](cacheId: String, collectionKey: String, value: A)(implicit fmt: Format[A]): Future[CacheMap]
 

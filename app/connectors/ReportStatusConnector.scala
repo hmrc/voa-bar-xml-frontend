@@ -60,12 +60,12 @@ class DefaultReportStatusConnector @Inject()(
   def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]] = {
     val headers = defaultHeaders(login.username, login.password)
     implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
-    http.PUT(s"$serviceUrl/submissions", reportStatus)
+    http.PUT(s"$serviceUrl/submissions?upsert=true", reportStatus)
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
           Logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't get submissions")))
+          Left(Error("", Seq("Couldn't save submission")))
         }
       }
   }
@@ -78,7 +78,7 @@ class DefaultReportStatusConnector @Inject()(
       .recover {
         case ex: Throwable => {
           Logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't get submissions")))
+          Left(Error("", Seq("Couldn't save user info for the submission")))
         }
       }
   }

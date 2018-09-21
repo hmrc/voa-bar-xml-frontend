@@ -32,7 +32,7 @@ import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{Request, Result}
-import repositories.UserReportUpload
+import models.UserReportUpload
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -139,8 +139,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   def onConfirmation = getData.async(parse.tolerantJson) { implicit request =>
     (for {
-      login <- EitherT(cachedLoginError(request.externalId))
       uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
+      login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login))
       _ <- EitherT(sendContent(xml, uploadConfirmation, login))

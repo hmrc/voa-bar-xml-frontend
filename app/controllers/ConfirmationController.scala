@@ -56,6 +56,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
+        _ <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
         _ <- EitherT(saveReportStatus(login, reference))
       } yield Ok(confirmation(login.username, reference, appConfig)))
         .valueOr(failPage => failPage)
