@@ -18,8 +18,8 @@ package controllers
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.VOAAuthorisedId
-import models.{NormalMode, ReportStatus}
+import identifiers.{LoginId, VOAAuthorisedId}
+import models.{Login, NormalMode, ReportStatus}
 import play.api.test.Helpers._
 import views.html.confirmation
 import org.mockito.Matchers.any
@@ -33,15 +33,16 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val username = "AUser"
   val submissionId = "SID372463"
+  val login = Login("foo", "bar")
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[String])) thenReturn Future(Right(Unit))
-  when(reportStatusConnectorMock.save(any[ReportStatus])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
       new DataRequiredActionImpl, FakeDataCacheConnector, reportStatusConnectorMock)
   }

@@ -20,14 +20,14 @@ import java.time.OffsetDateTime
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.VOAAuthorisedId
-import models.{Error, NormalMode, ReportStatus, Submitted}
+import identifiers.{LoginId, VOAAuthorisedId}
+import models._
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import utils.FakeNavigator
-import views.html.councilTaxStart
+import views.html.{councilTaxStart, login}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,6 +35,7 @@ import scala.concurrent.Future
 class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val username = "AUser"
+  val login = Login("foo", "bar")
   val submissionId = "SId9324832"
   val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(username), status = Some(Submitted.value))
 
@@ -45,7 +46,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
                           dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap
                         ) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxStartController(frontendAppConfig, messagesApi, dataRetrievalAction,
       new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, reportStatusConnector)
   }
@@ -61,12 +62,12 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
 
   def reportStatusConnect() = {
     val reportStatusConnector = mock[ReportStatusConnector]
-    when(reportStatusConnector.get(any[String])).thenReturn(Future(Right(Seq(reportStatus))))
+    when(reportStatusConnector.get(any[Login])).thenReturn(Future(Right(Seq(reportStatus))))
     reportStatusConnector
   }
   def reportStatusConnectFailure() = {
     val reportStatusConnector = mock[ReportStatusConnector]
-    when(reportStatusConnector.get(any[String])).thenReturn(Future(Left(Error("error", Seq()))))
+    when(reportStatusConnector.get(any[Login])).thenReturn(Future(Left(Error("error", Seq()))))
     reportStatusConnector
   }
 
