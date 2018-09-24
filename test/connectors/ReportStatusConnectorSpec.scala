@@ -113,5 +113,28 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
 
       assert(result.isLeft)
     }
+    "given submission id get reportstatus" in {
+      val http = mock[HttpClient]
+      when(http.GET[ReportStatus](any[String])
+        (any[HttpReads[ReportStatus]], any[HeaderCarrier], any[ExecutionContext]))
+        .thenReturn(Future(rs))
+      val connector = new DefaultReportStatusConnector(configuration, http, environment)
+      val login = Login("AUser", "anyPass")
+
+      val result = await(connector.getByReference(submissionId, login))
+
+      result match {
+        case Right(reportStatuses) => reportStatuses mustBe rs
+        case Left(_) => assert(false)
+      }
+    }
+
+    "return a failure when the repository encounters an issue while retrieving submission" in {
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+
+      val result = await(connector.getByReference(submissionId, login))
+
+      assert(result.isLeft)
+    }
   }
 }

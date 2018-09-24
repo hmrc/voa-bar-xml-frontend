@@ -40,10 +40,6 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                       (implicit val ec: ExecutionContext)
   extends FrontendController with BaseBarController with I18nSupport {
 
-  private def getUsername(externalId: String): Future[Either[Result, String]] = {
-    dataCacheConnector.getEntry[String](externalId, VOAAuthorisedId.toString)
-      .map(entry => Either.cond(entry.isDefined, entry.get, Redirect(routes.LoginController.onPageLoad(NormalMode))))
-  }
   private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
     reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(

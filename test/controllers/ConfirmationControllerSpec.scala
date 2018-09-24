@@ -16,9 +16,11 @@
 
 package controllers
 
+import java.time.OffsetDateTime
+
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.LoginId
 import models.{Login, NormalMode, ReportStatus}
 import play.api.test.Helpers._
 import views.html.confirmation
@@ -34,9 +36,11 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
   val username = "AUser"
   val submissionId = "SID372463"
   val login = Login("foo", "bar")
+  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now)
   val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
   when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn Future(Right(reportStatus))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -54,6 +58,8 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
   }
 
   def viewAsString() = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
+  def refreshViewAsString() =
+    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 
@@ -66,6 +72,20 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
 
     "if not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageLoad(submissionId)(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "return OK and the correct view for the refresh page" in {
+      val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe refreshViewAsString()
+    }
+
+    "if while refreshing not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
