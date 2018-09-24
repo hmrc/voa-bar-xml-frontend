@@ -78,7 +78,7 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Submission complete
+confirmation.heading = Submission
 confirmation.submissionId = Submission ID: 
 confirmation.subheading = We are processing your reports
 confirmation.file.received = We have received your file and we are processing your reports.

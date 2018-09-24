@@ -33,14 +33,14 @@
     <span class="voa-logo" aria-hidden="true"><img src="/voa-bar-xml-frontend/assets/images/voalogo.png" alt="Valuation Office Agency"></span>
 
     <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">@messages("confirmation.heading")</h1>
-        <h2>Status:
-        @if(reportStatus.isDefined && reportStatus.get.status.isDefined) {
+        <h1 class="transaction-banner__heading">
+            @messages("confirmation.heading")
+            @if(reportStatus.isDefined && reportStatus.get.status.isDefined) {
             @messages(s"status.${reportStatus.get.status.get.toLowerCase()}.title")
-        } else {
+            } else {
             @messages("status.pending.title")
-        }
-        </h2>
+            }
+        </h1>
         @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
             <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
         }
