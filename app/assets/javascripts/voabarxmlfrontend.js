@@ -142,4 +142,13 @@ $(document).ready(function() {
         }, 50);
         return true;
       });
+      // =====================================================
+      // Refresh status page
+      // =====================================================
+      const refreshUrl = $("#refreshUrl").val();
+      if(refreshUrl) {
+        setInterval(function() {
+            window.location = refreshUrl;
+        }, 3000);
+      }
   }

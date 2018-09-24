@@ -24,7 +24,7 @@ import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.VOAAuthorisedId
-import models.{Login, NormalMode}
+import models.{Login, NormalMode, ReportStatus}
 import play.api.mvc.{Request, Result}
 import views.html.confirmation
 import cats.implicits._
@@ -59,6 +59,22 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         _ <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
         _ <- EitherT(saveReportStatus(login, reference))
       } yield Ok(confirmation(login.username, reference, appConfig)))
+        .valueOr(failPage => failPage)
+  }
+
+  private def getReportStatus(reference: String, login: Login): Future[Either[Result, ReportStatus]] = {
+    reportStatusConnector.getByReference(reference, login).map(_.fold(
+      _ => Left(InternalServerError),
+      reportStatus => Right(reportStatus)
+    ))
+  }
+
+  def onPageRefresh(reference: String) = getData.async {
+    implicit request =>
+      (for {
+        login <- EitherT(cachedLogin(request.externalId))
+        reportStatus <- EitherT(getReportStatus(reference, login))
+      } yield Ok(confirmation(login.username, reportStatus._id, appConfig, Some(reportStatus))))
         .valueOr(failPage => failPage)
   }
 }

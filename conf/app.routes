@@ -13,6 +13,7 @@ GET         /check-your-answers                 controllers.CheckYourAnswersCont
 GET         /unauthorised                       controllers.UnauthorisedController.onPageLoad
 
 GET         /confirmation                       controllers.ConfirmationController.onPageLoad(submissionId: String)
+GET         /confirmation/refresh               controllers.ConfirmationController.onPageRefresh(submissionId: String)
 
 GET         /councilTaxStart                    controllers.CouncilTaxStartController.onPageLoad()
 GET         /goToCouncilTaxUpload               controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
