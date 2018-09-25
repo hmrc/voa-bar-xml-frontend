@@ -17,7 +17,7 @@
 @import models.{Submitted, Done, Verified, Failed}
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 
-<div class="bordered-box submission-panel" id="@reportStatus.submissionId">
+<div class="bordered-box submission-panel" id="@reportStatus.submissionId.split("-").head">
     @reportStatus.status match {
         case Some(Done.value) => {
         <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>
@@ -30,7 +30,7 @@
         case Some(Failed.value) => {
         <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
         <div class="submission-body">
-            <p><b class="bold">@messages("submission")</b>: @reportStatus.submissionId</p>
+            <p><b class="bold">@messages("submission")</b>: @reportStatus.submissionId.split("-").head</p>
             <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
             @if(reportStatus.filename.isDefined) {
             <p><b class="bold">@messages("file") </b>@reportStatus.filename</p>
@@ -46,7 +46,7 @@
         case _ if(reportStatus.created.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
         <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
         <div class="submission-body">
-            <p><b class="bold">@messages("submission")</b>: @reportStatus.submissionId</p>
+            <p><b class="bold">@messages("submission")</b>: @reportStatus.submissionId.split("-").head</p>
             <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
             <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
                 @reportStatus.created.toLocalTime</i>
