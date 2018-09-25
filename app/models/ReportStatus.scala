@@ -16,7 +16,7 @@
 
 package models
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
@@ -32,26 +32,15 @@ case object Done extends ReportStatusType
 
 object ReportStatus {
   implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
-  implicit val errorFormat = Json.format[ReportStatusError]
   implicit val format = Json.format[ReportStatus]
-  val name = classOf[ReportStatus].getSimpleName.toLowerCase
-  val key = "_id"
 }
-final case class ReportStatusError(
-                                    errorCode: String,
-                                    message: String,
-                                    detail: String
-                                  )
 final case class ReportStatus(
-                               _id: String,
-                               date: OffsetDateTime,
+                               submissionId: String,
+                               created: ZonedDateTime,
                                url: Option[String] = None,
                                checksum: Option[String] = None,
-                               errors: Option[Seq[ReportStatusError]] = Some(Seq()),
-                               userId: Option[String] = None,
+                               errors: Option[Seq[Error]] = Some(Seq()),
+                               baCode: Option[String] = None,
                                status: Option[String] = Some(Pending.value),
-                               filename: Option[String] = None,
-                               totalEntries: Option[Int] = None,
-                               successes: Option[Int] = None,
-                               failures: Option[Int] = None
+                               filename: Option[String] = None
                              )

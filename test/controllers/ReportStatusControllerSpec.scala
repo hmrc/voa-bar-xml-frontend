@@ -16,11 +16,11 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.LoginId
 import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, anyString}
@@ -49,11 +49,11 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val submissionId1 = "1234-XX"
   val submissionId2 = "1235-XX"
   val submissionId3 = "1236-XX"
-  val date = () => OffsetDateTime.now
+  val date = () => ZonedDateTime.now
 
-  val rs1 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Submitted.value))
-  val rs2 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Verified.value))
-  val rs3 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Done.value))
+  val rs1 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Submitted.value))
+  val rs2 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Verified.value))
+  val rs3 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Done.value))
 
   val fakeReports = Seq(rs1, rs2, rs3)
   val fakeMapAsJson = Json.toJson(fakeReports)
@@ -61,7 +61,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  val sortedReports = fakeReports.sortWith{ case (r, r2) => r.date.compareTo(r2.date) >= 0 }
+  val sortedReports = fakeReports.sortWith{ case (r, r2) => r.created.compareTo(r2.created) >= 0 }
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
   def fakeReportStatusConnector() = {

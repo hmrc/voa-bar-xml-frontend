@@ -16,7 +16,7 @@
 
 package connectors
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
@@ -86,7 +86,7 @@ class DefaultReportStatusConnector @Inject()(
   def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]] = {
     val headers = defaultHeaders(login.username, login.password)
     implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
-    http.PUT(s"$serviceUrl/submissions/user-info", ReportStatus(reference, OffsetDateTime.now, userId = Some(login.username)))
+    http.PUT(s"$serviceUrl/submissions/user-info", ReportStatus(reference, ZonedDateTime.now, baCode = Some(login.username)))
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {

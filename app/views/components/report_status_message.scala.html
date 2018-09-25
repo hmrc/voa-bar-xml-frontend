@@ -23,7 +23,7 @@
     <i>(@Messages(s"report.status.failed"))</i>
     }
 
-    case Some(Pending.value) if(report.date.compareTo(java.time.OffsetDateTime.now.minusHours(3)) < 0) => {
+    case Some(Pending.value) if(report.created.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
     <i>(@Messages(s"report.status.failed"))</i>
     }
 

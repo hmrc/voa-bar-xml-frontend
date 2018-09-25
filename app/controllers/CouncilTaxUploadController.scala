@@ -16,14 +16,14 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import javax.inject.Inject
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
-import models.{Error, Login, ReportStatus, ReportStatusError, ReportStatusType, Submitted, Verified, Failed}
+import models.{Error, Failed, Login, ReportStatus, ReportStatusType, Submitted, UserReportUpload, Verified}
 import cats.data.EitherT
 import cats.implicits._
 import models.UpScanRequests._
@@ -32,7 +32,6 @@ import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{Request, Result}
-import models.UserReportUpload
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -117,13 +116,13 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private def saveReportStatus(
                                 uploadConfirmation: UploadConfirmation,
                                 login: Login,
-                                errors: Seq[ReportStatusError] = Seq(),
+                                errors: Seq[Error] = Seq(),
                                 status: ReportStatusType = Verified
                               )
                               (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
     val reportStatus = ReportStatus(
       uploadConfirmation.reference,
-      OffsetDateTime.now,
+      ZonedDateTime.now,
       url = Some(uploadConfirmation.downloadUrl),
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
@@ -156,8 +155,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     Logger.error(errorMsg)
     (for {
       login <- EitherT(cachedLoginError(request.externalId))
-      uploadInfo <- EitherT(Future(parseUploadConfirmation(request)))
-      reportStatusError = ReportStatusError(error.code, errorMsg, "")
+      uploadInfo <- EitherT(Future.successful(parseUploadConfirmation(request)))
+      reportStatusError = Error(error.code)
       _ <- EitherT(saveReportStatus(uploadInfo, login, Seq(reportStatusError), Failed)(request))
     } yield InternalServerError(errorMsg))
       .valueOr(_ => InternalServerError(errorMsg))

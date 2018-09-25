@@ -16,10 +16,10 @@
 
 package utils
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object DateFormatter {
-  def formatDate(dateTime: OffsetDateTime) =
+  def formatDate(dateTime: ZonedDateTime) =
     s"""${dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))}"""
 }

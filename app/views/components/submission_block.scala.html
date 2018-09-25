@@ -17,7 +17,7 @@
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 <div id ="submission-block" class="bordered-box">
 
-    <h2 id="submission-id" class="hero__heading-large">@messages("status.submissionId.title") @reportStatus._id</h2>
+    <h2 id="submission-id" class="hero__heading-large">@messages("status.submissionId.title") @reportStatus.submissionId.split("-").head</h2>
 
     @{components.submission_panel(reportStatus)}
 

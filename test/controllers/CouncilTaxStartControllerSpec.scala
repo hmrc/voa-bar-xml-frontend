@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
@@ -37,7 +37,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
   val username = "AUser"
   val login = Login("foo", "bar")
   val submissionId = "SId9324832"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(username), status = Some(Submitted.value))
+  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, baCode = Some(username), status = Some(Submitted.value))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 

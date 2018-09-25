@@ -14,24 +14,20 @@
  * limitations under the License.
  *@
 
-@import models.ReportStatusError
+@import models.Error
 
-@(errors: Option[Seq[ReportStatusError]])(implicit messages: Messages)
+@(errors: Option[Seq[Error]])(implicit messages: Messages)
 
 @if(errors.isDefined) {
     @for(error <- errors.get) {
         <div class="submission-error">
             <h2 class="heading-medium">
-                @if(error.errorCode.length>0){
-                    @error.errorCode: @error.message
-                }else{
-                    @error.message
-                }
+                @error.code
             </h2>
             <ul class="list list-bullet ">
-                @if(error.detail.length>0){
-                <li>@error.detail</li>
-                }
+                @* TODO: what to be displayed here
+                *   <li>@error.detail</li>
+                *@
             </ul>
         </div>
     }

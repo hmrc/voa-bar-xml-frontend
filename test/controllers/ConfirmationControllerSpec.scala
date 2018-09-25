@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
@@ -36,7 +36,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
   val username = "AUser"
   val submissionId = "SID372463"
   val login = Login("foo", "bar")
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now)
+  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now)
   val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
   when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))

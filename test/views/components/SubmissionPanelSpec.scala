@@ -16,7 +16,7 @@
 
 package views.components
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import models._
 import views.behaviours.ViewBehaviours
@@ -26,12 +26,12 @@ class SubmissionPanelSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
   val baCode = "baCode"
-  val date = OffsetDateTime.now
-  val reportStatus1 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Submitted.value))
-  val reportStatus2 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Verified.value))
-  val reportStatus3 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Failed.value))
-  val reportStatus4 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Done.value))
-  val reportStatus5 = ReportStatus(submissionId, date, userId = Some(baCode), status = Some(Pending.value))
+  val date = ZonedDateTime.now
+  val reportStatus1 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Submitted.value))
+  val reportStatus2 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Verified.value))
+  val reportStatus3 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Failed.value))
+  val reportStatus4 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Done.value))
+  val reportStatus5 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Pending.value))
 
 
   def submission1 = () => submission_panel(reportStatus1)(messages)
