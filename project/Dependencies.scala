@@ -22,21 +22,23 @@ object Dependencies {
   private val scalacheckVersion = "1.13.4"
   private val catsVersion = "1.1.0"
   private val guiceUtilsVersion = "4.1.0"
+  private val pdfBoxVersion = "2.0.1"
 
 
   val compileDependencies = Seq(
     ws,
-    "uk.gov.hmrc"    %% "play-reactivemongo" % playReactivemongoVersion,
-    "uk.gov.hmrc"    %% "logback-json-logger" % logbackJsonLoggerVersion,
-    "uk.gov.hmrc"    %% "govuk-template" % govukTemplateVersion,
-    "uk.gov.hmrc"    %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc"    %% "play-ui" % playUiVersion,
-    "uk.gov.hmrc"    %% "http-caching-client" % httpCachingClientVersion,
-    "uk.gov.hmrc"    %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
-    "uk.gov.hmrc"    %% "bootstrap-play-25" % bootstrapVersion,
-    "uk.gov.hmrc"    %% "play-language" % playLanguageVersion,
-    "org.typelevel"  %% "cats-core" % catsVersion,
-    "net.codingwell" %% "scala-guice" % guiceUtilsVersion
+    "uk.gov.hmrc"       %% "play-reactivemongo" % playReactivemongoVersion,
+    "uk.gov.hmrc"       %% "logback-json-logger" % logbackJsonLoggerVersion,
+    "uk.gov.hmrc"       %% "govuk-template" % govukTemplateVersion,
+    "uk.gov.hmrc"       %% "play-health" % playHealthVersion,
+    "uk.gov.hmrc"       %% "play-ui" % playUiVersion,
+    "uk.gov.hmrc"       %% "http-caching-client" % httpCachingClientVersion,
+    "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
+    "uk.gov.hmrc"       %% "bootstrap-play-25" % bootstrapVersion,
+    "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
+    "org.typelevel"     %% "cats-core" % catsVersion,
+    "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
+    "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion
   )
 
   lazy val testDependencies = Seq(
