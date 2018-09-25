@@ -17,6 +17,7 @@
 package services
 
 import java.io.ByteArrayOutputStream
+import java.time.format.DateTimeFormatter
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import javax.imageio.ImageIO
@@ -38,6 +39,7 @@ class DefaultReceiptService @Inject() (
   val fontSize = 12f
   val leading = 1.5f * fontSize
   val margin = 72
+  val dateFomatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
 
   def producePDF(reportStatus: ReportStatus) = {
 
@@ -109,7 +111,7 @@ class DefaultReceiptService @Inject() (
   }
 
   def body(reportStatus: ReportStatus) = {
-    var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse(""), reportStatus.created.toLocalDateTime)
+    var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse(""), dateFomatter.format(reportStatus.created))
     content += " "
 
     reportStatus.status match {
@@ -159,7 +161,7 @@ class DefaultReceiptService @Inject() (
   def author = "Valuation Office Agency"
 
   def title(reportStatus: ReportStatus) = {
-    s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${reportStatus.created.toLocalDateTime}"
+    s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${dateFomatter.format(reportStatus.created)}"
   }
 
   def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit = {
