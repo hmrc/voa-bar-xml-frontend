@@ -16,27 +16,29 @@
 
 package controllers
 
+import cats.data.EitherT
+import cats.implicits._
 import javax.inject.Inject
-
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.VOAAuthorisedId
-import models.{NormalMode, ReportStatus}
+import models.{Login, ReportStatus}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
+import play.api.mvc.Result
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.reportStatus
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        override val messagesApi: MessagesApi,
-                                       dataCacheConnector: DataCacheConnector,
+                                       val dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction
-                                      ) extends FrontendController with I18nSupport {
+                                      )(implicit val ec: ExecutionContext)
+  extends FrontendController with BaseBarController with I18nSupport {
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
     val reportStatuses = json.asOpt[Seq[ReportStatus]]
     reportStatuses match {
@@ -45,17 +47,19 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
+  private def reportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]] = {
+    reportStatusConnector.get(login).map(_.fold(
+      _ => Left(InternalServerError),
+      reportStatuses => Right(reportStatuses)
+    ))
+  }
+
   def onPageLoad() = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) flatMap {
-        case Some(username) =>
-          reportStatusConnector.get(username).map(_.fold(
-            _ => InternalServerError,
-            reportStatuses => {
-              Ok(reportStatus(username, appConfig, reportStatuses))
-            }
-          ))
-        case None => Future.successful(Redirect(routes.LoginController.onPageLoad(NormalMode)))
-      }
+      (for {
+        login <- EitherT(cachedLogin(request.externalId))
+        reportStatuses <- EitherT(reportStatuses(login))
+      } yield Ok(reportStatus(login.username, appConfig, reportStatuses)))
+        .valueOr(f => f)
   }
 }

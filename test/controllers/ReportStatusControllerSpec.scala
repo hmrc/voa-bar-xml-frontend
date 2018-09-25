@@ -16,11 +16,11 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
-import connectors.{DefaultReportStatusConnector, FakeDataCacheConnector, ReportStatusConnector}
+import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.VOAAuthorisedId
+import identifiers.LoginId
 import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, anyString}
@@ -29,14 +29,13 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
-import repositories.ReportStatusRepository
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
+import scala.util.Failure
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -44,16 +43,17 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
   val username = "AUser"
+  val login = Login("foo", "bar")
 
   val baCode = "ba1221"
   val submissionId1 = "1234-XX"
   val submissionId2 = "1235-XX"
   val submissionId3 = "1236-XX"
-  val date = () => OffsetDateTime.now
+  val date = () => ZonedDateTime.now
 
-  val rs1 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Submitted.value))
-  val rs2 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Verified.value))
-  val rs3 = ReportStatus(submissionId1, date(), userId = Some(baCode), status = Some(Done.value))
+  val rs1 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Submitted.value))
+  val rs2 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Verified.value))
+  val rs3 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Done.value))
 
   val fakeReports = Seq(rs1, rs2, rs3)
   val fakeMapAsJson = Json.toJson(fakeReports)
@@ -61,18 +61,18 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  val sortedReports = fakeReports.sortWith{ case (r, r2) => r.date.compareTo(r2.date) >= 0 }
+  val sortedReports = fakeReports.sortWith{ case (r, r2) => r.created.compareTo(r2.created) >= 0 }
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector]
-    when(reportStatusConnectorMock.get(anyString)).thenReturn(Future(Right(fakeReports)))
+    when(reportStatusConnectorMock.get(any[Login])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl)
   }
 
@@ -126,12 +126,11 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       val httpMock = mock[HttpClient]
       when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any()))
         .thenReturn(Future.successful(Failure(new RuntimeException("Report status connector failed"))))
-      val reportStatusRepositoryMock = mock[ReportStatusRepository]
-      when(reportStatusRepositoryMock.atomicSaveOrUpdate(any[ReportStatus], any[Boolean])(any[ExecutionContext])) thenReturn Future(Right(Unit))
+      val reportStatusConnectorMock = mock[ReportStatusConnector]
+      when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
 
-      val connector = new DefaultReportStatusConnector(configuration, reportStatusRepositoryMock, environment)
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, connector, getEmptyCacheMap, new DataRequiredActionImpl)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl)
 
       intercept[Exception] {
         val result = controller.onPageLoad()(fakeRequest)

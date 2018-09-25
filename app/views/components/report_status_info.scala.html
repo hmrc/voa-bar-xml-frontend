@@ -28,26 +28,20 @@
 
     @activeReports.map { report =>
     <p class="current-activity-filename">
-        <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+        <a href="@routes.ReportStatusController.onPageLoad()/#@report.submissionId">@report.filename</a>
         @components.report_status_message(report)
     </p>
-
-        @if(report.totalEntries.isDefined && (report.successes.isDefined || report.failures.isDefined)){
-            <p class="current-activity-info">
-                @Html(Messages("report.active.details.in.progress.details", report.successes.getOrElse(0) + report.failures.getOrElse(0), report.totalEntries.get))
-            </p>
-        }
     }
 
     @if(lastReport.isDefined) {
         @defining(lastReport.get) { report =>
             <h4 class="heading-small">@Messages("home.reports.last")</h4>
             <p class="current-activity-filename">
-                <a href="@routes.ReportStatusController.onPageLoad()/#@report._id">@report.filename</a>
+                <a href="@routes.ReportStatusController.onPageLoad()/#@report.submissionId">@report.filename</a>
                     @components.report_status_message(report)
             </p>
 
-            <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.date))</p>
+            <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.created))</p>
         }
     }
 </div>

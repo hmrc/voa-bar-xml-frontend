@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package connectors
 
-import javax.inject.Inject
+trait BaseConnector {
+  def generateUsernameHeader(username: String) = ("BA-Code", username)
 
-import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms._
-import models.Login
+  def generatePasswordHeader(password: String) = ("password", password)
 
-class LoginFormProvider @Inject() extends Mappings {
-
-   def apply(): Form[Login] = Form(
-     mapping(
-      "username" -> text("login.error.username.required")
-        .verifying(maxLength(100, "login.error.username.length")),
-     "password" -> text("login.error.password.required")
-       .verifying(maxLength(100, "login.error.password.length")),
-     "reference" -> optional(text())
-    )(Login.apply)(Login.unapply)
-   )
- }
+  def defaultHeaders(username: String, password: String) =
+    Seq(generateUsernameHeader(username), generatePasswordHeader(password))
+}

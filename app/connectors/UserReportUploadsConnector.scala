@@ -18,26 +18,40 @@ package connectors
 
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
-import models.Error
-import reactivemongo.api.ReadPreference
-import repositories.{UserReportUpload, UserReportUploadsReactiveRepository}
+import models.{Error, Login}
+import play.api.Configuration
+import models.UserReportUpload
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DefaultUserReportUploadsConnector @Inject() (
-                                                     userReportUploadsReactiveRepository: UserReportUploadsReactiveRepository
-                                                   )(implicit executionContext: ExecutionContext) extends  UserReportUploadsConnector {
+                                                    http: HttpClient,
+                                                    val configuration: Configuration
+                                                   )(implicit executionContext: ExecutionContext)
+  extends  UserReportUploadsConnector with BaseConnector {
+  val hc: HeaderCarrier = HeaderCarrier()
+  val voaBarConfig = configuration.getConfig("microservice.services.voa-bar").get
+  val host = voaBarConfig.getString("host").get
+  val port = voaBarConfig.getString("port").get
+  val protocol = voaBarConfig.getString("protocol").get
+  val serviceUrl = s"$protocol://$host:$port/voa-bar"
   override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
-    userReportUploadsReactiveRepository.insert(userReportUpload)
+    val headers = defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
+    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+    http.PUT(s"$serviceUrl/user-report-upload", userReportUpload)
       .map(_ => Right(Unit))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
       }
   }
 
-  override def getById(id: String): Future[Either[Error, Option[UserReportUpload]]] = {
-    userReportUploadsReactiveRepository.findById(id, ReadPreference.primary)
+  override def getById(id: String, login: Login): Future[Either[Error, Option[UserReportUpload]]] = {
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+    http.GET[Option[UserReportUpload]](s"$serviceUrl/user-report-upload/$id")
       .map(Right(_))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
@@ -48,5 +62,5 @@ class DefaultUserReportUploadsConnector @Inject() (
 @ImplementedBy(classOf[DefaultUserReportUploadsConnector])
 trait UserReportUploadsConnector {
   def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]]
-  def getById(id: String): Future[Either[Error, Option[UserReportUpload]]]
+  def getById(id: String, login: Login): Future[Either[Error, Option[UserReportUpload]]]
 }

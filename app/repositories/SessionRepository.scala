@@ -79,6 +79,10 @@ class ReactiveMongoRepository(config: Configuration, mongo: () => DefaultDB)
 
   def get(id: String): Future[Option[CacheMap]] =
     collection.find(Json.obj("id" -> id)).one[CacheMap]
+
+  def getByField[A](key: String, value: String): Future[Option[CacheMap]] = {
+    collection.find(Json.obj(key -> value)).one[CacheMap]
+  }
 }
 
 @Singleton

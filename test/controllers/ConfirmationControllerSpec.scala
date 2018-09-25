@@ -16,10 +16,12 @@
 
 package controllers
 
+import java.time.ZonedDateTime
+
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import identifiers.VOAAuthorisedId
-import models.{NormalMode, ReportStatus}
+import identifiers.LoginId
+import models.{Login, NormalMode, ReportStatus}
 import play.api.test.Helpers._
 import views.html.confirmation
 import org.mockito.Matchers.any
@@ -33,15 +35,18 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val username = "AUser"
   val submissionId = "SID372463"
+  val login = Login("foo", "bar")
+  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now)
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[String])) thenReturn Future(Right(Unit))
-  when(reportStatusConnectorMock.save(any[ReportStatus])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn Future(Right(reportStatus))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
       new DataRequiredActionImpl, FakeDataCacheConnector, reportStatusConnectorMock)
   }
@@ -53,6 +58,8 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
   }
 
   def viewAsString() = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
+  def refreshViewAsString() =
+    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 
@@ -65,6 +72,20 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
 
     "if not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageLoad(submissionId)(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "return OK and the correct view for the refresh page" in {
+      val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe refreshViewAsString()
+    }
+
+    "if while refreshing not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)

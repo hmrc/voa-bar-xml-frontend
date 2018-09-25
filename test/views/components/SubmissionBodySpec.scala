@@ -16,7 +16,7 @@
 
 package views.components
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import models.{ReportStatus, Submitted}
 import views.behaviours.ViewBehaviours
@@ -26,7 +26,7 @@ class SubmissionBodySpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
   val baCode = "baCode"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, userId = Some(baCode), status = Some(Submitted.value))
+  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, baCode = Some(baCode), status = Some(Submitted.value))
 
   def submission = () => submission_body(reportStatus)(messages)
 

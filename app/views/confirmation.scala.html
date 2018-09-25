@@ -15,8 +15,9 @@
  *@
 
 @import config.FrontendAppConfig
+@import models.{Done, Failed, ReportStatus}
 
-@(baCode: String, submissionId: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(baCode: String, submissionId: String, appConfig: FrontendAppConfig, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("confirmation.title"),
@@ -25,12 +26,28 @@
 
     @components.service_info(baCode)
 
+    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Done.value), Some(Failed.value)).contains(reportStatus.get.status))) {
+        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(submissionId)" />
+    }
+
     <span class="voa-logo" aria-hidden="true"><img src="/voa-bar-xml-frontend/assets/images/voalogo.png" alt="Valuation Office Agency"></span>
 
     <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">@messages("confirmation.heading")</h1>
-        <h2>@messages("confirmation.submissionId") @submissionId</h2>
-        <p class="print-hide">@messages("confirmation.subheading")</p>
+        <h1 class="transaction-banner__heading">
+            @messages("confirmation.heading")
+            @if(reportStatus.isDefined && reportStatus.get.status.isDefined) {
+            @messages(s"status.${reportStatus.get.status.get.toLowerCase()}.title")
+            } else {
+            @messages("status.pending.title")
+            }
+        </h1>
+        @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+            <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
+        }
+        <h3>@messages("confirmation.submissionId") @submissionId.split("-").head</h3>
+        @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+            <p class="print-hide">@messages("confirmation.subheading")</p>
+        }
     </div>
 
     <p class="lede">@messages("confirmation.file.received")</p>

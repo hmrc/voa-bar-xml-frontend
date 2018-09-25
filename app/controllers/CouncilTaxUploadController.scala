@@ -16,15 +16,14 @@
 
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import javax.inject.Inject
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
-import identifiers.LoginId
-import models.{Error, Login, NormalMode, ReportStatus, ReportStatusError, ReportStatusType, Submitted, Verified, Failed}
+import models.{Error, Failed, Login, ReportStatus, ReportStatusType, Submitted, UserReportUpload, Verified}
 import cats.data.EitherT
 import cats.implicits._
 import models.UpScanRequests._
@@ -32,8 +31,7 @@ import models.requests.OptionalDataRequest
 import play.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.mvc.{Action, Request, Result}
-import repositories.UserReportUpload
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -44,29 +42,20 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
-                                           dataCacheConnector: DataCacheConnector,
+                                           val dataCacheConnector: DataCacheConnector,
                                            formProvider: FileUploadDataFormProvider,
                                            navigator: Navigator,
                                            uploadConnector: UploadConnector,
                                            userReportUploadsConnector: UserReportUploadsConnector,
                                            reportStatusConnector: ReportStatusConnector)
-                                          (implicit ec: ExecutionContext)
-  extends FrontendController with I18nSupport {
+                                          (implicit val ec: ExecutionContext)
+  extends FrontendController with BaseBarController with I18nSupport {
 
   private[controllers] val form = formProvider()
   private[controllers] val maxFileSize = appConfig.runModeConfiguration
     .getInt("microservice.services.upscan.max-file-size").get
   private[controllers] val callBackUrl = appConfig.runModeConfiguration
     .getString("microservice.services.upscan.callback-url").get
-
-  private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
-    dataCacheConnector.getEntry[Login](externalId, LoginId.toString) map {
-      case Some(login) => {
-        Right(login)
-      }
-      case None => Left(Redirect(routes.LoginController.onPageLoad(NormalMode)))
-    }
-  }
 
   private[controllers] def fileUploadDetails(username: String, password: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
@@ -105,9 +94,9 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation): Future[Either[Error, String]] = {
+  private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation, login: Login): Future[Either[Error, String]] = {
     (for {
-      userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference))
+      userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference, login: Login))
       userData <- EitherT.fromOption[Future](userDataByReference,
         Error(messagesApi("login.error.auth"), Seq("Couldn't send file because of expired submission.")))
       loginDetails = Login(userData.userId, userData.userPassword)
@@ -126,46 +115,49 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
 
   private def saveReportStatus(
                                 uploadConfirmation: UploadConfirmation,
-                                errors: Seq[ReportStatusError] = Seq(),
+                                login: Login,
+                                errors: Seq[Error] = Seq(),
                                 status: ReportStatusType = Verified
                               )
                               (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
     val reportStatus = ReportStatus(
       uploadConfirmation.reference,
-      OffsetDateTime.now,
+      ZonedDateTime.now,
       url = Some(uploadConfirmation.downloadUrl),
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
       filename = Some(uploadConfirmation.uploadDetails.fileName),
       errors = Some(errors)
     )
-    reportStatusConnector.save(reportStatus)
+    reportStatusConnector.save(reportStatus, login)
       .map(_.fold(
         _ => Left(Error(s"Couldn't save report status for reference ${uploadConfirmation.reference}", Seq())),
         _ => Right(Unit)
       ))
   }
 
-  def onConfirmation = Action.async(parse.tolerantJson) { implicit request =>
+  def onConfirmation = getData.async(parse.tolerantJson) { implicit request =>
     (for {
       uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
+      login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
-      _ <- EitherT(saveReportStatus(uploadConfirmation))
-      _ <- EitherT(sendContent(xml, uploadConfirmation))
-      _ <- EitherT(saveReportStatus(uploadConfirmation, status = Submitted))
+      _ <- EitherT(saveReportStatus(uploadConfirmation, login))
+      _ <- EitherT(sendContent(xml, uploadConfirmation, login))
+      _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Submitted))
     } yield NoContent)
       .valueOrF(error => {
         handleConfirmationError(request, error)
       })
   }
 
-  private def handleConfirmationError(request: Request[JsValue], error: Error) = {
+  private def handleConfirmationError(request: OptionalDataRequest[JsValue], error: Error) = {
     val errorMsg = s"Error: ${error.values.mkString("\n")}"
     Logger.error(errorMsg)
     (for {
-      uploadInfo <- EitherT(Future(parseUploadConfirmation(request)))
-      reportStatusError = ReportStatusError(error.code, errorMsg, "")
-      _ <- EitherT(saveReportStatus(uploadInfo, Seq(reportStatusError), Failed)(request))
+      login <- EitherT(cachedLoginError(request.externalId))
+      uploadInfo <- EitherT(Future.successful(parseUploadConfirmation(request)))
+      reportStatusError = Error(error.code)
+      _ <- EitherT(saveReportStatus(uploadInfo, login, Seq(reportStatusError), Failed)(request))
     } yield InternalServerError(errorMsg))
       .valueOr(_ => InternalServerError(errorMsg))
   }

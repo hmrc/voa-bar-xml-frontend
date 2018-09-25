@@ -16,7 +16,7 @@
 
 package views.components
 
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 import models.{ReportStatus, Submitted}
 import views.behaviours.ViewBehaviours
@@ -25,7 +25,7 @@ import views.html.components.submission_block
 class SubmissionBlockSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
-  val reportStatus = ReportStatus(submissionId, OffsetDateTime.now, status = Some(Submitted.value), userId = Some("BA0121"))
+  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, status = Some(Submitted.value), baCode = Some("BA0121"))
 
   def submission = () => submission_block(reportStatus)(messages)
   lazy val doc = asDocument(submission())

@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package models
 
-import javax.inject.Inject
+import play.api.libs.json.Json
 
-import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms._
-import models.Login
+final case class UserReportUpload(_id: String, userId: String, userPassword: String)
 
-class LoginFormProvider @Inject() extends Mappings {
-
-   def apply(): Form[Login] = Form(
-     mapping(
-      "username" -> text("login.error.username.required")
-        .verifying(maxLength(100, "login.error.username.length")),
-     "password" -> text("login.error.password.required")
-       .verifying(maxLength(100, "login.error.password.length")),
-     "reference" -> optional(text())
-    )(Login.apply)(Login.unapply)
-   )
- }
+object UserReportUpload {
+  implicit val format = Json.format[UserReportUpload]
+  final val name = classOf[UserReportUpload].getSimpleName.toLowerCase
+}

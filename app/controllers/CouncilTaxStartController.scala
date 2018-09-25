@@ -24,10 +24,9 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import identifiers.{CouncilTaxStartId, VOAAuthorisedId}
-import models.{NormalMode, ReportStatus}
-import models.requests.OptionalDataRequest
-import play.api.mvc.{AnyContent, Result}
+import identifiers.CouncilTaxStartId
+import models.{Login, NormalMode, ReportStatus}
+import play.api.mvc.Result
 import utils.Navigator
 import views.html.councilTaxStart
 
@@ -38,30 +37,26 @@ class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
                                           getData: DataRetrievalAction,
                                           requireData: DataRequiredAction,
                                           navigator: Navigator,
-                                          dataCacheConnector: DataCacheConnector,
+                                          val dataCacheConnector: DataCacheConnector,
                                           reportStatusConnector: ReportStatusConnector
-                                         ) (implicit ec: ExecutionContext) extends FrontendController with I18nSupport {
+                                         ) (implicit val ec: ExecutionContext)
+  extends FrontendController with BaseBarController with I18nSupport {
 
   def onPageLoad = getData.async {
     implicit request =>
       (for {
-        username <- EitherT(getUsername(request))
-        reportStatus <- EitherT(getReportStatuses(username))
-      } yield(Ok(councilTaxStart(username, appConfig, reportStatus, reportStatus.headOption))))
+        login <- EitherT(cachedLogin(request.externalId))
+        reportStatus <- EitherT(getReportStatuses(login))
+      } yield(Ok(councilTaxStart(login.username, appConfig, reportStatus, reportStatus.headOption))))
         .valueOr(fallbackPage => fallbackPage)
   }
 
-  private def getReportStatuses(username: String): Future[Either[Result, Seq[ReportStatus]]]  = {
-    reportStatusConnector.get(username)
+  private def getReportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]]  = {
+    reportStatusConnector.get(login)
       .map(_.fold(
         error => Left(InternalServerError(error.code)),
         Right(_)
       ))
-  }
-
-  private def getUsername(request: OptionalDataRequest[AnyContent]): Future[Either[Result, String]] = {
-    dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString)
-        .map(Either.fromOption(_, Redirect(routes.LoginController.onPageLoad(NormalMode))))
   }
 
   def goToCouncilTaxUploadPage() = (getData andThen requireData) { implicit request =>
