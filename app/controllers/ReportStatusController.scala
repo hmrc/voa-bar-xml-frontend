@@ -53,8 +53,8 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private def reportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]] = {
-    reportStatusConnector.get(login).map(_.fold(
+  private def reportStatuses(login: Login, filter: Option[String]): Future[Either[Result, Seq[ReportStatus]]] = {
+    reportStatusConnector.get(login, filter).map(_.fold(
       _ => Left(InternalServerError),
       reportStatuses => Right(reportStatuses)
     ))
@@ -67,12 +67,12 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     ))
   }
 
-  def onPageLoad() = getData.async {
+  def onPageLoad(filter: Option[String] = None) = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
-        reportStatuses <- EitherT(reportStatuses(login))
-      } yield Ok(reportStatus(login.username, appConfig, reportStatuses)))
+        reportStatuses <- EitherT(reportStatuses(login, filter))
+      } yield Ok(reportStatus(login.username, appConfig, reportStatuses, filter)))
         .valueOr(f => f)
   }
 

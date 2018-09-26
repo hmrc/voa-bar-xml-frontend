@@ -17,6 +17,7 @@
 package services
 
 import java.io.ByteArrayInputStream
+import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId, ZonedDateTime}
 
 import models._
@@ -36,6 +37,7 @@ class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
   val messages = app.injector.instanceOf[MessagesApi]
   val service = new DefaultReceiptService(messages)
   val date = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault)
+  val dateFomatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
@@ -53,7 +55,7 @@ class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include ("Your file , was uploaded on 01 January 1970 at 01:00. The report is being\nverified.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file , was uploaded on ${dateFomatter.format(date)}. The report is being\nverified.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()
@@ -73,7 +75,7 @@ class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include ("Your file , was uploaded on 01 January 1970 at 01:00. The report has failed.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file , was uploaded on ${dateFomatter.format(date)}. The report has failed.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()
@@ -92,7 +94,7 @@ class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include ("Your file , was uploaded on 01 January 1970 at 01:00. The report was\nprocessed successfully.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file , was uploaded on ${dateFomatter.format(date)}. The report was\nprocessed successfully.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()

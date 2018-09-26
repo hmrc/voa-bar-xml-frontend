@@ -42,17 +42,17 @@ class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
                                          ) (implicit val ec: ExecutionContext)
   extends FrontendController with BaseBarController with I18nSupport {
 
-  def onPageLoad = getData.async {
+  def onPageLoad(filter: Option[String] = None) = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
-        reportStatus <- EitherT(getReportStatuses(login))
+        reportStatus <- EitherT(getReportStatuses(login, filter))
       } yield(Ok(councilTaxStart(login.username, appConfig, reportStatus, reportStatus.headOption))))
         .valueOr(fallbackPage => fallbackPage)
   }
 
-  private def getReportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]]  = {
-    reportStatusConnector.get(login)
+  private def getReportStatuses(login: Login, filter: Option[String]): Future[Either[Result, Seq[ReportStatus]]]  = {
+    reportStatusConnector.get(login, filter)
       .map(_.fold(
         error => Left(InternalServerError(error.code)),
         Right(_)

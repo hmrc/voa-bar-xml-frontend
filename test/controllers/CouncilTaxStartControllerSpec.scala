@@ -62,7 +62,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
 
   def reportStatusConnect() = {
     val reportStatusConnector = mock[ReportStatusConnector]
-    when(reportStatusConnector.get(any[Login])).thenReturn(Future(Right(Seq(reportStatus))))
+    when(reportStatusConnector.get(any[Login], any[Option[String]])).thenReturn(Future(Right(Seq(reportStatus))))
     reportStatusConnector
   }
   def reportStatusConnectFailure() = {
@@ -76,7 +76,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
   "CouncilTaxStart Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController(reportStatusConnect).onPageLoad(fakeRequest)
+      val result = loggedInController(reportStatusConnect).onPageLoad(None)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
