@@ -44,10 +44,11 @@ class DefaultReportStatusConnector @Inject()(
   val serviceUrl = s"${baseUrl("voa-bar")}/voa-bar"
   val hc: HeaderCarrier = HeaderCarrier()
 
-  def get(login: Login): Future[Either[Error, Seq[ReportStatus]]] = {
+  def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]] = {
     val headers = defaultHeaders(login.username, login.password)
     implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions")
+    val filterParam = filter.fold("")(f => s"filter=$f")
+    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions?$filterParam")
       .map(Right(_))
       .recover{
         case ex: Throwable => {
@@ -101,6 +102,6 @@ class DefaultReportStatusConnector @Inject()(
 trait ReportStatusConnector {
   def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]]
   def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]]
-  def get(login: Login): Future[Either[Error, Seq[ReportStatus]]]
+  def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]]
   def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]]
 }

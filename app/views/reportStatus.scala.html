@@ -16,7 +16,7 @@
 
 @import config.FrontendAppConfig
 
-@(baCode: String, appConfig: FrontendAppConfig, reportStatuses: Seq[ReportStatus] = Seq())(implicit request: Request[_], messages: Messages)
+@(baCode: String, appConfig: FrontendAppConfig, reportStatuses: Seq[ReportStatus] = Seq(), filter: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reportStatus.title"),
@@ -27,6 +27,16 @@
 
     @components.heading("reportStatus.heading", baCode)
 
-    @reportStatuses.map(reportStatus => components.submission_panel(reportStatus))
+    @components.submission_filter(messages, filter)
+
+    @if(reportStatuses.isEmpty){
+        <p class="lede">
+            @messages("reports.notFound")
+        </p>
+    }else{
+        @reportStatuses.map(reportStatus => components.submission_panel(reportStatus))
+    }
+
+    @components.submission_filter(messages, filter)
 
 }

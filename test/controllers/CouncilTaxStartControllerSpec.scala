@@ -76,7 +76,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
   "CouncilTaxStart Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController(reportStatusConnect).onPageLoad(fakeRequest)
+      val result = loggedInController(reportStatusConnect).onPageLoad(None)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()

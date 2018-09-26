@@ -71,6 +71,12 @@ error.2000.message = Invalid XML
 error.2001.message = Invalid XML
 error.3000.message = Ebars unavailable
 
+report.filter.failed = Failed Submissions
+report.filter.all = All Submissions
+report.filter.done = Completed Submissions
+
+reports.notFound = Reports not found
+
 reports.history.page.title = Submission history
 reports.history.title = Submission history
 reports.history.subtitle = Council Tax
@@ -149,7 +155,7 @@ login.error.auth = Needs to login
 
 welcome.title = Welcome
 welcome.heading = Welcome
-welcome.BA = Billing Authority Reports submission
+welcome.BA = Billing Authority Reports
 welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 

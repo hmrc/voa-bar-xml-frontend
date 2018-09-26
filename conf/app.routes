@@ -29,5 +29,5 @@ POST        /login                              controllers.LoginController.onSu
 GET         /changeLogin                        controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeLogin                        controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
-GET         /reportStatus                       controllers.ReportStatusController.onPageLoad()
+GET         /reportStatus                       controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /reportStatus/print                 controllers.ReportStatusController.onReceiptDownload(submissionId: String)
