@@ -62,7 +62,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
 
   def reportStatusConnect() = {
     val reportStatusConnector = mock[ReportStatusConnector]
-    when(reportStatusConnector.get(any[Login])).thenReturn(Future(Right(Seq(reportStatus))))
+    when(reportStatusConnector.get(any[Login], any[Option[String]])).thenReturn(Future(Right(Seq(reportStatus))))
     reportStatusConnector
   }
   def reportStatusConnectFailure() = {

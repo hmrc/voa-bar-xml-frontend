@@ -70,7 +70,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector]
-    when(reportStatusConnectorMock.get(any[Login])).thenReturn(Future(Right(fakeReports)))
+    when(reportStatusConnectorMock.get(any[Login], any[Option[String]])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
 
