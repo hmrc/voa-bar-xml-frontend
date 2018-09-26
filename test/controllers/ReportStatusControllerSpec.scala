@@ -29,13 +29,14 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
+import services.ReceiptService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Failure
+import scala.util.{Failure, Success}
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -64,6 +65,9 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val sortedReports = fakeReports.sortWith{ case (r, r2) => r.created.compareTo(r2.created) >= 0 }
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
+  val receiptServiceMock = mock[ReceiptService]
+  when(receiptServiceMock.producePDF(any[ReportStatus])) thenReturn(Success(Array[Byte](1, 2, 3, 4)))
+
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector]
     when(reportStatusConnectorMock.get(any[Login])).thenReturn(Future(Right(fakeReports)))
@@ -73,12 +77,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl, receiptServiceMock)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl, receiptServiceMock)
   }
 
   def viewAsString() = reportStatus(username, frontendAppConfig, fakeReports)(fakeRequest, messages).toString
@@ -123,19 +127,30 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "Throw a runtime exception when  the Report Status returns an exception" in {
-      val httpMock = mock[HttpClient]
-      when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any()))
-        .thenReturn(Future.successful(Failure(new RuntimeException("Report status connector failed"))))
       val reportStatusConnectorMock = mock[ReportStatusConnector]
       when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
 
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
 
       intercept[Exception] {
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
+    }
+
+    "return OK when trying to download a report status" in {
+      val reportStatusConnectorMock = mock[ReportStatusConnector]
+      when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn (Future(Right(rs1)))
+      FakeDataCacheConnector.resetCaptures()
+      FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
+
+      val controller =
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+
+      val result = controller.onReceiptDownload(submissionId1)(fakeRequest)
+
+      status(result) mustBe OK
     }
   }
 }

@@ -30,3 +30,4 @@ GET         /changeLogin                        controllers.LoginController.onPa
 POST        /changeLogin                        controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
 GET         /reportStatus                       controllers.ReportStatusController.onPageLoad()
+GET         /reportStatus/print                 controllers.ReportStatusController.onReceiptDownload(submissionId: String)

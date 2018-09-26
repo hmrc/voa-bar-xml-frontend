@@ -44,6 +44,14 @@ reports.active.waiting = waiting...
 reports.active.timestamp = {0}
 report.active.details.in.progress.details = {0} {1, choice, 0#report| 1#report|1<reports} out of {1} submitted.
 
+report.pdf.details.title = Report for
+report.pdf.details.summary.first.line = Your file {0}, was uploaded on {1}.
+report.pdf.details.summary.done = The report was processed successfully.
+report.pdf.details.summary.failed = The report has failed.
+report.pdf.details.summary.verified = The report contain no security issues and is being submitted to the system.
+report.pdf.details.summary.pending = The report is being verified.
+report.pdf.details.summary.submitted = The report is being processed.
+
 reports.history.page.title = Submission history
 reports.history.title = Submission history
 reports.history.subtitle = Council Tax

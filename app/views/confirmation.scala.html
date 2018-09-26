@@ -54,7 +54,9 @@
 
     <p class="print-hide">@messages("confirmation.window.open")</p>
 
-    @components.button_link(messageKey = "site.print.button", href = "javascript:window.print()", id = "print-button", className = "button print-hidden js-visible")
+    @if(reportStatus.isDefined && Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status)) {
+        @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(submissionId).url, id = "print-button", className = "button print-hidden js-visible")
+    }
 
     <div id="more-options">
     <h2 class="heading-large">

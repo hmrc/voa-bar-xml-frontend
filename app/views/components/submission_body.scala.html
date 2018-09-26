@@ -24,5 +24,5 @@
     }
     <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
         @reportStatus.created.toLocalTime</i></p>
-    @components.button_link(messageKey = "site.print.button", href = "javascript:window.print()", id = "print-button", className = "button print-hidden js-visible")
+    @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.submissionId).url, id = "print-button", className = "button print-hidden js-visible")
 </div>

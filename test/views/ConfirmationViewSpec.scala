@@ -16,8 +16,10 @@
 
 package views
 
+import java.time.ZonedDateTime
+
 import controllers.routes
-import models.NormalMode
+import models.{Done, NormalMode, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.confirmation
@@ -28,8 +30,16 @@ class ConfirmationViewSpec extends ViewBehaviours {
   val submissionId = "SId328473"
   val messageKeyPrefix = "confirmation"
   val confirmationFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ConfirmationController"))
+  val reportStatus = ReportStatus(
+    submissionId,
+    ZonedDateTime.now,
+    status = Some(Done.value)
+  )
 
-  def createView = () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
+  def createView =
+    () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
+  def createViewWithStatus =
+    () => confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -64,8 +74,8 @@ class ConfirmationViewSpec extends ViewBehaviours {
       href mustBe controllers.routes.ReportStatusController.onPageLoad().url.toString
     }
 
-    "Include a Download receipt button" in {
-      val downloadButton = doc.getElementById("print-button").text
+    "Include a Download receipt button when completed" in {
+      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
       downloadButton mustBe messages("site.print.button")
     }
 
