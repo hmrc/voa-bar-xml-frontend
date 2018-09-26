@@ -22,7 +22,7 @@
     @for(error <- errors.get) {
         <div class="submission-error">
             <h2 class="heading-medium">
-                @error.code
+                @error.code: @messages(s"error.${error.code}.message")
             </h2>
             <ul class="list list-bullet ">
                 @* TODO: what to be displayed here
