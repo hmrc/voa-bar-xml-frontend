@@ -17,7 +17,7 @@
 @import models.{Submitted, Done, Verified, Failed}
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 
-<div class="bordered-box submission-panel" id="@reportStatus.submissionId.split("-").head">
+<div class="bordered-box submission-panel" id="@reportStatus.submissionId">
     @reportStatus.status match {
         case Some(Done.value) => {
         <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>
