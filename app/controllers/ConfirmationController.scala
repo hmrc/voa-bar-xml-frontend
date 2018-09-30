@@ -40,20 +40,10 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                       (implicit val ec: ExecutionContext)
   extends FrontendController with BaseBarController with I18nSupport {
 
-  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
-    reportStatusConnector.saveUserInfo(reference, login)
-      .map(_.fold(
-        _ => Left(InternalServerError),
-        _ => Right(Unit)
-      ))
-  }
-
   def onPageLoad(reference: String) = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
-        _ <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
-        _ <- EitherT(saveReportStatus(login, reference))
       } yield Ok(confirmation(login.username, reference, appConfig)))
         .valueOr(failPage => failPage)
   }

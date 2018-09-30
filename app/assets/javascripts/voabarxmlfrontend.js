@@ -137,10 +137,43 @@ $(document).ready(function() {
       // Continue with the processing of the file after it's uploaded to upscan.
       // =====================================================
       $("#councilTaxUploadForm").submit(function(e){
-        setTimeout(function() {
-            window.location = $("#councilTaxUploadFormRedirect").val();
-        }, 50);
-        return true;
+        e.preventDefault();
+        var councilTaxUploadForm = this;
+
+        function fileUpload(form){
+            $.ajax({
+                  url: form.action,
+                  type: "POST",
+                  data: new FormData(form),
+                  processData: false,
+                  contentType: false,
+                  xhrFields: {
+                      withCredentials: true
+                  },
+                  crossDomain: true
+            }).done(function(){
+                window.location = $("#councilTaxUploadFormRedirect").val();
+            }).error(function(jqXHR, textStatus, errorThrown ){
+                //TODO: redirect to error page
+                console.error(textStatus);
+                window.location = $("#councilTaxUploadFormRedirect").val();
+            });
+        };
+
+        $.ajax({
+            url: $("#councilTaxUploadPrepareUpload").val(),
+            method: "POST",
+            contentType: "application/json",
+            data: '{}',
+            xhrFields: {
+                withCredentials: true
+            }
+        }).done(function(){
+            fileUpload(councilTaxUploadForm);
+        }).error(function(jqXHR, textStatus, errorThrown ){
+            //TODO: redirect to error page
+            console.error(textStatus);
+        });
       });
       // =====================================================
       // Refresh status page
