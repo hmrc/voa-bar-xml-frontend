@@ -41,6 +41,7 @@
             <p>
                 @components.submission_error(reportStatus.errors)
             </p>
+            @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.submissionId).url, id = "print-button", className = "button print-hidden js-visible")
         </div>
         }
         case _ if(reportStatus.created.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
