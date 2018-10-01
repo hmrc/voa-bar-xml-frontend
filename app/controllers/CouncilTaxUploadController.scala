@@ -150,6 +150,24 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       })
   }
 
+  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+    reportStatusConnector.saveUserInfo(reference, login)
+      .map(_.fold(
+        _ => Left(InternalServerError),
+        _ => Right(Unit)
+      ))
+  }
+
+  def onPrepareUpload(reference: String) = getData.async {
+    implicit request =>
+      (for {
+        login <- EitherT(cachedLogin(request.externalId))
+        _ <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
+        _ <- EitherT(saveReportStatus(login, reference))
+      } yield NoContent)
+        .valueOr(failPage => failPage)
+  }
+
   private def handleConfirmationError(request: OptionalDataRequest[JsValue], error: Error) = {
     val errorMsg = s"Error: ${error.values.mkString("\n")}"
     Logger.error(errorMsg)
