@@ -173,5 +173,17 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       status(result) mustBe INTERNAL_SERVER_ERROR
     }
+
+    "return NoContent when preparing the file upload" in {
+      val result = loggedInController(uploadConnector).onPrepareUpload(submissionId)(fakeRequest)
+
+      status(result) mustBe NO_CONTENT
+    }
+
+    "return invalid response when preparing for file upload fails" in {
+      val result = loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onPrepareUpload(submissionId)(fakeRequest)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+    }
   }
 }
