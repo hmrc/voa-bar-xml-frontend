@@ -141,18 +141,18 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
           reference = reference,
           uploadRequest = UploadRequest(
             href = uploadUrl,
-            fields = UploadRequestFields(
-              acl = "private",
-              key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-              policy = "xxxxxxxx==",
-              `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
-              `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
-              `x-amz-date` =  "yyyyMMddThhmmssZ",
-              `x-amz-meta-callback-url` =  "https://myservice.com/callback",
-              `x-amz-signature` =  "xxxx",
-              `x-amz-meta-consuming-service` = "something",
-              `x-amz-meta-session-id` = "session-1234567890",
-              `x-amz-meta-request-id` = "request-12345789"
+            fields = Map(
+              ("acl", "private"),
+              ("key", "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+              ("policy", "xxxxxxxx=="),
+              ("x-amz-algorithm", "AWS4-HMAC-SHA256"),
+              ("x-amz-credential", "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request"),
+              ("x-amz-date", "yyyyMMddThhmmssZ"),
+              ("x-amz-meta-callback-url", "https://myservice.com/callback"),
+              ("x-amz-signature", "xxxx"),
+              ("x-amz-meta-consuming-service", "something"),
+              ("x-amz-meta-session-id", "session-1234567890"),
+              ("x-amz-meta-request-id", "request-12345789")
             )
           )
         )

@@ -48,17 +48,9 @@
 
                 <input type="hidden" name="reference" value=@(initiateResponse.get.reference)>
                 <input type="hidden" name="uploadUrl" value=@(initiateResponse.get.uploadRequest.href)>
-                <input type="hidden" name="x-amz-algorithm" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-algorithm`)>
-                <input type="hidden" name="x-amz-meta-callback-url" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-callback-url`)>
-                <input type="hidden" name="x-amz-date" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-date`)>
-                <input type="hidden" name="x-amz-credential" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-credential`)>
-                <input type="hidden" name="x-amz-meta-consuming-service" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-consuming-service`)>
-                <input type="hidden" name="x-amz-signature" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-signature`)>
-                <input type="hidden" name="policy" value=@(initiateResponse.get.uploadRequest.fields.policy)>
-                <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
-                <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
-                <input type="hidden" name="x-amz-meta-session-id" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-session-id`)>
-                <input type="hidden" name="x-amz-meta-request-id" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-request-id`)>
+                @initiateResponse.get.uploadRequest.fields.map{ case (key, value) =>
+                    <input type="hidden" name="@key" value="@value">
+                }
 
                 @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
 
