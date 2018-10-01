@@ -57,6 +57,7 @@
                 <input type="hidden" name="policy" value=@(initiateResponse.get.uploadRequest.fields.policy)>
                 <input type="hidden" name="key" value=@(initiateResponse.get.uploadRequest.fields.key)>
                 <input type="hidden" name="acl" value=@(initiateResponse.get.uploadRequest.fields.acl)>
+                <input type="hidden" name="x-amz-meta-session-id" value=@(initiateResponse.get.uploadRequest.fields.`x-amz-meta-session-id`)>
 
                 @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
 
