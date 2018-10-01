@@ -147,9 +147,6 @@ $(document).ready(function() {
                   data: new FormData(form),
                   processData: false,
                   contentType: false,
-                  xhrFields: {
-                      withCredentials: true
-                  },
                   crossDomain: true
             }).done(function(){
                 window.location = $("#councilTaxUploadFormRedirect").val();
