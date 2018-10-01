@@ -45,23 +45,20 @@
         <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(initiateResponse.get.reference)) />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value=@(routes.CouncilTaxUploadController.onPrepareUpload(initiateResponse.get.reference)) />
         <form id="councilTaxUploadForm" method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
+            @initiateResponse.get.uploadRequest.fields.map{ case (key, value) =>
+                <input type="hidden" name="@key" value="@value">
+            }
 
-                <input type="hidden" name="reference" value=@(initiateResponse.get.reference)>
-                <input type="hidden" name="uploadUrl" value=@(initiateResponse.get.uploadRequest.href)>
-                @initiateResponse.get.uploadRequest.fields.map{ case (key, value) =>
-                    <input type="hidden" name="@key" value="@value">
-                }
+            @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
 
-                @helper.inputFile(fileUploadForm("file"), '_label -> messages("councilTaxUpload.xml"), '_help -> "", 'accept -> ".xml", '_type -> "file", 'class -> "upload", 'required -> "required")
+            @components.submit_button()
 
-                @components.submit_button()
-
-                <p><h5 class="alert">
-                   @messages("councilTaxUpload.message1")
-                   <br />
-                   <br />
-                   @messages("councilTaxUpload.message2")
-                </h5></p>
+            <p><h5 class="alert">
+               @messages("councilTaxUpload.message1")
+               <br />
+               <br />
+               @messages("councilTaxUpload.message2")
+            </h5></p>
         </form>
     }
 }
