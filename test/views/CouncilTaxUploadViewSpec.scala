@@ -19,7 +19,7 @@ package views
 import controllers.routes
 import forms.FileUploadDataFormProvider
 import models.{NormalMode}
-import models.UpScanRequests.{InitiateResponse, UploadRequest, UploadRequestFields}
+import models.UpScanRequests.{InitiateResponse, UploadRequest}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 import views.html.councilTaxUpload
@@ -38,18 +38,18 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
     reference = "foo",
     uploadRequest = UploadRequest(
       href = "http://www.bar.foo",
-      fields = UploadRequestFields(
-        acl = "private",
-        key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        policy = "xxxxxxxx==",
-        `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
-        `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
-        `x-amz-date` =  "yyyyMMddThhmmssZ",
-        `x-amz-meta-callback-url` =  "https://myservice.com/callback",
-        `x-amz-signature` =  "xxxx",
-        `x-amz-meta-consuming-service` = "something",
-        `x-amz-meta-session-id` = "session-1234567890",
-        `x-amz-meta-request-id` = "request-12345789"
+      fields = Map(
+        ("acl", "private"),
+        ("key", "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+        ("policy", "xxxxxxxx=="),
+        ("x-amz-algorithm", "AWS4-HMAC-SHA256"),
+        ("x-amz-credential", "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request"),
+        ("x-amz-date", "yyyyMMddThhmmssZ"),
+        ("x-amz-meta-callback-url", "https://myservice.com/callback"),
+        ("x-amz-signature", "xxxx"),
+        ("x-amz-meta-consuming-service", "something"),
+        ("x-amz-meta-session-id", "session-1234567890"),
+        ("x-amz-meta-request-id", "request-12345789")
       )
     )
   )
@@ -94,23 +94,23 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
       val doc = asDocument(createView())
       val upscanInputs = doc.getElementById("councilTaxUploadForm").getElementsByAttributeValue("type", "hidden")
       Option(upscanInputs.select("[name='policy']")) mustBe defined
-      upscanInputs.select("[name='policy']").`val` mustBe initiateResponse.uploadRequest.fields.policy
+      upscanInputs.select("[name='policy']").`val` mustBe initiateResponse.uploadRequest.fields("policy")
       Option(upscanInputs.select("[name='x-amz-algorithm']")) mustBe defined
-      upscanInputs.select("[name='x-amz-algorithm']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-algorithm`
+      upscanInputs.select("[name='x-amz-algorithm']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-algorithm")
       Option(upscanInputs.select("[name='x-amz-credential']")) mustBe defined
-      upscanInputs.select("[name='x-amz-credential']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-credential`
+      upscanInputs.select("[name='x-amz-credential']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-credential")
       Option(upscanInputs.select("[name='x-amz-date']")) mustBe defined
-      upscanInputs.select("[name='x-amz-date']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-date`
+      upscanInputs.select("[name='x-amz-date']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-date")
       Option(upscanInputs.select("[name='x-amz-meta-callback-url']")) mustBe defined
-      upscanInputs.select("[name='x-amz-meta-callback-url']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-meta-callback-url`
+      upscanInputs.select("[name='x-amz-meta-callback-url']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-meta-callback-url")
       Option(upscanInputs.select("[name='x-amz-meta-consuming-service']")) mustBe defined
-      upscanInputs.select("[name='x-amz-meta-consuming-service']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-meta-consuming-service`
+      upscanInputs.select("[name='x-amz-meta-consuming-service']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-meta-consuming-service")
       Option(upscanInputs.select("[name='x-amz-signature']")) mustBe defined
-      upscanInputs.select("[name='x-amz-signature']").`val` mustBe initiateResponse.uploadRequest.fields.`x-amz-signature`
+      upscanInputs.select("[name='x-amz-signature']").`val` mustBe initiateResponse.uploadRequest.fields("x-amz-signature")
       Option(upscanInputs.select("[name='acl']")) mustBe defined
-      upscanInputs.select("[name='acl']").`val` mustBe initiateResponse.uploadRequest.fields.acl
+      upscanInputs.select("[name='acl']").`val` mustBe initiateResponse.uploadRequest.fields("acl")
       Option(upscanInputs.select("[name='key']")) mustBe defined
-      upscanInputs.select("[name='key']").`val` mustBe initiateResponse.uploadRequest.fields.key
+      upscanInputs.select("[name='key']").`val` mustBe initiateResponse.uploadRequest.fields("key")
       Option(upscanInputs.select("[name='reference']")) mustBe defined
       upscanInputs.select("[name='reference']").`val` mustBe initiateResponse.reference
       Option(upscanInputs.select("[name='uploadUrl']")) mustBe defined

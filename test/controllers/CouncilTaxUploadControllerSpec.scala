@@ -22,7 +22,7 @@ import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnecto
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest, UploadRequestFields}
+import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest}
 import models._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -60,18 +60,18 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     reference = reference,
     uploadRequest = UploadRequest(
       href = uploadUrl,
-      fields = UploadRequestFields(
-        acl = "private",
-        key = "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        policy = "xxxxxxxx==",
-        `x-amz-algorithm` =  "AWS4-HMAC-SHA256",
-        `x-amz-credential` =  "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
-        `x-amz-date` =  "yyyyMMddThhmmssZ",
-        `x-amz-meta-callback-url` =  "https://myservice.com/callback",
-        `x-amz-signature` =  "xxxx",
-        `x-amz-meta-consuming-service` = "something",
-        `x-amz-meta-session-id` = "session-1234567890",
-        `x-amz-meta-request-id` = "request-12345789"
+      fields = Map(
+        ("acl", "private"),
+        ("key", "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+        ("policy", "xxxxxxxx=="),
+        ("x-amz-algorithm", "AWS4-HMAC-SHA256"),
+        ("x-amz-credential", "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request"),
+        ("x-amz-date", "yyyyMMddThhmmssZ"),
+        ("x-amz-meta-callback-url", "https://myservice.com/callback"),
+        ("x-amz-signature", "xxxx"),
+        ("x-amz-meta-consuming-service", "something"),
+        ("x-amz-meta-session-id", "session-1234567890"),
+        ("x-amz-meta-request-id", "request-12345789")
       )
     )
   )

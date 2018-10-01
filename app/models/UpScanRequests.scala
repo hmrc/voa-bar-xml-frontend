@@ -22,7 +22,6 @@ import play.api.libs.json.Json
 
 object UpScanRequests {
   implicit val initiateRequest = Json.format[InitiateRequest]
-  implicit val uploadRequestFields = Json.format[UploadRequestFields]
   implicit val uploadRequests = Json.format[UploadRequest]
   implicit val initialResponse = Json.format[InitiateResponse]
   implicit val uploadDetails = Json.format[UploadDetails]
@@ -39,22 +38,8 @@ object UpScanRequests {
 
   case class UploadRequest(
                             href: String,
-                            fields: UploadRequestFields
+                            fields: Map[String, String]
                           )
-
-  case class UploadRequestFields(
-                                  `x-amz-meta-consuming-service`: String,
-                                  acl: String,
-                                  key: String,
-                                  policy: String,
-                                  `x-amz-algorithm`: String,
-                                  `x-amz-credential`: String,
-                                  `x-amz-date`: String,
-                                  `x-amz-meta-callback-url`: String,
-                                  `x-amz-signature`: String,
-                                  `x-amz-meta-session-id`: String,
-                                  `x-amz-meta-request-id`: String
-                                )
 
   case class UploadConfirmation (
                                 reference: String,
