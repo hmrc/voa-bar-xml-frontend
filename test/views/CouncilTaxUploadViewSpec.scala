@@ -111,10 +111,6 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
       upscanInputs.select("[name='acl']").`val` mustBe initiateResponse.uploadRequest.fields("acl")
       Option(upscanInputs.select("[name='key']")) mustBe defined
       upscanInputs.select("[name='key']").`val` mustBe initiateResponse.uploadRequest.fields("key")
-      Option(upscanInputs.select("[name='reference']")) mustBe defined
-      upscanInputs.select("[name='reference']").`val` mustBe initiateResponse.reference
-      Option(upscanInputs.select("[name='uploadUrl']")) mustBe defined
-      upscanInputs.select("[name='uploadUrl']").`val` mustBe initiateResponse.uploadRequest.href
     }
 
     "do not contain Submit button when there is not initiate response" in {
