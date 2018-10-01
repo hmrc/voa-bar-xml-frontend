@@ -69,7 +69,8 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
         `x-amz-date` =  "yyyyMMddThhmmssZ",
         `x-amz-meta-callback-url` =  "https://myservice.com/callback",
         `x-amz-signature` =  "xxxx",
-        `x-amz-meta-consuming-service` = "something"
+        `x-amz-meta-consuming-service` = "something",
+        `x-amz-meta-session-id` = "session-1234567890"
       )
     )
   )
