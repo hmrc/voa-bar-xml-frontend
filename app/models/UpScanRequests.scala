@@ -52,7 +52,8 @@ object UpScanRequests {
                                   `x-amz-date`: String,
                                   `x-amz-meta-callback-url`: String,
                                   `x-amz-signature`: String,
-                                  `x-amz-meta-session-id`: String
+                                  `x-amz-meta-session-id`: String,
+                                  `x-amz-meta-request-id`: String
                                 )
 
   case class UploadConfirmation (
