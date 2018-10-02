@@ -30,12 +30,17 @@ case object Submitted extends ReportStatusType
 case object Cancelled extends ReportStatusType
 case object Done extends ReportStatusType
 
-object ReportStatus {
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
-  implicit val format = Json.format[ReportStatus]
+object ReportStatus {import ReactiveMongoFormats.mongoEntity
+
+  implicit val format =  mongoEntity {
+
+    implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+
+    Json.format[ReportStatus]
+  }
 }
 final case class ReportStatus(
-                               submissionId: String,
+                               id: String,
                                created: ZonedDateTime,
                                url: Option[String] = None,
                                checksum: Option[String] = None,

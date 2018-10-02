@@ -60,7 +60,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield Ok(confirmation(login.username, reportStatus.submissionId, appConfig, Some(reportStatus))))
+      } yield Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus))))
         .valueOr(failPage => failPage)
   }
 }

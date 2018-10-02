@@ -28,7 +28,7 @@
 
     @activeReports.map { report =>
     <p class="current-activity-filename">
-        <a href="@routes.ReportStatusController.onPageLoad()/#@report.submissionId">@report.filename</a>
+        <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@report.filename</a>
         @components.report_status_message(report)
     </p>
     }
@@ -37,7 +37,7 @@
         @defining(lastReport.get) { report =>
             <h4 class="heading-small">@Messages("home.reports.last")</h4>
             <p class="current-activity-filename">
-                <a href="@routes.ReportStatusController.onPageLoad()/#@report.submissionId">@report.filename</a>
+                <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@report.filename</a>
                     @components.report_status_message(report)
             </p>
 
