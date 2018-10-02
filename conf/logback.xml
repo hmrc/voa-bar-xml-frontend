@@ -44,6 +44,10 @@
     </logger>
 
     <logger name="com.google.inject" level="INFO"/>
+    <logger name="reactivemongo" level="INFO"/>
+    <logger name="org.asynchttpclient.netty.channel.DefaultChannelPool" level="INFO"/>
+
+
 
     <logger name="uk.gov" level="INFO"/>
 
