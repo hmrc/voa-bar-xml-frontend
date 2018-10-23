@@ -32,3 +32,4 @@ POST        /changeLogin                        controllers.LoginController.onSu
 
 GET         /reportStatus                       controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /reportStatus/print                 controllers.ReportStatusController.onReceiptDownload(submissionId: String)
+GET         /reportStatus/all                   controllers.ReportStatusController.onAllReceiptsDownload()

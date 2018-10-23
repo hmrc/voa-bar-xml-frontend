@@ -24,7 +24,8 @@ import javax.inject.Inject
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.actions._
-import models.{Login, ReportStatus}
+import models.{Login, Pending, ReportStatus}
+import org.joda.time.Instant
 import play.api.http.HeaderNames
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
@@ -55,6 +56,13 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   private def reportStatuses(login: Login, filter: Option[String]): Future[Either[Result, Seq[ReportStatus]]] = {
     reportStatusConnector.get(login, filter).map(_.fold(
+      _ => Left(InternalServerError),
+      reportStatuses => Right(reportStatuses)
+    ))
+  }
+
+  private def allReportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]] = {
+    reportStatusConnector.getAll(login).map(_.fold(
       _ => Left(InternalServerError),
       reportStatuses => Right(reportStatuses)
     ))
@@ -95,6 +103,29 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
           HeaderNames.CONTENT_TYPE -> withCharset("application/pdf"),
           HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
         ))
+        .valueOr(f => f)
+  }
+
+  private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] = {
+    val headerFields = Seq("Id", "Created", "BA Code", "Status", "File Name", "Error")
+    def errors = (r: ReportStatus) =>
+      s"${r.errors.getOrElse(Seq()).map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
+    val lines = reportStatuses.map(r =>
+      s"${r.id},${r.created},${r.baCode.getOrElse("")},${r.status.getOrElse(Pending.value)},${r.filename},${errors(r)}"
+    )
+    val header = headerFields.mkString(",")
+    s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")
+  }
+
+  def onAllReceiptsDownload() = getData.async {
+    implicit request =>
+      (for {
+        login <- EitherT(cachedLogin(request.externalId))
+        reportStatuses <- EitherT(allReportStatuses(login))
+      } yield Ok(createCsv(reportStatuses)).withHeaders(
+        HeaderNames.CONTENT_TYPE -> withCharset("application/csv"),
+        HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=all-submission-status-${Instant.now().toString()}.csv"""
+      ))
         .valueOr(f => f)
   }
 }
