@@ -58,6 +58,19 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
+  def getAll(login: Login): Future[Either[Error, Seq[ReportStatus]]] = {
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions/all")
+      .map(Right(_))
+      .recover{
+        case ex: Throwable => {
+          Logger.error(ex.getMessage)
+          Left(Error("", Seq("Couldn't get submissions")))
+        }
+      }
+  }
+
   def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]] = {
     val headers = defaultHeaders(login.username, login.password)
     implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
@@ -103,5 +116,6 @@ trait ReportStatusConnector {
   def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]]
   def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]]
   def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]]
+  def getAll(login: Login): Future[Either[Error, Seq[ReportStatus]]]
   def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]]
 }

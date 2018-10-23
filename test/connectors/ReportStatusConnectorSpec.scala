@@ -136,5 +136,29 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
 
       assert(result.isLeft)
     }
+
+    "get all reportstatus" in {
+      val http = mock[HttpClient]
+      when(http.GET[Seq[ReportStatus]](any[String])
+        (any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
+        .thenReturn(Future(Seq(rs)))
+      val connector = new DefaultReportStatusConnector(configuration, http, environment)
+      val login = Login("AUser", "anyPass")
+
+      val result = await(connector.getAll(login))
+
+      result match {
+        case Right(reportStatuses) => reportStatuses mustBe Seq(rs)
+        case Left(_) => assert(false)
+      }
+    }
+
+    "return a failure when the repository encounters an issue while retrieving all submission" in {
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+
+      val result = await(connector.getAll(login))
+
+      assert(result.isLeft)
+    }
   }
 }

@@ -152,5 +152,33 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
       status(result) mustBe OK
     }
+
+    "return OK when trying to download all the report statuses" in {
+      val reportStatusConnectorMock = mock[ReportStatusConnector]
+      when(reportStatusConnectorMock.getAll(any[Login])) thenReturn (Future(Right(Seq(rs1))))
+      FakeDataCacheConnector.resetCaptures()
+      FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
+
+      val controller =
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+
+      val result = controller.onAllReceiptsDownload()(fakeRequest)
+
+      status(result) mustBe OK
+    }
+
+    "return 500 when trying to download all the report statuses" in {
+      val reportStatusConnectorMock = mock[ReportStatusConnector]
+      when(reportStatusConnectorMock.getAll(any[Login])) thenReturn (Future(Left(Error("error", Seq()))))
+      FakeDataCacheConnector.resetCaptures()
+      FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
+
+      val controller =
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+
+      val result = controller.onAllReceiptsDownload()(fakeRequest)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+    }
   }
 }
