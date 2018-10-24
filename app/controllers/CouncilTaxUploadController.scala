@@ -94,6 +94,17 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
+  private[controllers] def parseError(request: Request[JsValue]): Either[Result, Error] = {
+    request.body.validate[Error] match {
+      case error: JsSuccess[Error] => Right(error.get)
+      case _ => {
+        val errorMsg = s"Couldn't parse: \n${request.body}"
+        Logger.warn(errorMsg)
+        Left(InternalServerError)
+      }
+    }
+  }
+
   private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation, login: Login): Future[Either[Error, String]] = {
     (for {
       userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference, login: Login))
@@ -136,6 +147,26 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       ))
   }
 
+  private def saveReportStatus(
+                                reference: String,
+                                login: Login,
+                                errors: Seq[Error],
+                                status: ReportStatusType
+                              )
+                              (implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+    val reportStatus = ReportStatus(
+      reference,
+      ZonedDateTime.now,
+      status = Some(status.value),
+      errors = Some(errors)
+    )
+    reportStatusConnector.save(reportStatus, login)
+      .map(_.fold(
+        _ => Left(InternalServerError),
+        _ => Right(Unit)
+      ))
+  }
+
   def onConfirmation = getData.async(parse.tolerantJson) { implicit request =>
     (for {
       uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
@@ -148,6 +179,18 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       .valueOrF(error => {
         handleConfirmationError(request, error)
       })
+  }
+
+  def onError(reference: String) = getData.async(parse.tolerantJson) {
+    implicit request =>
+      (for {
+        error <- EitherT(Future.successful(parseError(request)))
+        login <- EitherT(cachedLogin(request.externalId))
+        _ <- EitherT(saveReportStatus(reference, login, Seq(error), Failed))
+      } yield NoContent)
+        .valueOr(_ => {
+          InternalServerError
+        })
   }
 
   private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {

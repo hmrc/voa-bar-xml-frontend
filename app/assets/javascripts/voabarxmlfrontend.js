@@ -134,11 +134,26 @@ $(document).ready(function() {
               e.preventDefault();
       });
       // =====================================================
-      // Continue with the processing of the file after it's uploaded to upscan.
+      // Upscan upload
       // =====================================================
       $("#councilTaxUploadForm").submit(function(e){
         e.preventDefault();
         var councilTaxUploadForm = this;
+
+        function submitError(error){
+            var payload = {
+                code: error,
+                values: []
+            };
+            $.ajax({
+                  url: $("#councilTaxUploadReportError").val(),
+                  type: "POST",
+                  data: JSON.stringify(payload),
+                  contentType: 'application/json'
+            }).complete(function(){
+                window.location = $("#councilTaxUploadFormRedirect").val();
+            });
+        };
 
         function fileUpload(form){
             $.ajax({
@@ -148,11 +163,9 @@ $(document).ready(function() {
                   processData: false,
                   contentType: false,
                   crossDomain: true
-            }).done(function(){
-                window.location = $("#councilTaxUploadFormRedirect").val();
             }).error(function(jqXHR, textStatus, errorThrown ){
-                //TODO: redirect to error page
-                console.error(textStatus);
+                submitError("4000")
+            }).done(function(){
                 window.location = $("#councilTaxUploadFormRedirect").val();
             });
         };
@@ -165,11 +178,10 @@ $(document).ready(function() {
             xhrFields: {
                 withCredentials: true
             }
+        }).error(function(jqXHR, textStatus, errorThrown ){
+            submitError("5000")
         }).done(function(){
             fileUpload(councilTaxUploadForm);
-        }).error(function(jqXHR, textStatus, errorThrown ){
-            //TODO: redirect to error page
-            console.error(textStatus);
         });
       });
       // =====================================================
