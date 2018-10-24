@@ -162,7 +162,7 @@ welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 
 reportStatus.title = Report Status
-reportStatus.heading = Submission history
+reportStatus.heading = Submission history,
 
 header.links.home = Home
 header.links.logout = Logout
