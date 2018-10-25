@@ -43,7 +43,7 @@
 @insideHeader = {
     @uiLayouts.header_nav(
       navTitle = Some(messages("site.service_name")),
-      navTitleLink = None,
+      navTitleLink = Some(routes.LoginController.onPageLoad(NormalMode)),
       showBetaLink = false,
       navLinks = Some(headerNavLinks))
 }
