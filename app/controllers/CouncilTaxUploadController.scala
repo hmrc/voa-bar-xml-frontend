@@ -94,6 +94,17 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
+  private[controllers] def parseUploadConfirmationError(request: Request[JsValue]): Either[Error, UploadConfirmationError] = {
+    request.body.validate[UploadConfirmationError] match {
+      case uc: JsSuccess[UploadConfirmationError] => Right(uc.get)
+      case _ => {
+        val errorMsg = s"Couldn't parse: \n${request.body}"
+        Logger.warn(errorMsg)
+        Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
+      }
+    }
+  }
+
   private[controllers] def parseError(request: Request[JsValue]): Either[Result, Error] = {
     request.body.validate[Error] match {
       case error: JsSuccess[Error] => Right(error.get)
@@ -153,7 +164,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                 errors: Seq[Error],
                                 status: ReportStatusType
                               )
-                              (implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+                              (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
     val reportStatus = ReportStatus(
       reference,
       ZonedDateTime.now,
@@ -161,15 +172,30 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       errors = Some(errors)
     )
     reportStatusConnector.save(reportStatus, login)
-      .map(_.fold(
+  }
+
+  private def saveReportStatusResult(
+    reference: String,
+    login: Login,
+    errors: Seq[Error],
+    status: ReportStatusType
+  )(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+      saveReportStatus(reference, login, errors, status).map(_.fold(
         _ => Left(InternalServerError),
         _ => Right(Unit)
       ))
   }
 
   def onConfirmation = getData.async(parse.tolerantJson) { implicit request =>
+    parseUploadConfirmation(request) orElse parseUploadConfirmationError(request) match {
+      case Right(u: UploadConfirmation) => onSuccessfulConfirmation(u)
+      case Right(e: UploadConfirmationError) => onFailedConfirmation(e)
+      case _ => Future.successful(InternalServerError)
+    }
+  }
+
+  private def onSuccessfulConfirmation(uploadConfirmation: UploadConfirmation)(implicit request: OptionalDataRequest[JsValue]) = {
     (for {
-      uploadConfirmation <- EitherT.fromEither[Future](parseUploadConfirmation(request))
       login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login))
@@ -181,12 +207,25 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       })
   }
 
+  private def onFailedConfirmation(uploadConfirmationError: UploadConfirmationError)(implicit request: OptionalDataRequest[JsValue]) = {
+    (for {
+      login <- EitherT(cachedLoginByReference(uploadConfirmationError.reference))
+      _ <- EitherT(saveReportStatus(
+          uploadConfirmationError.reference,
+          login,
+          Seq(Error("4000", Seq(uploadConfirmationError.failureDetails.failureReason))),
+          Failed)
+        )
+    } yield NoContent)
+      .valueOr(_ => InternalServerError)
+  }
+
   def onError(reference: String) = getData.async(parse.tolerantJson) {
     implicit request =>
       (for {
         error <- EitherT(Future.successful(parseError(request)))
         login <- EitherT(cachedLogin(request.externalId))
-        _ <- EitherT(saveReportStatus(reference, login, Seq(error), Failed))
+        _ <- EitherT(saveReportStatusResult(reference, login, Seq(error), Failed))
       } yield NoContent)
         .valueOr(_ => {
           InternalServerError

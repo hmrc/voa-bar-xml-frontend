@@ -26,6 +26,8 @@ object UpScanRequests {
   implicit val initialResponse = Json.format[InitiateResponse]
   implicit val uploadDetails = Json.format[UploadDetails]
   implicit val uploadConfirmation = Json.format[UploadConfirmation]
+  implicit val failureDetails = Json.format[FailureDetails]
+  implicit val uploadConfirmationError = Json.format[UploadConfirmationError]
   case class InitiateRequest(
                               callbackUrl: String,
                               maxFileSize: Int
@@ -47,6 +49,17 @@ object UpScanRequests {
                                 fileStatus: String,
                                 uploadDetails: UploadDetails
                                 )
+
+  case class FailureDetails (
+                            failureReason: String,
+                            message: String
+                            )
+
+  case class UploadConfirmationError (
+                                       reference: String,
+                                       fileStatus: String,
+                                       failureDetails: FailureDetails
+                                     )
 
   case class UploadDetails (
                            uploadTimestamp: OffsetDateTime,
