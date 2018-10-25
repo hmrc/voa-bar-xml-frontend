@@ -52,11 +52,11 @@
 
     @{
         if(reportStatus == Some(Failed.value)) {
-            <p class="lede">@messages("confirmation.file.failure")</p>
+            <p class="lede">{messages("confirmation.file.failure")}</p>
         } else if (reportStatus == Some(Done.value)) {
-            <p class="lede">@messages("confirmation.file.success")</p>
+            <p class="lede">{messages("confirmation.file.success")}</p>
         } else {
-            <p class="lede">@messages("confirmation.file.received")</p>
+            <p class="lede">{messages("confirmation.file.received")}</p>
         }
     }
 
