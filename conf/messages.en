@@ -70,6 +70,8 @@ error.1022.message = Unknown data object
 error.2000.message = Invalid XML
 error.2001.message = Invalid XML
 error.3000.message = Ebars unavailable
+error.4000.message = File was not uploaded, please contact support.
+error.5000.message = Unkown error.
 
 report.filter.failed = Failed Submissions
 report.filter.all = All Submissions
@@ -154,13 +156,13 @@ login.error.password.length = Password must be 100 characters or less
 login.error.auth = Needs to login
 
 welcome.title = Welcome
-welcome.heading = Welcome
+welcome.heading = Welcome,
 welcome.BA = Billing Authority Reports
 welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 
 reportStatus.title = Report Status
-reportStatus.heading = Submission history
+reportStatus.heading = Submission history,
 
 header.links.home = Home
 header.links.logout = Logout

@@ -42,6 +42,7 @@
     @components.error_summary(fileUploadForm.errors)
 
     @if(initiateResponse.isDefined) {
+        <input type="hidden" id="councilTaxUploadReportError" value=@(routes.CouncilTaxUploadController.onError(initiateResponse.get.reference)) />
         <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(initiateResponse.get.reference)) />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value=@(routes.CouncilTaxUploadController.onPrepareUpload(initiateResponse.get.reference)) />
         <form id="councilTaxUploadForm" method="POST" action=@(initiateResponse.get.uploadRequest.href) enctype="multipart/form-data">
