@@ -213,5 +213,27 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       status(result) mustBe INTERNAL_SERVER_ERROR
     }
+
+    "return valid response on the upscan failed confirmation endpoint" in {
+      val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
+        .getLines
+        .mkString("\n")
+      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+
+      val result = call(loggedInController(uploadConnector).onConfirmation, request)
+
+      status(result) mustBe NO_CONTENT
+    }
+
+    "return invalid response on the failed upscan confirmation endpoint when the submission fails" in {
+      val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
+        .getLines
+        .mkString("\n")
+      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+
+      val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+    }
   }
 }
