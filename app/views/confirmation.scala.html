@@ -51,9 +51,9 @@
     </div>
 
     @{
-        if(reportStatus == Some(Failed.value)) {
+        if(reportStatus.isDefined && reportStatus.get.status == Some(Failed.value)) {
             <p class="lede">{messages("confirmation.file.failure")}</p>
-        } else if (reportStatus == Some(Done.value)) {
+        } else if (reportStatus.isDefined && reportStatus.get.status == Some(Done.value)) {
             <p class="lede">{messages("confirmation.file.success")}</p>
         } else {
             <p class="lede">{messages("confirmation.file.received")}</p>
