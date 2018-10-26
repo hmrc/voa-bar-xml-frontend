@@ -25,9 +25,9 @@
                 Error @error.code: @messages(s"error.${error.code}.message")
             </h2>
             <ul class="list list-bullet ">
-                @* TODO: what to be displayed here
-                *   <li>@error.detail</li>
-                *@
+                @error.values.map{v =>
+                    <li>@v</li>
+                }
             </ul>
         </div>
     }
