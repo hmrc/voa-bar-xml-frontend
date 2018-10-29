@@ -19,16 +19,26 @@
 @(errors: Option[Seq[Error]])(implicit messages: Messages)
 
 @if(errors.isDefined) {
-    @for(error <- errors.get) {
-        <div class="submission-error">
-            <h2 class="heading-medium">
-                Error @error.code: @messages(s"error.${error.code}.message")
-            </h2>
-            <ul class="list list-bullet ">
-                @error.values.map{v =>
-                    <li>@v</li>
-                }
-            </ul>
-        </div>
+    @defining(errors.get.foldLeft(Map[String, Error]())((acc, e) => {
+            val existingError = acc.get(e.code)
+            if (existingError.isDefined) {
+                acc + (e.code -> models.Error(e.code, existingError.get.values ++ e.values))
+            } else {
+                acc + (e.code -> e)
+            }
+        }).values.toList
+    ){ groupedErrors =>
+        @for(error <- groupedErrors) {
+            <div class="submission-error">
+                <h2 class="heading-medium">
+                    Error @error.code: @messages(s"error.${error.code}.message")
+                </h2>
+                <ul class="list list-bullet ">
+                    @error.values.map{v =>
+                        <li>@v</li>
+                    }
+                </ul>
+            </div>
+        }
     }
 }
