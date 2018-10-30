@@ -18,7 +18,7 @@ object Dependencies {
   private val playReactivemongoVersion = "6.2.0"
   private val playConditionalFormMappingVersion = "0.2.0"
   private val playLanguageVersion = "3.4.0"
-  private val bootstrapVersion = "3.0.0"
+  private val bootstrapVersion = "3.14.0"
   private val scalacheckVersion = "1.13.4"
   private val catsVersion = "1.1.0"
   private val guiceUtilsVersion = "4.1.0"
