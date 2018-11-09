@@ -170,7 +170,7 @@ header.links.home = Home
 header.links.logout = Logout
 header.links.council-tax = Council Tax
 header.links.upload = Upload
-header.links.confirmation = Confirmation
+header.links.confirmation = Submission
 header.links.status = History
 
 status.submissionId.title = Submission ID:

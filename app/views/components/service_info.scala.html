@@ -26,19 +26,23 @@
             }
             case Some("controllers.CouncilTaxStartController") => {
                 <li class="breadcrumb-nav__item"><a id="homelink" href="@routes.WelcomeController.onPageLoad">@Messages("header.links.home")</a></li>
-                <li id="council-tax-element" class="breadcrumb-nav__item active faded-text"> > @Messages("header.links.council-tax")</li>
+                <li id="council-tax-element" class="breadcrumb-nav__item active faded-text">   @Messages("header.links.council-tax")</li>
             }
             case Some("controllers.CouncilTaxUploadController") => {
                 <li class="breadcrumb-nav__item"><a id="homelink" href="@routes.WelcomeController.onPageLoad">@Messages("header.links.home")</a></li>
-                <li id="upload-element" class="breadcrumb-nav__item faded-text"> > @Messages("header.links.upload")</li>
+                <li id="council-tax-element" class="breadcrumb-nav__item active faded-text"> <a id="councilTaxlink" href="@routes.CouncilTaxStartController.onPageLoad">  @Messages("header.links.council-tax")</a></li>
+                <li id="upload-element" class="breadcrumb-nav__item faded-text">   @Messages("header.links.upload")</li>
             }
             case Some("controllers.ConfirmationController") => {
                 <li class="breadcrumb-nav__item"><a id="homelink" href="@routes.WelcomeController.onPageLoad">@Messages("header.links.home")</a></li>
-                <li id="confirmation-element" class="breadcrumb-nav__item active faded-text"> > @Messages("header.links.confirmation")</li>
+                <li id="council-tax-element" class="breadcrumb-nav__item active faded-text"> <a id="councilTaxlink" href="@routes.CouncilTaxStartController.onPageLoad">  @Messages("header.links.council-tax")</a></li>
+                <li id="upload-element" class="breadcrumb-nav__item active faded-text"> <a id="uploadLink" href="@routes.CouncilTaxUploadController.onPageLoad">  @Messages("header.links.upload")</a></li>
+                <li id="confirmation-element" class="breadcrumb-nav__item active faded-text">   @Messages("header.links.confirmation")</li>
             }
             case Some("controllers.ReportStatusController") => {
                 <li class="breadcrumb-nav__item"><a id="homelink" href="@routes.WelcomeController.onPageLoad">@Messages("header.links.home")</a></li>
-                <li id="status-element" class="breadcrumb-nav__item active faded-text"> > @Messages("header.links.status")</li>
+                <li id="council-tax-element" class="breadcrumb-nav__item active faded-text"> <a id="councilTaxlink" href="@routes.CouncilTaxStartController.onPageLoad">  @Messages("header.links.council-tax")</a></li>
+                <li id="status-element" class="breadcrumb-nav__item active faded-text">  @Messages("header.links.status")</li>
             }
 
             case _ => {
