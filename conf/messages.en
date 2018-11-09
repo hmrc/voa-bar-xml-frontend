@@ -189,6 +189,7 @@ status.type.title = Type
 status.submissionType.CT = CT
 status.created.para1 = Created on
 status.created.para2 = at
+status.totalReports.submited=reports were submitted
 status.last-submission.title = LAST SUBMISSION
 status.total-reports.title = Total reports
 status.failed-reports.title = Failed reports
