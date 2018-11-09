@@ -38,6 +38,11 @@ p.font-xsmall{
   display: block;
 }
 
+
+ul li:not(:first-child).breadcrumb-nav__item {
+    margin-left: 10px;
+}
+
 .breadcrumb-nav__item--trail-pipe {
 
   &:after {
