@@ -19,6 +19,7 @@
 <div class="submission-body">
     <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
     <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+    <p><b class="bold">@reportStatus.totalReports.getOrElse(0)</b> @messages("status.totalReports.submited")</p>
     @if(reportStatus.filename.isDefined) {
     <p><b class="bold">@messages("file")</b> @reportStatus.filename</p>
     }
