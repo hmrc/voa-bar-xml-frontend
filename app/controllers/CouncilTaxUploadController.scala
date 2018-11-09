@@ -111,7 +111,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       case _ => {
         val errorMsg = s"Couldn't parse: \n${request.body}"
         Logger.warn(errorMsg)
-        Left(InternalServerError)
+        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[_]])))
       }
     }
   }
@@ -181,7 +181,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     status: ReportStatusType
   )(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
       saveReportStatus(reference, login, errors, status).map(_.fold(
-        _ => Left(InternalServerError),
+        _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
         _ => Right(Unit)
       ))
   }
@@ -190,7 +190,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     parseUploadConfirmation(request) orElse parseUploadConfirmationError(request) match {
       case Right(u: UploadConfirmation) => onSuccessfulConfirmation(u)
       case Right(e: UploadConfirmationError) => onFailedConfirmation(e)
-      case _ => Future.successful(InternalServerError)
+      case _ => Future.successful(InternalServerError(error(messagesApi.preferred(request), appConfig)))
     }
   }
 
@@ -217,7 +217,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
           Failed)
         )
     } yield NoContent)
-      .valueOr(_ => InternalServerError)
+      .valueOr(_ => InternalServerError(error(messagesApi.preferred(request), appConfig)))
   }
 
   def onError(reference: String) = getData.async(parse.tolerantJson) {
@@ -235,7 +235,7 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
     reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(
-        _ => Left(InternalServerError),
+        _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
         _ => Right(Unit)
       ))
   }

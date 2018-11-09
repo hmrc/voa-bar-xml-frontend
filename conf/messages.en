@@ -23,6 +23,8 @@ error.required = Please enter a value
 error.summary.title = There’s been a problem
 error.summary.text = Check the following
 error.invalid_details = Invalid Login Details
+error.internal_server_error.title = Error with the service
+error.internal_server_error.description = An error occurred, please try again later.
 
 home.reports.current.progress = Current progress
 home.reports.no.current.progress = No submissions currently in progress.
