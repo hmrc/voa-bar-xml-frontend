@@ -202,3 +202,6 @@ status.failed.timeout = The submission hasn't been processed properly, please se
 status.failed.description = The submission hasn't been processed properly, please contact BARS@voa.gsi.gov.uk.
 status.report.title = Report No
 status.report.para = failed with the following errors:
+
+feedback.description =This is a new service -your <a href="" target="_blank">feedback</a> will help us to improve it.
+feedback.contact=Should you wish to supply any additional information to support your reports, please email BARS@voa.gsi.gov.uk
