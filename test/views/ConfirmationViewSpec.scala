@@ -61,7 +61,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
       val href = doc.getElementById("homelink").attr("href")
       val currentPageName = doc.getElementById("confirmation-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> Confirmation"
+      currentPageName mustBe "Submission"
     }
 
     "Include an upload link which redirects the users to council tax upload page" in {

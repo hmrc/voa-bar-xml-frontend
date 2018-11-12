@@ -63,7 +63,7 @@ class CouncilTaxStartViewSpec extends ViewBehaviours {
     val href = doc.getElementById("homelink").attr("href")
     val currentPageName = doc.getElementById("council-tax-element").text
     href mustBe routes.WelcomeController.onPageLoad().url.toString
-    currentPageName mustBe "> Council Tax"
+    currentPageName mustBe "Council Tax"
   }
 
   "Include a submissions link which redirects the users to the submissions history page" in {

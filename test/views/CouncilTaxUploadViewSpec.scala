@@ -81,7 +81,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
       val href = doc.getElementById("homelink").attr("href")
       val currentPageName = doc.getElementById("upload-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> Upload"
+      currentPageName mustBe "Upload"
     }
 
     "contain Submit button with the value Submit" in {

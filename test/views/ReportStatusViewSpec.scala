@@ -51,7 +51,7 @@ class ReportStatusViewSpec extends ViewBehaviours {
       val href = doc.getElementById("homelink").attr("href")
       val currentPageName = doc.getElementById("status-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> History"
+      currentPageName mustBe " History"
     }
   }
 }

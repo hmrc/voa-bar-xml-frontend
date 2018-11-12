@@ -80,7 +80,7 @@ class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
       val href = doc2.getElementById("homelink").attr("href")
       val currentPageName = doc2.getElementById("council-tax-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> Council Tax"
+      currentPageName mustBe "Council Tax"
     }
 
     "Have a home link in the top navigation bar which links to the welcome page when request is from CouncilTaxUploadController and" +
@@ -88,7 +88,7 @@ class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
       val href = doc3.getElementById("homelink").attr("href")
       val currentPageName = doc3.getElementById("upload-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> Upload"
+      currentPageName mustBe "Upload"
     }
 
     "Have a home link in the top navigation bar which links to the welcome page when request is from ConfirmationController and" +
@@ -96,7 +96,7 @@ class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
       val href = doc4.getElementById("homelink").attr("href")
       val currentPageName = doc4.getElementById("confirmation-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> Confirmation"
+      currentPageName mustBe "Submission"
     }
 
     "Have a home link in the top navigation bar which links to the welcome page when request is from ReportStatusController and" +
@@ -104,7 +104,7 @@ class ServiceInfoSpec extends ViewBehaviours with ControllerSpecBase {
       val href = doc5.getElementById("homelink").attr("href")
       val currentPageName = doc5.getElementById("status-element").text
       href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "> History"
+      currentPageName mustBe "History"
     }
   }
 }
