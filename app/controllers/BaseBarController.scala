@@ -18,17 +18,21 @@ package controllers
 
 import cats.data.EitherT
 import cats.implicits._
+import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import identifiers.LoginId
 import models.{Error, Login, NormalMode}
 import play.api.Logger
-import play.api.mvc.{Controller, Result}
+import play.api.i18n.Messages
+import play.api.mvc.{Controller, Request, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseBarController extends Controller {
   val dataCacheConnector: DataCacheConnector
   implicit val ec: ExecutionContext
+  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
+    views.html.error_template(messages("error.internal_server_error.title"), messages("error.internal_server_error.title"), messages("error.internal_server_error.description"), appConfig)(request, messages)
   private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),

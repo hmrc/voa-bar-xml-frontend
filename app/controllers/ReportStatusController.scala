@@ -29,7 +29,7 @@ import org.joda.time.Instant
 import play.api.http.HeaderNames
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.reportStatus
@@ -54,23 +54,23 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private def reportStatuses(login: Login, filter: Option[String]): Future[Either[Result, Seq[ReportStatus]]] = {
+  private def reportStatuses(login: Login, filter: Option[String])(implicit request: Request[_]): Future[Either[Result, Seq[ReportStatus]]] = {
     reportStatusConnector.get(login, filter).map(_.fold(
-      _ => Left(InternalServerError),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatuses => Right(reportStatuses)
     ))
   }
 
-  private def allReportStatuses(login: Login): Future[Either[Result, Seq[ReportStatus]]] = {
+  private def allReportStatuses(login: Login)(implicit request: Request[_]): Future[Either[Result, Seq[ReportStatus]]] = {
     reportStatusConnector.getAll(login).map(_.fold(
-      _ => Left(InternalServerError),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatuses => Right(reportStatuses)
     ))
   }
 
-  private def getReportStatus(submissionId: String, login: Login): Future[Either[Result, ReportStatus]] = {
+  private def getReportStatus(submissionId: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] = {
     reportStatusConnector.getByReference(submissionId, login).map(_.fold(
-      _ => Left(InternalServerError),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatus => Right(reportStatus)
     ))
   }
@@ -84,10 +84,10 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
         .valueOr(f => f)
   }
 
-  private def getPDF(reportStatus: ReportStatus): Future[Either[Result, Array[Byte]]] = {
+  private def getPDF(reportStatus: ReportStatus)(implicit request: Request[_]): Future[Either[Result, Array[Byte]]] = {
     Future{receiptService.producePDF(reportStatus) match {
         case Success(content) => Right(content)
-        case Failure(exception) => Left(InternalServerError)
+        case Failure(exception) => Left(InternalServerError(error(messagesApi.preferred(request), appConfig)))
       }
     }
   }
