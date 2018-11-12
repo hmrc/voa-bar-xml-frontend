@@ -50,6 +50,17 @@
         }
     </div>
 
+
+    <p>
+        @Html(messages("feedback.description"))
+    </p>
+
+    <h5 class="alert">
+        <p>
+            @messages("feedback.contact")
+        </p>
+    </h5>
+
     @{
         if(reportStatus.isDefined && reportStatus.get.status == Some(Failed.value)) {
             <p class="lede">{messages("confirmation.file.failure")}</p>
