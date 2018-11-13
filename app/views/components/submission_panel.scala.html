@@ -15,6 +15,7 @@
  *@
 
 @import models.{Submitted, Done, Verified, Failed}
+@import utils.FormHelpers._
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 
 <div class="bordered-box submission-panel" id="@reportStatus.id">
@@ -33,7 +34,7 @@
             <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
             <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
             @if(reportStatus.filename.isDefined) {
-            <p><b class="bold">@messages("file")</b>: @reportStatus.filename</p>
+            <p><b class="bold">@messages("file")</b>: @getAlternativeText(reportStatus.filename, "filename unavailable")</p>
             }
             <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
                 @reportStatus.created.toLocalTime</i>
