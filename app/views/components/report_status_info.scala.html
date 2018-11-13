@@ -16,6 +16,7 @@
 
 @import models.{ReportStatus, Done, Cancelled, Unknown, Pending}
 @import utils.DateFormatter._
+@import utils.FormHelpers._
 
 @(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
 
@@ -28,7 +29,7 @@
 
     @activeReports.map { report =>
     <p class="current-activity-filename">
-        <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@report.filename</a>
+        <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
         @components.report_status_message(report)
     </p>
     }
@@ -37,7 +38,7 @@
         @defining(lastReport.get) { report =>
             <h4 class="heading-small">@Messages("home.reports.last")</h4>
             <p class="current-activity-filename">
-                <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@report.filename</a>
+                <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
                     @components.report_status_message(report)
             </p>
 

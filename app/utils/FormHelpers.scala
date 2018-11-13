@@ -26,4 +26,12 @@ object FormHelpers {
       case Some(error) => error.message
     }
   }
+
+  def getAlternativeText(s: Option[String], text: String) = {
+    if(s.isEmpty || s.get.isEmpty) {
+      text
+    } else {
+      s
+    }
+  }
 }
