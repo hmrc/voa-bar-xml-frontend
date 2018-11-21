@@ -140,7 +140,6 @@ $(document).ready(function() {
         e.preventDefault();
         var councilTaxUploadForm = this;
 
-        document.querySelector('.list.list-bullet').append("UPLOADING: JUST CLICKED")
         function submitError(error){
             var payload = {
                 code: error,
@@ -152,7 +151,6 @@ $(document).ready(function() {
                   data: JSON.stringify(payload),
                   contentType: 'application/json'
             }).complete(function(){
-                document.querySelector('.list.list-bullet').append("UPLOADING: JUST BEFORE REDIRECT")
                 window.location = $("#councilTaxUploadFormRedirect").val();
             });
         };
@@ -166,10 +164,8 @@ $(document).ready(function() {
                   contentType: false,
                   crossDomain: true
             }).error(function(jqXHR, textStatus, errorThrown ){
-                document.querySelector('.list.list-bullet').append("UPLOADING: ERROR")
                 submitError("4000")
             }).done(function(){
-                document.querySelector('.list.list-bullet').append("UPLOADING: UPSCAN ALL GOOD")
                 window.location = $("#councilTaxUploadFormRedirect").val();
             });
         };
