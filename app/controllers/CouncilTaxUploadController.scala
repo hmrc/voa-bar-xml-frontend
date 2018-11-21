@@ -199,8 +199,8 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
       login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
       xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login))
-      _ <- EitherT(sendContent(xml, uploadConfirmation, login))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Submitted))
+      _ <- EitherT(sendContent(xml, uploadConfirmation, login))
     } yield NoContent)
       .valueOrF(error => {
         handleConfirmationError(request, error)
