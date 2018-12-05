@@ -34,3 +34,9 @@ POST        /changeLogin                        controllers.LoginController.onSu
 GET         /reportStatus                       controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /reportStatus/print                 controllers.ReportStatusController.onReceiptDownload(submissionId: String)
 GET         /reportStatus/all                   controllers.ReportStatusController.onAllReceiptsDownload()
+
+GET         /inpagefeedback 		            controllers.FeedbackController.inPageFeedback
+POST 		/sendbetafeedbacktohmrc             controllers.FeedbackController.sendBetaFeedbackToHmrc
+POST 		/sendbetafeedbacktohmrcnologin      controllers.FeedbackController.sendBetaFeedbackToHmrcNoLogin
+GET         /inpagefeedbackThankyou             controllers.FeedbackController.inPageFeedbackThankyou
+GET 		/inpagefeedbackNoLogin	            controllers.FeedbackController.inPageFeedbackNoLogin

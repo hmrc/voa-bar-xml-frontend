@@ -175,6 +175,18 @@ header.links.upload = Upload
 header.links.confirmation = Submission
 header.links.status = History
 
+label.beta = BETA
+label.phase=This is a new service – your <a href="{0}" target="_blank" id="betaFeedback">feedback <span class="visuallyhidden"> (Opens in a new window)</span></a> will help us to improve it.
+
+heading.giveFeedback = Give feedback
+
+label.feedback.heading=Feedback
+copy.feedback=If you need help completing this form, please use the ‘Get help with this form’ link at the bottom of each page.
+copy.feedback.thankyou=Thank you for your feedback
+copy.feedback.anotherForm=Submit another form
+label.feedback.error=There was an error sending your feedback.
+copy.form.help.thankyouvacated=Thank you for submitting this feedback, there will be no need for you to continue with the on-line form and we will contact you if we need more information.
+
 status.submissionId.title = Submission ID:
 status.history.title = History
 status.submitted.title = SUBMITTED

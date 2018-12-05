@@ -75,7 +75,14 @@
 @footerLinks = {}
 
 @serviceInfo = {
-<div class="service-info"></div>
+<div class="service-info">
+    <div class="phase-banner">
+        <p>
+            <strong class="phase-tag">@Messages("label.beta")</strong>
+            <span>@Html(Messages("label.phase", routes.FeedbackController.inPageFeedback))</span>
+        </p>
+    </div>
+</div>
 }
 
 @mainContentHeader = {

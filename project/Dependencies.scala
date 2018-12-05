@@ -23,6 +23,7 @@ object Dependencies {
   private val catsVersion = "1.1.0"
   private val guiceUtilsVersion = "4.1.0"
   private val pdfBoxVersion = "2.0.1"
+  private val playPartialsVersion = "6.1.0"
 
 
   val compileDependencies = Seq(
@@ -32,6 +33,9 @@ object Dependencies {
     "uk.gov.hmrc"       %% "govuk-template" % govukTemplateVersion,
     "uk.gov.hmrc"       %% "play-health" % playHealthVersion,
     "uk.gov.hmrc"       %% "play-ui" % playUiVersion,
+    "uk.gov.hmrc"       %% "play-partials" % playPartialsVersion excludeAll(
+      ExclusionRule("uk.gov.hmrc",  "http-verbs-play-25_2.11")   // This library is deprecated
+    ),
     "uk.gov.hmrc"       %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
     "uk.gov.hmrc"       %% "bootstrap-play-25" % bootstrapVersion,
