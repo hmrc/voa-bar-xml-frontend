@@ -193,4 +193,9 @@ $(document).ready(function() {
             window.location = refreshUrl;
         }, 3000);
       }
+
+      //feedback.js
+      window.VoaFeedback.feedbackOverrides();
+      window.VoaFeedback.toggleHelp();
+      window.VoaFeedback.helpForm();
   }

@@ -44,9 +44,10 @@ class FeedbackController @Inject() (
   }
   val contactFrontendPartialBaseUrl = appConfig.baseUrl("contact-frontend")
   val serviceIdentifier = "VOA_BAR"
+  val serviceName = appConfig.getString("appName")
 
-  val betaFeedbackSubmitUrl = routes.FeedbackController.sendBetaFeedbackToHmrc().url
-  val betaFeedbackSubmitUrlNoLogin = routes.FeedbackController.sendBetaFeedbackToHmrcNoLogin().url
+  val betaFeedbackSubmitUrl = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrc().url}"
+  val betaFeedbackSubmitUrlNoLogin = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrcNoLogin().url}"
   val hmrcSubmitBetaFeedbackUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?resubmitUrl=${urlEncode(betaFeedbackSubmitUrl)}"
   val hmrcSubmitBetaFeedbackNoLoginUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?resubmitUrl=${urlEncode(betaFeedbackSubmitUrlNoLogin)}"
   val hmrcBetaFeedbackFormUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?service=$serviceIdentifier&submitUrl=${urlEncode(betaFeedbackSubmitUrl)}"
