@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.partials.HtmlPartial
-import views.html.{inPageFeedbackThankyou, inpagefeedback}
+import views.html.{inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,6 +62,17 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
     "be able to submit form" in {
       val result = notLoggedInController.sendBetaFeedbackToHmrc()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))
+
+      status(result) mustBe SEE_OTHER
+    }
+    "return feedback not logged in page when requested" in {
+      val result = notLoggedInController.inPageFeedbackNoLogin()(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe inpagefeedbackNoLogin(Some(url), frontendAppConfig)(fakeRequest, messages, notLoggedInController.formPartialRetriever).toString
+    }
+    "be able to submit form when not logged in" in {
+      val result = notLoggedInController.sendBetaFeedbackToHmrcNoLogin()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))
 
       status(result) mustBe SEE_OTHER
     }
