@@ -1,42 +1,42 @@
 # microservice specific routes
 
-GET         /                                   controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+GET         /                                     controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 
-GET         /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /this-service-has-been-reset        controllers.SessionExpiredController.onPageLoad
+GET         /this-service-has-been-reset          controllers.SessionExpiredController.onPageLoad
 
-GET         /check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad
 
-GET         /unauthorised                       controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad
 
-GET         /confirmation                       controllers.ConfirmationController.onPageLoad(submissionId: String)
-GET         /confirmation/refresh               controllers.ConfirmationController.onPageRefresh(submissionId: String)
+GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
+GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
 
-GET         /councilTaxStart                    controllers.CouncilTaxStartController.onPageLoad()
-GET         /goToCouncilTaxUpload               controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
+GET         /council-tax/home                     controllers.CouncilTaxStartController.onPageLoad()
+GET         /goToCouncilTaxUpload                 controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
 
-GET         /councilTaxUpload                   controllers.CouncilTaxUploadController.onPageLoad()
-POST        /councilTaxUpload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
-POST        /councilTaxUpload/upload/:reference controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
-POST        /councilTaxUpload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
+GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad()
+POST        /council-tax/upload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
+POST        /council-tax/upload/upload/:reference controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
+POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 
-GET         /welcome                            controllers.WelcomeController.onPageLoad()
-GET         /goToCouncilTaxStart                controllers.WelcomeController.goToCouncilTaxStartPage()
+GET         /welcome                              controllers.WelcomeController.onPageLoad()
+GET         /goToCouncilTaxStart                  controllers.WelcomeController.goToCouncilTaxStartPage()
 
-GET         /login                              controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
-POST        /login                              controllers.LoginController.onSubmit(mode: Mode = NormalMode)
-GET         /changeLogin                        controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeLogin                        controllers.LoginController.onSubmit(mode: Mode = CheckMode)
+GET         /login                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+POST        /login                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)
+GET         /changeLogin                          controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeLogin                          controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
-GET         /reportStatus                       controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
-GET         /reportStatus/print                 controllers.ReportStatusController.onReceiptDownload(submissionId: String)
-GET         /reportStatus/all                   controllers.ReportStatusController.onAllReceiptsDownload()
+GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
+GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
+GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload()
 
-GET         /inpagefeedback 		            controllers.FeedbackController.inPageFeedback
-POST 		/sendbetafeedbacktohmrc             controllers.FeedbackController.sendBetaFeedbackToHmrc
-POST 		/sendbetafeedbacktohmrcnologin      controllers.FeedbackController.sendBetaFeedbackToHmrcNoLogin
-GET         /inpagefeedbackThankyou             controllers.FeedbackController.inPageFeedbackThankyou
-GET 		/inpagefeedbackNoLogin	            controllers.FeedbackController.inPageFeedbackNoLogin
+GET         /feedback/tell-us 		              controllers.FeedbackController.inPageFeedback
+POST 		/sendbetafeedbacktohmrc               controllers.FeedbackController.sendBetaFeedbackToHmrc
+POST 		/sendbetafeedbacktohmrcnologin        controllers.FeedbackController.sendBetaFeedbackToHmrcNoLogin
+GET         /inpagefeedbackThankyou               controllers.FeedbackController.inPageFeedbackThankyou
+GET 		/inpagefeedbackNoLogin	              controllers.FeedbackController.inPageFeedbackNoLogin
