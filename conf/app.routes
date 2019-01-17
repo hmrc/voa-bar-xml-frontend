@@ -20,7 +20,7 @@ GET         /goToCouncilTaxUpload                 controllers.CouncilTaxStartCon
 
 GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad()
 POST        /council-tax/upload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
-POST        /council-tax/upload/upload/:reference controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
+POST        /council-tax/upload/:reference controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
 POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 
 GET         /welcome                              controllers.WelcomeController.onPageLoad()
