@@ -147,7 +147,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
-      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
       val result = call(loggedInController(uploadConnector).onConfirmation, request)
 
@@ -158,7 +158,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
-      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
       val result = call(loggedInController(uploadConnector, userReportUploadsConnector = userReportUploadsConnectorFailMock).onConfirmation, request)
 
@@ -169,7 +169,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
-      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
       val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
 
@@ -218,7 +218,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
-      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
       val result = call(loggedInController(uploadConnector).onConfirmation, request)
 
@@ -229,7 +229,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
-      val request = FakeRequest(POST, "/councilTaxUpload/confirmation").withJsonBody(Json.parse(json))
+      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
       val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
 
