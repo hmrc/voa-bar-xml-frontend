@@ -60,7 +60,7 @@ error.1002.message = There must not be any existing address for this report type
 error.1003.message = There must only be be either a proposed or an existing address for this report type, not both.
 error.1004.message = There must be at least one proposed address for this report type.
 error.1005.message = There must be at least one existing address for this report type.
-error.1006.message = Report codes CR08 / CR11 / CR13 are not in use.
+error.1006.message = Report codes CR08 / CR11 / CR13 / CR15 / CR16 are not in use.
 error.1007.message = There must be only one existing address for this report type.
 error.1008.message = There must not be any proposed address for this report type.
 error.1010.message = You may only upload reports for the Authority or Council you have logged in as.
@@ -72,7 +72,7 @@ error.1022.message = There is a problem with the file, please contact you Local 
 error.2000.message = There is a problem with the file, please contact your supplier with this message:
 error.2001.message = There is a problem with the file, please contact your supplier with this message:
 error.3000.message = There is a problem with the system, please try again later.
-error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact yout support team.
+error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact your support team.
 error.5000.message = Unknown error.
 
 report.filter.failed = Failed Submissions
