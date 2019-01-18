@@ -72,7 +72,7 @@ error.1022.message = There is a problem with the file, please contact you Local 
 error.2000.message = There is a problem with the file, please contact your supplier with this message:
 error.2001.message = There is a problem with the file, please contact your supplier with this message:
 error.3000.message = There is a problem with the system, please try again later.
-error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact yout support team.
+error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact your support team.
 error.5000.message = Unknown error.
 
 report.filter.failed = Failed Submissions
