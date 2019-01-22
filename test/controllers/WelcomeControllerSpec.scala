@@ -24,9 +24,12 @@ import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.html.welcome
 
+import scala.concurrent.ExecutionContext
+
 class WelcomeControllerSpec extends ControllerSpecBase {
 
   val username = "AUser"
+  val ec = ExecutionContext.global
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -34,13 +37,13 @@ class WelcomeControllerSpec extends ControllerSpecBase {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new WelcomeController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl,
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new WelcomeController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl,
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector)(ec)
   }
 
   def viewAsString() = welcome(username, frontendAppConfig)(fakeRequest, messages).toString

@@ -30,7 +30,7 @@ import play.api.Logger
 import utils.{Navigator, UserAnswers}
 import views.html.login
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class LoginController @Inject()(appConfig: FrontendAppConfig,
@@ -41,7 +41,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 requireData: DataRequiredAction,
                                 formProvider: LoginFormProvider,
                                 loginConnector: LoginConnector
-                               ) extends FrontendController with I18nSupport {
+                               )(implicit ec: ExecutionContext) extends FrontendController with I18nSupport {
 
   val form = formProvider()
 
