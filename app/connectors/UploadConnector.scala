@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UploadConnector @Inject()(http: HttpClient,
                                 val configuration: Configuration,
-                                environment: Environment,
+                                val environment: Environment,
                                 messages: MessagesApi)
                                (implicit ec: ExecutionContext)
   extends ServicesConfig {
