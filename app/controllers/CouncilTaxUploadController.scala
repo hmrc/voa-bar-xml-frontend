@@ -116,13 +116,13 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  private[controllers] def sendContent(content: String, uploadConfirmation: UploadConfirmation, login: Login): Future[Either[Error, String]] = {
+  private[controllers] def sendContent(xmlUrl: String, uploadConfirmation: UploadConfirmation, login: Login): Future[Either[Error, String]] = {
     (for {
       userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference, login: Login))
       userData <- EitherT.fromOption[Future](userDataByReference,
         Error(messagesApi("login.error.auth"), Seq("Couldn't send file because of expired submission.")))
       loginDetails = Login(userData.userId, userData.userPassword)
-      result <- EitherT(uploadConnector.sendXml(content, loginDetails, uploadConfirmation.reference))
+      result <- EitherT(uploadConnector.sendXml(xmlUrl, loginDetails, uploadConfirmation.reference))
     } yield Right(result))
         .valueOr(Left(_))
   }
@@ -197,10 +197,9 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private def onSuccessfulConfirmation(uploadConfirmation: UploadConfirmation)(implicit request: OptionalDataRequest[JsValue]) = {
     (for {
       login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
-      xml <- EitherT(uploadConnector.downloadFile(uploadConfirmation))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login))
       _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Submitted))
-      _ <- EitherT(sendContent(xml, uploadConfirmation, login))
+      _ <- EitherT(sendContent(uploadConfirmation.downloadUrl, uploadConfirmation, login))
     } yield NoContent)
       .valueOrF(error => {
         handleConfirmationError(request, error)
