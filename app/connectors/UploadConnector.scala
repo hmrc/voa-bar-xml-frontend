@@ -23,7 +23,7 @@ import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
-import models.{Error, Login}
+import models.{Error, Login, VoaBarUpload}
 import play.api.Mode.Mode
 import play.api.i18n.MessagesApi
 
@@ -55,11 +55,14 @@ class UploadConnector @Inject()(http: HttpClient,
 
   def generatePasswordHeader(password: String) = ("password", password)
 
-  def sendXml(xml: String, loginDetails: Login, id: String): Future[Either[Error, String]] = {
+  def sendXml(xmlUrl: String, loginDetails: Login, id: String): Future[Either[Error, String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
-    val headers = Seq(xmlContentTypeHeader, generateUsernameHeader(baCode), generatePasswordHeader(password))
-    http.POSTString(s"$serviceUrl${baseSegment}upload?reference=$id", xml, headers)
+    val headers = Seq(generateUsernameHeader(baCode), generatePasswordHeader(password))
+
+    val uploadData = VoaBarUpload(id, xmlUrl)
+
+    http.POST(s"$serviceUrl${baseSegment}upload", uploadData, headers)
       .map {
         response =>
           response.status match {
@@ -92,17 +95,4 @@ class UploadConnector @Inject()(http: HttpClient,
       }
   }
 
-  def downloadFile(request: UploadConfirmation): Future[Either[Error, String]] = {
-    http.doGet(request.downloadUrl)
-      .map{ response =>
-        Right(response.body)
-      }
-      .recover {
-        case ex: Throwable => {
-          val errorMsg = s"Error downloading file from ${request.downloadUrl}"
-          Logger.error(errorMsg, ex)
-          Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
-        }
-      }
-  }
 }
