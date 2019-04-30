@@ -197,9 +197,9 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   private def onSuccessfulConfirmation(uploadConfirmation: UploadConfirmation)(implicit request: OptionalDataRequest[JsValue]) = {
     (for {
       login <- EitherT(cachedLoginByReference(uploadConfirmation.reference))
-      _ <- EitherT(saveReportStatus(uploadConfirmation, login))
-      _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Submitted))
-      _ <- EitherT(sendContent(uploadConfirmation.downloadUrl, uploadConfirmation, login))
+      _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Verified))          //TODO Confirm verification in db, maybe here we should return OK to upscan and continue in different thread.
+      _ <- EitherT(sendContent(uploadConfirmation.downloadUrl, uploadConfirmation, login))  //Send to voa-bar -> eBar
+      _ <- EitherT(saveReportStatus(uploadConfirmation, login, status = Submitted))         //Update that everything is ok.
     } yield NoContent)
       .valueOrF(error => {
         handleConfirmationError(request, error)
@@ -250,14 +250,14 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
   }
 
   private def handleConfirmationError(request: OptionalDataRequest[JsValue], error: Error) = {
-    val errorMsg = s"Error: ${error.values.mkString("\n")}"
+    val errorMsg = s"Error: code: ${error.code} detail messages: ${error.values.mkString(", ")}"
     Logger.error(errorMsg)
     (for {
       login <- EitherT(cachedLoginError(request.externalId))
       uploadInfo <- EitherT(Future.successful(parseUploadConfirmation(request)))
       reportStatusError = Error(error.code)
       _ <- EitherT(saveReportStatus(uploadInfo, login, Seq(reportStatusError), Failed)(request))
-    } yield InternalServerError(errorMsg))
-      .valueOr(_ => InternalServerError(errorMsg))
+    } yield InternalServerError(errorMsg))        //TODO maybe we should return 200, because it's message for upscan.
+      .valueOr(_ => InternalServerError(errorMsg)) //Here we should report 500, because we have error and can't recover from it.
   }
 }
