@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
     "have a method that save user and report information that" must {
       "return a successful result when valid arguments are provided" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.PUT(any[String], any[UserReportUpload])
+        when(httpMock.PUT(any[String], any[UserReportUpload], any[Seq[(String,String)]])
           (any[Writes[UserReportUpload]], any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(httpResponse))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpMock, configuration)
@@ -58,7 +58,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       }
       "return a failed result when the repository fails" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.PUT(any[String], any[UserReportUpload])
+        when(httpMock.PUT(any[String], any[UserReportUpload], any[Seq[(String,String)]])
         (any[Writes[UserReportUpload]], any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.failed(exception))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpMock, configuration)

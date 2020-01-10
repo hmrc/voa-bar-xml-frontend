@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     val http = mock[HttpClient]
     when(http.GET[HtmlPartial](any[String])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HtmlPartial.Success(None, Html("<div/>"))))
-    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
+    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String,String)]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HttpResponse(OK)))
     new FeedbackController(
       messagesApi,

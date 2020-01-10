@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,14 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   when(httpMock.GET[Seq[ReportStatus]](any[String])
     (any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(Seq(rs)))
-  when(httpMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus])
+  when(httpMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus], any[Seq[(String,String)]])
     (any[Writes[ReportStatus]], any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(httpResponse))
   val httpFailMock = mock[HttpClient]
   when(httpFailMock.GET[Seq[ReportStatus]](any[String])
     (any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.failed(exception))
-  when(httpFailMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus])
+  when(httpFailMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus], any[Seq[(String,String)]])
     (any[Writes[ReportStatus]], any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.failed(exception))
 
