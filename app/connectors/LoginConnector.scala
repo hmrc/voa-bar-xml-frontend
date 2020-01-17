@@ -17,7 +17,6 @@
 package connectors
 
 import javax.inject.Inject
-
 import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.libs.json._
@@ -26,23 +25,22 @@ import models.Login
 import scala.util.{Failure, Success, Try}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
+
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
-                               environment: Environment) extends ServicesConfig {
+                               val serviceConfig: ServicesConfig,
+                               environment: Environment) {
 
-  override protected def mode: Mode = environment.mode
-
-  override protected def runModeConfiguration: Configuration = configuration
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val serviceUrl = baseUrl("voa-bar")
+  val serviceUrl = serviceConfig.baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
   val jsonContentTypeHeader = ("Content-Type", "application/json")
 

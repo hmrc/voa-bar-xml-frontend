@@ -17,38 +17,39 @@
 package connectors
 
 import java.io.{File, PrintWriter}
-import java.time.OffsetDateTime
 
 import base.SpecBase
 import com.typesafe.config.ConfigException
-import models.UpScanRequests.{UploadDetails, _}
+import models.UpScanRequests._
 import models._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.i18n.MessagesApi
-import play.api.libs.Files.TemporaryFile
+import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
 import play.api.libs.json._
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
+import scala.concurrent.Future
 
 class UploadConnectorSpec extends SpecBase with MockitoSugar {
 
-  val configuration = injector.instanceOf[Configuration]
-  val environment = injector.instanceOf[Environment]
+  def configuration = injector.instanceOf[Configuration]
+  def environment = injector.instanceOf[Environment]
 
-  val file = File.createTempFile("foo", "bar")
-  val path = new PrintWriter(file) { write("<xml />"); close }
-  val tempFile = new TemporaryFile(file)
+  def file = File.createTempFile("foo", "bar")
+  def path = new PrintWriter(file) { write("<xml />"); close }
+
+  def tempCreator = injector.instanceOf[TemporaryFileCreator]
+
+  def tempFile: TemporaryFile = tempCreator.create(file.toPath)
 
   val upScanConfigPath = "microservice.services.upscan"
   val upScanConfig = configuration.getConfig(upScanConfigPath)
@@ -59,6 +60,8 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
   val maximumFileSizePath = "max-file-size"
   val maximumFileSize = upScanConfig.getInt(maximumFileSizePath)
     .getOrElse(throw new ConfigException.Missing(maximumFileSizePath))
+
+  def servicesConfig = injector.instanceOf[ServicesConfig]
 
   val xmlUrl = "http://localhost:59145"
   val username = "user"
@@ -88,7 +91,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(Status.OK, Some(submissionId))
 
-        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
+        val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
@@ -101,7 +104,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
-        val connector = new UploadConnector(getHttpMock(Status.OK, Some(submissionId)), configuration, environment, messagesApi)
+        val connector = new UploadConnector(getHttpMock(Status.OK, Some(submissionId)), configuration, servicesConfig, messagesApi)
         val result = await(connector.sendXml(xmlUrl, login, submissionId))
         result match {
           case Right(submissionValue) => submissionValue mustBe submissionId
@@ -110,7 +113,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a failure representing the error when send method fails" in {
-        val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR, None), configuration, environment, messagesApi)
+        val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR, None), configuration, servicesConfig, messagesApi)
         val result = await(connector.sendXml(xmlUrl, login, submissionId))
         assert(result.isLeft)
       }
@@ -119,7 +122,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val httpMock = mock[HttpClient]
         when(httpMock.POST(anyString, any[VoaBarUpload], any[Seq[(String, String)]])(any[Writes[VoaBarUpload]], any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
-        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
+        val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
         val result = await(connector.sendXml(xmlUrl, login, submissionId))
         assert(result.isLeft)
       }
@@ -155,7 +158,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar {
         val httpMock = mock[HttpClient]
         when(httpMock.POST[InitiateRequest, InitiateResponse](anyString, any[InitiateRequest], any[Seq[(String, String)]])
           (jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any())) thenReturn Future.successful(initiateResponse)
-        val connector = new UploadConnector(httpMock, configuration, environment, messagesApi)
+        val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
 
         val response = await(connector.initiate(initiateRequest))
 

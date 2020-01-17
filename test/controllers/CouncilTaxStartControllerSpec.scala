@@ -25,14 +25,15 @@ import models._
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.html.{councilTaxStart, login}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar {
+  class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val username = "AUser"
   val login = Login("foo", "bar")
@@ -41,6 +42,9 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
+  def ec = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
   def loggedInController(
                           reportStatusConnector: ReportStatusConnector,
                           dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap
@@ -48,7 +52,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxStartController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, reportStatusConnector)
+      new DataRequiredActionImpl(ec), new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, reportStatusConnector, controllerComponents)
   }
 
   def notLoggedInController(
@@ -57,7 +61,7 @@ class CouncilTaxStartControllerSpec extends ControllerSpecBase with MockitoSugar
                            ) = {
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxStartController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, reportStatusConnector)
+      new DataRequiredActionImpl(ec), new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, reportStatusConnector, controllerComponents)
   }
 
   def reportStatusConnect() = {

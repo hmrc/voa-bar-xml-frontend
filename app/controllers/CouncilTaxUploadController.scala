@@ -17,6 +17,7 @@
 package controllers
 
 import java.time.ZonedDateTime
+import java.util.Locale
 
 import javax.inject.Inject
 import config.FrontendAppConfig
@@ -29,16 +30,18 @@ import cats.implicits._
 import models.UpScanRequests._
 import models.requests.OptionalDataRequest
 import play.Logger
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.Configuration
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
+class CouncilTaxUploadController @Inject()(configuration: Configuration,
+                                            appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
@@ -47,14 +50,17 @@ class CouncilTaxUploadController @Inject()(appConfig: FrontendAppConfig,
                                            navigator: Navigator,
                                            uploadConnector: UploadConnector,
                                            userReportUploadsConnector: UserReportUploadsConnector,
-                                           reportStatusConnector: ReportStatusConnector)
+                                           reportStatusConnector: ReportStatusConnector,
+                                           controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
-  extends FrontendController with BaseBarController with I18nSupport {
+  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+
+  implicit val lang: Lang = Lang(Locale.UK)
 
   private[controllers] val form = formProvider()
-  private[controllers] val maxFileSize = appConfig.runModeConfiguration
+  private[controllers] val maxFileSize = configuration
     .getInt("microservice.services.upscan.max-file-size").get
-  private[controllers] val callBackUrl = appConfig.runModeConfiguration
+  private[controllers] val callBackUrl = configuration
     .getString("microservice.services.upscan.callback-url").get
 
   private[controllers] def fileUploadDetails(username: String, password: String)

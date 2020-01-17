@@ -18,13 +18,19 @@ package controllers
 
 import play.api.test.Helpers._
 import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
+import play.api.mvc.MessagesControllerComponents
 import viewmodels.AnswerSection
 import views.html.check_your_answers
 
+import scala.concurrent.ExecutionContext
+
 class CheckYourAnswersControllerSpec extends ControllerSpecBase {
 
+  def ec = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CheckYourAnswersController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl)
+    new CheckYourAnswersController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl(ec), controllerComponents)
 
   "Check Your Answers Controller" must {
     "return 200 and the correct view for a GET" in {

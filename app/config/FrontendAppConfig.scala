@@ -17,19 +17,17 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import play.api.i18n.Lang
 import controllers.routes
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendAppConfig @Inject() (override val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig {
+class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
-  override protected def mode = environment.mode
+  private def loadConfig(key: String) = configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
-  private def loadConfig(key: String) = runModeConfiguration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
-
-  private lazy val contactHost = runModeConfiguration.getString("contact-frontend.host").getOrElse("")
+  private lazy val contactHost = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "voabarxmlfrontend"
 
   lazy val analyticsToken = loadConfig(s"google-analytics.token")
@@ -40,7 +38,7 @@ class FrontendAppConfig @Inject() (override val runModeConfiguration: Configurat
   lazy val betaFeedbackUrl = s"$contactHost/contact/beta-feedback"
   lazy val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated"
 
-  lazy val languageTranslationEnabled = runModeConfiguration.getBoolean("microservice.services.features.welsh-translation").getOrElse(true)
+  lazy val languageTranslationEnabled = configuration.getOptional[Boolean]("microservice.services.features.welsh-translation").getOrElse(true)
   def languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy"))

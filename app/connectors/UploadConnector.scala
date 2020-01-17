@@ -16,33 +16,30 @@
 
 package connectors
 
+import java.util.Locale
+
 import javax.inject.{Inject, Singleton}
 import models.UpScanRequests._
 import play.api.{Configuration, Environment, Logger}
 import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 import models.{Error, Login, VoaBarUpload}
 import play.api.Mode.Mode
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UploadConnector @Inject()(http: HttpClient,
                                 val configuration: Configuration,
-                                val environment: Environment,
+                                val servicesConfig: ServicesConfig,
                                 messages: MessagesApi)
-                               (implicit ec: ExecutionContext)
-  extends ServicesConfig {
-
-  override protected def mode: Mode = environment.mode
-
-  override protected def runModeConfiguration: Configuration = configuration
+                               (implicit ec: ExecutionContext) {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  private[connectors] val serviceUrl = baseUrl("voa-bar")
+  private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
   private[connectors] val baseSegment = "/voa-bar/"
   private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
   private[connectors] val upScanConfig = configuration.getConfig("microservice.services.upscan").get
@@ -76,6 +73,8 @@ class UploadConnector @Inject()(http: HttpClient,
         handleSendXmlError(e.getMessage)
     }
   }
+
+  implicit val lang: Lang = Lang(Locale.UK)
 
   private def handleSendXmlError(message: String) = {
     val errorMsg = s"Error when uploading am xml file\n$message"

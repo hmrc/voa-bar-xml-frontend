@@ -18,6 +18,7 @@ package services
 
 import java.io.ByteArrayOutputStream
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import javax.imageio.ImageIO
@@ -26,7 +27,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory
 import org.apache.pdfbox.pdmodel.{PDDocument, PDDocumentInformation, PDPage, PDPageContentStream}
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 
 import scala.language.reflectiveCalls
 import scala.collection.mutable.ArrayBuffer
@@ -39,6 +40,9 @@ class DefaultReceiptService @Inject() (
   val fontSize = 12f
   val leading = 1.5f * fontSize
   val margin = 72
+
+  implicit val lang: Lang = Lang(Locale.UK)
+
   val dateFomatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
 
   def producePDF(reportStatus: ReportStatus) = {

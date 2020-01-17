@@ -16,12 +16,13 @@
 
 package controllers.actions
 
-import play.api.mvc.Request
+import play.api.mvc.{AnyContent, BodyParser, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.requests.OptionalDataRequest
+import play.api.test.Helpers
 import utils.UserAnswers
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FakeDataRetrievalAction(cacheMapToReturn: Option[CacheMap]) extends DataRetrievalAction {
@@ -29,4 +30,8 @@ class FakeDataRetrievalAction(cacheMapToReturn: Option[CacheMap]) extends DataRe
     case None => Future(OptionalDataRequest(request, "id", None))
     case Some(cacheMap)=> Future(OptionalDataRequest(request, "id", Some(new UserAnswers(cacheMap))))
   }
+
+  override def parser: BodyParser[AnyContent] = Helpers.stubBodyParser(AnyContent(""))
+
+  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 }

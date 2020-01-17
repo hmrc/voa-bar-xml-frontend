@@ -25,32 +25,40 @@ import models.{Error, Login, NormalMode}
 import play.api.Logger
 import play.api.i18n.Messages
 import play.api.mvc.{Controller, Request, Result}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseBarController extends Controller {
+trait BaseBarController extends FrontendBaseController {
+
   val dataCacheConnector: DataCacheConnector
+
   implicit val ec: ExecutionContext
+
   private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
     views.html.error_template(messages("error.internal_server_error.title"), messages("error.internal_server_error.title"), messages("error.internal_server_error.description"), appConfig)(request, messages)
+
   private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
       Redirect(routes.LoginController.onPageLoad(NormalMode))
     ).value
   }
+
   private[controllers] def cachedLoginError(externalId: String): Future[Either[Error, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
       Error("Couldn't get user session", Seq())
     ).value
   }
+
   private[controllers] def cachedLoginByReference(reference: String): Future[Either[Error, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntryByField[Login]("data.login.reference", reference, LoginId.toString),
       Error("Couldn't get user session", Seq())
     ).value
   }
+
   private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit.type]] = {
     dataCacheConnector.save[Login](externalId, LoginId.toString, login)
         .map(_ => Right(Unit))

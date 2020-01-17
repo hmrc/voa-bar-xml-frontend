@@ -27,6 +27,7 @@ import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{BillingAuthorities, Login, Mode}
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import utils.{Navigator, UserAnswers}
 import views.html.login
 
@@ -40,8 +41,9 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 getData: DataRetrievalAction,
                                 requireData: DataRequiredAction,
                                 formProvider: LoginFormProvider,
-                                loginConnector: LoginConnector
-                               )(implicit ec: ExecutionContext) extends FrontendController with I18nSupport {
+                                loginConnector: LoginConnector,
+                                controllerComponents: MessagesControllerComponents
+                               )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport {
 
   val form = formProvider()
 

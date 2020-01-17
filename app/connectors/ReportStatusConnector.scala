@@ -25,23 +25,20 @@ import models.ReportStatus._
 import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DefaultReportStatusConnector @Inject()(
                                       val configuration: Configuration,
                                       http: HttpClient,
-                                      environment: Environment)
+                                      environment: Environment,
+                                      val serviceConfig: ServicesConfig)
                                      (implicit ec: ExecutionContext)
-  extends ServicesConfig with ReportStatusConnector with BaseConnector {
+  extends ReportStatusConnector with BaseConnector {
 
-  override protected def mode: Mode = environment.mode
-  override protected def runModeConfiguration: Configuration = configuration
-
-  val serviceUrl = s"${baseUrl("voa-bar")}/voa-bar"
+  val serviceUrl = s"${serviceConfig.baseUrl("voa-bar")}/voa-bar"
   val hc: HeaderCarrier = HeaderCarrier()
 
   def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]] = {

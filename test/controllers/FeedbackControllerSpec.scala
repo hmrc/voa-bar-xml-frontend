@@ -20,12 +20,15 @@ import connectors.FakeDataCacheConnector
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
+import play.api.Configuration
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.partials.HtmlPartial
 import views.html.{inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
 
@@ -33,6 +36,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
+
+  def ec = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def servicesConfig = app.injector.instanceOf[ServicesConfig]
+  def configuration = app.injector.instanceOf[Configuration]
+
   def notLoggedInController() = {
     FakeDataCacheConnector.resetCaptures()
     val encrypter = mock[Encrypter with Decrypter]
@@ -49,7 +58,10 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       getEmptyCacheMap,
       frontendAppConfig,
       sessionCookieCrypto,
-      http)
+      http,
+      controllerComponents,
+      servicesConfig,
+      configuration)
   }
   val url = "feedback.url"
 
