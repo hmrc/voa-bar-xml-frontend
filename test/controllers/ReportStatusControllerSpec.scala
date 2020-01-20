@@ -27,6 +27,7 @@ import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.ReceiptService
@@ -35,7 +36,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.reportStatus
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
@@ -68,6 +69,9 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   val receiptServiceMock = mock[ReceiptService]
   when(receiptServiceMock.producePDF(any[ReportStatus])) thenReturn(Success(Array[Byte](1, 2, 3, 4)))
 
+  def ec = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector]
     when(reportStatusConnectorMock.get(any[Login], any[Option[String]])).thenReturn(Future(Right(fakeReports)))
@@ -77,12 +81,14 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl, receiptServiceMock)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(),
+      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(), dataRetrievalAction, new DataRequiredActionImpl, receiptServiceMock)
+    new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(),
+      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
   }
 
   def viewAsString() = reportStatus(username, frontendAppConfig, fakeReports)(fakeRequest, messages).toString
@@ -131,7 +137,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
 
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
+          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
 
       intercept[Exception] {
         val result = controller.onPageLoad()(fakeRequest)
@@ -146,7 +153,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
+          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
 
       val result = controller.onReceiptDownload(submissionId1)(fakeRequest)
 
@@ -160,7 +168,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
+          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
 
       val result = controller.onAllReceiptsDownload()(fakeRequest)
 
@@ -174,7 +183,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap, new DataRequiredActionImpl, receiptServiceMock)
+        new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
+          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, controllerComponents)
 
       val result = controller.onAllReceiptsDownload()(fakeRequest)
 

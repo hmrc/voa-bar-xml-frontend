@@ -26,7 +26,7 @@ import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.CouncilTaxStartId
 import models.{Login, NormalMode, ReportStatus}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.Navigator
 import views.html.councilTaxStart
 
@@ -38,9 +38,10 @@ class CouncilTaxStartController @Inject()(appConfig: FrontendAppConfig,
                                           requireData: DataRequiredAction,
                                           navigator: Navigator,
                                           val dataCacheConnector: DataCacheConnector,
-                                          reportStatusConnector: ReportStatusConnector
+                                          reportStatusConnector: ReportStatusConnector,
+                                          controllerComponents: MessagesControllerComponents
                                          ) (implicit val ec: ExecutionContext)
-  extends FrontendController with BaseBarController with I18nSupport {
+  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
 
   def onPageLoad(filter: Option[String] = None) = getData.async {
     implicit request =>

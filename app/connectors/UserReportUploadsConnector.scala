@@ -33,11 +33,14 @@ class DefaultUserReportUploadsConnector @Inject() (
                                                    )(implicit executionContext: ExecutionContext)
   extends  UserReportUploadsConnector with BaseConnector {
   val hc: HeaderCarrier = HeaderCarrier()
+
   val voaBarConfig = configuration.getConfig("microservice.services.voa-bar").get
   val host = voaBarConfig.getString("host").get
   val port = voaBarConfig.getString("port").get
   val protocol = voaBarConfig.getString("protocol").get
-  val serviceUrl = s"$protocol://$host:$port/voa-bar"
+  val serviceUrl = s"$protocol://$host:$port/voa-bar" //TODO - Refactor with services config
+
+
   override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
     val headers = defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
     implicit val headerCarrier = hc.withExtraHeaders(headers:_*)

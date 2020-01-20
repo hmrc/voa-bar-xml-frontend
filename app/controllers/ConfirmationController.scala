@@ -25,7 +25,7 @@ import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import identifiers.VOAAuthorisedId
 import models.{Login, NormalMode, ReportStatus}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import views.html.confirmation
 import cats.implicits._
 
@@ -36,9 +36,10 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val dataCacheConnector: DataCacheConnector,
-                                       reportStatusConnector: ReportStatusConnector)
+                                       reportStatusConnector: ReportStatusConnector,
+                                       controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
-  extends FrontendController with BaseBarController with I18nSupport {
+  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
 
   def onPageLoad(reference: String) = getData.async {
     implicit request =>

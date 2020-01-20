@@ -32,12 +32,14 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers.{status, _}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
-  val configuration = injector.instanceOf[Configuration]
-  val environment = injector.instanceOf[Environment]
-  val minimalJson = JsObject(Map[String, JsValue]())
+  def configuration = injector.instanceOf[Configuration]
+  def environment = injector.instanceOf[Environment]
+  def minimalJson = JsObject(Map[String, JsValue]())
+  def servicesConfig = injector.instanceOf[ServicesConfig]
 
   val username = "user"
   val password = "pass"
@@ -50,7 +52,6 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
     when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
     httpMock
   }
-
   "Login Connector" when {
 
     "provided with a Contact Login Input" must {
@@ -63,7 +64,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-        val connector = new LoginConnector(httpMock, configuration, environment)
+        val connector = new LoginConnector(httpMock, configuration, servicesConfig, environment)
 
         await(connector.send(login))
 
@@ -75,7 +76,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a 200 status when the send method is successfull using login model" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, environment)
+        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig, environment)
         val result = await(connector.send(login))
         result match {
           case Success(status) => status mustBe 200
@@ -84,7 +85,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a failure representing the error when send method fails" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration, environment)
+        val connector = new LoginConnector(getHttpMock(500), configuration, servicesConfig,  environment)
         val result = await(connector.send(login))
         assert(result.isFailure)
       }
@@ -101,7 +102,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-        val connector = new LoginConnector(httpMock, configuration, environment)
+        val connector = new LoginConnector(httpMock, configuration, servicesConfig, environment)
 
         await(connector.sendJson(minimalJson))
 
@@ -113,7 +114,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return a 200 status when the send method is successful" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, environment)
+        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig, environment)
         val result = await(connector.sendJson(minimalJson))
         result match {
           case Success(status) => status mustBe 200
@@ -122,7 +123,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
       }
 
       "return failure respresenting the error if the backend service call fails using minimal Json" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration, environment)
+        val connector = new LoginConnector(getHttpMock(500), configuration,servicesConfig, environment)
         val result = await(connector.sendJson(minimalJson))
         assert(result.isFailure)
       }
@@ -131,7 +132,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         val httpMock = mock[HttpClient]
         when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
           any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
-        val connector = new LoginConnector(httpMock, configuration, environment)
+        val connector = new LoginConnector(httpMock, configuration,servicesConfig, environment)
         val result = await(connector.sendJson(minimalJson))
         assert(result.isFailure)
       }

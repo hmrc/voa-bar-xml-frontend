@@ -29,7 +29,7 @@ import org.joda.time.Instant
 import play.api.http.HeaderNames
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.reportStatus
@@ -43,9 +43,10 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        reportStatusConnector: ReportStatusConnector,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
-                                       receiptService: ReceiptService
+                                       receiptService: ReceiptService,
+                                       controllerComponents: MessagesControllerComponents
                                       )(implicit val ec: ExecutionContext)
-  extends FrontendController with BaseBarController with I18nSupport {
+  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
     val reportStatuses = json.asOpt[Seq[ReportStatus]]
     reportStatuses match {

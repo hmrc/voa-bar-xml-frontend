@@ -29,10 +29,11 @@ import models.{Login, NormalMode}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+import play.api.mvc.MessagesControllerComponents
 import views.html.login
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
@@ -44,6 +45,9 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
   val form = formProvider()
   val validBACode = "ba0114"
 
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec = app.injector.instanceOf[ExecutionContext]
+
   val loginConnector = mock[LoginConnector]
   when(loginConnector.send(any[Login])) thenReturn Future.successful(Success(200))
 
@@ -53,7 +57,7 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl, formProvider, connector)
+      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents)
   }
 
   def viewAsString(form: Form[_] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString

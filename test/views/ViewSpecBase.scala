@@ -16,12 +16,17 @@
 
 package views
 
+import java.util.Locale
+
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
 import base.SpecBase
+import play.api.i18n.Lang
 
 trait ViewSpecBase extends SpecBase {
+
+  implicit def lang = Lang(Locale.UK)
 
   def asDocument(html: Html): Document = Jsoup.parse(html.toString())
 

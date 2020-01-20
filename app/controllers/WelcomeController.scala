@@ -24,17 +24,19 @@ import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import identifiers.{VOAAuthorisedId, WelcomeId}
 import models.NormalMode
+import play.api.mvc.MessagesControllerComponents
 import views.html.welcome
 import utils.Navigator
 
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
-                                  override val messagesApi: MessagesApi,
                                   getData: DataRetrievalAction,
                                   requireData: DataRequiredAction,
                                   navigator: Navigator,
-                                  dataCacheConnector: DataCacheConnector) (implicit ec: ExecutionContext) extends FrontendController with I18nSupport {
+                                  dataCacheConnector: DataCacheConnector,
+                                  controllerComponents: MessagesControllerComponents) (implicit ec: ExecutionContext)
+  extends FrontendController(controllerComponents) with I18nSupport {
 
   def onPageLoad = getData.async {
     implicit request =>

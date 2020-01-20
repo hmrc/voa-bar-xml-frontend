@@ -17,9 +17,10 @@
 package config
 
 import filters.VoaBarAuditFilter
-import play.api.{Configuration, Environment}
+import play.api.{Configuration, Environment, Logger}
 import play.api.inject.{Binding, Module}
 import uk.gov.hmrc.play.bootstrap.FrontendModule
+import uk.gov.hmrc.play.bootstrap.filters.AuditFilter
 import uk.gov.hmrc.play.bootstrap.filters.frontend.FrontendAuditFilter
 
 /**
@@ -30,13 +31,16 @@ class VoaBarFrontendModule extends Module {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
 
-    val frontendBindings = new FrontendModule().bindings(environment, configuration)
-    frontendBindings.map { binding =>
-      if(binding.key.clazz.equals(classOf[FrontendAuditFilter])) {
-        bind[FrontendAuditFilter].to[VoaBarAuditFilter]
+    Logger.warn("Binding audit filter")
+
+    new FrontendModule().bindings(environment, configuration)
+    .map { binding =>
+      if(binding.key.clazz.equals(classOf[AuditFilter])) {
+        bind[AuditFilter].to[VoaBarAuditFilter]
       }else {
         binding
       }
     }
+
   }
 }

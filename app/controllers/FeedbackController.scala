@@ -21,6 +21,7 @@ import java.net.URLEncoder
 import actions.DataRetrievalAction
 import config.FrontendAppConfig
 import javax.inject.Inject
+import play.api.Configuration
 import play.api.mvc.Results._
 import play.api.mvc._
 import play.twirl.api.Html
@@ -28,6 +29,8 @@ import uk.gov.hmrc.play.partials._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.{HttpGet, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -36,15 +39,18 @@ class FeedbackController @Inject() (
   getData: DataRetrievalAction,
   appConfig: FrontendAppConfig,
   sessionCookieCrypto: SessionCookieCrypto,
-  http: HttpClient
-)(implicit ec: scala.concurrent.ExecutionContext) extends I18nSupport with HeaderCarrierForPartialsConverter {
+  http: HttpClient,
+  controllerComponents: MessagesControllerComponents,
+  serviceConfig: ServicesConfig,
+  configuration: Configuration
+)(implicit ec: scala.concurrent.ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport  {
   implicit val formPartialRetriever: FormPartialRetriever = new FormPartialRetriever {
     override def httpGet: HttpGet = http
     override def crypto: (String) => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
   }
-  val contactFrontendPartialBaseUrl = appConfig.baseUrl("contact-frontend")
+  val contactFrontendPartialBaseUrl = serviceConfig.baseUrl("contact-frontend")
   val serviceIdentifier = "VOA_BAR"
-  val serviceName = appConfig.getString("appName")
+  val serviceName = configuration.getString("appName")
 
   val betaFeedbackSubmitUrl = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrc().url}"
   val betaFeedbackSubmitUrlNoLogin = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrcNoLogin().url}"
@@ -63,7 +69,7 @@ class FeedbackController @Inject() (
 
   private def urlEncode(value: String) = URLEncoder.encode(value, "UTF-8")
 
-  override def crypto: String => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
+  //override def crypto: String => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
 
   def inPageFeedback = Action { implicit request =>
         Ok(views.html.inpagefeedback(Some(hmrcBetaFeedbackFormUrl), appConfig, None))

@@ -19,6 +19,7 @@ package filters
 import java.util.UUID
 
 import akka.stream.Materializer
+import base.SpecBase
 import com.google.inject.Inject
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
@@ -46,7 +47,7 @@ object SessionIdFilterSpec {
                                       ) extends SessionIdFilter(mat, UUID.fromString(sessionId), ec)
 }
 
-class SessionIdFilterSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class SessionIdFilterSpec extends SpecBase  {
 
   import SessionIdFilterSpec._
 

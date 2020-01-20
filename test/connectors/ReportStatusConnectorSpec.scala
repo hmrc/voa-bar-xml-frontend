@@ -29,6 +29,7 @@ import play.api.{Configuration, Environment}
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -47,6 +48,9 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   val exception = new Exception
   val login = Login("AUser", "anyPass")
   val httpMock = mock[HttpClient]
+
+  def servicesConfig = app.injector.instanceOf[ServicesConfig]
+
   when(httpMock.GET[Seq[ReportStatus]](any[String])
     (any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(Seq(rs)))
@@ -63,7 +67,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
 
   "Report status connector spec" must {
     "given an username that was authorised by the voa - request the currently known report statuses from VOA-BAR" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment, servicesConfig)
       val login = Login("AUser", "anyPass")
 
       val result = await(connector.get(login))
@@ -75,15 +79,15 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
     
     "return a failure when the repository encounters an issue" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
-      
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment, servicesConfig)
+
       val result = await(connector.get(login))
 
       assert(result.isLeft)
     }
 
     "returns a valid result when saving a new report" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment, servicesConfig)
 
       val result = await(connector.saveUserInfo(submissionId, login))
 
@@ -91,7 +95,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
 
     "returns an error when saving a new report" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment, servicesConfig)
 
       val result = await(connector.saveUserInfo(submissionId, login))
 
@@ -99,7 +103,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
 
     "returns a valid result when saving a report" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpMock, environment, servicesConfig)
 
       val result = await(connector.save(rs, login))
 
@@ -107,7 +111,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
 
     "returns an error when saving a report" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment, servicesConfig)
 
       val result = await(connector.save(rs, login))
 
@@ -118,7 +122,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       when(http.GET[ReportStatus](any[String])
         (any[HttpReads[ReportStatus]], any[HeaderCarrier], any[ExecutionContext]))
         .thenReturn(Future(rs))
-      val connector = new DefaultReportStatusConnector(configuration, http, environment)
+      val connector = new DefaultReportStatusConnector(configuration, http, environment, servicesConfig)
       val login = Login("AUser", "anyPass")
 
       val result = await(connector.getByReference(submissionId, login))
@@ -130,7 +134,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
 
     "return a failure when the repository encounters an issue while retrieving submission" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment, servicesConfig)
 
       val result = await(connector.getByReference(submissionId, login))
 
@@ -142,7 +146,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
       when(http.GET[Seq[ReportStatus]](any[String])
         (any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
         .thenReturn(Future(Seq(rs)))
-      val connector = new DefaultReportStatusConnector(configuration, http, environment)
+      val connector = new DefaultReportStatusConnector(configuration, http, environment, servicesConfig)
       val login = Login("AUser", "anyPass")
 
       val result = await(connector.getAll(login))
@@ -154,7 +158,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     }
 
     "return a failure when the repository encounters an issue while retrieving all submission" in {
-      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment)
+      val connector = new DefaultReportStatusConnector(configuration, httpFailMock, environment, servicesConfig )
 
       val result = await(connector.getAll(login))
 

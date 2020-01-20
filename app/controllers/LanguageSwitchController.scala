@@ -19,15 +19,15 @@ package controllers
 import com.google.inject.Inject
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, Controller}
+import play.api.mvc.{Action, AnyContent, Call, Controller, MessagesControllerComponents}
 import config.FrontendAppConfig
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
 class LanguageSwitchController @Inject() ( languageUtils: LanguageUtils,
                                            configuration: Configuration,
                                            appConfig: FrontendAppConfig,
-                                           implicit val messagesApi: MessagesApi
-                                         ) extends LanguageController(configuration, languageUtils) {
+                                           controllerComponents: MessagesControllerComponents
+                                         ) extends LanguageController(configuration, languageUtils, controllerComponents) {
 
   override protected def fallbackURL: String = routes.WelcomeController.onPageLoad().url
 

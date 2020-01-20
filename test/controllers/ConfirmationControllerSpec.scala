@@ -27,11 +27,15 @@ import views.html.confirmation
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+import play.api.mvc.MessagesControllerComponents
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
+
+  def ec = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   val username = "AUser"
   val submissionId = "SID372463"
@@ -48,13 +52,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, FakeDataCacheConnector, reportStatusConnectorMock)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl, FakeDataCacheConnector, reportStatusConnectorMock)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, controllerComponents)
   }
 
   def viewAsString() = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
