@@ -51,9 +51,11 @@ class SessionIdFilter (
         HMRCHeaderNames.xSessionId -> sessionId
       )
 
-      f(rh.withHeaders(headers).addAttr(RequestAttrKey.Session, Cell(session))).map {
+      val requestHeader = rh.withHeaders(headers).addAttr(RequestAttrKey.Session, Cell(session))
+
+      f(requestHeader).map {
         result =>
-          result.withSession(result.session(rh) + (SessionKeys.sessionId -> sessionId))
+          result.withSession(result.session(requestHeader) + (SessionKeys.sessionId -> sessionId))
       }
     } else {
       f(rh)
