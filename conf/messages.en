@@ -22,7 +22,7 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There’s been a problem
 error.summary.text = Check the following
-error.invalid_details = Invalid Login Details
+error.invalid_details = Invalid log in details
 error.internal_server_error.title = Error with the service
 error.internal_server_error.description = An error occurred, please try again later.
 
@@ -107,7 +107,7 @@ site.yes = Yes
 site.submit = Submit
 site.service_name = Billing Authority Reports
 site.textarea.char_limit = (Limit is {0} characters)
-site.login = Login
+site.login = Log in
 site.start = Start now
 site.print.button = Download receipt
 
@@ -147,17 +147,17 @@ councilTaxUpload.xml = Please select an XML report
 councilTaxUpload.download.error = Error while downloading file
 councilTaxUpload.error.transferXml = Error while uploading file
 
-login.title = Please login
-login.heading = Please login
+login.title = Please log in
+login.heading = Please log in
 login.subheading = Billing Authority Reports
 login.username = Username
 login.password = Password
-login.checkYourAnswersLabel = Login
+login.checkYourAnswersLabel = Log in
 login.error.username.required = Enter username
 login.error.password.required = Enter password
 login.error.username.length = Username must be 100 characters or less
 login.error.password.length = Password must be 100 characters or less
-login.error.auth = Needs to login
+login.error.auth = Needs to log in
 
 welcome.title = Welcome
 welcome.heading = Welcome,
