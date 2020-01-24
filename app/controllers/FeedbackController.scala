@@ -18,21 +18,20 @@ package controllers
 
 import java.net.URLEncoder
 
-import actions.DataRetrievalAction
 import config.FrontendAppConfig
+import controllers.actions.DataRetrievalAction
 import javax.inject.Inject
-import play.api.{Configuration, Logger}
-import play.api.mvc.Results._
+import play.api.Configuration
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
-import uk.gov.hmrc.play.partials._
-import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.{HttpGet, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.partials._
 
 class FeedbackController @Inject() (
   override val messagesApi: MessagesApi,
