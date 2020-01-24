@@ -18,21 +18,20 @@ package controllers
 
 import java.net.URLEncoder
 
-import actions.DataRetrievalAction
 import config.FrontendAppConfig
+import controllers.actions.DataRetrievalAction
 import javax.inject.Inject
 import play.api.Configuration
-import play.api.mvc.Results._
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
-import uk.gov.hmrc.play.partials._
-import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.{HttpGet, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.partials._
 
 class FeedbackController @Inject() (
   override val messagesApi: MessagesApi,
@@ -77,7 +76,8 @@ class FeedbackController @Inject() (
 
   def sendBetaFeedbackToHmrc = getData.async { implicit request =>
         request.body.asFormUrlEncoded.map { formData =>
-          http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData) map { res => res.status match {
+          implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
+          http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData )(readPartialsForm, headerCarrier, ec) map { res => res.status match {
             case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
             case 400 => BadRequest(views.html.inpagefeedback(None, appConfig, Some(Html(res.body))))
             case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
@@ -88,7 +88,8 @@ class FeedbackController @Inject() (
 
   def sendBetaFeedbackToHmrcNoLogin = Action.async { implicit request =>
     request.body.asFormUrlEncoded.map { formData =>
-      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData) map { res => res.status match {
+      implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
+      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData)(readPartialsForm, headerCarrier, ec) map { res => res.status match {
         case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
         case 400 => BadRequest(views.html.inpagefeedbackNoLogin(None, appConfig, Some(Html(res.body))))
         case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
