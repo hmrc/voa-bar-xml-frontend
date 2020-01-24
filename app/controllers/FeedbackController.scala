@@ -21,7 +21,7 @@ import java.net.URLEncoder
 import actions.DataRetrievalAction
 import config.FrontendAppConfig
 import javax.inject.Inject
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.mvc.Results._
 import play.api.mvc._
 import play.twirl.api.Html
@@ -77,7 +77,8 @@ class FeedbackController @Inject() (
 
   def sendBetaFeedbackToHmrc = getData.async { implicit request =>
         request.body.asFormUrlEncoded.map { formData =>
-          http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData) map { res => res.status match {
+          implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
+          http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData )(readPartialsForm, headerCarrier, ec) map { res => res.status match {
             case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
             case 400 => BadRequest(views.html.inpagefeedback(None, appConfig, Some(Html(res.body))))
             case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
@@ -88,7 +89,8 @@ class FeedbackController @Inject() (
 
   def sendBetaFeedbackToHmrcNoLogin = Action.async { implicit request =>
     request.body.asFormUrlEncoded.map { formData =>
-      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData) map { res => res.status match {
+      implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
+      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData)(readPartialsForm, headerCarrier, ec) map { res => res.status match {
         case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
         case 400 => BadRequest(views.html.inpagefeedbackNoLogin(None, appConfig, Some(Html(res.body))))
         case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
