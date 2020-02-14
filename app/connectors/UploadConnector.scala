@@ -38,7 +38,7 @@ class UploadConnector @Inject()(http: HttpClient,
                                 messages: MessagesApi)
                                (implicit ec: ExecutionContext) {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  //implicit val hc: HeaderCarrier = HeaderCarrier()
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
   private[connectors] val baseSegment = "/voa-bar/"
   private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
@@ -48,11 +48,13 @@ class UploadConnector @Inject()(http: HttpClient,
   private[connectors] val upScanProtocol = upScanConfig.getString("protocol").get
   private[connectors] val initiateUrl = s"$upScanProtocol://$upScanHost:$upScanPort${upScanConfig.getString("initiate.url").get}"
 
+  val logger = Logger(this.getClass)
+
   def generateUsernameHeader(username: String) = ("BA-Code", username)
 
   def generatePasswordHeader(password: String) = ("password", password)
 
-  def sendXml(xmlUrl: String, loginDetails: Login, id: String): Future[Either[Error, String]] = {
+  def sendXml(xmlUrl: String, loginDetails: Login, id: String)(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
     val baCode = loginDetails.username
     val password = loginDetails.password
     val headers = Seq(generateUsernameHeader(baCode), generatePasswordHeader(password))
@@ -82,9 +84,12 @@ class UploadConnector @Inject()(http: HttpClient,
     Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
   }
 
-  def initiate(request: InitiateRequest): Future[Either[Error, InitiateResponse]] = {
+  def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] = {
     http.POST[InitiateRequest, InitiateResponse](initiateUrl, request)
-      .map(Right(_))
+      .map{ initiateResponse =>
+        logger.info(s"Upscan initiate response : ${initiateResponse}")
+        initiateResponse
+      }.map(Right(_))
       .recover {
         case ex: Throwable => {
           val errorMessage = "Failed to get UpScan file upload details"

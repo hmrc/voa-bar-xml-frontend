@@ -48,14 +48,14 @@ trait BaseBarController extends FrontendBaseController {
   private[controllers] def cachedLoginError(externalId: String): Future[Either[Error, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
-      Error("Couldn't get user session", Seq())
+      Error("Couldn't get user session", Seq(s"ExternalId: ${externalId}"))
     ).value
   }
 
   private[controllers] def cachedLoginByReference(reference: String): Future[Either[Error, Login]] = {
     EitherT.fromOptionF(
       dataCacheConnector.getEntryByField[Login]("data.login.reference", reference, LoginId.toString),
-      Error("Couldn't get user session", Seq())
+      Error("Couldn't get user session", Seq(s"Reference : ${reference}"))
     ).value
   }
 

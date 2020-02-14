@@ -24,15 +24,14 @@ import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest}
 import models._
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
 import play.api.data.Form
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.FakeNavigator
 import views.html.councilTaxUpload
 
@@ -41,6 +40,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSugar {
+
+  implicit def hc: HeaderCarrier = HeaderCarrier()
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -85,12 +86,12 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
   val error = Error("error", Seq())
 
   val uploadConnector = mock[UploadConnector]
-  when(uploadConnector.sendXml(any[String], any[Login], any[String])) thenReturn Future(Right(submissionId))
-  when(uploadConnector.initiate(any[InitiateRequest])) thenReturn Future(Right(initiateResponse))
+  when(uploadConnector.sendXml(any[String], any[Login], any[String])(any[HeaderCarrier])) thenReturn Future(Right(submissionId))
+  when(uploadConnector.initiate(any[InitiateRequest])(any[HeaderCarrier])) thenReturn Future(Right(initiateResponse))
 
   val uploadConnectorF = mock[UploadConnector]
-  when(uploadConnectorF.sendXml(any[String], any[Login], any[String])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
-  when(uploadConnectorF.initiate(any[InitiateRequest])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
+  when(uploadConnectorF.sendXml(any[String], any[Login], any[String])(any[HeaderCarrier])) thenReturn Future(Left(Error("SEND-XML-ERROR", Seq("Received exception from upstream service"))))
+  when(uploadConnectorF.initiate(any[InitiateRequest])(any[HeaderCarrier])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
 
   val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
   when(userReportUploadsConnectorMock.save(any[UserReportUpload])) thenReturn Future(Right(Unit))
@@ -159,7 +160,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       status(result) mustBe NO_CONTENT
     }
 
-    "return invalid response on the upscan confirmation endpoint when the user upload information fails" in {
+    "return valid response on the upscan confirmation endpoint even when the user upload information fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
@@ -167,10 +168,10 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val result = call(loggedInController(uploadConnector, userReportUploadsConnector = userReportUploadsConnectorFailMock).onConfirmation, request)
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe NO_CONTENT
     }
 
-    "return invalid response on the upscan confirmation endpoint when the submission fails" in {
+    "return valid response on the upscan confirmation endpoint even when the submission fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
@@ -178,7 +179,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe NO_CONTENT
     }
 
     "return NoContent when preparing the file upload" in {
@@ -230,7 +231,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
       status(result) mustBe NO_CONTENT
     }
 
-    "return invalid response on the failed upscan confirmation endpoint when the submission fails" in {
+    "return valid response on the failed upscan confirmation endpoint even when the submission fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
         .getLines
         .mkString("\n")
@@ -238,7 +239,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
 
       val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe NO_CONTENT
     }
   }
 }

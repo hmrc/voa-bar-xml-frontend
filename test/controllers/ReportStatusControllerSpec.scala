@@ -23,21 +23,18 @@ import controllers.actions._
 import identifiers.LoginId
 import models._
 import org.joda.time.DateTime
-import org.mockito.Matchers.{any, anyString}
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.ReceiptService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.reportStatus
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
 
@@ -73,7 +70,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   def fakeReportStatusConnector() = {
-    val reportStatusConnectorMock = mock[ReportStatusConnector]
+    val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
     when(reportStatusConnectorMock.get(any[Login], any[Option[String]])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
@@ -133,7 +130,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "Throw a runtime exception when  the Report Status returns an exception" in {
-      val reportStatusConnectorMock = mock[ReportStatusConnector]
+      val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
       when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
 
       val controller =

@@ -15,7 +15,7 @@ object Dependencies {
   private val pegdownVersion = "1.6.0"
   private val mockitoAllVersion = "1.10.19"
   private val httpCachingClientVersion = "9.0.0-play-26"
-  private val simpleReactiveMongo = "7.22.0-play-26"
+  private val simpleReactiveMongo = "7.23.0-play-26"
   private val playConditionalFormMappingVersion = "1.2.0-play-26"
   private val playLanguageVersion = "4.2.0-play-26"
   private val bootstrapVersion = "1.3.0"
@@ -59,7 +59,7 @@ object Dependencies {
         "org.pegdown" % "pegdown" % pegdownVersion % Test,
         "org.jsoup" % "jsoup" % "1.12.1" % Test,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % Test,
-        "org.mockito" % "mockito-all" % mockitoAllVersion % Test,
+        "org.mockito" %% "mockito-scala-scalatest" % "1.7.1" % Test,
         "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test
       )
 

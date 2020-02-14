@@ -20,9 +20,7 @@ import java.time.ZonedDateTime
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.Writes
 import play.api.{Configuration, Environment}
 

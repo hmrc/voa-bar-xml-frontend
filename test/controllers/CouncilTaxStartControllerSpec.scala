@@ -22,9 +22,7 @@ import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.{LoginId, VOAAuthorisedId}
 import models._
-import org.scalatest.mockito.MockitoSugar
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
@@ -65,7 +63,7 @@ import scala.concurrent.{ExecutionContext, Future}
   }
 
   def reportStatusConnect() = {
-    val reportStatusConnector = mock[ReportStatusConnector]
+    val reportStatusConnector = mock[ReportStatusConnector](withSettings.lenient())
     when(reportStatusConnector.get(any[Login], any[Option[String]])).thenReturn(Future(Right(Seq(reportStatus))))
     reportStatusConnector
   }

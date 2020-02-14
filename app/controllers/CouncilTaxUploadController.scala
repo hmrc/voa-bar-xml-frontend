@@ -34,6 +34,7 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 import views.html.councilTaxUpload
@@ -122,7 +123,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     }
   }
 
-  private[controllers] def sendContent(xmlUrl: String, uploadConfirmation: UploadConfirmation, login: Login): Future[Either[Error, String]] = {
+  private[controllers] def sendContent(xmlUrl: String, uploadConfirmation: UploadConfirmation, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
     (for {
       userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference, login: Login))
       userData <- EitherT.fromOption[Future](userDataByReference,
@@ -192,11 +193,17 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       ))
   }
 
-  def onConfirmation = getData.async(parse.tolerantJson) { implicit request =>
+  def onConfirmation = getData(parse.tolerantJson) { implicit request =>
     parseUploadConfirmation(request) orElse parseUploadConfirmationError(request) match {
-      case Right(u: UploadConfirmation) => onSuccessfulConfirmation(u)
-      case Right(e: UploadConfirmationError) => onFailedConfirmation(e)
-      case _ => Future.successful(InternalServerError(error(messagesApi.preferred(request), appConfig)))
+      case Right(u: UploadConfirmation) => {
+        onSuccessfulConfirmation(u) //Fire and forget
+        NoContent
+      }
+      case Right(e: UploadConfirmationError) => {
+        onFailedConfirmation(e) //Fire and forget
+        NoContent
+      }
+      case _ => InternalServerError("Unable to parse request")
     }
   }
 

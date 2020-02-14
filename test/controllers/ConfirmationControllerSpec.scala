@@ -24,9 +24,7 @@ import identifiers.LoginId
 import models.{Login, NormalMode, ReportStatus}
 import play.api.test.Helpers._
 import views.html.confirmation
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
 
 import scala.concurrent.{ExecutionContext, Future}
