@@ -17,15 +17,14 @@
 package connectors
 
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
-import org.mockito.Mockito.{verify, when}
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import base.SpecBase
 import models._
+import org.scalatest.{Matchers, MustMatchers}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -34,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class LoginConnectorSpec extends SpecBase with MockitoSugar {
+class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
 
   def configuration = injector.instanceOf[Configuration]
   def environment = injector.instanceOf[Environment]
@@ -47,9 +46,9 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
   def getHttpMock(returnedStatus: Int) = {
     val httpMock = mock[HttpClient]
-    when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
-      any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
-    when(httpMock.GET(anyString)(any[HttpReads[Any]], any[HeaderCarrier], any())) thenReturn Future.successful(HttpResponse(returnedStatus, None))
+    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+      any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
+//    when(httpMock.GET(any[String])(any[HttpReads[Any]], any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
     httpMock
   }
   "Login Connector" when {
@@ -69,7 +68,8 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         await(connector.send(login))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
-          httpReadsNapper.capture, headerCarrierNapper.capture, any())
+          httpReadsNapper.capture, headerCarrierNapper.capture, any[ExecutionContext])
+
         urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
         bodyCaptor.getValue mustBe Json.toJson(login)
         headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
@@ -107,7 +107,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
         await(connector.sendJson(minimalJson))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(jsonWritesNapper.capture,
-          httpReadsNapper.capture, headerCarrierNapper.capture, any())
+          httpReadsNapper.capture, headerCarrierNapper.capture, any[ExecutionContext])
         urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
         bodyCaptor.getValue mustBe minimalJson
         headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
@@ -130,8 +130,8 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar {
 
       "return a failure if the data transfer call throws an exception" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.POST(anyString, any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
-          any[HeaderCarrier], any())) thenReturn Future.successful(new RuntimeException)
+        when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+          any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(new RuntimeException)
         val connector = new LoginConnector(httpMock, configuration,servicesConfig, environment)
         val result = await(connector.sendJson(minimalJson))
         assert(result.isFailure)

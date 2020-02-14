@@ -17,8 +17,7 @@
 package utils
 
 import base.SpecBase
-import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import controllers.routes
 import identifiers._
 import models._

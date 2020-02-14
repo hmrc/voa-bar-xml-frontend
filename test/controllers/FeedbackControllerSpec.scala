@@ -17,14 +17,12 @@
 package controllers
 
 import connectors.FakeDataCacheConnector
-import org.scalatest.mockito.MockitoSugar
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
+import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
@@ -44,11 +42,11 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def notLoggedInController() = {
     FakeDataCacheConnector.resetCaptures()
-    val encrypter = mock[Encrypter with Decrypter]
+    val encrypter = mock[Encrypter with Decrypter](withSettings.lenient())
     when(encrypter.encrypt(any[PlainText])).thenReturn(Crypted("foo"))
-    val sessionCookieCrypto = mock[SessionCookieCrypto]
+    val sessionCookieCrypto = mock[SessionCookieCrypto](withSettings.lenient())
     when(sessionCookieCrypto.crypto).thenReturn(encrypter)
-    val http = mock[HttpClient]
+    val http = mock[DefaultHttpClient](withSettings.lenient())
     when(http.GET[HtmlPartial](any[String])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HtmlPartial.Success(None, Html("<div/>"))))
     when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String,String)]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))

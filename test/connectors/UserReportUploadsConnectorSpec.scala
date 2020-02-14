@@ -18,9 +18,7 @@ package connectors
 
 import base.SpecBase
 import models.{Error, Login, UserReportUpload}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.scalatest.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.libs.json.Writes
