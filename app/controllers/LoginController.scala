@@ -42,7 +42,8 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 requireData: DataRequiredAction,
                                 formProvider: LoginFormProvider,
                                 loginConnector: LoginConnector,
-                                controllerComponents: MessagesControllerComponents
+                                controllerComponents: MessagesControllerComponents,
+                                login: views.html.login
                                )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport {
 
   val form = formProvider()
@@ -64,7 +65,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
   def onSubmit(mode: Mode) = getData.async {
     implicit request =>
       form.bindFromRequest().fold(
-        (formWithErrors: Form[_]) =>
+        (formWithErrors: Form[Login]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         value => {
           val encryptedLogin = value.encrypt

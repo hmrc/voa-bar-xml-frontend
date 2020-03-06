@@ -24,6 +24,7 @@ object Dependencies {
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
   private val playPartialsVersion = "6.9.0-play-26"
+  private val playFrontendGovUkVersion = "0.40.0-play-26"
 
   private val akkaVersion     = "2.5.23"
   private val akkaHttpVersion = "10.0.15"
@@ -41,6 +42,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
+    "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
     "org.typelevel"     %% "cats-core" % catsVersion,
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion
@@ -54,14 +56,14 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion force()
   )
 
-  lazy val testDependencies = Seq(
-        "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % Test,
-        "org.pegdown" % "pegdown" % pegdownVersion % Test,
-        "org.jsoup" % "jsoup" % "1.12.1" % Test,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % Test,
-        "org.mockito" %% "mockito-scala-scalatest" % "1.7.1" % Test,
-        "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test
-      )
+  def testDependencies(scope: String) = Seq(
+    "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % scope,
+    "org.pegdown" % "pegdown" % pegdownVersion % scope,
+    "org.jsoup" % "jsoup" % "1.12.1" % scope,
+    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+    "org.mockito" %% "mockito-scala-scalatest" % "1.7.1" % scope,
+    "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope
+  )
 
-  val appDependencies = compileDependencies ++ testDependencies
+  val appDependencies = compileDependencies ++ testDependencies("test") ++ testDependencies("it")
 }

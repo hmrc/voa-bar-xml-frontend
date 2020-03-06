@@ -106,6 +106,8 @@ site.no = No
 site.yes = Yes
 site.submit = Submit
 site.service_name = Billing Authority Reports
+service.name = Billing Authority Reports
+
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Log in
 site.start = Start now

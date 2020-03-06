@@ -20,7 +20,7 @@ import play.api.data.Form
 import controllers.routes
 import forms.LoginFormProvider
 import models.{NormalMode, Login}
-import views.behaviours.QuestionViewBehaviours
+import views.behaviours.govuk.QuestionViewBehaviours
 import views.html.login
 
 class LoginViewSpec extends QuestionViewBehaviours[Login] {
@@ -29,9 +29,9 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
 
   override val form = new LoginFormProvider()()
 
-  def createView = () => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createView = () => createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
 
-  def createViewUsingForm = (form: Form[_]) => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createViewUsingForm = (form: Form[Login]) => createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
 
 
   "Login view" must {
