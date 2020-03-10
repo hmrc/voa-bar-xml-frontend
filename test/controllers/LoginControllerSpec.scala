@@ -27,14 +27,18 @@ import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, NormalMode}
 import org.mockito.scalatest.MockitoSugar
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{AnyContent, MessagesControllerComponents}
+import views.ViewSpecBase
 import views.html.login
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import play.api.test.CSRFTokenHelper.CSRFRequest
+import play.api.test.FakeRequest
 
-class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
+
+class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
   var captures = Map[String, Any]()
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
@@ -55,10 +59,10 @@ class LoginControllerSpec extends ControllerSpecBase with MockitoSugar {
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents)
+      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents, createLoginView())
   }
 
-  def viewAsString(form: Form[_] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
+  def viewAsString(form: Form[Login] = form) = createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
 
   "Login Controller" must {
 

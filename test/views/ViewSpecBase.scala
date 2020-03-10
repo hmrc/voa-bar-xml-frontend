@@ -22,7 +22,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
 import base.SpecBase
+import com.typesafe.config.{Config, ConfigFactory}
+import config.FrontendAppConfig
+import play.api.Configuration
 import play.api.i18n.Lang
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukFooter, GovukHeader, govukInput, govukPhaseBanner, govukTag}
+import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
+import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import views.html.govuk.{head, scripts}
+import views.html.login
 
 trait ViewSpecBase extends SpecBase {
 
@@ -96,4 +105,41 @@ trait ViewSpecBase extends SpecBase {
       case _ => assert(!radio.hasAttr("checked") && radio.attr("checked") != "checked", s"\n\nElement $id is checked")
     }
   }
+
+  def createLoginView(): login = {
+    new login(
+      createMain_template(),
+      new formWithCSRF(),
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukInput,
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukButton,
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+    )
+  }
+
+  def createMain_template(): views.html.govuk.main_template = {
+    new views.html.govuk.main_template(
+      createGovukLayout(),
+      create_head(),
+      create_scripts(),
+      new govukPhaseBanner(new govukTag())
+    )
+  }
+
+  def create_head(): head = {
+    new head()
+  }
+
+  def create_scripts(): scripts = {
+    val config = ConfigFactory.load
+    val configuration = Configuration(config)
+    val serviceConfig = new ServicesConfig(configuration, new RunMode(configuration, play.api.Mode.Test))
+    val appConfig = new FrontendAppConfig(configuration, serviceConfig)
+    new scripts(appConfig)
+  }
+
+  def createGovukLayout(): govukLayout = {
+    new govukLayout(uk.gov.hmrc.govukfrontend.views.html.components.GovukTemplate, GovukHeader, GovukFooter, GovukBackLink)
+  }
+
+
 }
