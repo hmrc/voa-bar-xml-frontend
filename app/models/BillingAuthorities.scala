@@ -251,6 +251,8 @@ object BillingAuthorities {
     "BA3525" -> "St Edmundsbury",
     "BA3530" -> "Suffolk Coastal",
     "BA3535" -> "Waveney",
+    "BA3540" -> "East Suffolk",
+    "BA3545" -> "West Suffolk",
     "BA3605" -> "Elmbridge",
     "BA3610" -> "Epsom and Ewell",
     "BA3615" -> "Guildford",
