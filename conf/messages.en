@@ -20,11 +20,12 @@ error.integer = Give an answer in whole numbers
 error.non_numeric = Give a value using only numbers
 error.number = Please enter a valid number
 error.required = Please enter a value
-error.summary.title = There’s been a problem
+error.summary.title = There is a problem
 error.summary.text = Check the following
-error.invalid_details = Invalid log in details
+error.invalid_details = Enter a valid username and password
 error.internal_server_error.title = Error with the service
 error.internal_server_error.description = An error occurred, please try again later.
+error.title.prefix = Error
 
 home.reports.current.progress = Current progress
 home.reports.no.current.progress = No submissions currently in progress.
@@ -109,7 +110,7 @@ site.service_name = Billing Authority Reports
 service.name = Billing Authority Reports
 
 site.textarea.char_limit = (Limit is {0} characters)
-site.login = Log in
+site.login = Sign in
 site.start = Start now
 site.print.button = Download receipt
 
@@ -149,8 +150,8 @@ councilTaxUpload.xml = Please select an XML report
 councilTaxUpload.download.error = Error while downloading file
 councilTaxUpload.error.transferXml = Error while uploading file
 
-login.title = Please log in
-login.heading = Please log in
+login.title = Sign in
+login.heading = Sign in
 login.subheading = Billing Authority Reports
 login.username = Username
 login.password = Password
