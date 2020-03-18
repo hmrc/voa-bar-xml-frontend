@@ -20,7 +20,7 @@ error.integer = Give an answer in whole numbers
 error.non_numeric = Give a value using only numbers
 error.number = Please enter a valid number
 error.required = Please enter a value
-error.summary.title = There’s been a problem
+error.summary.title = There is a problem
 error.summary.text = Check the following
 error.invalid_details = Invalid log in details
 error.internal_server_error.title = Error with the service
@@ -219,3 +219,13 @@ status.report.para = failed with the following errors:
 
 feedback.description =This is a new service -your <a href="https://www.smartsurvey.co.uk/s/BARSsurvey/" target="_blank">feedback</a> will help us to improve it.
 feedback.contact=Should you wish to supply any additional information to support your reports, please email BARS@voa.gsi.gov.uk
+
+
+#web-bars
+ba-report.pageLabel=Page title
+ba-report.ba-report.label=question ?
+ba-report.error.number=Billing authority report must be a number
+
+
+ba-ref.pageLabel=Billing authority reference
+ba-ref.ba-ref.label=
