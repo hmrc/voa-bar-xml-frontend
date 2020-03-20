@@ -222,10 +222,16 @@ feedback.contact=Should you wish to supply any additional information to support
 
 
 #web-bars
-ba-report.pageLabel=Page title
-ba-report.ba-report.label=question ?
+ba-report.pageLabel=Billing authority report
+ba-report.ba-report.label=
+ba-report.error.minLenght=Enter a billing authority report number
+ba-report.error.maxLenght=Billing authority report must be 12 characters or fewer
 ba-report.error.number=Billing authority report must be a number
 
 
 ba-ref.pageLabel=Billing authority reference
 ba-ref.ba-ref.label=
+ba-ref.error.minLenght=Enter a billing authority reference
+ba-ref.error.maxLenght=Billing authority reference must be 25 characters or fewer
+ba-ref.error.allowedChars=Billing authority reference must only contain letters a to z, hyphens, spaces and apostrophes
+

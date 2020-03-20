@@ -19,8 +19,8 @@ package controllers
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
-import ltbs.uniform.validation.Rule
 import ltbs.uniform._
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.govukInput
@@ -40,6 +40,8 @@ class AutobarsInterpreter (
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
   with InferListingPages[Html] {
+
+  val logger = Logger(this.getClass)
 
   override def blankTell: Html = Html("")
 
@@ -75,7 +77,6 @@ class AutobarsInterpreter (
    implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
       override def encode(in: String): Input = Input.one(List(in))
-
 
       override def render(pageKey: List[String],
                           fieldKey: List[String],

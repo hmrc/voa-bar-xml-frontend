@@ -15,12 +15,17 @@
  */
 
 package controllers
+import java.util.UUID
+
+import connectors.DataCacheConnector
 import ltbs.uniform._
 import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
 import ltbs.uniform.common.web.{FormField, FormFieldStats}
+import play.api.Logger
 import play.api.i18n.{Messages => _, _}
+import play.api.libs.json.Json
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.govukInput
@@ -33,10 +38,23 @@ import scala.concurrent.{ExecutionContext, Future}
 class UniformController @Inject()(messagesApi: MessagesApi,
                                   pageChrome: pageChrome,
                                   govukInput: govukInput,
+                                  dataCaheConnector: DataCacheConnector,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
-  implicit val persistence: PersistenceEngine[Request[AnyContent]] =
-    DebugPersistence(UnsafePersistence())
+  implicit val mongoPersistance: PersistenceEngine[Request[AnyContent]] = new UUIDPersistence() {
+
+    val storageKey = "CR03"
+
+    import utils.Formats.uniformDBFormat
+
+    override def load(uuid: UUID): Future[_root_.ltbs.uniform.interpreters.playframework.DB] = {
+      dataCaheConnector.getEntry[DB](uuid.toString, storageKey).map(_.getOrElse(Map[List[String], String]()))
+    }
+
+    override def save(uuid: UUID, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+      dataCaheConnector.save(uuid.toString, storageKey, db).map(_ => ())
+    }
+  }
 
   lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput)
 
@@ -52,10 +70,5 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
 
   }
-
-
-
-
-
 
 }

@@ -16,14 +16,15 @@
 
 package journey
 
+import cats.data.Validated
 import ltbs.uniform._
 import cats.implicits._
-import ltbs.uniform.interpreters.cli.{AskCli, CliInterpreter}
 import ltbs.uniform.validation.Rule
+import ltbs.uniform.validation.Rule.{maxLength, minLength}
 
 import scala.language.higherKinds
 
-object UniformJourney extends App {
+object UniformJourney {
 
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
   case class ComplexForm(baReport: String, baRef: String, address: Address)
@@ -36,57 +37,28 @@ object UniformJourney extends App {
     import interpreter._
 
     for {
-      baReport <- interpreter.ask[String]("ba-report", validation = baReportValidation )
+      baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
-      address <- ask[String]("address")
+      address <- ask[String]("property-address")
     } yield ComplexForm(baReport, baRef, Address(address, "", None, None, ""))
   }
 
   def baReportValidation(a: String) = {
-    Rule.lengthBetween[String](1,12).apply(a) andThen (
+    lengthBetween(1, 12, "ba-report.error.minLenght", "ba-report.error.maxLenght").apply(a) andThen (
       Rule.matchesRegex("\\d+", "ba-report.error.number").apply(_))
   }
 
   def baReferenceValidation(a: String) = {
-    Rule.maxLength[String](25).apply(a) andThen ((Rule.matchesRegex("[a-zA-Z0-9 \\-']+").apply(_)))
+    // [A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
+    lengthBetween(1, 25, "ba-ref.error.minLenght", "ba-ref.error.maxLenght").apply(a) andThen ((
+      Rule.matchesRegex("""[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*""", "ba-ref.error.allowedChars").apply(_)))
   }
 
-
-
-  /*
-  (
-  NonEmptyList(
-    List()),
-    NonEmptyList(
-      ErrorMsg(
-        minLength,
-        WrappedArray(0, 1)
-      )
-    )
-  )
-   */
-
-
-  def gg(id: String): Either[String, Address] = {
-    Console.println(s"id for address : ${id}")
-    Right(Address("aaa", "ggg", None, None, "Postcode"))
-  }
-
-  implicit val askCliAddress: AskCli[Address] =  {
-    new AskCli[Address] {
-      override def apply(in: String, validation: Rule[Address]): Address = {
-        val line1 = CliInterpreter.askString("line1", Rule.nonEmpty)
-        val line2 = CliInterpreter.askString("line2", Rule.nonEmpty)
-        val postcode =  CliInterpreter.askString("line1", Rule.nonEmpty)
-        Address(line1, line2, None, None, postcode)
-      }
+  def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage:String) = new Rule[String] {
+    override def apply(v1: String): Validated[ErrorTree, String] = {
+        minLength[String](min, minMessage).apply(v1) andThen (maxLength[String](max, maxMessage).apply(_))
     }
   }
-
-  val interpreter = new CliInterpreter[TellTypes, AskTypes]()
-
-  ctTaxJourney(interpreter)
-
 
 }
 

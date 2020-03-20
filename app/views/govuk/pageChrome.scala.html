@@ -52,11 +52,11 @@
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
             'autoComplete -> "off"
     ) {
-
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
                 errors.map { error =>
-                    ErrorLink(None, HtmlContent(error._2.head.render[Html](messages2)))
+                    ErrorLink(error._1.head.headOption.orElse(Some(key.head)).map("#" + _),
+                        HtmlContent(error._2.head.render[Html](messages2)))
                 }.toList
             }, title = Text(messages("error.summary.title"))))
         }
@@ -71,14 +71,17 @@
     }
 
     <br /><br />
-    <div style="border: solid">
+    <br style="border: solid">
         <h4 style="color: red">This is debug box, IGNORE</h4>
         <hr />
         Key: @key.mkString(".")
         <hr/>
         breadcrumbs: @breadcrumbs.mkString(",")
         <hr/>
-        errors: @errors.mkString(",")
+        errors: @errors.mkString(",") </br> </br>
+        @for(error <- errors) {
+            @error._1 | @error._2 <br />
+        }
         <hr />
     </div>
 
