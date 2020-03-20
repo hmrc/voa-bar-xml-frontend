@@ -1,0 +1,88 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import ltbs.uniform.ErrorTree
+@import ltbs.uniform.UniformMessages
+@import ltbs.uniform.common.web.FormFieldStats
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.Aliases.ErrorLink
+
+@this(
+  mainTemplate: views.html.govuk.main_template,
+  formWithCSRF: formWithCSRF,
+  govukButton: govukButton,
+  govukBackLink: govukBackLink,
+  errorSummary: govukErrorSummary
+)
+
+@(
+        key: List[String],
+        errors: ErrorTree,
+        tell: Html,
+        ask: Html,
+        breadcrumbs: List[String],
+        messages2: UniformMessages[Html],
+        fieldStats: FormFieldStats
+)(implicit request: Request[_], messages: Messages)
+
+
+@mainTemplate(
+    pageTitle = Some(messages("login.title"))
+) {
+    @*second element from breadcrumbs, head is always current element. *@
+    @govukBackLink(BackLink(
+        href=breadcrumbs.tail.headOption.getOrElse("/"), content = Text("Back")
+    ))
+
+    @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
+            'autoComplete -> "off"
+    ) {
+        @if(errors.isNonEmpty) {
+            @errorSummary(ErrorSummary(errorList = {
+                errors.map { error =>
+                    ErrorLink(error._1.head.headOption.orElse(Some(key.head)).map("#" + _),
+                        HtmlContent(error._2.head.render[Html](messages2)))
+                }.toList
+            }, title = Text(messages("error.summary.title"))))
+        }
+        <h1 class="govuk-heading-xl">@messages(key.mkString(".") + ".pageLabel")</h1>
+        @tell
+        @ask
+
+        @govukButton(Button( attributes = Map("id" -> "submit"),
+            name = Some("submit"), content = Text("Continue")
+        ))
+
+    }
+
+    <br /><br />
+    <br style="border: solid">
+        <h4 style="color: red">This is debug box, IGNORE</h4>
+        <hr />
+        Key: @key.mkString(".")
+        <hr/>
+        breadcrumbs: @breadcrumbs.mkString(",")
+        <hr/>
+        errors: @errors.mkString(",") </br> </br>
+        @for(error <- errors) {
+            @error._1 | @error._2 <br />
+        }
+        <hr />
+    </div>
+
+}

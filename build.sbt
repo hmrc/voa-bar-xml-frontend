@@ -34,7 +34,7 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*identifiers;.*models.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*FrontendAuditConnector.*;.*Routes.*;.*GuiceInjector;.*DataCacheConnector;" +
       ".*ControllerConfiguration;.*LanguageSwitchController;.*FormErrorHelper;.*FrontendAppConfig;.*Constraints;" +
-      ".*Formatters;.*CheckYourAnswersHelper;.*FormHelpers;.*error_template.template;.*main_template.template",
+      ".*Formatters;.*CheckYourAnswersHelper;.*FormHelpers;.*error_template.template;.*main_template.template;.*pageChrome.template;.*feedbackError.template",
     ScoverageKeys.coverageMinimum := 85,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
@@ -45,6 +45,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
+    scalaVersion := "2.11.12",
+    scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),

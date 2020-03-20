@@ -48,6 +48,9 @@
     <logger name="org.asynchttpclient.netty.channel.DefaultChannelPool" level="INFO"/>
 
 
+    <logger name="uk.gov.hmrc.audit.handler.DatastreamHandler" level="OFF" />
+
+    <logger name="scala.Predef$" level="OFF" />
 
     <logger name="uk.gov" level="INFO"/>
 

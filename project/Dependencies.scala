@@ -43,9 +43,14 @@ object Dependencies {
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
-    "org.typelevel"     %% "cats-core" % catsVersion,
+    //"org.typelevel"     %% "cats-core" % catsVersion,
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
-    "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion
+    "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,
+    "com.luketebbs.uniform" %% "core" % "4.9.0",
+    "com.luketebbs.uniform" %% "interpreter-play26" % "4.10.0",
+    "com.luketebbs.uniform" %% "interpreter-cli" % "4.10.0",
+    //"com.luketebbs.uniform" %% "govuk-widgets" % "0.4.9"
+
   )
 
   val dependencyOverrides = Seq(
