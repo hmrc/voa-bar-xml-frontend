@@ -41,9 +41,14 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(LoginId, NormalMode) (mockUserAnswers) mustBe routes.WelcomeController.onPageLoad()
       }
 
-      "on clicking Council Tax Upload link should redirect to Council Tax Start Page" in {
-        WelcomeId.toString mustBe "welcome"
-        navigator.nextPage(WelcomeId, NormalMode) (mockUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
+      "on selecting Council Tax web form link should redirect to web form Start Page" in {
+        WelcomeWebformId.toString mustBe "welcomeWebForm"
+        navigator.nextPage(WelcomeWebformId, NormalMode) (mockUserAnswers) mustBe routes.UniformController.myJourney("ba-report")
+      }
+
+      "on selecting Council Tax Upload link should redirect to Council Tax Start Page" in {
+        WelcomeUploadId.toString mustBe "welcomeUpload"
+        navigator.nextPage(WelcomeUploadId, NormalMode) (mockUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
       }
 
       "on clicking Council Tax Start now button should redirect to Council Tax Upload Page" in {
