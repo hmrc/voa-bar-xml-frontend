@@ -16,6 +16,7 @@
 
 package views
 
+import forms.SubmissionTypeFormProvider
 import models.NormalMode
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
@@ -25,10 +26,11 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
+  val form = SubmissionTypeFormProvider()
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => welcome(username, frontendAppConfig)(welcomeFakeRequest, messages)
+  def createView = () => welcome(username, form, frontendAppConfig)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -55,5 +57,43 @@ class WelcomeViewSpec extends ViewBehaviours {
   "Have a home-element in the top navigation bar" in {
     val elem = doc.getElementById("home-element").text
     elem mustBe "Home"
+  }
+
+  // Welcome page containing form for navigation
+
+  val formUsername = "BA1445"
+  val formMessageKeyPrefix = "submissionCategory"
+
+  def createFormView = () => welcome(formUsername, form, frontendAppConfig)(welcomeFakeRequest, messages)
+
+  lazy val formdDoc = asDocument(createFormView())
+
+  "Include an username element displaying the BA name based on given BA Code when form is displayed" in {
+    val user = formdDoc.getElementById("username-element").text
+    user mustBe "Brighton and Hove"
+  }
+
+  "contain radio buttons for the value" in {
+    for (option <- SubmissionTypeFormProvider.options) {
+      assertContainsRadioButton(formdDoc, option.id, "value", option.value, false)
+    }
+  }
+
+  "has a radio button with the label set to the message with key submissionCategory.council_tax_webform and that it is used once" in {
+    labelDefinedAndUsedOnce("council_tax_webform", formMessageKeyPrefix, createFormView)
+  }
+
+  "has a radio button with the label set to the message with key submissionCategory.council_tax_xml_upload and that it is used once" in {
+    labelDefinedAndUsedOnce("council_tax_xml_upload", formMessageKeyPrefix, createFormView)
+  }
+
+  "The view history links to the ReportStatusController.onPageLoad method" in {
+    val href = formdDoc.getElementById("submissions").attr("href")
+    assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
+  }
+
+  "contain Continue button with the value Continue" in {
+    val continueButton = formdDoc.getElementsByClass("button").attr("value")
+    assert(continueButton == messages("site.continue"))
   }
 }

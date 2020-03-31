@@ -18,6 +18,7 @@ package controllers
 
 import connectors.FakeDataCacheConnector
 import controllers.actions._
+import forms.SubmissionTypeFormProvider
 import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
@@ -30,6 +31,8 @@ import scala.concurrent.ExecutionContext
 class WelcomeControllerSpec extends ControllerSpecBase {
 
   val username = "AUser"
+  val form = SubmissionTypeFormProvider()
+
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
@@ -48,7 +51,7 @@ class WelcomeControllerSpec extends ControllerSpecBase {
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents)(ec)
   }
 
-  def viewAsString() = welcome(username, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = welcome(username, form, frontendAppConfig)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

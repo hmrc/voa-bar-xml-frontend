@@ -15,8 +15,11 @@
  *@
 
 @import config.FrontendAppConfig
+@import controllers.routes._
+@import uk.gov.hmrc.play.views.html._
+@import forms.SubmissionTypeFormProvider
 
-@(baCode: String, appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(baCode: String, form: Form[String], appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("welcome.title"),
@@ -27,11 +30,28 @@
 
     @components.heading("welcome.heading", baCode)
 
-    <h3 class="heading-medium">
-        <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
-    </h3>
+    @if(baCode == "BA1445" || baCode == "BA3615") {
 
-    <p>
-    @messages("welcome.councilTax.description")
-    </p>
+        @helpers.form(action = WelcomeController.onSubmit(), 'autoComplete -> "off") {
+
+            @components.error_summary(form.errors)
+
+            @components.input_radio(
+                field = form("value"),
+                legend = messages("welcome.want.to"),
+                trackGa = true,
+                inputs = SubmissionTypeFormProvider.options
+            )
+
+            <p><a href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></p>
+
+            @components.button("site.continue", "submit")
+        }
+    } else {
+        <h3 class="heading-medium">
+            <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
+        </h3>
+
+        <p>@messages("welcome.councilTax.description")</p>
+    }
 }

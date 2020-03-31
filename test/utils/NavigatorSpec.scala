@@ -28,6 +28,9 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
 
   val mockUserAnswers = mock[UserAnswers]
 
+  val formUserAnswers = new FakeUserAnswers(Login("", ""), "council_tax_webform")
+  val uploadUserAnswers = new FakeUserAnswers(Login("", ""), "council_tax_xml_upload")
+
   "Navigator" when {
 
     "in Normal mode" must {
@@ -41,9 +44,14 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(LoginId, NormalMode) (mockUserAnswers) mustBe routes.WelcomeController.onPageLoad()
       }
 
-      "on clicking Council Tax Upload link should redirect to Council Tax Start Page" in {
+      "on selecting Council Tax web form link should redirect to web form Start Page" in {
         WelcomeId.toString mustBe "welcome"
-        navigator.nextPage(WelcomeId, NormalMode) (mockUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
+        navigator.nextPage(WelcomeId, NormalMode) (formUserAnswers) mustBe routes.UniformController.myJourney("ba-report")
+      }
+
+      "on selecting Council Tax Upload link should redirect to Council Tax Start Page" in {
+        WelcomeId.toString mustBe "welcome"
+        navigator.nextPage(WelcomeId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
       }
 
       "on clicking Council Tax Start now button should redirect to Council Tax Upload Page" in {
