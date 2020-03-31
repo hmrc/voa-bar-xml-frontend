@@ -16,6 +16,6 @@
 
 package identifiers
 
-case object WelcomeUploadId extends Identifier {
-  override def toString: String = "welcomeUpload"
+case object WelcomeId extends Identifier {
+  override def toString: String = "welcome"
 }

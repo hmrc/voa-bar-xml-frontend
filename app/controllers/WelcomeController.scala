@@ -17,7 +17,7 @@
 package controllers
 
 import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
@@ -26,8 +26,9 @@ import identifiers.{VOAAuthorisedId, WelcomeId}
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
 import views.html.welcome
-import utils.Navigator
-
+import forms.SubmissionTypeFormProvider
+import play.api.data.Form
+import utils.{Navigator, UserAnswers}
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
@@ -41,9 +42,25 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(welcome(username, appConfig))
+        case Some(username) => Ok(welcome(username, SubmissionTypeFormProvider(), appConfig))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
+  }
+
+  def onSubmit = getData.async {
+    implicit request =>
+      SubmissionTypeFormProvider().bindFromRequest.fold(
+        (formWithErrors: Form[String]) =>
+          dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+            case Some(username) => BadRequest(welcome(username, formWithErrors, appConfig))
+            case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+          },
+        value => {
+          dataCacheConnector.save[String](request.externalId, WelcomeId.toString, value).map ( cacheMap =>
+            Redirect(navigator.nextPage(WelcomeId, NormalMode)(new UserAnswers(cacheMap)))
+          )
+        }
+      )
   }
 
   def goToCouncilTaxStartPage() = (getData andThen requireData) { implicit request =>
