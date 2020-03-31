@@ -16,6 +16,8 @@
 
 package controllers
 
+import cats.data.NonEmptyList
+import journey.{Postcode, PostcodeValidator}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
@@ -74,7 +76,7 @@ class AutobarsInterpreter (
     override def render(in: Long, key: String, messages: UniformMessages[Html]): Html = Html(s"in: ${in}, key:${messages}")
   }
 
-   implicit val stringField = new FormField[String, Html] {
+  implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
       override def encode(in: String): Input = Input.one(List(in))
 
@@ -85,21 +87,68 @@ class AutobarsInterpreter (
                           messages: UniformMessages[Html]): Html =  {
         import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
-        val errorMessage = errors.valueAtRoot
+        val errorMessage = errors.get(NonEmptyList.one(fieldKey))
+          .orElse {
+            errors.valueAtRoot.filter(_ => pageKey == fieldKey)
+          }
           .map(x => x.head.render[Html](messages))
           .map(x => ErrorMessage(content = HtmlContent(x)))
 
-        val messageKey = ("label" :: fieldKey ++ pageKey).reverse
+        val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
+
+        logger.debug(
+          s"""
+            |pageKey : ${pageKey}
+            |fieldKey: ${fieldKey}
+            |Errors:
+            |  ${errors.mkString(" \n")}
+            |
+            |Value:
+            |  ${data.mkString(" \n")}
+            |
+            |""".stripMargin)
+
+
+        val messageKey = fieldKey :+ "label"
 
         govukInput(GovInput(
           id = fieldKey.mkString("_"),
           name = fieldKey.mkString("."),
           label = Label(content = HtmlContent(messages(messageKey.mkString(".")))),
           classes="govuk-input--width-20",
-          value = data.valueAtRoot.flatMap(_.headOption),
+          value = fieldValue,
           errorMessage = errorMessage
         ))
       }
+  }
+
+  implicit val stringOption = new FormField[Option[String], Html] {
+
+    override def encode(in: Option[String]): Input = Input.one(List(in.getOrElse("")))
+
+    override def decode(out: Input): Either[ErrorTree, Option[String]] = {
+      out.toStringField().toEither.map(value => if(value == "") None else Option(value))
+    }
+
+    override def render(pageKey: List[String],
+                        fieldKey: List[String],
+                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = {
+      stringField.render(pageKey, fieldKey, breadcrumbs, data, errors, messages)
+    }
+  }
+
+  implicit val postcodeField = new FormField[Postcode, Html] {
+    override def render(pageKey: List[String], fieldKey: List[String], breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = stringField.render(pageKey, fieldKey, breadcrumbs, data, errors, messages)
+
+    override def encode(in: Postcode): Input = Input.one(List(in.postcode))
+
+    override def decode(out: Input): Either[ErrorTree, Postcode] = {
+      val value = out.toStringField().getOrElse("")
+      val validationResult = new PostcodeValidator().apply(value).map(Postcode(_))
+      validationResult.toEither
+    }
   }
 
 
@@ -123,5 +172,8 @@ class AutobarsInterpreter (
                                   values: Input,
                                   errors: ErrorTree,
                                   messages: UniformMessages[Html],
-                                  cfl: CoproductFieldList[A, Html]): Html = Html("should render coproduct :👻")
+                                  cfl: CoproductFieldList[A, Html]): Html = {
+    Html(
+      s"should render coproduct<br /> stats: ${cfl.stats}, <br />${cfl.inner} <br />")
+  }
 }

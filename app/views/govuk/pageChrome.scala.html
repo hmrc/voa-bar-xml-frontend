@@ -42,11 +42,13 @@
 
 
 @mainTemplate(
-    pageTitle = Some(messages("login.title"))
+    pageTitle = Some(
+        if(errors.isEmpty) messages(key.mkString(".") + ".pageLabel") else "Error: " + messages(key.mkString(".") + ".pageLabel")
+        )
 ) {
     @*second element from breadcrumbs, head is always current element. *@
     @govukBackLink(BackLink(
-        href=breadcrumbs.tail.headOption.getOrElse("/"), content = Text("Back")
+        href=breadcrumbs.tail.headOption.getOrElse(controllers.routes.WelcomeController.onPageLoad().url), content = Text("Back")
     ))
 
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
@@ -55,7 +57,7 @@
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
                 errors.map { error =>
-                    ErrorLink(error._1.head.headOption.orElse(Some(key.head)).map("#" + _),
+                    ErrorLink(Some(error._1.head.mkString("#","_", "")),
                         HtmlContent(error._2.head.render[Html](messages2)))
                 }.toList
             }, title = Text(messages("error.summary.title"))))

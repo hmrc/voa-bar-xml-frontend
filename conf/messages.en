@@ -224,15 +224,38 @@ feedback.contact=Should you wish to supply any additional information to support
 
 #web-bars
 ba-report.pageLabel=Billing authority report
-ba-report.ba-report.label=
-ba-report.error.minLenght=Enter a billing authority report number
-ba-report.error.maxLenght=Billing authority report must be 12 characters or fewer
+ba-report.label=
+ba-report.error.minLength=Enter a billing authority report number
+ba-report.error.maxLength=Billing authority report must be 12 characters or fewer
 ba-report.error.number=Billing authority report must be a number
 
-
 ba-ref.pageLabel=Billing authority reference
-ba-ref.ba-ref.label=
-ba-ref.error.minLenght=Enter a billing authority reference
-ba-ref.error.maxLenght=Billing authority reference must be 25 characters or fewer
+ba-ref.label=
+ba-ref.error.minLength=Enter a billing authority reference
+ba-ref.error.maxLength=Billing authority reference must be 25 characters or fewer
 ba-ref.error.allowedChars=Billing authority reference must only contain letters a to z, hyphens, spaces and apostrophes
+
+property-address.pageLabel=Property address
+property-address.line1.label=Address line 1
+property-address.line1.minLength=Enter the first line of the address
+property-address.line1.maxLength=First line of address must be 100 characters or fewer
+property-address.line1.allowedChars=First line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+property-address.line2.label=Address line 2
+property-address.line2.minLength=Enter the second line of the address
+property-address.line2.maxLength=Second line of address must be 100 characters or fewer
+property-address.line2.allowedChars=Second line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+property-address.line3.label=Address line 3 (optional)
+property-address.line3.maxLength=Third line of address must be 100 characters or fewer
+property-address.line3.allowedChars=Third line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+property-address.line4.label=Address line 4 (optional)
+property-address.line4.maxLength=Fourth line of address must be 100 characters or fewer
+property-address.line4.allowedChars=Fourth line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+property-address.postcode.label=Postcode
+property-address.postcode.minLength=Enter a postcode
+property-address.postcode.allowedChar=Postcode must only include letters a to z and numbers 0 to 9
+property-address.postcode.eror=Enter a real postcode
 
