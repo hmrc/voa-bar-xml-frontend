@@ -17,10 +17,11 @@
 package journey
 
 import cats.data.Validated.{Invalid, Valid}
-import org.scalatest.{FlatSpec, MustMatchers}
+import ltbs.uniform.ErrorTree
+import org.scalatest.{EitherValues, FlatSpec, MustMatchers}
 import org.scalatestplus.play.PlaySpec
 
-class UniformJourneySpec extends FlatSpec with MustMatchers {
+class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
 
   import UniformJourney._
 
@@ -36,6 +37,17 @@ class UniformJourneySpec extends FlatSpec with MustMatchers {
     baReferenceValidation("1234") mustBe Valid("1234")
     baReferenceValidation("adasd#$^&*()") mustBe Valid("adasd#$^&*()")
     baReferenceValidation("adasd#$^&*(%)") mustBe a [Invalid[_]]
+  }
+
+  it should "validate Address" in {
+    val address = Address("99  Fosse Way", "ARDNAGOINE", None, Some("Fiction house"), Postcode("IV26 4YY"))
+    UniformJourney.addressValidation(address).toEither.right.value mustBe(address)
+  }
+
+  it should "reject invalid address" in {
+    val address = Address("", "ARDNAGOINE", None, None, Postcode("IV26 4YY"))
+    UniformJourney.addressValidation(address).toEither.left.value mustBe a[ErrorTree]
+
   }
 
 
