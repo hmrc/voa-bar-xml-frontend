@@ -16,6 +16,7 @@
 
 package views
 
+import forms.SubmissionTypeFormProvider
 import models.NormalMode
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
@@ -25,10 +26,11 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
+  val form = SubmissionTypeFormProvider()
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => welcome(username, frontendAppConfig)(welcomeFakeRequest, messages)
+  def createView = () => welcome(username, form, frontendAppConfig)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
