@@ -171,7 +171,7 @@ welcome.want.to = I want to
 welcome.councilTax.url = Council Tax
 welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
 submissionCategory.council_tax_webform = create a Council Tax report
-submissionCategory.council_tax_xml_upload = Upload an XML file of Council Tax reports
+submissionCategory.council_tax_xml_upload = Upload a file of Council Tax reports
 
 reportStatus.title = Report Status
 reportStatus.heading = Submission history,
