@@ -17,6 +17,7 @@
 package controllers
 
 import cats.data.NonEmptyList
+import journey.UniformJourney.CtTaxForm
 import journey.{Postcode, PostcodeValidator}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
@@ -25,11 +26,11 @@ import ltbs.uniform._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.govukInput
+import uk.gov.hmrc.govukfrontend.views.html.components.{govukInput, govukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
-import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.{ErrorLink, ErrorSummary}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
 
 import scala.concurrent.ExecutionContext
 
@@ -75,6 +76,55 @@ class AutobarsInterpreter (
   implicit val webTellLong = new WebTell[Long] {
     override def render(in: Long, key: String, messages: UniformMessages[Html]): Html = Html(s"in: ${in}, key:${messages}")
   }
+
+  implicit val ctTaxFormWebTell = new WebTell[CtTaxForm] {
+    val sumaryList = new govukSummaryList()
+
+    override def render(in: CtTaxForm, key: String, messages: UniformMessages[Html]): Html = {
+
+      val baReport = SummaryListRow(
+        key = Key(HtmlContent(messages("ba-report.pageLabel"))),
+        value = Value(Text(in.baReport)),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("ba-report").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+      val baRef = SummaryListRow(
+        key = Key(HtmlContent(messages("ba-ref.pageLabel"))),
+        value = Value(Text(in.baRef)),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("ba-ref").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+
+      val addressContent = HtmlFormat.fill(List(
+      HtmlFormat.escape(in.address.line1),Html("<br />"),
+      HtmlFormat.escape(in.address.line2),Html("<br />"),
+      in.address.line3.map(line3 => HtmlFormat.fill(
+        List(HtmlFormat.escape(line3), Html("<br />")))
+      ).getOrElse(Html("")),
+      in.address.line4.map(line3 => HtmlFormat.fill(
+          List(HtmlFormat.escape(line3), Html("<br />")))
+        ).getOrElse(Html("")),
+        HtmlFormat.escape(in.address.postcode.postcode)
+      ))
+
+      val propertyAddress = SummaryListRow(
+        key = Key(HtmlContent(messages("property-address.pageLabel"))),
+        value = Value(HtmlContent(addressContent)),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("property-address").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+
+      sumaryList(SummaryList(Seq(baReport, baRef, propertyAddress)))
+
+    }
+  }
+
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
