@@ -27,7 +27,7 @@ import scala.language.higherKinds
 
 object UniformJourney {
 
-  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: Postcode)
+  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
   case class CtTaxForm(baReport: String, baRef: String, address: Address)
 
   type AskTypes = Address :: String :: NilTypes
@@ -63,7 +63,7 @@ object UniformJourney {
       "property-address.line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(addressLineRegex,
       "property-address.line1.allowedChars").apply(_))).leftMap(_.prefixWith("line1"))
 
-    val line2 = (lengthBetween(1, 100, "property-address.line2.minLenght",
+    val line2 = (lengthBetween(1, 100, "property-address.line2.minLength",
       "property-address.line2.maxLength").apply(a.line2) andThen (Rule.matchesRegex(addressLineRegex,
       "property-address.line2.allowedChars").apply(_))).leftMap(_.prefixWith("line2"))
 
@@ -73,7 +73,7 @@ object UniformJourney {
     val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("property-address.line4.maxLength", "property-address.line4.allowedChars")
       .apply(a.line4).leftMap(_.prefixWith("line4"))
 
-    val postcode = Validated.Valid(a.postcode)
+    val postcode = new PostcodeValidator().apply(a.postcode).leftMap(_.prefixWith("postcode"))
 
     val result = (line1, line2, line3, line4, postcode).mapN(Address)
 

@@ -9,7 +9,7 @@ import com.typesafe.sbt.uglify.Import._
 import com.typesafe.sbt.digest.Import._
 import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin, _}
-import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
+import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings, integrationTestSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
 
@@ -19,14 +19,9 @@ lazy val appDependencies : Seq[ModuleID] = Dependencies.appDependencies
 lazy val plugins : Seq[Plugins] = Seq.empty
 lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
-  tests map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(playSettings : _*)
   .settings( majorVersion := 0 )
   .settings(RoutesKeys.routesImport ++= Seq("models._"))
@@ -54,12 +49,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(
-    Keys.fork in IntegrationTest := false,
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false)
+  .settings(integrationTestSettings(): _*)
   .settings(resolvers ++= Seq(
     Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo,

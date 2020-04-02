@@ -40,12 +40,12 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
   }
 
   it should "validate Address" in {
-    val address = Address("99  Fosse Way", "ARDNAGOINE", None, Some("Fiction house"), Postcode("IV26 4YY"))
+    val address = Address("99  Fosse Way", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
     UniformJourney.addressValidation(address).toEither.right.value mustBe(address)
   }
 
   it should "reject invalid address" in {
-    val address = Address("", "ARDNAGOINE", None, None, Postcode("IV26 4YY"))
+    val address = Address("", "ARDNAGOINE", None, None, "IV26 4YY")
     UniformJourney.addressValidation(address).toEither.left.value mustBe a[ErrorTree]
 
   }

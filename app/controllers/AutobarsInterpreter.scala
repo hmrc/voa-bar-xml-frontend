@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.NonEmptyList
 import journey.UniformJourney.CtTaxForm
-import journey.{Postcode, PostcodeValidator}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
@@ -108,7 +107,7 @@ class AutobarsInterpreter (
       in.address.line4.map(line3 => HtmlFormat.fill(
           List(HtmlFormat.escape(line3), Html("<br />")))
         ).getOrElse(Html("")),
-        HtmlFormat.escape(in.address.postcode.postcode)
+        HtmlFormat.escape(in.address.postcode)
       ))
 
       val propertyAddress = SummaryListRow(
@@ -187,20 +186,6 @@ class AutobarsInterpreter (
       stringField.render(pageKey, fieldKey, breadcrumbs, data, errors, messages)
     }
   }
-
-  implicit val postcodeField = new FormField[Postcode, Html] {
-    override def render(pageKey: List[String], fieldKey: List[String], breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = stringField.render(pageKey, fieldKey, breadcrumbs, data, errors, messages)
-
-    override def encode(in: Postcode): Input = Input.one(List(in.postcode))
-
-    override def decode(out: Input): Either[ErrorTree, Postcode] = {
-      val value = out.toStringField().getOrElse("")
-      val validationResult = new PostcodeValidator().apply(value).map(Postcode(_))
-      validationResult.toEither
-    }
-  }
-
 
   override def renderProduct[A](pageKey: List[String],
                                 fieldKey: List[String],
