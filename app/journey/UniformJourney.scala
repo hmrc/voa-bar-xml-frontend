@@ -28,21 +28,22 @@ import scala.language.higherKinds
 object UniformJourney {
 
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: Postcode)
-  case class ComplexForm(baReport: String, baRef: String, address: Address)
+  case class CtTaxForm(baReport: String, baRef: String, address: Address)
 
   type AskTypes = Address :: String :: NilTypes
-  type TellTypes = Long :: NilTypes
+  type TellTypes = CtTaxForm :: Long :: NilTypes
 
   val addressLineRegex = """[a-zA-Z0-9\-" \.]*"""
 
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[ComplexForm] = {
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[CtTaxForm] = {
     import interpreter._
 
     for {
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       address <- ask[Address]("property-address", validation = addressValidation)
-    } yield ComplexForm(baReport, baRef, address)
+      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, address))
+    } yield CtTaxForm(baReport, baRef, address)
   }
 
   def baReportValidation(a: String) = {

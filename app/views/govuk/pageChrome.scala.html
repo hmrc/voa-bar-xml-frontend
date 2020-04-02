@@ -67,7 +67,7 @@
         @ask
 
         @govukButton(Button( attributes = Map("id" -> "submit"),
-            name = Some("submit"), content = Text("Continue")
+            name = Some("submit"), content = Text(if(key.mkString(".") == "check-answers")"Submit" else "Continue")
         ))
 
     }

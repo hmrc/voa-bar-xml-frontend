@@ -13,6 +13,8 @@ GET         /ba-ref                               controllers.UniformController.
 POST        /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
 GET         /property-address                     controllers.UniformController.myJourney(id = "property-address")
 POST        /property-address                     controllers.UniformController.myJourney(id = "property-address")
+GET         /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
+POST        /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
