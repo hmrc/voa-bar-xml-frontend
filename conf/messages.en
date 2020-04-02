@@ -218,8 +218,8 @@ status.failed-reports.title = Failed reports
 status.success.paragraph = The file was submitted successfully without any errors.
 status.failed.para1 = The file was rejected because of
 status.failed.para2 = invalid reports.
-status.failed.timeout = The submission hasn't been processed properly, please send it again.
-status.failed.description = The submission hasn't been processed properly, please contact BARS@voa.gsi.gov.uk.
+status.failed.timeout = The submission hasn’t been processed properly, please send it again.
+status.failed.description = The submission hasn’t been processed properly, please contact BARS@voa.gsi.gov.uk.
 status.report.title = Report No
 status.report.para = failed with the following errors:
 
