@@ -22,13 +22,14 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import identifiers.{VOAAuthorisedId, WelcomeId}
+import identifiers.{VOAAuthorisedId, WelcomeFormId, WelcomeId}
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
 import views.html.welcome
 import forms.SubmissionTypeFormProvider
 import play.api.data.Form
 import utils.{Navigator, UserAnswers}
+
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
@@ -57,7 +58,7 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
           },
         value => {
           dataCacheConnector.save[String](request.externalId, WelcomeId.toString, value).map ( cacheMap =>
-            Redirect(navigator.nextPage(WelcomeId, NormalMode)(new UserAnswers(cacheMap)))
+            Redirect(navigator.nextPage(WelcomeFormId, NormalMode)(new UserAnswers(cacheMap)))
           )
         }
       )
