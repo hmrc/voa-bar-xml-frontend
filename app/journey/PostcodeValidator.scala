@@ -19,10 +19,8 @@ package journey
 import cats.data.Validated
 import ltbs.uniform.ErrorTree
 import ltbs.uniform.validation.Rule
-import collection.JavaConverters._
+//import collection.JavaConverters._
 
-
-case class Postcode(postcode: String)
 
 class PostcodeValidator extends Rule[String]{
 
