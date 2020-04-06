@@ -29,9 +29,9 @@ object UniformJourney {
 
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
-  case class CtTaxForm(baReport: String, baRef: String, address: Address, propertyContactDetails: ContactDetails)
+  case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address, propertyContactDetails: ContactDetails)
 
-  type AskTypes = ContactDetails :: Address :: String :: NilTypes
+  type AskTypes = ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
 
   //RestrictedStringType
@@ -48,10 +48,11 @@ object UniformJourney {
     for {
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
+      upnr <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = addressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, address, propertyContactDetails))
-    } yield CtTaxForm(baReport, baRef, address, propertyContactDetails)
+      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, upnr, address, propertyContactDetails))
+    } yield CtTaxForm(baReport, baRef, upnr, address, propertyContactDetails)
   }
 
   def baReportValidation(a: String) = {
@@ -63,6 +64,17 @@ object UniformJourney {
     // [A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
     lengthBetween(1, 25, "ba-ref.error.minLength", "ba-ref.error.maxLength").apply(a) andThen ((
       Rule.matchesRegex("""[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*""", "ba-ref.error.allowedChars").apply(_)))
+  }
+
+  def uprnValidation(a: Option[String]) = {
+    (a match {
+      case None => Validated.valid(None)
+      case Some(uprn) => {
+        (lengthBetween(1,12, "", "UPRN.error.maxLength" ).apply(uprn) andThen (
+          Rule.matchesRegex("""\d+""", "UPRN.error.allowedChars").apply(_)
+        )).map(Option(_))
+      }
+    })
   }
 
   def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] = {

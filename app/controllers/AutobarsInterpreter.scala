@@ -98,6 +98,17 @@ class AutobarsInterpreter (
         ))
       )
 
+      val uprn = in.uprn.map { uprn =>
+        SummaryListRow(
+          key = Key(HtmlContent(messages("UPRN.pageLabel"))),
+          value = Value(Text(uprn)),
+          actions = Some(Actions(items = Seq(
+            ActionItem(controllers.routes.UniformController.myJourney("UPRN").url,
+              HtmlContent(messages("check-answers.changeLabel"))))
+          ))
+        )
+      }
+
       val addressContent = HtmlFormat.fill(List(
       HtmlFormat.escape(in.address.line1),Html("<br />"),
       HtmlFormat.escape(in.address.line2),Html("<br />"),
@@ -138,7 +149,12 @@ class AutobarsInterpreter (
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
-      sumaryList(SummaryList(Seq(baReport, baRef, propertyAddress, contactDetails)))
+      sumaryList(SummaryList(Seq(
+        Option(baReport),
+        Option(baRef),
+        uprn,
+        Option(propertyAddress),
+        Option(contactDetails)).flatten))
     }
   }
 

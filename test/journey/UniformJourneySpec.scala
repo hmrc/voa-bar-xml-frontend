@@ -39,13 +39,21 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
     baReferenceValidation("adasd#$^&*(%)") mustBe a [Invalid[_]]
   }
 
+  it should "validate UPRN" in {
+    uprnValidation(None) mustBe Valid(None)
+    uprnValidation(Some("1123")) mustBe Valid(Some("1123"))
+    uprnValidation(Some("123456789011")) mustBe Valid(Some("123456789011"))
+    uprnValidation(Some("1234567890013")) mustBe a [Invalid[_]]
+    uprnValidation(Some("")) mustBe a [Invalid[_]]
+  }
+
   it should "validate Address" in {
     val address = Address("99  Fosse Way", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
     UniformJourney.addressValidation(address).toEither.right.value mustBe(address)
   }
 
   it should "reject invalid address" in {
-    val address = Address("", "ARDNAGOINE", None, None, "IV26 4YY")
+    val address = Address("", "ARDNAGOINE", None, None, "HHGGD")
     UniformJourney.addressValidation(address).toEither.left.value mustBe a[ErrorTree]
   }
 
