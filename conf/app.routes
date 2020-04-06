@@ -15,6 +15,8 @@ GET         /property-address                     controllers.UniformController.
 POST        /property-address                     controllers.UniformController.myJourney(id = "property-address")
 GET         /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
 POST        /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
+GET         /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
+POST        /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
