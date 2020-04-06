@@ -36,7 +36,7 @@ object UniformJourney {
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
-  val restrictedStringTypeRegex = """[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*"""
+  val restrictedStringTypeRegex = """[A-Za-z0-9\s\~!"@#\$%\+&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*"""
 
   // Email Type
   //[0-9A-Za-z'\.\-_]{1,127}@[0-9A-Za-z'\.\-_]{1,127}
@@ -48,11 +48,11 @@ object UniformJourney {
     for {
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
-      upnr <-ask[Option[String]]("UPRN", validation = uprnValidation)
+      uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = addressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, upnr, address, propertyContactDetails))
-    } yield CtTaxForm(baReport, baRef, upnr, address, propertyContactDetails)
+      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails))
+    } yield CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails)
   }
 
   def baReportValidation(a: String) = {
