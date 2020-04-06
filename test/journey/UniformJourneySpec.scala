@@ -47,7 +47,17 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
   it should "reject invalid address" in {
     val address = Address("", "ARDNAGOINE", None, None, "IV26 4YY")
     UniformJourney.addressValidation(address).toEither.left.value mustBe a[ErrorTree]
+  }
 
+  it should "Validate correct contact details" in {
+    val contactDetails = ContactDetails("First name", "lastName", None, None)
+    UniformJourney.propertyContactDetailValidator(contactDetails).toEither.right.value mustBe(contactDetails)
+  }
+
+  it should "reject invalid contact details" in {
+    val contactDetails = ContactDetails("", "", Some("*&*&"), Some("*&(*&"))
+    UniformJourney.propertyContactDetailValidator(contactDetails).toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.propertyContactDetailValidator(contactDetails).toEither.left.value must have size(4)
   }
 
 

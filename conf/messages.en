@@ -264,5 +264,23 @@ property-address.postcode.minLength=Enter a postcode
 property-address.postcode.allowedChar=Postcode must only include letters a to z and numbers 0 to 9
 property-address.postcode.eror=Enter a real postcode
 
+
+property-contact-details.pageLabel=Property contact details
+property-contact-details.firstName.label=First name
+property-contact-details.firstName.minLength=Enter a first name
+property-contact-details.firstName.maxLength=First name must be 35 characters or fewer
+property-contact-details.firstName.allowedChars=First name must only contain letters a to z, hyphens, spaces and apostrophes
+
+property-contact-details.lastName.label=Last name
+property-contact-details.lastName.minLength=First name
+property-contact-details.lastName.maxLength=First name
+property-contact-details.lastName.allowedChars=First name must only contain letters a to z, hyphens, spaces and apostrophes
+
+property-contact-details.email.label=Email address (optional)
+property-contact-details.email.format=Enter an email address in the correct format, like name@example.com
+
+property-contact-details.phoneNumber.label=Phone number (optional)
+property-contact-details.phoneNumber.format=Enter a phone number, like 01632 960 001
+
 check-answers.pageLabel=Check your answers
 check-answers.changeLabel=Change

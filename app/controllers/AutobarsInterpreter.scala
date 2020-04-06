@@ -119,8 +119,26 @@ class AutobarsInterpreter (
         ))
       )
 
-      sumaryList(SummaryList(Seq(baReport, baRef, propertyAddress)))
+      val contactDetailsContent = HtmlFormat.fill(List(
+        HtmlFormat.escape(in.propertyContactDetails.firstName),Html("<br />"),
+        HtmlFormat.escape(in.propertyContactDetails.lastName),Html("<br />"),
+        in.propertyContactDetails.email.map(email => HtmlFormat.fill(
+          List(HtmlFormat.escape(email), Html("<br />"))
+        )).getOrElse(Html("")),
+        in.propertyContactDetails.phoneNumber.map(phoneNumber => HtmlFormat.fill(
+          List(HtmlFormat.escape(phoneNumber))
+        )).getOrElse(Html(""))
+      ))
 
+      val contactDetails = SummaryListRow(
+        key = Key(HtmlContent(messages("property-contact-details.pageLabel"))),
+        value = Value(HtmlContent(contactDetailsContent)),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("property-contact-details").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+      sumaryList(SummaryList(Seq(baReport, baRef, propertyAddress, contactDetails)))
     }
   }
 
