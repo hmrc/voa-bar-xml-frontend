@@ -240,6 +240,14 @@ ba-ref.error.minLength=Enter a billing authority reference
 ba-ref.error.maxLength=Billing authority reference must be 25 characters or fewer
 ba-ref.error.allowedChars=Billing authority reference must only contain letters a to z, hyphens, spaces and apostrophes
 
+UPRN.pageLabel=Unique property reference number (UPRN)
+UPRN.label=
+UPRN.error.minLength=
+UPRN.error.maxLength=UPRN must be 12 characters or fewer
+UPRN.error.allowedChars=UPRN must be a number
+
+
+
 property-address.pageLabel=Property address
 property-address.line1.label=Address line 1
 property-address.line1.minLength=Enter the first line of the address
@@ -272,9 +280,9 @@ property-contact-details.firstName.maxLength=First name must be 35 characters or
 property-contact-details.firstName.allowedChars=First name must only contain letters a to z, hyphens, spaces and apostrophes
 
 property-contact-details.lastName.label=Last name
-property-contact-details.lastName.minLength=First name
-property-contact-details.lastName.maxLength=First name
-property-contact-details.lastName.allowedChars=First name must only contain letters a to z, hyphens, spaces and apostrophes
+property-contact-details.lastName.minLength=Enter a last name
+property-contact-details.lastName.maxLength=Last name must be 35 characters or fewer
+property-contact-details.lastName.allowedChars=Last name must only contain letters a to z, hyphens, spaces and apostrophes
 
 property-contact-details.email.label=Email address (optional)
 property-contact-details.email.format=Enter an email address in the correct format, like name@example.com

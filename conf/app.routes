@@ -11,6 +11,8 @@ GET         /ba-report                            controllers.UniformController.
 POST        /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
 GET         /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
 POST        /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
+GET         /UPRN                                 controllers.UniformController.myJourney(id = "UPRN")
+POST        /UPRN                                 controllers.UniformController.myJourney(id = "UPRN")
 GET         /property-address                     controllers.UniformController.myJourney(id = "property-address")
 POST        /property-address                     controllers.UniformController.myJourney(id = "property-address")
 GET         /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
