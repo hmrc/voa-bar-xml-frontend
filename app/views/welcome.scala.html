@@ -15,43 +15,62 @@
  *@
 
 @import config.FrontendAppConfig
-@import controllers.routes._
-@import uk.gov.hmrc.play.views.html._
 @import forms.SubmissionTypeFormProvider
+@import models.Mode
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
-@(baCode: String, form: Form[String], appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@this(
+        main_template: views.html.govuk.main_template,
+        formWithCSRF: formWithCSRF,
+        govukRadios: govukRadios,
+        govukButton: govukButton,
+        errorSummary: govukErrorSummary
+)
+
+
+@(appConfig: FrontendAppConfig, form: Form[String], mode: Mode, baCode: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = messages("welcome.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+    pageTitle = if(form.errors.nonEmpty) {
+        Some(messages("error.title.prefix") + ": " + messages("welcome.title"))
+    } else {
+        Some(messages("welcome.title"))
+    }
+) {
 
-    @components.service_info(baCode)
+    @if(form.errors.nonEmpty) {
+        @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+    }
 
-    @components.heading("welcome.heading", baCode)
+    <span class="govuk-caption-xl">@messages("service.name")</span>
+    <h1 class="govuk-heading-xl">@messages("welcome.heading") @BillingAuthorities.find(baCode)</h1>
 
-    @if(baCode == "BA1445" || baCode == "BA3615") {
+    @if(appConfig.baCodes.contains(baCode)) {
+        @formWithCSRF(
+            action = routes.WelcomeController.onSubmit(),
+            'autoComplete -> "off"
+        ) {
 
-        @helpers.form(action = WelcomeController.onSubmit(), 'autoComplete -> "off") {
+            @govukRadios(Radios(
+                fieldset = Some(Fieldset(legend = Some(Legend(Text(messages("welcome.want.to")))))),
+                errorMessage = form.errors.asTextErrorMessageForField("submissionCategory"),
+                name = "submissionCategory",
+                items = SubmissionTypeFormProvider.options
+            ))
 
-            @components.error_summary(form.errors)
+            <p><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></p>
 
-            @components.input_radio(
-                field = form("value"),
-                legend = messages("welcome.want.to"),
-                trackGa = true,
-                inputs = SubmissionTypeFormProvider.options
-            )
-
-            <p><a href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></p>
-
-            @components.button("site.continue", "submit")
+            @govukButton(Button(attributes = Map("id" -> "submit"),
+                name = Some("submit"), content = Text(messages("site.continue"))
+            ))
         }
     } else {
         <h3 class="heading-medium">
-            <a href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
+            <a class="govuk-link" href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
         </h3>
 
-        <p>@messages("welcome.councilTax.description")</p>
+        <p class="govuk-body">@messages("welcome.councilTax.description")</p>
     }
 }
