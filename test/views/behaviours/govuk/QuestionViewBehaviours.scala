@@ -63,4 +63,11 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
       }
     }
   }
+
+  def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable) = {
+    val doc = asDocument(view())
+    assert(messages.isDefinedAt(s"$prefix.$option"))
+    val label = doc.select(s"label[for=$prefix.$option]")
+    assert(label.size() == 1)
+  }
 }

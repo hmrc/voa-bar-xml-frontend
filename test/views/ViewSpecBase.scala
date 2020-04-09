@@ -31,7 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import views.html.govuk.{head, scripts}
-import views.html.login
+import views.html.{login, welcome}
 
 trait ViewSpecBase extends SpecBase {
 
@@ -111,6 +111,16 @@ trait ViewSpecBase extends SpecBase {
       createMain_template(),
       new formWithCSRF(),
       uk.gov.hmrc.govukfrontend.views.html.components.GovukInput,
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukButton,
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+    )
+  }
+
+  def createWelcomeView(): welcome = {
+    new welcome(
+      createMain_template(),
+      new formWithCSRF(),
+      uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios,
       uk.gov.hmrc.govukfrontend.views.html.components.GovukButton,
       uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
     )
