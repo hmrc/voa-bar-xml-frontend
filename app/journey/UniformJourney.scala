@@ -60,14 +60,13 @@ object UniformJourney {
 
   def baReportValidation(a: String) = {
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
-      Rule.matchesRegex("\\d+", "error.number").apply(_)))
+      Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)))
       .leftMap(_.prefixWith("ba-report"))
   }
 
   def baReferenceValidation(a: String) = {
-    // [A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
     (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(a) andThen ((
-      Rule.matchesRegex("""[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*""", "error.allowedChars").apply(_))))
+      Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_))))
       .leftMap(_.prefixWith("ba-ref"))
   }
 
