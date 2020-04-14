@@ -73,7 +73,7 @@
     }
 
     <br /><br />
-    <br style="border: solid">
+    <div style="border: solid 1px; padding: 5px; font-family: 'JetBrains Mono', monospace; width:150%">
         <h4 style="color: red">This is debug box, IGNORE</h4>
         <hr />
         Key: @key.mkString(".")
@@ -82,8 +82,8 @@
         <hr/>
         <ul>
             @for(error <- errors) {
-                <li style="padding-top: 10px;">@error._1
-                    <ul>
+                <li style="padding-top: 17px;">@error._1
+                    <ul style="list-style: none; padding-top: 7px;">
                         <li>@error._2</li>
                     </ul>
                 </li>

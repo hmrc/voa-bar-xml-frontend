@@ -233,7 +233,7 @@ ba-report.pageLabel=Billing authority report
 ba-report.label=
 ba-report.error.minLength=Enter a billing authority report number
 ba-report.error.maxLength=Billing authority report must be 12 characters or fewer
-ba-report.error.number=Billing authority report must be a number
+ba-report.error.allowedChars=Billing authority report must only contain letters a to z, hyphens, spaces and apostrophes
 
 ba-ref.pageLabel=Billing authority reference
 ba-ref.label=
