@@ -291,5 +291,11 @@ property-contact-details.email.format=Enter an email address in the correct form
 property-contact-details.phoneNumber.label=Phone number (optional)
 property-contact-details.phoneNumber.format=Enter a phone number, like 01632 960 001
 
+same-contact-address.pageLabel=Do you want to use the same address for the contact?
+same-contact-address.required=Select ‘yes’ if you want to use the same address for the contact
+
+same-contact-address.same-contact-address.yes=Yes
+same-contact-address.same-contact-address.no=No
+
 check-answers.pageLabel=Check your answers
 check-answers.changeLabel=Change

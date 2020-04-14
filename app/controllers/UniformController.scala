@@ -28,7 +28,7 @@ import play.api.i18n.{Messages => _, _}
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.govukInput
+import uk.gov.hmrc.govukfrontend.views.html.components.{govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.govuk.pageChrome
 
@@ -38,6 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UniformController @Inject()(messagesApi: MessagesApi,
                                   pageChrome: pageChrome,
                                   govukInput: govukInput,
+                                  govukRadios: govukRadios,
                                   dataCaheConnector: DataCacheConnector,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
@@ -56,7 +57,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
   }
 
-  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput)
+  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios)
 
   def myJourney(targetId: String) = Action.async { implicit request: Request[AnyContent] =>
     import interpreter._
