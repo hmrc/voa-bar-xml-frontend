@@ -37,13 +37,15 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
                                   requireData: DataRequiredAction,
                                   navigator: Navigator,
                                   dataCacheConnector: DataCacheConnector,
-                                  controllerComponents: MessagesControllerComponents) (implicit ec: ExecutionContext)
+                                  controllerComponents: MessagesControllerComponents,
+                                  welcome: views.html.welcome
+                                 ) (implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
 
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(welcome(username, SubmissionTypeFormProvider(), appConfig))
+        case Some(username) => Ok(welcome(appConfig, SubmissionTypeFormProvider(), NormalMode, username))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
@@ -53,7 +55,7 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
       SubmissionTypeFormProvider().bindFromRequest.fold(
         (formWithErrors: Form[String]) =>
           dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-            case Some(username) => BadRequest(welcome(username, formWithErrors, appConfig))
+            case Some(username) => BadRequest(welcome(appConfig, formWithErrors, NormalMode, username))
             case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
           },
         value => {

@@ -19,23 +19,21 @@ package views
 import forms.SubmissionTypeFormProvider
 import models.NormalMode
 import play.routing.Router.Tags.ROUTE_CONTROLLER
-import views.behaviours.ViewBehaviours
-import views.html.welcome
+import views.behaviours.govuk.QuestionViewBehaviours
 
-class WelcomeViewSpec extends ViewBehaviours {
+class WelcomeViewSpec extends QuestionViewBehaviours[String] {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
-  val form = SubmissionTypeFormProvider()
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => welcome(username, form, frontendAppConfig)(welcomeFakeRequest, messages)
+  def createView = () => createWelcomeView()(frontendAppConfig, form, NormalMode, username)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Welcome view" must {
-    behave like normalPage(createView, messageKeyPrefix, "councilTax.url", "councilTax.description")
+    behave like normalPage(createView, messageKeyPrefix)
   }
 
   "The Council Tax links to the goToCouncilTaxStartPage method" in {
@@ -44,38 +42,19 @@ class WelcomeViewSpec extends ViewBehaviours {
     assert(href == controllers.routes.WelcomeController.goToCouncilTaxStartPage().url.toString)
   }
 
-  "Include an username element displaying the BA name based on given BA Code" in {
-    val user = doc.getElementById("username-element").text
-    user mustBe "Cambridge"
-  }
-
-  "Include a logout link which redirects the users to the login page" in {
-    val href = doc.getElementById("logout-link").attr("href")
-    href mustBe controllers.routes.LoginController.onPageLoad(NormalMode).url.toString
-  }
-
-  "Have a home-element in the top navigation bar" in {
-    val elem = doc.getElementById("home-element").text
-    elem mustBe "Home"
-  }
-
   // Welcome page containing form for navigation
 
+  val form = SubmissionTypeFormProvider()(messages)
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
-  def createFormView = () => welcome(formUsername, form, frontendAppConfig)(welcomeFakeRequest, messages)
+  def createFormView = () => createWelcomeView()(frontendAppConfig, form, NormalMode, formUsername)(welcomeFakeRequest, messages)
 
-  lazy val formdDoc = asDocument(createFormView())
-
-  "Include an username element displaying the BA name based on given BA Code when form is displayed" in {
-    val user = formdDoc.getElementById("username-element").text
-    user mustBe "Brighton and Hove"
-  }
+  lazy val formDoc = asDocument(createFormView())
 
   "contain radio buttons for the value" in {
-    for (option <- SubmissionTypeFormProvider.options) {
-      assertContainsRadioButton(formdDoc, option.id, "value", option.value, false)
+    for (option <- SubmissionTypeFormProvider.options(messages)) {
+      assertContainsRadioButton(formDoc, option.id.getOrElse(""), "submissionCategory", option.value.getOrElse(""), false)
     }
   }
 
@@ -88,12 +67,12 @@ class WelcomeViewSpec extends ViewBehaviours {
   }
 
   "The view history links to the ReportStatusController.onPageLoad method" in {
-    val href = formdDoc.getElementById("submissions").attr("href")
+    val href = formDoc.getElementById("submissions").attr("href")
     assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
   }
 
   "contain Continue button with the value Continue" in {
-    val continueButton = formdDoc.getElementsByClass("button").attr("value")
+    val continueButton = formDoc.getElementById("submit").text()
     assert(continueButton == messages("site.continue"))
   }
 }

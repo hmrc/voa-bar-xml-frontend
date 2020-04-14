@@ -24,14 +24,14 @@ import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
-import views.html.welcome
+import views.ViewSpecBase
 
 import scala.concurrent.ExecutionContext
 
-class WelcomeControllerSpec extends ControllerSpecBase {
+class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
-  val form = SubmissionTypeFormProvider()
+  val form = SubmissionTypeFormProvider()(messages)
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
@@ -42,16 +42,16 @@ class WelcomeControllerSpec extends ControllerSpecBase {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new WelcomeController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents)(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new WelcomeController(frontendAppConfig,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents)(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
-  def viewAsString() = welcome(username, form, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString() = createWelcomeView()(frontendAppConfig, form, NormalMode, username)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

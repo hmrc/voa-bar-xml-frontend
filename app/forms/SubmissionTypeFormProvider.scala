@@ -19,27 +19,38 @@ package forms
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formatter
-import utils.RadioOption
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 
 object SubmissionTypeFormProvider extends FormErrorHelper {
 
-  def submissionTypeFormatter = new Formatter[String] {
+  def submissionTypeFormatter(implicit messages: Messages) = new Formatter[String] {
     def bind(key: String, data: Map[String, String]) = data.get(key) match {
       case Some(s) if optionIsValid(s) => Right(s)
-      case None => produceError(key, "error.required")
+      case None => produceError(key, "error.select.option")
       case _ => produceError(key, "error.unknown")
     }
 
     def unbind(key: String, value: String) = Map(key -> value)
   }
 
-  def apply(): Form[String] =
-    Form(single("value" -> of(submissionTypeFormatter)))
+  def apply()(implicit messages: Messages): Form[String] =
+    Form(single("submissionCategory" -> of(submissionTypeFormatter)))
 
-  def options = Seq(
-    RadioOption("submissionCategory", "council_tax_webform"),
-    RadioOption("submissionCategory", "council_tax_xml_upload")
+  def options(implicit messages: Messages)  = Seq(
+    RadioItem(
+      content = Text(messages("submissionCategory.council_tax_webform")),
+      id = Some("submissionCategory.council_tax_webform"),
+      value = Some("council_tax_webform"),
+      label = Some(Label(forAttr = Some("submissionCategory.council_tax_webform")))),
+    RadioItem(
+      content = Text(messages("submissionCategory.council_tax_xml_upload")),
+      id = Some("submissionCategory.council_tax_xml_upload"),
+      value = Some("council_tax_xml_upload"),
+      label = Some(Label(forAttr = Some("submissionCategory.council_tax_xml_upload"))))
   )
 
-  def optionIsValid(value: String) = options.exists(o => o.value == value)
+  def optionIsValid(value: String)(implicit messages: Messages) = options.exists(o => o.value.getOrElse("") == value)
 }
