@@ -29,9 +29,11 @@ object UniformJourney {
 
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
-  case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address, propertyContactDetails: ContactDetails)
+  case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
+                       propertyContactDetails: ContactDetails,
+                       sameContactAddress: Boolean)
 
-  type AskTypes = ContactDetails :: Address :: Option[String] :: String :: NilTypes
+  type AskTypes = YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
 
   //RestrictedStringType
@@ -51,50 +53,53 @@ object UniformJourney {
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = addressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails))
-    } yield CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails)
+      sameContactAddress <- ask[YesNoType]("same-contact-address")
+      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails, sameContactAddress == "Yes"))
+    } yield CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == "Yes")
   }
 
   def baReportValidation(a: String) = {
-    lengthBetween(1, 12, "ba-report.error.minLength", "ba-report.error.maxLength").apply(a) andThen (
-      Rule.matchesRegex("\\d+", "ba-report.error.number").apply(_))
+    (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
+      Rule.matchesRegex("\\d+", "error.number").apply(_)))
+      .leftMap(_.prefixWith("ba-report"))
   }
 
   def baReferenceValidation(a: String) = {
     // [A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
-    lengthBetween(1, 25, "ba-ref.error.minLength", "ba-ref.error.maxLength").apply(a) andThen ((
-      Rule.matchesRegex("""[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*""", "ba-ref.error.allowedChars").apply(_)))
+    (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(a) andThen ((
+      Rule.matchesRegex("""[A-Za-z0-9\s\~!"@#\$&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*""", "error.allowedChars").apply(_))))
+      .leftMap(_.prefixWith("ba-ref"))
   }
 
   def uprnValidation(a: Option[String]) = {
     (a match {
       case None => Validated.valid(None)
       case Some(uprn) => {
-        (lengthBetween(1,12, "", "UPRN.error.maxLength" ).apply(uprn) andThen (
-          Rule.matchesRegex("""\d+""", "UPRN.error.allowedChars").apply(_)
+        (lengthBetween(1,12, "", "error.maxLength" ).apply(uprn) andThen (
+          Rule.matchesRegex("""\d+""", "error.allowedChars").apply(_)
         )).map(Option(_))
       }
-    })
+    }).leftMap(_.prefixWith("UPRN"))
   }
 
   def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] = {
 
-    val firstName = (lengthBetween(1, 35, "property-contact-details.firstName.minLength",
-      "property-contact-details.firstName.maxLength" )
+    val firstName = (lengthBetween(1, 35, "firstName.minLength",
+      "firstName.maxLength" )
       .apply(contactDetails.firstName) andThen (
-      Rule.matchesRegex(restrictedStringTypeRegex, "property-contact-details.firstName.allowedChars").apply(_)
+      Rule.matchesRegex(restrictedStringTypeRegex, "firstName.allowedChars").apply(_)
     )).leftMap(_.prefixWith("firstName"))
 
-    val lastName = (lengthBetween(1, 35, "property-contact-details.lastName.minLength",
-      "property-contact-details.lastName.maxLength" )
+    val lastName = (lengthBetween(1, 35, "lastName.minLength",
+      "lastName.maxLength" )
       .apply(contactDetails.lastName) andThen (
-      Rule.matchesRegex(restrictedStringTypeRegex, "property-contact-details.lastName.allowedChars").apply(_)
+      Rule.matchesRegex(restrictedStringTypeRegex, "lastName.allowedChars").apply(_)
       )).leftMap(_.prefixWith("lastName"))
 
     val emailAddress = (contactDetails.email match {
       case None => Validated.valid(None)
       case Some(email) => {
-          Rule.matchesRegex(emailAddressRegex, "property-contact-details.email.format")(email).map(Option(_))
+          Rule.matchesRegex(emailAddressRegex, "email.format")(email).map(Option(_))
       }
     }).leftMap(_.prefixWith("email"))
 
@@ -113,18 +118,18 @@ object UniformJourney {
 
   def addressValidation(a: Address): Validated[ErrorTree, Address] = {
 
-    val line1 = (lengthBetween(1, 100, "property-address.line1.minLength",
-      "property-address.line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
-      "property-address.line1.allowedChars").apply(_))).leftMap(_.prefixWith("line1"))
+    val line1 = (lengthBetween(1, 100, "line1.minLength",
+      "line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
+      "line1.allowedChars").apply(_))).leftMap(_.prefixWith("line1"))
 
-    val line2 = (lengthBetween(1, 100, "property-address.line2.minLength",
-      "property-address.line2.maxLength").apply(a.line2) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
-      "property-address.line2.allowedChars").apply(_))).leftMap(_.prefixWith("line2"))
+    val line2 = (lengthBetween(1, 100, "line2.minLength",
+      "line2.maxLength").apply(a.line2) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
+      "line2.allowedChars").apply(_))).leftMap(_.prefixWith("line2"))
 
-    val line3: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("property-address.line3.maxLength", "property-address.line3.allowedChars")
+    val line3: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("line3.maxLength", "line3.allowedChars")
       .apply(a.line3).leftMap(_.prefixWith("line3"))
 
-    val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("property-address.line4.maxLength", "property-address.line4.allowedChars")
+    val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("line4.maxLength", "line4.allowedChars")
       .apply(a.line4).leftMap(_.prefixWith("line4"))
 
     val postcode = new PostcodeValidator().apply(a.postcode).leftMap(_.prefixWith("postcode"))

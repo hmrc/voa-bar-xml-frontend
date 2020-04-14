@@ -27,10 +27,10 @@ class PostcodeValidator extends Rule[String]{
   val allowedChars = """[^a-zA-Z0-9]""".r
 
   override def apply(v1: String): Validated[ErrorTree, String] = {
-    Rule.minLength[String](1, "property-address.postcode.minLength").apply(v1) andThen { validLenght =>
+    Rule.minLength[String](1, "postcode.minLength").apply(v1) andThen { validLenght =>
       val cleanedPostcode = allowedChars.replaceAllIn(validLenght, "").toUpperCase
       Rule.matchesRegex("""^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$""",
-        "property-address.postcode.eror").apply(cleanedPostcode).map { validPostcode =>
+        "postcode.eror").apply(cleanedPostcode).map { validPostcode =>
         validPostcode.substring(0, validPostcode.length - 3) + " " + validPostcode.substring(validPostcode.length - 3)
       }
     }

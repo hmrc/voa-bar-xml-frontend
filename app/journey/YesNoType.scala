@@ -16,25 +16,9 @@
 
 package journey
 
-import cats.data.Validated
-import ltbs.uniform.ErrorTree
-import ltbs.uniform.validation.Rule
+sealed trait YesNoType
 
-class PhoneNumberValidator extends Rule[String]{
-  import PhoneNumberValidator._
+case object Yes extends YesNoType
+case object No extends YesNoType
 
 
-  val validationRegex = """[0-9 \-]{1,20}"""
-
-  override def apply(v1: String): Validated[ErrorTree, String] = {
-    val updatePhoneNumber = allowedChars.replaceAllIn(v1, "")
-    Rule.matchesRegex(validationRegex, "phoneNumber.format").apply(updatePhoneNumber)
-  }
-}
-
-object PhoneNumberValidator {
-  val allowedChars = """[^0-9 \-]""".r
-
-  def apply(): PhoneNumberValidator = new PhoneNumberValidator
-
-}

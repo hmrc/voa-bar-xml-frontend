@@ -58,7 +58,7 @@
             @errorSummary(ErrorSummary(errorList = {
                 errors.map { error =>
                     ErrorLink(Some(error._1.head.mkString("#","_", "")),
-                        HtmlContent(error._2.head.render[Html](messages2)))
+                        HtmlContent(error._2.head.prefixWith(key).render[Html](messages2)))
                 }.toList
             }, title = Text(messages("error.summary.title"))))
         }
@@ -80,10 +80,15 @@
         <hr/>
         breadcrumbs: @breadcrumbs.mkString(",")
         <hr/>
-        errors: @errors.mkString(",") </br> </br>
-        @for(error <- errors) {
-            @error._1 | @error._2 <br />
-        }
+        <ul>
+            @for(error <- errors) {
+                <li style="padding-top: 10px;">@error._1
+                    <ul>
+                        <li>@error._2</li>
+                    </ul>
+                </li>
+            }
+        </ul>
         <hr />
     </div>
 

@@ -18,17 +18,19 @@ package controllers
 
 import cats.data.NonEmptyList
 import journey.UniformJourney.CtTaxForm
+import journey.{No, Yes, YesNoType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
+import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldEncoding, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
 import ltbs.uniform._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.{govukInput, govukSummaryList}
+import uk.gov.hmrc.govukfrontend.views.html.components.{govukInput, govukRadios, govukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
 
 import scala.concurrent.ExecutionContext
@@ -37,7 +39,8 @@ class AutobarsInterpreter (
                            results: Results,
                            messagesApi: play.api.i18n.MessagesApi,
                            page_chrome: views.html.govuk.pageChrome,
-                             govukInput: govukInput
+                           govukInput: govukInput,
+                           govukRadios: govukRadios
                          )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
@@ -174,7 +177,7 @@ class AutobarsInterpreter (
           .orElse {
             errors.valueAtRoot.filter(_ => pageKey == fieldKey)
           }
-          .map(x => x.head.render[Html](messages))
+          .map(x => x.head.prefixWith(pageKey).render[Html](messages))
           .map(x => ErrorMessage(content = HtmlContent(x)))
 
         val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
@@ -242,7 +245,22 @@ class AutobarsInterpreter (
                                   errors: ErrorTree,
                                   messages: UniformMessages[Html],
                                   cfl: CoproductFieldList[A, Html]): Html = {
-    Html(
-      s"should render coproduct<br /> stats: ${cfl.stats}, <br />${cfl.inner} <br />")
+    val value = values.valueAtRoot.map(_.mkString)
+
+    val radiosItems = Seq[RadioItem](
+      RadioItem(
+        id=Option("Yes"),
+        value=Option("Yes"),
+        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}yes")),
+        checked = value.map(_ == "Yes").getOrElse(false)
+      ),
+        RadioItem(
+        id=Option("No"),
+        value=Option("No"),
+        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}no")),
+        checked = value.map(_ == "No").getOrElse(false)
+      )
+    )
+    govukRadios(Radios(items = radiosItems, name = fieldKey.head))
   }
 }
