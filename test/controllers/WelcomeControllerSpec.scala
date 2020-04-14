@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext
 class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
-  val form = SubmissionTypeFormProvider()
+  val form = SubmissionTypeFormProvider()(messages)
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]

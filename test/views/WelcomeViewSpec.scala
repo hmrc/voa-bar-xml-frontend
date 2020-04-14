@@ -44,7 +44,7 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
 
   // Welcome page containing form for navigation
 
-  val form = SubmissionTypeFormProvider()
+  val form = SubmissionTypeFormProvider()(messages)
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
@@ -53,7 +53,7 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
   lazy val formDoc = asDocument(createFormView())
 
   "contain radio buttons for the value" in {
-    for (option <- SubmissionTypeFormProvider.options) {
+    for (option <- SubmissionTypeFormProvider.options(messages)) {
       assertContainsRadioButton(formDoc, option.id.getOrElse(""), "submissionCategory", option.value.getOrElse(""), false)
     }
   }
