@@ -19,13 +19,14 @@ package forms
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formatter
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 
 object SubmissionTypeFormProvider extends FormErrorHelper {
 
-  def submissionTypeFormatter = new Formatter[String] {
+  def submissionTypeFormatter(implicit messages: Messages) = new Formatter[String] {
     def bind(key: String, data: Map[String, String]) = data.get(key) match {
       case Some(s) if optionIsValid(s) => Right(s)
       case None => produceError(key, "error.select.option")
@@ -35,21 +36,21 @@ object SubmissionTypeFormProvider extends FormErrorHelper {
     def unbind(key: String, value: String) = Map(key -> value)
   }
 
-  def apply(): Form[String] =
+  def apply()(implicit messages: Messages): Form[String] =
     Form(single("submissionCategory" -> of(submissionTypeFormatter)))
 
-  def options  = Seq(
+  def options(implicit messages: Messages)  = Seq(
     RadioItem(
-      content = Text("submissionCategory.council_tax_webform"),//"create a Council Tax report"),
+      content = Text(messages("submissionCategory.council_tax_webform")),
       id = Some("submissionCategory.council_tax_webform"),
       value = Some("council_tax_webform"),
       label = Some(Label(forAttr = Some("submissionCategory.council_tax_webform")))),
     RadioItem(
-      content = Text("submissionCategory.council_tax_xml_upload"), //"Upload a file of Council Tax reports"),
+      content = Text(messages("submissionCategory.council_tax_xml_upload")),
       id = Some("submissionCategory.council_tax_xml_upload"),
       value = Some("council_tax_xml_upload"),
       label = Some(Label(forAttr = Some("submissionCategory.council_tax_xml_upload"))))
   )
 
-  def optionIsValid(value: String) = options.exists(o => o.value.getOrElse("") == value)
+  def optionIsValid(value: String)(implicit messages: Messages) = options.exists(o => o.value.getOrElse("") == value)
 }
