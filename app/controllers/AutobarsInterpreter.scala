@@ -29,6 +29,7 @@ import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukInput, govukRadios, govukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
@@ -170,7 +171,16 @@ class AutobarsInterpreter (
                           fieldKey: List[String],
                           breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                           data: Input, errors: ErrorTree,
-                          messages: UniformMessages[Html]): Html =  {
+                          messages: UniformMessages[Html]): Html = _render(
+        pageKey, fieldKey, breadcrumbs, data, errors, false, messages)
+
+
+        def _render(pageKey: List[String],
+                            fieldKey: List[String],
+                            breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                            data: Input, errors: ErrorTree,
+                            optional: Boolean,
+                            messages: UniformMessages[Html]): Html =  {
         import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
         val errorMessage = errors.get(NonEmptyList.one(fieldKey))
@@ -194,6 +204,11 @@ class AutobarsInterpreter (
             |
             |""".stripMargin)
 
+        val hint = if(optional) {
+          Option(Hint(content = Text("Optional")))
+        }else {
+          Option.empty[Hint]
+        }
 
         val messageKey = fieldKey :+ "label"
 
@@ -203,7 +218,8 @@ class AutobarsInterpreter (
           label = Label(content = HtmlContent(messages(messageKey.mkString(".")))),
           classes="govuk-input--width-20",
           value = fieldValue,
-          errorMessage = errorMessage
+          errorMessage = errorMessage,
+          hint = hint
         ))
       }
   }
@@ -220,7 +236,7 @@ class AutobarsInterpreter (
                         fieldKey: List[String],
                         breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                         data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = {
-      stringField.render(pageKey, fieldKey, breadcrumbs, data, errors, messages)
+      stringField._render(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
     }
   }
 
