@@ -30,13 +30,15 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
     baReportValidation("1") mustBe Valid("1")
     baReportValidation("123456789012") mustBe Valid("123456789012")
     baReportValidation("") mustBe a [Invalid[_]]
-    baReportValidation("asdasd") mustBe a [Invalid[_]]
+    baReportValidation("asdasd") mustBe a [Valid[_]]
+    baReportValidation("|") mustBe a [Invalid[_]]
   }
 
   it should "validate BA-ref" in {
     baReferenceValidation("1234") mustBe Valid("1234")
     baReferenceValidation("adasd#$^&*()") mustBe Valid("adasd#$^&*()")
-    baReferenceValidation("adasd#$^&*(%)") mustBe a [Invalid[_]]
+    baReferenceValidation("adasd#$^&*(%)") mustBe a [Valid[_]]
+    baReferenceValidation("|") mustBe a [Invalid[_]]
   }
 
   it should "validate UPRN" in {
