@@ -47,7 +47,7 @@
     <span class="govuk-caption-xl">@messages("service.name")</span>
     <h1 class="govuk-heading-xl">@messages("welcome.heading") @BillingAuthorities.find(baCode)</h1>
 
-    @if(appConfig.baCodes.contains(baCode)) {
+    @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
         @formWithCSRF(
             action = routes.WelcomeController.onSubmit(),
             'autoComplete -> "off"
