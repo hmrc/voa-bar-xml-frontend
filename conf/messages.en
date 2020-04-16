@@ -299,3 +299,27 @@ same-contact-address.same-contact-address.no=No
 
 check-answers.pageLabel=Check your answers
 check-answers.changeLabel=Change
+
+contact-address.pageLabel=Contact address
+contact-address.line1.label=Address line 1
+contact-address.line1.minLength=Enter the first line of the address
+contact-address.line1.maxLength=First line of address must be 35 characters or fewer
+contact-address.line1.allowedChars=First line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+contact-address.line2.label=Address line 2
+contact-address.line2.minLength=Enter the second line of the address
+contact-address.line2.maxLength=Second line of address must be 35 characters or fewer
+contact-address.line2.allowedChars=Second line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+contact-address.line3.label=Address line 3 (optional)
+contact-address.line3.maxLength=Third line of address must be 35 characters or fewer
+contact-address.line3.allowedChars=Third line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+contact-address.line4.label=Address line 4 (optional)
+contact-address.line4.maxLength=Fourth line of address must be 35 characters or fewer
+contact-address.line4.allowedChars=Fourth line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+contact-address.postcode.label=Postcode
+contact-address.postcode.minLength=Enter a postcode
+contact-address.postcode.allowedChar=Postcode must only include letters a to z and numbers 0 to 9
+contact-address.postcode.eror=Enter a real postcode

@@ -19,8 +19,10 @@ GET         /check-answers                        controllers.UniformController.
 POST        /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
 GET         /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
 POST        /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
-GET         /same-contact-address             controllers.UniformController.myJourney(id = "same-contact-address")
-POST        /same-contact-address             controllers.UniformController.myJourney(id = "same-contact-address")
+GET         /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
+POST        /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
+GET         /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
+POST        /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 

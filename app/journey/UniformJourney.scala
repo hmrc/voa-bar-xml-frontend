@@ -31,7 +31,7 @@ object UniformJourney {
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
                        propertyContactDetails: ContactDetails,
-                       sameContactAddress: Boolean)
+                       sameContactAddress: Boolean, contactAddress: Option[Address])
 
   type AskTypes = YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
@@ -51,11 +51,13 @@ object UniformJourney {
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
-      address <- ask[Address]("property-address", validation = addressValidation)
+      address <- ask[Address]("property-address", validation = longAddressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
       sameContactAddress <- ask[YesNoType]("same-contact-address")
-      _ <- tell[CtTaxForm]("check-answers", CtTaxForm(baReport, baRef, uprn, address, propertyContactDetails, sameContactAddress == "Yes"))
-    } yield CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == "Yes")
+      contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when (sameContactAddress == No)
+      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress)
+      _ <- tell[CtTaxForm]("check-answers", ctForm)
+    } yield ctForm
   }
 
   def baReportValidation(a: String) = {
@@ -115,20 +117,23 @@ object UniformJourney {
     result.leftMap(_.prefixWith("property-contact-details"))
   }
 
-  def addressValidation(a: Address): Validated[ErrorTree, Address] = {
+  def shortAddressValidation(a: Address):Validated[ErrorTree, Address] = addressValidation(35)(a)
+  def longAddressValidation(a: Address): Validated[ErrorTree, Address] = addressValidation(100)(a)
 
-    val line1 = (lengthBetween(1, 100, "line1.minLength",
+  def addressValidation(maxLen: Int)(a: Address): Validated[ErrorTree, Address] = {
+
+    val line1 = (lengthBetween(1, maxLen, "line1.minLength",
       "line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
       "line1.allowedChars").apply(_))).leftMap(_.prefixWith("line1"))
 
-    val line2 = (lengthBetween(1, 100, "line2.minLength",
+    val line2 = (lengthBetween(1, maxLen, "line2.minLength",
       "line2.maxLength").apply(a.line2) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
       "line2.allowedChars").apply(_))).leftMap(_.prefixWith("line2"))
 
-    val line3: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("line3.maxLength", "line3.allowedChars")
+    val line3: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine(maxLen, "line3.maxLength", "line3.allowedChars")
       .apply(a.line3).leftMap(_.prefixWith("line3"))
 
-    val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine("line4.maxLength", "line4.allowedChars")
+    val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine(maxLen, "line4.maxLength", "line4.allowedChars")
       .apply(a.line4).leftMap(_.prefixWith("line4"))
 
     val postcode = new PostcodeValidator().apply(a.postcode).leftMap(_.prefixWith("postcode"))
@@ -144,13 +149,13 @@ object UniformJourney {
     }
   }
 
-  def validateOptionalAddressLine(maxLenMsg: String, formatMsg: String) = new Rule[Option[String]] {
+  def validateOptionalAddressLine(maxLen: Int, maxLenMsg: String, formatMsg: String) = new Rule[Option[String]] {
     override def apply(v1: Option[String]): Validated[ErrorTree, Option[String]] = {
       v1 match {
         case None => Validated.Valid(Option.empty[String])
         case Some(value) => {
 
-          val res = maxLength[String](100, maxLenMsg).apply(value) andThen (Rule.matchesRegex(
+          val res = maxLength[String](maxLen, maxLenMsg).apply(value) andThen (Rule.matchesRegex(
             restrictedStringTypeRegex, formatMsg).apply(_))
           val res2: Validated[ ErrorTree, Option[String]] = res.map(x => Option(x))
           res2
