@@ -153,12 +153,49 @@ class AutobarsInterpreter (
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
+      val sameAddressQuestion = SummaryListRow(
+        key = Key(HtmlContent(messages("same-contact-address.pageLabel"))),
+        value = Value(HtmlContent(
+          messages(if(in.sameContactAddress)"same-contact-address.same-contact-address.yes" else "same-contact-address.same-contact-address.no")
+        )),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("same-contact-address").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+
+      val contactAddress = in.contactAddress.map { contactAddress =>
+        val addressContent = HtmlFormat.fill(List(
+          HtmlFormat.escape(contactAddress.line1),Html("<br />"),
+          HtmlFormat.escape(contactAddress.line2),Html("<br />"),
+          in.address.line3.map(line3 => HtmlFormat.fill(
+            List(HtmlFormat.escape(line3), Html("<br />")))
+          ).getOrElse(Html("")),
+          in.address.line4.map(line3 => HtmlFormat.fill(
+            List(HtmlFormat.escape(line3), Html("<br />")))
+          ).getOrElse(Html("")),
+          HtmlFormat.escape(contactAddress.postcode)
+        ))
+
+        SummaryListRow(
+          key = Key(HtmlContent(messages("contact-address.pageLabel"))),
+          value = Value(HtmlContent(addressContent)),
+          actions = Some(Actions(items = Seq(
+            ActionItem(controllers.routes.UniformController.myJourney("contact-address").url,
+              HtmlContent(messages("check-answers.changeLabel"))))
+          ))
+        )
+      }
+
       sumaryList(SummaryList(Seq(
         Option(baReport),
         Option(baRef),
         uprn,
         Option(propertyAddress),
-        Option(contactDetails)).flatten))
+        Option(contactDetails),
+        Option(sameAddressQuestion),
+        contactAddress
+      ).flatten))
     }
   }
 
