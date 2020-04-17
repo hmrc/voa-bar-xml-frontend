@@ -23,6 +23,10 @@ GET         /same-contact-address                 controllers.UniformController.
 POST        /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
 GET         /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
 POST        /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
+GET         /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
+POST        /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
+
+
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 

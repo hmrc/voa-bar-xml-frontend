@@ -16,6 +16,8 @@
 
 package journey
 
+import java.time.LocalDate
+
 import cats.data.{NonEmptyList, Validated}
 import ltbs.uniform._
 import cats.implicits._
@@ -31,9 +33,10 @@ object UniformJourney {
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
                        propertyContactDetails: ContactDetails,
-                       sameContactAddress: Boolean, contactAddress: Option[Address])
+                       sameContactAddress: Boolean, contactAddress: Option[Address],
+                       effectiveDate: LocalDate)
 
-  type AskTypes = YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
+  type AskTypes = LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
 
   //RestrictedStringType
@@ -55,7 +58,8 @@ object UniformJourney {
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
       sameContactAddress <- ask[YesNoType]("same-contact-address")
       contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when (sameContactAddress == No)
-      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress)
+      effectiveDate <- ask[LocalDate]("effective-date")
+      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress, effectiveDate)
       _ <- tell[CtTaxForm]("check-answers", ctForm)
     } yield ctForm
   }
