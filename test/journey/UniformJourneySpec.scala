@@ -80,6 +80,13 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
     UniformJourney.propertyContactDetailValidator(contactDetails).toEither.left.value must have size(4)
   }
 
+  it should "validate planning reference" in {
+    UniformJourney.planningRefValidator("1234asdf½").toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.planningRefValidator("").toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.planningRefValidator("12345678901234567890123456").toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.planningRefValidator("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ").toEither.right.value mustBe("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
+  }
+
 
 
 }
