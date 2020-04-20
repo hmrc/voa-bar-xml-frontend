@@ -325,7 +325,7 @@ contact-address.postcode.allowedChar=Postcode must only include letters a to z a
 contact-address.postcode.eror=Enter a real postcode
 
 
-effective-date.pageLabel=Effective Date
+effective-date.pageLabel=Effective date
 effective-date.hint=For example, 23 3 2020
 effective-date.day=Day
 effective-date.month=Month
@@ -347,10 +347,14 @@ effective-date.error.month.range=Effective date must have a month that is a numb
 effective-date.error.year.number=Effective date must have a year that is a number
 effective-date.error.year.range=Effective date must be between 1 January 1900 and today
 
-
 have-planning-ref.pageLabel=Do you have a planning reference?
 have-planning-ref.label=
 have-planning-ref.have-planning-ref.yes=Yes
 have-planning-ref.have-planning-ref.no=No
 have-planning-ref.required=Select 'yes' if you have a planning reference
 
+planning-ref.pageLabel=Planning reference
+planning-ref.label=
+planning-ref.error.minLength=Enter a planning reference
+planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
+planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes

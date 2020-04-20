@@ -34,7 +34,7 @@ object UniformJourney {
   case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
                        propertyContactDetails: ContactDetails,
                        sameContactAddress: Boolean, contactAddress: Option[Address],
-                       effectiveDate: LocalDate, havePlaningReference: Boolean)
+                       effectiveDate: LocalDate, havePlaningReference: Boolean, planningRef: Option[String])
 
   type AskTypes = LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
@@ -59,8 +59,9 @@ object UniformJourney {
       contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when (sameContactAddress == No)
       effectiveDate <- ask[LocalDate]("effective-date")
       havePlanningRef <- ask[YesNoType]("have-planning-ref")
+      planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
-                effectiveDate, havePlanningRef == Yes)
+                effectiveDate, havePlanningRef == Yes, planningRef)
 
       _ <- tell[CtTaxForm]("check-answers", ctForm)
     } yield ctForm
@@ -87,6 +88,13 @@ object UniformJourney {
         )).map(Option(_))
       }
     }).leftMap(_.prefixWith("UPRN"))
+  }
+
+  def planningRefValidator(planningRef: String) = {
+    (lengthBetween(1,25, "error.minLength", "error.maxLength" ).apply(planningRef) andThen(
+      new Iso558910Validator()(_))
+    ).leftMap(_.prefixWith("planning-ref"))
+
   }
 
   def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] = {
