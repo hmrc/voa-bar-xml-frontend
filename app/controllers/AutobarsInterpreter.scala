@@ -206,6 +206,15 @@ class AutobarsInterpreter (
         ))
       )
 
+      val tempDoYouHavePlanningReference = SummaryListRow(
+        key = Key(HtmlContent(messages("have-planning-ref.pageLabel"))),
+        value = Value(HtmlContent(
+          if(in.havePlaningReference) messages("have-planning-ref.have-planning-ref.yes") else messages("have-planning-ref.have-planning-ref.no"))),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("have-planning-ref").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
 
       sumaryList(SummaryList(Seq(
         Option(baReport),
@@ -215,7 +224,8 @@ class AutobarsInterpreter (
         Option(contactDetails),
         Option(sameAddressQuestion),
         contactAddress,
-        Option(effectiveDate)
+        Option(effectiveDate),
+        Option(tempDoYouHavePlanningReference)
       ).flatten))
     }
   }

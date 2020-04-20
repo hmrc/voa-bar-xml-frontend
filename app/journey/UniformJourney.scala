@@ -34,7 +34,7 @@ object UniformJourney {
   case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
                        propertyContactDetails: ContactDetails,
                        sameContactAddress: Boolean, contactAddress: Option[Address],
-                       effectiveDate: LocalDate)
+                       effectiveDate: LocalDate, havePlaningReference: Boolean)
 
   type AskTypes = LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
@@ -43,9 +43,8 @@ object UniformJourney {
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
   val restrictedStringTypeRegex = """[A-Za-z0-9\s\~!"@#\$%\+&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*"""
 
-  // Email Type
-  //[0-9A-Za-z'\.\-_]{1,127}@[0-9A-Za-z'\.\-_]{1,127}
-  val emailAddressRegex = """[0-9A-Za-z'\.\-_]{1,127}@[0-9A-Za-z'\.\-_]{1,127}"""
+  // More strict validation that in XML https://emailregex.com/
+  val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
   def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[CtTaxForm] = {
     import interpreter._
@@ -59,7 +58,10 @@ object UniformJourney {
       sameContactAddress <- ask[YesNoType]("same-contact-address")
       contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when (sameContactAddress == No)
       effectiveDate <- ask[LocalDate]("effective-date")
-      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress, effectiveDate)
+      havePlanningRef <- ask[YesNoType]("have-planning-ref")
+      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
+                effectiveDate, havePlanningRef == Yes)
+
       _ <- tell[CtTaxForm]("check-answers", ctForm)
     } yield ctForm
   }

@@ -32,6 +32,7 @@ class PostcodeValidatorSpec extends FlatSpec with Matchers with EitherValues {
     validator("-(&^^%*$&%^#- BN12 4A x").toEither.right.value shouldBe ("BN12 4AX")
     validator("bn124ax:").toEither.right.value shouldBe ("BN12 4AX")
     validator("e2-6b J:").toEither.right.value shouldBe ("E2 6BJ")
+    validator("e2-6b,. J:").toEither.right.value shouldBe ("E2 6BJ")
     //bn12 4axx and bbn12 4ax
   }
 
