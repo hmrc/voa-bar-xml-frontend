@@ -25,6 +25,8 @@ GET         /contact-address                      controllers.UniformController.
 POST        /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
 GET         /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
 POST        /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
+GET         /have-planning-ref                    controllers.UniformController.myJourney(id = "have-planning-ref")
+POST        /have-planning-ref                    controllers.UniformController.myJourney(id = "have-planning-ref")
 
 
 

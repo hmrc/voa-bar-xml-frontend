@@ -348,4 +348,9 @@ effective-date.error.year.number=Effective date must have a year that is a numbe
 effective-date.error.year.range=Effective date must be between 1 January 1900 and today
 
 
+have-planning-ref.pageLabel=Do you have a planning reference?
+have-planning-ref.label=
+have-planning-ref.have-planning-ref.yes=Yes
+have-planning-ref.have-planning-ref.no=No
+have-planning-ref.required=Select 'yes' if you have a planning reference
 
