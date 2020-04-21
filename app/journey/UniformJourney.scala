@@ -34,9 +34,10 @@ object UniformJourney {
   case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
                        propertyContactDetails: ContactDetails,
                        sameContactAddress: Boolean, contactAddress: Option[Address],
-                       effectiveDate: LocalDate, havePlaningReference: Boolean, planningRef: Option[String])
+                       effectiveDate: LocalDate, havePlaningReference: Boolean,
+                       planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType])
 
-  type AskTypes = LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
+  type AskTypes = NoPlanningReferenceType :: LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
 
   //RestrictedStringType
@@ -46,6 +47,7 @@ object UniformJourney {
   // More strict validation that in XML https://emailregex.com/
   val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
+  // $COVERAGE-OFF$
   def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[CtTaxForm] = {
     import interpreter._
 
@@ -60,12 +62,14 @@ object UniformJourney {
       effectiveDate <- ask[LocalDate]("effective-date")
       havePlanningRef <- ask[YesNoType]("have-planning-ref")
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
+      noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
-                effectiveDate, havePlanningRef == Yes, planningRef)
+                effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference)
 
       _ <- tell[CtTaxForm]("check-answers", ctForm)
     } yield ctForm
   }
+  // $COVERAGE-ON$
 
   def baReportValidation(a: String) = {
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (

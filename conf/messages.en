@@ -294,8 +294,8 @@ property-contact-details.phoneNumber.format=Enter a phone number, like 01632 960
 same-contact-address.pageLabel=Do you want to use the same address for the contact?
 same-contact-address.required=Select ‘yes’ if you want to use the same address for the contact
 
-same-contact-address.same-contact-address.yes=Yes
-same-contact-address.same-contact-address.no=No
+same-contact-address.same-contact-address.Yes=Yes
+same-contact-address.same-contact-address.No=No
 
 check-answers.pageLabel=Check your answers
 check-answers.changeLabel=Change
@@ -349,8 +349,8 @@ effective-date.error.year.range=Effective date must be between 1 January 1900 an
 
 have-planning-ref.pageLabel=Do you have a planning reference?
 have-planning-ref.label=
-have-planning-ref.have-planning-ref.yes=Yes
-have-planning-ref.have-planning-ref.no=No
+have-planning-ref.have-planning-ref.Yes=Yes
+have-planning-ref.have-planning-ref.No=No
 have-planning-ref.required=Select 'yes' if you have a planning reference
 
 planning-ref.pageLabel=Planning reference
@@ -358,3 +358,11 @@ planning-ref.label=
 planning-ref.error.minLength=Enter a planning reference
 planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
 planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes
+
+why-no-planning-ref.pageLabel=Why is there no planning reference?
+why-no-planning-ref.required=Select why you don’t have a planning reference
+why-no-planning-ref.why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
+why-no-planning-ref.why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable
+why-no-planning-ref.why-no-planning-ref.NotRequiredPlanningPermission=Planning permission is not required
+why-no-planning-ref.why-no-planning-ref.PermittedDevelopment=It's a permitted development
+why-no-planning-ref.why-no-planning-ref.NoPlanningApplicationSubmitted=No planning application has been submitted
