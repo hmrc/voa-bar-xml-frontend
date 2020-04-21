@@ -29,7 +29,8 @@ GET         /have-planning-ref                    controllers.UniformController.
 POST        /have-planning-ref                    controllers.UniformController.myJourney(id = "have-planning-ref")
 GET         /planning-ref                         controllers.UniformController.myJourney(id = "planning-ref")
 POST        /planning-ref                         controllers.UniformController.myJourney(id = "planning-ref")
-
+GET         /why-no-planning-ref                  controllers.UniformController.myJourney(id = "why-no-planning-ref")
+POST        /why-no-planning-ref                  controllers.UniformController.myJourney(id = "why-no-planning-ref")
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 

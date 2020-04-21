@@ -22,7 +22,7 @@ import java.util.Locale
 
 import cats.data.NonEmptyList
 import journey.UniformJourney.CtTaxForm
-import journey.{LocalDateFormFieldEncoding, No, Yes, YesNoType}
+import journey.{LocalDateFormFieldEncoding, No, NoPlanningReferenceType, Yes, YesNoType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldEncoding, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
@@ -164,7 +164,7 @@ class AutobarsInterpreter (
       val sameAddressQuestion = SummaryListRow(
         key = Key(HtmlContent(messages("same-contact-address.pageLabel"))),
         value = Value(HtmlContent(
-          messages(if(in.sameContactAddress)"same-contact-address.same-contact-address.yes" else "same-contact-address.same-contact-address.no")
+          messages(if(in.sameContactAddress)"same-contact-address.same-contact-address.Yes" else "same-contact-address.same-contact-address.No")
         )),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("same-contact-address").url,
@@ -217,6 +217,17 @@ class AutobarsInterpreter (
         )
       }
 
+      val noPlanningRef = in.noPlanningReference.map { noPlanningRef =>
+        SummaryListRow(
+          key = Key(HtmlContent(messages("why-no-planning-ref.pageLabel"))),
+          value = Value(HtmlContent(messages("why-no-planning-ref.why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$","")))),
+          actions = Some(Actions(items = Seq(
+            ActionItem(controllers.routes.UniformController.myJourney("why-no-planning-ref").url,
+              HtmlContent(messages("check-answers.changeLabel"))))
+          ))
+        )
+      }
+
       sumaryList(SummaryList(Seq(
         Option(baReport),
         Option(baRef),
@@ -226,7 +237,8 @@ class AutobarsInterpreter (
         Option(sameAddressQuestion),
         contactAddress,
         Option(effectiveDate),
-        planningRef
+        planningRef,
+        noPlanningRef
       ).flatten))
     }
   }
@@ -369,22 +381,26 @@ class AutobarsInterpreter (
                                   errors: ErrorTree,
                                   messages: UniformMessages[Html],
                                   cfl: CoproductFieldList[A, Html]): Html = {
-    val value = values.valueAtRoot.map(_.mkString)
 
-    val radiosItems = Seq[RadioItem](
+    val value = values.valueAtRoot.map(_.mkString)
+    val coproductValues = cfl.inner.map(_._1).toSet
+    val items = if(coproductValues == NoPlanningReferenceType.order.toSet) {
+      NoPlanningReferenceType.order
+    } else if (coproductValues == Set("Yes", "No")) {
+      List("Yes", "No")
+    } else {
+      cfl.inner.map(_._1)
+    }
+
+    val radiosItems = items.map { name:String =>
       RadioItem(
-        id=Option("Yes"),
-        value=Option("Yes"),
-        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}yes")),
-        checked = value.map(_ == "Yes").getOrElse(false)
-      ),
-        RadioItem(
-        id=Option("No"),
-        value=Option("No"),
-        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}no")),
-        checked = value.map(_ == "No").getOrElse(false)
+        id=Option(name),
+        value=Option(name),
+        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}${name}")),
+        checked = value.map(_ == name).getOrElse(false)
       )
-    )
+    }
+
     govukRadios(Radios(items = radiosItems, name = fieldKey.head))
   }
 }
