@@ -115,7 +115,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
   def validateDay(day: String): Either[ErrorTree, Int] = {
     if(testRegex.matcher(day).matches()) {
       val intDay = day.toInt
-      if(intDay > 31) {
+      if(intDay > 31 || intDay < 1) {
         Left(ErrorTree.one(NonEmptyList.one(ErrorMsg("error.day.range"))
           .append(ErrorMsg("day"))))
       }else {
@@ -130,7 +130,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
   def validateMont(month: String): Either[ErrorTree, Int] = {
     if(testRegex.matcher(month).matches()) {
       val intMonth = month.toInt
-      if(intMonth > 12) {
+      if(intMonth > 12 | intMonth < 1) {
         Left(ErrorTree.one(NonEmptyList.one(ErrorMsg("error.month.range"))
           .append(ErrorMsg("month"))))
       }else {

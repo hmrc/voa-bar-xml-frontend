@@ -52,7 +52,7 @@
     ))
 
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
-            'autoComplete -> "off"
+        ('novalidate -> "novalidate"), ('autoComplete -> "off")
     ) {
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
