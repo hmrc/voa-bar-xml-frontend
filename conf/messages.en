@@ -351,7 +351,7 @@ have-planning-ref.pageLabel=Do you have a planning reference?
 have-planning-ref.label=
 have-planning-ref.have-planning-ref.Yes=Yes
 have-planning-ref.have-planning-ref.No=No
-have-planning-ref.required=Select 'yes' if you have a planning reference
+have-planning-ref.required=Select ‘yes’ if you have a planning reference
 
 planning-ref.pageLabel=Planning reference
 planning-ref.label=
@@ -364,5 +364,10 @@ why-no-planning-ref.required=Select why you don’t have a planning reference
 why-no-planning-ref.why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
 why-no-planning-ref.why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable
 why-no-planning-ref.why-no-planning-ref.NotRequiredPlanningPermission=Planning permission is not required
-why-no-planning-ref.why-no-planning-ref.PermittedDevelopment=It's a permitted development
+why-no-planning-ref.why-no-planning-ref.PermittedDevelopment=It’s a permitted development
 why-no-planning-ref.why-no-planning-ref.NoPlanningApplicationSubmitted=No planning application has been submitted
+
+comments.pageLabel=Comments
+comments.label=
+comments.error.maxLength=Comments must be 226 characters or fewer
+comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes

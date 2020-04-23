@@ -195,7 +195,7 @@ class AutobarsInterpreter (
         )
       }
 
-      val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+      val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
       val effectiveDate = SummaryListRow(
         key = Key(HtmlContent(messages("effective-date.pageLabel"))),
@@ -228,6 +228,17 @@ class AutobarsInterpreter (
         )
       }
 
+      val comments = in.comments.map { comment =>
+        SummaryListRow(
+          key = Key(HtmlContent(messages("comments.pageLabel"))),
+          value = Value(Text(comment)),
+          actions = Some(Actions(items = Seq(
+            ActionItem(controllers.routes.UniformController.myJourney("comments").url,
+              HtmlContent(messages("check-answers.changeLabel"))))
+          ))
+        )
+      }
+
       sumaryList(SummaryList(Seq(
         Option(baReport),
         Option(baRef),
@@ -238,7 +249,8 @@ class AutobarsInterpreter (
         contactAddress,
         Option(effectiveDate),
         planningRef,
-        noPlanningRef
+        noPlanningRef,
+        comments
       ).flatten))
     }
   }

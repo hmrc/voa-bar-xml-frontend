@@ -22,7 +22,7 @@ import cats.data.{NonEmptyList, Validated}
 import ltbs.uniform._
 import cats.implicits._
 import ltbs.uniform.validation.Rule
-import ltbs.uniform.validation.Rule.{error, maxLength, minLength}
+import ltbs.uniform.validation.Rule.{maxLength, minLength}
 
 import scala.collection.immutable.ListMap
 import scala.language.higherKinds
@@ -35,7 +35,7 @@ object UniformJourney {
                        propertyContactDetails: ContactDetails,
                        sameContactAddress: Boolean, contactAddress: Option[Address],
                        effectiveDate: LocalDate, havePlaningReference: Boolean,
-                       planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType])
+                       planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
   type AskTypes = NoPlanningReferenceType :: LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = CtTaxForm :: Long :: NilTypes
@@ -63,8 +63,9 @@ object UniformJourney {
       havePlanningRef <- ask[YesNoType]("have-planning-ref")
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
+      comments <- ask[Option[String]]("comments", validation = commentsValidation)
       ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
-                effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference)
+                effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
       _ <- tell[CtTaxForm]("check-answers", ctForm)
     } yield ctForm
@@ -92,6 +93,17 @@ object UniformJourney {
         )).map(Option(_))
       }
     }).leftMap(_.prefixWith("UPRN"))
+  }
+
+  def commentsValidation(a: Option[String]) = {
+    (a match {
+      case None => Validated.valid(None)
+      case Some(uprn) => {
+        (lengthBetween(1,226, "", "error.maxLength" ).apply(uprn) andThen (
+          new journey.Iso558910Validator().apply(_)
+          )).map(Option(_))
+      }
+    }).leftMap(_.prefixWith("comments"))
   }
 
   def planningRefValidator(planningRef: String) = {

@@ -25,6 +25,9 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
 
   import UniformJourney._
 
+  val string226Char = ((1 to 22).map(_ => "1234567890").mkString("")) + "123456"
+  val string227Char = string226Char + "7"
+
   "UniformJourney" should "validate BAReport" in {
     baReportValidation("1234") mustBe Valid("1234")
     baReportValidation("1") mustBe Valid("1")
@@ -84,7 +87,13 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
     UniformJourney.planningRefValidator("1234asdf½").toEither.left.value mustBe a[ErrorTree]
     UniformJourney.planningRefValidator("").toEither.left.value mustBe a[ErrorTree]
     UniformJourney.planningRefValidator("12345678901234567890123456").toEither.left.value mustBe a[ErrorTree]
-    UniformJourney.planningRefValidator("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ").toEither.right.value mustBe("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
+    UniformJourney.planningRefValidator("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ").toEither.right.value mustBe ("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
+  }
+
+  it should "validate comments" in {
+    UniformJourney.commentsValidation(Option(string226Char)).toEither.right.value mustBe (Option(string226Char))
+    UniformJourney.commentsValidation(Option(string227Char)).toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.right.value mustBe(Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ"))
   }
 
 
