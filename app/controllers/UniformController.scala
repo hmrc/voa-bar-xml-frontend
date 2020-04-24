@@ -22,7 +22,7 @@ import ltbs.uniform._
 import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
-import ltbs.uniform.common.web.{FormField, FormFieldStats}
+import ltbs.uniform.common.web.{FormField, FormFieldStats, JourneyConfig}
 import play.api.Logger
 import play.api.i18n.{Messages => _, _}
 import play.api.libs.json.Json
