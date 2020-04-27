@@ -371,3 +371,7 @@ comments.pageLabel=Comments
 comments.label=
 comments.error.maxLength=Comments must be 226 characters or fewer
 comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
+
+summary.submit=Submit
+summary.comments.none=None
+summary.uprn.notEntered=Not entered

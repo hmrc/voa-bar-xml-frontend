@@ -110,16 +110,15 @@ class AutobarsInterpreter (
         ))
       )
 
-      val uprn = in.uprn.map { uprn =>
-        SummaryListRow(
+      val uprn = SummaryListRow(
           key = Key(HtmlContent(messages("UPRN.pageLabel"))),
-          value = Value(Text(uprn)),
+          value = Value(in.uprn.map(Text).getOrElse(HtmlContent(messages("summary.uprn.notEntered")))),
           actions = Some(Actions(items = Seq(
             ActionItem(controllers.routes.UniformController.myJourney("UPRN").url,
               HtmlContent(messages("check-answers.changeLabel"))))
           ))
         )
-      }
+
 
       val addressContent = HtmlFormat.fill(List(
       HtmlFormat.escape(in.address.line1),Html("<br />"),
@@ -143,7 +142,7 @@ class AutobarsInterpreter (
       )
 
       val contactDetailsContent = HtmlFormat.fill(List(
-        HtmlFormat.escape(in.propertyContactDetails.firstName),Html("<br />"),
+        HtmlFormat.escape(in.propertyContactDetails.firstName),Html("&nbsp;"),
         HtmlFormat.escape(in.propertyContactDetails.lastName),Html("<br />"),
         in.propertyContactDetails.email.map(email => HtmlFormat.fill(
           List(HtmlFormat.escape(email), Html("<br />"))
@@ -176,10 +175,10 @@ class AutobarsInterpreter (
         val addressContent = HtmlFormat.fill(List(
           HtmlFormat.escape(contactAddress.line1),Html("<br />"),
           HtmlFormat.escape(contactAddress.line2),Html("<br />"),
-          in.address.line3.map(line3 => HtmlFormat.fill(
+          contactAddress.line3.map(line3 => HtmlFormat.fill(
             List(HtmlFormat.escape(line3), Html("<br />")))
           ).getOrElse(Html("")),
-          in.address.line4.map(line3 => HtmlFormat.fill(
+          contactAddress.line4.map(line3 => HtmlFormat.fill(
             List(HtmlFormat.escape(line3), Html("<br />")))
           ).getOrElse(Html("")),
           HtmlFormat.escape(contactAddress.postcode)
@@ -206,6 +205,15 @@ class AutobarsInterpreter (
         ))
       )
 
+      val havePlanningRef = SummaryListRow(
+        key = Key(HtmlContent(messages("have-planning-ref.pageLabel"))),
+        value = Value(HtmlContent(if(in.havePlaningReference) messages("have-planning-ref.have-planning-ref.Yes") else messages("have-planning-ref.have-planning-ref.No"))),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("have-planning-ref").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+
       val planningRef = in.planningRef.map { planningRef =>
         SummaryListRow(
           key = Key(HtmlContent(messages("planning-ref.pageLabel"))),
@@ -228,29 +236,30 @@ class AutobarsInterpreter (
         )
       }
 
-      val comments = in.comments.map { comment =>
+      val comments =
         SummaryListRow(
           key = Key(HtmlContent(messages("comments.pageLabel"))),
-          value = Value(Text(comment)),
+          value = Value(in.comments.map(Text).getOrElse(HtmlContent(messages("summary.comments.none")))),
           actions = Some(Actions(items = Seq(
             ActionItem(controllers.routes.UniformController.myJourney("comments").url,
               HtmlContent(messages("check-answers.changeLabel"))))
           ))
         )
-      }
+
 
       sumaryList(SummaryList(Seq(
         Option(baReport),
         Option(baRef),
-        uprn,
+        Option(uprn),
         Option(propertyAddress),
         Option(contactDetails),
         Option(sameAddressQuestion),
         contactAddress,
         Option(effectiveDate),
+        Option(havePlanningRef),
         planningRef,
         noPlanningRef,
-        comments
+        Option(comments)
       ).flatten))
     }
   }
