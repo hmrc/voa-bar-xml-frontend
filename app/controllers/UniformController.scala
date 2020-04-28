@@ -17,12 +17,15 @@
 package controllers
 import java.util.UUID
 
+import config.FrontendAppConfig
 import connectors.DataCacheConnector
+import controllers.actions.DataRetrievalAction
 import ltbs.uniform._
 import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
 import ltbs.uniform.common.web.{FormField, FormFieldStats, JourneyConfig}
+import models.requests.OptionalDataRequest
 import play.api.Logger
 import play.api.i18n.{Messages => _, _}
 import play.api.libs.json.Json
@@ -41,36 +44,54 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   govukRadios: govukRadios,
                                   govukDateInput: govukDateInput,
                                   dataCaheConnector: DataCacheConnector,
+                                  getData: DataRetrievalAction,
+                                  appConfig: FrontendAppConfig,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
-  implicit val mongoPersistance: PersistenceEngine[Request[AnyContent]] = new UUIDPersistence() {
+  implicit val mongoPersistance: PersistenceEngine[OptionalDataRequest[AnyContent]] = new PersistenceEngine[OptionalDataRequest[AnyContent]]() {
 
     val storageKey = "CR03"
 
     import utils.Formats.uniformDBFormat
 
-    override def load(uuid: UUID): Future[_root_.ltbs.uniform.interpreters.playframework.DB] = {
-      dataCaheConnector.getEntry[DB](uuid.toString, storageKey).map(_.getOrElse(Map[List[String], String]()))
+    override def apply(request: OptionalDataRequest[AnyContent])(
+      f: DB => Future[(_root_.ltbs.uniform.interpreters.playframework.DB, Result)]): Future[Result] = {
+
+      for {
+        db <- load(request.externalId)
+        (newdb, result) <- f(db)
+        _ <- save(request.externalId, newdb)
+      }yield {
+        result
+      }
     }
 
-    override def save(uuid: UUID, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
-      dataCaheConnector.save(uuid.toString, storageKey, db).map(_ => ())
+    def load(externalId: String): Future[_root_.ltbs.uniform.interpreters.playframework.DB] = {
+      dataCaheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
     }
+
+    def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+      dataCaheConnector.save(externalId, storageKey, db).map(_ => ())
+    }
+
   }
 
   lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput)
 
-  def myJourney(targetId: String) = Action.async { implicit request: Request[AnyContent] =>
+  def myJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
 
     val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))
-
-    playProgram.run(targetId, purgeStateUponCompletion = true) {
-      complexForm  => Future.successful(Ok(s"${complexForm}"))
+    if(request.userAnswers.flatMap(_.login).isEmpty) {
+      implicit val messages = cc.messagesApi.preferred(request)
+      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+    }else {
+      playProgram.run(targetId, purgeStateUponCompletion = true) {
+        complexForm => Future.successful(Ok(s"${complexForm}"))
+      }
     }
-
   }
 
 }
