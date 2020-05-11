@@ -1,0 +1,75 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import java.time.format.DateTimeFormatter
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
+@import views.html.govuk.cr03SubmissionConfirmation
+
+@import journey.UniformJourney.Cr03Submission
+
+@this(
+    mainTemplate: views.html.govuk.main_template,
+    govukBackLink: govukBackLink,
+    govukPanel: govukPanel,
+    cr03SubmissionConfirmation:cr03SubmissionConfirmation
+)
+
+@(  report: ReportStatus,
+    cr03Submission: Option[Cr03Submission]
+)(implicit request: Request[_], messages: Messages)
+
+@dateFormat = @{DateTimeFormatter.ofPattern("d MMMM y H:mm")}
+
+@beforeBlock = {
+    @govukBackLink(BackLink(
+        href=controllers.routes.WelcomeController.onPageLoad().url, content = Text("Back")
+    ))
+}
+
+@mainTemplate(
+    pageTitle = Option("Confirmation - Billing Authority "),
+    beforeContentBlock = Option(beforeBlock)
+) {
+    @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
+        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(report.id)" />
+    }
+
+    @govukPanel(Panel(
+        headingLevel = 1, title = Text( messages(s"status.${report.status.getOrElse(Pending.value).toLowerCase}.title") ),
+        content = Text(s"${messages("submission")} ${report.id.substring(0, 8)}")
+    ))
+
+    @if(cr03Submission.isDefined) {
+        @cr03SubmissionConfirmation(cr03Submission.get)
+    }
+
+    <h3 class="govuk-heading-m">What I should do next?</h3>
+    <p class="govuk-body">Send additional information to bars@@voa.gsi.gov.uk</p>
+
+    <p class="govuk-body">
+        Billing authority report : @{report.id.substring(0, 8)}<br />
+        Submitted : @report.created.format(dateFormat)
+    </p>
+    <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="@routes.WelcomeController.onPageLoad()">Submit more council tax reports</a><br />
+        <a class="govuk-link govuk-link--no-visited-state" href="@routes.ReportStatusController.onPageLoad(None)">View submission histor</a>
+    </p>
+
+
+
+}

@@ -18,27 +18,32 @@ package journey
 
 import java.time.LocalDate
 
-import cats.data.{NonEmptyList, Validated}
+import cats.data.Validated
 import ltbs.uniform._
 import cats.implicits._
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
+import play.api.libs.json.Json
 
-import scala.collection.immutable.ListMap
 import scala.language.higherKinds
 
 object UniformJourney {
 
+  object Address { implicit val format = Json.format[Address] }
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
+  object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
-  case class CtTaxForm(baReport: String, baRef: String, uprn: Option[String], address: Address,
-                       propertyContactDetails: ContactDetails,
-                       sameContactAddress: Boolean, contactAddress: Option[Address],
-                       effectiveDate: LocalDate, havePlaningReference: Boolean,
-                       planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
+  object Cr03Submission { val format = Json.format[Cr03Submission] }
+  case class Cr03Submission(baReport: String, baRef: String, uprn: Option[String], address: Address,
+                            propertyContactDetails: ContactDetails,
+                            sameContactAddress: Boolean, contactAddress: Option[Address],
+                            effectiveDate: LocalDate, havePlaningReference: Boolean,
+                            planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
+
+
 
   type AskTypes = NoPlanningReferenceType :: LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
-  type TellTypes = CtTaxForm :: Long :: NilTypes
+  type TellTypes = Cr03Submission :: Long :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -48,7 +53,7 @@ object UniformJourney {
   val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
   // $COVERAGE-OFF$
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[CtTaxForm] = {
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr03Submission] = {
     import interpreter._
 
     for {
@@ -64,10 +69,10 @@ object UniformJourney {
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
-      ctForm = CtTaxForm(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
+      ctForm = Cr03Submission(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
                 effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
-      _ <- tell[CtTaxForm]("check-answers", ctForm)
+      _ <- tell[Cr03Submission]("check-answers", ctForm)
     } yield ctForm
   }
   // $COVERAGE-ON$
@@ -142,7 +147,7 @@ object UniformJourney {
     }).leftMap(_.prefixWith("phoneNumber"))
 
 
-    val result = (firstName, lastName, emailAddress, phoneNumber).mapN(ContactDetails)
+    val result = (firstName, lastName, emailAddress, phoneNumber).mapN(ContactDetails.apply)
 
     result.leftMap(_.prefixWith("property-contact-details"))
   }
@@ -168,7 +173,7 @@ object UniformJourney {
 
     val postcode = new PostcodeValidator().apply(a.postcode).leftMap(_.prefixWith("postcode"))
 
-    val result = (line1, line2, line3, line4, postcode).mapN(Address)
+    val result = (line1, line2, line3, line4, postcode).mapN(Address.apply)
 
     result.leftMap(_.prefixWith("property-address"))
   }
