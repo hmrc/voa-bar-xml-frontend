@@ -48,5 +48,6 @@ final case class ReportStatus(
                                baCode: Option[String] = None,
                                status: Option[String] = Some(Pending.value),
                                filename: Option[String] = None,
-                               totalReports: Option[Int] = None
+                               totalReports: Option[Int] = None,
+                               report: Option[JsObject] = None
                              )

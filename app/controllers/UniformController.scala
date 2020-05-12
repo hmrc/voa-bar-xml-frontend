@@ -31,6 +31,7 @@ import play.api.i18n.{Messages => _, _}
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
+import services.Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.govuk.pageChrome
@@ -46,6 +47,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   dataCaheConnector: DataCacheConnector,
                                   getData: DataRetrievalAction,
                                   appConfig: FrontendAppConfig,
+                                  cr03Service: Cr03Service,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   implicit val mongoPersistance: PersistenceEngine[OptionalDataRequest[AnyContent]] = new PersistenceEngine[OptionalDataRequest[AnyContent]]() {
@@ -88,8 +90,11 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
     }else {
-      playProgram.run(targetId, purgeStateUponCompletion = true) {
-        complexForm => Future.successful(Ok(s"${complexForm}"))
+      playProgram.run(targetId, purgeStateUponCompletion = true) { cr03Submission: Cr03Submission =>
+        cr03Service.storeSubmission(cr03Submission, request.userAnswers.get.login.get).map { submissionId =>
+          Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
+        }
+
       }
     }
   }

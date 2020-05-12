@@ -28,6 +28,8 @@ import models.{Login, NormalMode, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import views.html.confirmation
 import cats.implicits._
+import journey.UniformJourney.Cr03Submission
+import play.api.libs.json.JsString
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +39,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        requireData: DataRequiredAction,
                                        val dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
+                                       reportConfirmation: views.html.govuk.confirmation,
                                        controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
@@ -45,7 +48,8 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
-      } yield Ok(confirmation(login.username, reference, appConfig)))
+        reportStatus <- EitherT(getReportStatus(reference, login))
+      } yield Ok(reportConfirmation(reportStatus, getCr03(reportStatus))))
         .valueOr(failPage => failPage)
   }
 
@@ -56,12 +60,19 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     ))
   }
 
+  private def getCr03(reportStatus: ReportStatus): Option[Cr03Submission] = {
+    reportStatus.report
+      .map(_.value)
+      .filter(x => x.get("type").map {case x: JsString => x.value == "Cr03Submission"}.getOrElse(false))
+      .flatMap(x => x.get("submission")).flatMap(x => Cr03Submission.format.reads(x).asOpt)
+  }
+
   def onPageRefresh(reference: String) = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus))))
+      } yield Ok(reportConfirmation(reportStatus, getCr03(reportStatus))))
         .valueOr(failPage => failPage)
   }
 }

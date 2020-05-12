@@ -14,11 +14,22 @@
  * limitations under the License.
  *@
 
-@this(appConfig: config.FrontendAppConfig)
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
-@()
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-<script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
-<script id="GTM" GTMCode="@{appConfig.GTM}" src='@routes.Assets.versioned("javascripts/govuk-google-tag-manager.js")' type="text/javascript"></script>
-<script src='@routes.Assets.versioned("javascripts/voabarxmlfrontend-app.min.js")'></script>
-<script>window.GOVUKFrontend.initAll();</script>
+@import journey.UniformJourney.Cr03Submission
+@import controllers.uniform.Cr03SubmissionWebTell
+@import ltbs.uniform.UniformMessages
+
+@this(
+        summaryList: govukSummaryList
+)
+
+
+@(cr03Submission: Cr03Submission)(implicit request: Request[_], messages: Messages)
+
+@summaryList(
+ (new Cr03SubmissionWebTell(summaryList)).confirmationSummary(cr03Submission, messages)
+)
+

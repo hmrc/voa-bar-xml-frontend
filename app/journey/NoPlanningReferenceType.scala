@@ -16,6 +16,8 @@
 
 package journey
 
+import play.api.libs.json.{Format, JsError, JsObject, JsResult, JsString, JsSuccess, JsValue, Json, OFormat}
+
 sealed trait NoPlanningReferenceType
 
 case object WithoutPlanningPermission extends NoPlanningReferenceType
@@ -33,5 +35,27 @@ object NoPlanningReferenceType {
     "NoPlanningApplicationSubmitted"
   )
 
+  implicit val format: Format[NoPlanningReferenceType] = new Format[NoPlanningReferenceType] {
+    override def reads(json: JsValue): JsResult[NoPlanningReferenceType] = {
+      json match  {
+        case JsString("WithoutPlanningPermission") => JsSuccess(WithoutPlanningPermission)
+        case JsString("NotApplicablePlanningPermission") => JsSuccess(NotApplicablePlanningPermission)
+        case JsString("NotRequiredPlanningPermission") => JsSuccess(NotRequiredPlanningPermission)
+        case JsString("PermittedDevelopment") => JsSuccess(PermittedDevelopment)
+        case JsString("NoPlanningApplicationSubmitted") => JsSuccess(NoPlanningApplicationSubmitted)
+        case x => JsError(s"Unable to deserialize NoPlanningReferenceType ${x}")
+      }
+    }
+
+    override def writes(o: NoPlanningReferenceType): JsValue = {
+      o match  {
+        case WithoutPlanningPermission       => JsString("WithoutPlanningPermission")
+        case NotApplicablePlanningPermission => JsString("NotApplicablePlanningPermission")
+        case NotRequiredPlanningPermission   => JsString("NotRequiredPlanningPermission")
+        case PermittedDevelopment            => JsString("PermittedDevelopment")
+        case NoPlanningApplicationSubmitted  => JsString("NoPlanningApplicationSubmitted")
+      }
+    }
+  }
 }
 

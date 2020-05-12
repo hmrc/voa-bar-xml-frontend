@@ -198,7 +198,7 @@ copy.form.help.thankyouvacated=Thank you for submitting this feedback, there wil
 
 status.submissionId.title = Submission ID:
 status.history.title = History
-status.submitted.title = SUBMITTED
+status.submitted.title = Submitted
 status.done.title = DONE
 status.verified.title = VERIFIED
 status.verified.description = The file has been verified for viruses and other vulnerabilities successfully.
