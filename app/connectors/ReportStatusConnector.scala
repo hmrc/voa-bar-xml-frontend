@@ -24,9 +24,11 @@ import models.{Error, Login, ReportStatus}
 import models.ReportStatus._
 import play.api.{Configuration, Environment, Logger}
 import play.api.Mode.Mode
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.mvc.Result
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -38,6 +40,7 @@ class DefaultReportStatusConnector @Inject()(
                                      (implicit ec: ExecutionContext)
   extends ReportStatusConnector with BaseConnector {
 
+  val logger = Logger(this.getClass)
   val serviceUrl = s"${serviceConfig.baseUrl("voa-bar")}/voa-bar"
   val hc: HeaderCarrier = HeaderCarrier()
 
@@ -106,6 +109,23 @@ class DefaultReportStatusConnector @Inject()(
         }
       }
   }
+
+  override def deleteByReference(reference: String, login: Login)(hc: HeaderCarrier): Future[Either[Result, HttpResponse]] = {
+    //Prevent Feature to fail.
+    implicit val httpReads: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
+      override def read(method: String, url: String, response: HttpResponse): HttpResponse = {
+        response
+      }
+    }
+
+    logger.warn(s"Deletion of submission report, reference: ${reference}, user ${login.username}")
+    val headers = defaultHeaders(login.username, login.password)
+    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+    http.DELETE(s"$serviceUrl/submissions/$reference").map { status =>
+      logger.warn(s"Status of deletion for reference ${status.status}, body: ${status.body}")
+      Right(status)
+    }
+  }
 }
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
@@ -115,4 +135,5 @@ trait ReportStatusConnector {
   def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]]
   def getAll(login: Login): Future[Either[Error, Seq[ReportStatus]]]
   def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]]
+  def deleteByReference(reference: String, login: Login)(hc: HeaderCarrier): Future[Either[Result, HttpResponse]]
 }

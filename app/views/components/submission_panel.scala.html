@@ -16,9 +16,14 @@
 
 @import models.{Submitted, Done, Verified, Failed}
 @import utils.FormHelpers._
-@(reportStatus: ReportStatus)(implicit messages: Messages)
+@import helper._
+@import controllers.ReportDeleteController
+@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
 
 <div class="bordered-box submission-panel" id="@reportStatus.id">
+
+    @submission_delete(reportStatus, baCode)
+
     @reportStatus.status match {
         case Some(Done.value) => {
         <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>

@@ -19,6 +19,7 @@ package views.components
 import java.time.ZonedDateTime
 
 import models._
+import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_panel
 
@@ -34,11 +35,11 @@ class SubmissionPanelSpec extends ViewBehaviours {
   val reportStatus5 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Pending.value))
 
 
-  def submission1 = () => submission_panel(reportStatus1)(messages)
-  def submission2 = () => submission_panel(reportStatus2)(messages)
-  def submission3 = () => submission_panel(reportStatus3)(messages)
-  def submission4 = () => submission_panel(reportStatus4)(messages)
-  def submission5 = () => submission_panel(reportStatus5)(messages)
+  def submission1 = () => submission_panel(reportStatus1, baCode)(messages, FakeRequest())
+  def submission2 = () => submission_panel(reportStatus2, baCode)(messages, FakeRequest())
+  def submission3 = () => submission_panel(reportStatus3, baCode)(messages, FakeRequest())
+  def submission4 = () => submission_panel(reportStatus4, baCode)(messages, FakeRequest())
+  def submission5 = () => submission_panel(reportStatus5, baCode)(messages, FakeRequest())
 
   "Submission Panel" must {
 
