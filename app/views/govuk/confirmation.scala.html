@@ -35,15 +35,8 @@
 
 @dateFormat = @{DateTimeFormatter.ofPattern("d MMMM y H:mm")}
 
-@beforeBlock = {
-    @govukBackLink(BackLink(
-        href=controllers.routes.WelcomeController.onPageLoad().url, content = Text("Back")
-    ))
-}
-
 @mainTemplate(
-    pageTitle = Option("Confirmation - Billing Authority "),
-    beforeContentBlock = Option(beforeBlock)
+    pageTitle = Option("Confirmation - Billing Authority ")
 ) {
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(report.id)" />
@@ -51,7 +44,7 @@
 
     @govukPanel(Panel(
         headingLevel = 1, title = Text( messages(s"status.${report.status.getOrElse(Pending.value).toLowerCase}.title") ),
-        content = Text(s"${messages("submission")} ${report.id.substring(0, 8)}")
+        content = Text(s"${messages("submission")} ID ${report.id.substring(0, 8)}")
     ))
 
     @if(cr03Submission.isDefined) {
