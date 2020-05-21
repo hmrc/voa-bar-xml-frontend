@@ -65,6 +65,7 @@ POST        /changeLogin                          controllers.LoginController.on
 
 GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
+POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit()
 GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload()
 
 GET         /feedback/tell-us 		              controllers.FeedbackController.inPageFeedback

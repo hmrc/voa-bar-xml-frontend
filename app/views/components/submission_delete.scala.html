@@ -1,0 +1,52 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.{Submitted, Done, Verified, Failed}
+@import utils.FormHelpers._
+@import helper._
+@import controllers.ReportDeleteController
+
+@import play.api.Play
+@import scala.util.Try
+@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
+
+@renderDelete = @{
+
+    val delete = for {
+        application <- Play.maybeApplication
+        deleteFlag <- application.configuration.getOptional[String]("feature.delete.enable").flatMap(x => Try(x.toBoolean).toOption)
+        deleteApproved <- application.configuration.getOptional[Seq[String]]("feature.delete.baCodes").map(_.contains(baCode))
+    }yield (deleteFlag & deleteApproved)
+
+    delete.getOrElse(false)
+
+//    Play.maybeApplication
+//            .flatMap(a => a.configuration.getOptional[String]("feature.delete.enable"))
+//            .flatMap(x => Try(x.toBoolean).toOption)
+//            .getOrElse(false)
+
+}
+@if(renderDelete) {
+
+    @form(routes.ReportDeleteController.onPageSubmit()) {
+        @CSRF.formField
+        <input type="hidden" name="@ReportDeleteController.submissionId" value="@reportStatus.id">
+        <input type="submit" name="delete" value="Delete">
+    }
+
+}
+
+

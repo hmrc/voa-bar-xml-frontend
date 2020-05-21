@@ -34,7 +34,7 @@
             @messages("reports.notFound")
         </p>
     }else{
-        @reportStatuses.map(reportStatus => components.submission_panel(reportStatus))
+        @reportStatuses.map(reportStatus => components.submission_panel(reportStatus, baCode))
     }
 
     @components.submission_filter(messages, filter)

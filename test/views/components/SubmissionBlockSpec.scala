@@ -19,15 +19,17 @@ package views.components
 import java.time.ZonedDateTime
 
 import models.{ReportStatus, Submitted}
+import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_block
 
 class SubmissionBlockSpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
+  val baCode = "BA1010"
   val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, status = Some(Submitted.value), baCode = Some("BA0121"))
 
-  def submission = () => submission_block(reportStatus)(messages)
+  def submission = () => submission_block(reportStatus, baCode)(messages, FakeRequest())
   lazy val doc = asDocument(submission())
 
   "Submission Block " must {
