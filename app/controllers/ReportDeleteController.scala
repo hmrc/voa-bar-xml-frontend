@@ -42,7 +42,7 @@ class ReportDeleteController @Inject() ( configuration: Configuration,
   )(implicit val ec: ExecutionContext)
     extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
 
-  val enabled = configuration.getOptional[String]("feature.delete.enable").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)
+  val enabled = configuration.getOptional[String]("feature.delete.enabled").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)
 
   def onPageSubmit() = getData.async { implicit request =>
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
