@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import scala.util.Try
+@import play.api.Configuration
 @import ltbs.uniform.ErrorTree
 @import ltbs.uniform.UniformMessages
 @import ltbs.uniform.common.web.FormFieldStats
@@ -27,7 +29,8 @@
   formWithCSRF: formWithCSRF,
   govukButton: govukButton,
   govukBackLink: govukBackLink,
-  errorSummary: govukErrorSummary
+  errorSummary: govukErrorSummary,
+  configuration: Configuration
 )
 
 @(
@@ -72,24 +75,30 @@
 
     }
 
-    <br /><br />
-    <div style="border: solid 1px; padding: 5px; font-family: 'JetBrains Mono', monospace; width:150%">
-        <h4 style="color: red">This is debug box, IGNORE</h4>
-        <hr />
-        Key: @key.mkString(".")
-        <hr/>
-        breadcrumbs: @breadcrumbs.mkString(",")
-        <hr/>
-        <ul>
+    @if(configuration.getOptional[String]("feature.uniform-debug.enabled").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)) {
+        <br />
+        <br />
+        <div style="border: solid 1px;
+            padding: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            width: 150%">
+            <h4 style="color: red">This is debug box, IGNORE</h4>
+            <hr />
+            Key: @key.mkString(".")
+            <hr/>
+            breadcrumbs: @breadcrumbs.mkString(",")
+            <hr/>
+            <ul>
             @for(error <- errors) {
                 <li style="padding-top: 17px;">@error._1
-                    <ul style="list-style: none; padding-top: 7px;">
-                        <li>@error._2</li>
-                    </ul>
+                <ul style="list-style: none;
+                    padding-top: 7px;">
+                    <li>@error._2</li>
+                </ul>
                 </li>
             }
-        </ul>
-        <hr />
-    </div>
-
+            </ul>
+            <hr />
+        </div>
+    }
 }
