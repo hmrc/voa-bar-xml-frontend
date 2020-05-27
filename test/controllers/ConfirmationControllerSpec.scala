@@ -66,9 +66,12 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, controllerComponents)
   }
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = reportConfirmationView(report, cr03Report)(fakeRequest, messages).toString
+  def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
+    reportConfirmationView(report, cr03Report)(fakeRequest, messages).toString
+
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
   def refreshViewAsString() =
-    reportConfirmationView(reportStatus.copy(status = Option(Pending.value)), None)(fakeRequest, messages).toString
+    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 
@@ -87,10 +90,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "return OK and the correct view for the refresh page" in {
-      val refreshSubmissionId = UUID.randomUUID().toString
-      when(reportStatusConnectorMock.getByReference(eqTo(refreshSubmissionId), any[Login]))
-        .thenReturn(Future(Right(reportStatus.copy(status = Option(Pending.value)))))
-      val result = loggedInController().onPageRefresh(refreshSubmissionId)(fakeRequest)
+      val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe refreshViewAsString()
@@ -117,7 +117,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe viewAsString(cr03ReportStatus, Some(cr03Report))
+      contentAsString(result) mustBe cr03ViewAsString(cr03ReportStatus, Some(cr03Report))
     }
   }
 

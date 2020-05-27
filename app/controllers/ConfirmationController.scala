@@ -49,8 +49,12 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield Ok(reportConfirmation(reportStatus, getCr03(reportStatus))))
-        .valueOr(failPage => failPage)
+      } yield {
+        getCr03(reportStatus) match {
+          case None => Ok(confirmation(login.username, reference, appConfig))
+          case cr03@Some(_) => Ok(reportConfirmation(reportStatus, cr03))
+        }
+      }).valueOr(failPage => failPage)
   }
 
   private def getReportStatus(reference: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] = {
@@ -72,7 +76,11 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield Ok(reportConfirmation(reportStatus, getCr03(reportStatus))))
-        .valueOr(failPage => failPage)
+      } yield {
+        getCr03(reportStatus) match {
+          case None => Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus)))
+          case cr03@Some(_) => Ok(reportConfirmation(reportStatus, cr03))
+        }
+      }).valueOr(failPage => failPage)
   }
 }
