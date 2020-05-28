@@ -42,7 +42,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalaVersion := "2.11.12",
     scalacOptions += "-Ypartial-unification",
-    scalacOptions += "-J-Xss2M",
+    scalacOptions += "-J-Xss4M",
+    scalacOptions += "-Xlog-implicits",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
