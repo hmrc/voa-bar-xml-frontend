@@ -346,7 +346,7 @@ effective-date.error.month.number=Effective date must have a month that is a num
 effective-date.error.month.range=Effective date must have a month that is a number between 1 and 12
 
 effective-date.error.year.number=Effective date must have a year that is a number
-effective-date.error.year.range=Effective date must be between 1 January 1900 and today
+effective-date.error.year.range=Effective date must be between 1 April 1993 and today
 
 have-planning-ref.pageLabel=Do you have a planning reference?
 have-planning-ref.label=

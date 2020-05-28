@@ -83,7 +83,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
   }
 
   val testRegex = """\d+""".r.pattern
-  val centuryBegin = LocalDate.of(1900, 1, 1)
+  val earliestEffectiveDate = LocalDate.of(1993, 4, 1)
 
   def validateDateField(day: String, month: String, year: String): Either[ErrorTree, LocalDate] = {
     for {
@@ -99,7 +99,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
             .append(ErrorMsg("month"))
             .append(ErrorMsg("year"))
         )).right.flatMap { date =>
-          if(date.isBefore(centuryBegin) || date.isAfter(LocalDate.now())) {
+          if(date.isBefore(earliestEffectiveDate) || date.isAfter(LocalDate.now())) {
             Left(ErrorTree.one(NonEmptyList.one(ErrorMsg("error.year.range"))
               .append(ErrorMsg("day")).append(ErrorMsg("month")).append(ErrorMsg("year"))))
           }else {
@@ -145,7 +145,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
   def validateYear(year: String): Either[ErrorTree, Int] = {
     if(testRegex.matcher(year).matches()) {
       val intYear = year.toInt
-      if(intYear < 1900 || intYear > LocalDate.now().getYear() ) {
+      if(intYear < 1993 || intYear > LocalDate.now().getYear() ) {
         Left(ErrorTree.one(NonEmptyList.one(ErrorMsg("error.year.range"))
           .append(ErrorMsg("year"))))
       }else {
