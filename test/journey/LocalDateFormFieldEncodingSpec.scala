@@ -52,8 +52,8 @@ class LocalDateFormFieldEncodingSpec extends FlatSpec with Matchers with EitherV
 
   val validInputDate = Table(
     ("day", "month", "year"),
-    ("23", "12", "1980"),
-    ("1", "1", "1900"),
+    ("23", "12", "1993"),
+    ("1", "4", "1993"),
     (today.getDayOfMonth.toString, today.getMonthValue.toString, today.getYear.toString)
   )
 
