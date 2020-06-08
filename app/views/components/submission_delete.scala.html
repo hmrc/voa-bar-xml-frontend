@@ -28,7 +28,7 @@
     val delete = for {
         application <- Play.maybeApplication
         deleteFlag <- application.configuration.getOptional[String]("feature.delete.enabled").flatMap(x => Try(x.toBoolean).toOption)
-        deleteApproved <- application.configuration.getOptional[Seq[String]]("feature.delete.baCodes").map(_.contains(baCode))
+        deleteApproved <- application.configuration.getOptional[Seq[String]]("feature.delete.baCodes").map(_.contains(baCode.toUpperCase))
     }yield (deleteFlag & deleteApproved)
 
     delete.getOrElse(false)

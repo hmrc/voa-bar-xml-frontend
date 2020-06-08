@@ -41,7 +41,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,
-    "com.luketebbs.uniform" %% "core" % "4.9.0",
+    "com.luketebbs.uniform" %% "core" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-play26" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-cli" % "4.10.0"
   )
