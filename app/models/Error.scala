@@ -16,9 +16,9 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
-case class Error(code: String, values: Seq[String] = Seq())
+case class Error(code: String, values: Seq[String] = Seq(), errorDetail: Option[JsObject] = None)
 
 object Error{
   implicit val format = Json.format[Error]

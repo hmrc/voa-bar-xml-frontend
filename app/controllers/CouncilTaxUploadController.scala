@@ -29,8 +29,7 @@ import cats.data.EitherT
 import cats.implicits._
 import models.UpScanRequests._
 import models.requests.OptionalDataRequest
-import play.Logger
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
@@ -55,6 +54,8 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                            controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+
+  val log = Logger(this.getClass)
 
   implicit val lang: Lang = Lang(Locale.UK)
 
@@ -95,7 +96,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
       case _ => {
         val errorMsg = s"Couldn't parse: \n${request.body}"
-        Logger.warn(errorMsg)
+        log.warn(errorMsg)
         Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
       }
     }
@@ -106,7 +107,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       case uc: JsSuccess[UploadConfirmationError] => Right(uc.get)
       case _ => {
         val errorMsg = s"Couldn't parse: \n${request.body}"
-        Logger.warn(errorMsg)
+        log.warn(errorMsg)
         Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
       }
     }
@@ -117,7 +118,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       case error: JsSuccess[Error] => Right(error.get)
       case _ => {
         val errorMsg = s"Couldn't parse: \n${request.body}"
-        Logger.warn(errorMsg)
+        log.warn(errorMsg)
         Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[_]])))
       }
     }
@@ -234,6 +235,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
 
   def onError(reference: String) = getData.async(parse.tolerantJson) {
     implicit request =>
+      log.warn(s"Unable to upload XML, error detail: ${request.body}")
       (for {
         error <- EitherT(Future.successful(parseError(request)))
         login <- EitherT(cachedLogin(request.externalId))
@@ -264,7 +266,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
 
   private def handleConfirmationError(request: OptionalDataRequest[JsValue], error: Error) = {
     val errorMsg = s"Error: code: ${error.code} detail messages: ${error.values.mkString(", ")}"
-    Logger.error(errorMsg)
+    log.error(errorMsg)
     (for {
       login <- EitherT(cachedLoginError(request.externalId))
       uploadInfo <- EitherT(Future.successful(parseUploadConfirmation(request)))
