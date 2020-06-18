@@ -18,10 +18,15 @@ package models
 
 import base.SpecBase
 
-class BillingAuthoritiesSpec extends SpecBase{
+class BillingAuthoritiesSpec extends SpecBase {
 
   val existingBaCode = "BA0230"
   val nonExistingBaCode = "ba9999"
+  val ForestHeath = "ba3510"
+  val StEdmundsbury = "ba3525"
+  val SuffolkCoastal = "ba3530"
+  val Waveney = "ba3535"
+  val BAMapSize = 350
 
   "BillingAuthorities" must {
 
@@ -31,6 +36,26 @@ class BillingAuthoritiesSpec extends SpecBase{
 
     "Return None if no baCode is found related to the given code even if the user is logged in" in {
       BillingAuthorities.find(nonExistingBaCode) mustBe None
+    }
+
+    "have 350 entries" in {
+      BillingAuthorities.billingAuthorities.size mustBe BAMapSize
+    }
+
+    "Return None if Forest Heath Code is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(ForestHeath) mustBe None
+    }
+
+    "Return None if St Edmundsbury Code is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(StEdmundsbury) mustBe None
+    }
+
+    "Return None if Suffolk Coastal Code is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(SuffolkCoastal) mustBe None
+    }
+
+    "Return None if Waveney Code is found related to the given code even if the user is logged in" in {
+      BillingAuthorities.find(Waveney) mustBe None
     }
   }
 }
