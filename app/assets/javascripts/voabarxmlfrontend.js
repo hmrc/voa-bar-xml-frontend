@@ -140,10 +140,11 @@ $(document).ready(function() {
         e.preventDefault();
         var councilTaxUploadForm = this;
 
-        function submitError(error){
+        function submitError(error, jqXHR){
             var payload = {
                 code: error,
-                values: []
+                values: [],
+                errorDetail: jqXHR
             };
             $.ajax({
                   url: $("#councilTaxUploadReportError").val(),
@@ -164,7 +165,7 @@ $(document).ready(function() {
                   contentType: false,
                   crossDomain: true
             }).error(function(jqXHR, textStatus, errorThrown ){
-                submitError("4000")
+                submitError("4000", jqXHR)
             }).done(function(){
                 window.location = $("#councilTaxUploadFormRedirect").val();
             });
@@ -179,7 +180,7 @@ $(document).ready(function() {
                 withCredentials: true
             }
         }).error(function(jqXHR, textStatus, errorThrown ){
-            submitError("5000")
+            submitError("5000", jqXHR)
         }).done(function(){
             fileUpload(councilTaxUploadForm);
         });
