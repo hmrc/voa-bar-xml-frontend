@@ -134,7 +134,7 @@ class AutobarsInterpreter (
             |""".stripMargin)
 
         val hint = if(optional) {
-          Option(Hint(content = Text("Optional")))
+          Option(Hint(content = Text("(optional)")))
         }else {
           Option.empty[Hint]
         }
