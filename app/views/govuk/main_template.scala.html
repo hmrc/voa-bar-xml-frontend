@@ -24,11 +24,13 @@
         govukLayout: govukLayout,
         head: head,
         scripts: scripts,
-        govukPhaseBanner: govukPhaseBanner
+        govukPhaseBanner: govukPhaseBanner,
+        siteHeader: components.siteHeader
 )
 
 @(pageTitle: Option[String] = None,
-        beforeContentBlock: Option[Html] = None
+        beforeContentBlock: Option[Html] = None,
+        showSignOut: Boolean = true
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @beforeBLock = {
@@ -43,6 +45,7 @@
     pageTitle = pageTitle,
     headBlock = Some(head()),
     beforeContentBlock = Option(beforeBLock),
+    headerBlock = Some(siteHeader(showSignOut)),
     footerItems = Seq(
         FooterItem(
             href = Some("/help/cookies"),
@@ -57,5 +60,6 @@
             href = Some("https://www.gov.uk/help"),
             text = Some("Help using GOV.UK"))
 
-    ),
-    bodyEndBlock = Some(scripts()))(contentBlock)
+        ),
+    bodyEndBlock = Some(scripts())
+)(contentBlock)

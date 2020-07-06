@@ -116,6 +116,7 @@ service.homePageUrl = /voa-bar-xml-frontend/welcome
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Sign in
 site.start = Start now
+site.signOut = Sign out
 site.print.button = Download receipt
 
 unauthorised.title = You can’t access this service with this account

@@ -20,7 +20,8 @@ object Dependencies {
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
   private val playPartialsVersion = "6.11.0-play-26"
-  private val playFrontendGovUkVersion = "0.45.0-play-26"
+  private val playFrontendGovUkVersion = "0.46.0-play-26"
+  private val playFrontendHmrcVersion = "0.15.0-play-26"
 
   private val akkaVersion     = "2.5.23"
   private val akkaHttpVersion = "10.0.15"
@@ -38,6 +39,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
+    "uk.gov.hmrc"       %% "play-frontend-hmrc" % playFrontendHmrcVersion,
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,

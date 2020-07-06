@@ -24,7 +24,7 @@ import identifiers.LoginId
 import models.{Error, Login, NormalMode}
 import play.api.Logger
 import play.api.i18n.Messages
-import play.api.mvc.{Controller, Request, Result}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}

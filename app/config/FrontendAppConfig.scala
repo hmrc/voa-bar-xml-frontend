@@ -39,6 +39,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   lazy val betaFeedbackUrl = s"$contactHost/contact/beta-feedback"
   lazy val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated"
 
+  lazy val signOutUrl: String = "/sign-out"
+
   lazy val languageTranslationEnabled = configuration.getOptional[Boolean]("microservice.services.features.welsh-translation").getOrElse(true)
   def languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
