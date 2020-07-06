@@ -38,7 +38,8 @@
         Some(messages("error.title.prefix") + ": " + messages("login.title"))
     } else {
         Some(messages("login.title"))
-    }
+    },
+    showSignOut = false
 ) {
     @formWithCSRF(
         action = routes.LoginController.onSubmit(mode),

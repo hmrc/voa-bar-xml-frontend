@@ -63,6 +63,11 @@ POST        /login                                controllers.LoginController.on
 GET         /changeLogin                          controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeLogin                          controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
+### SignOut Expired
+### -----------------------
+GET        /sign-out                              controllers.SignOutController.signOut()
+
+
 GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
 POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit()
