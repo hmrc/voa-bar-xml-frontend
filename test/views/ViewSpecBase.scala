@@ -26,7 +26,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.Lang
-import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukFooter, GovukHeader, govukInput, govukPhaseBanner, govukTag}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukFooter, GovukHeader, govukPhaseBanner, govukTag}
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
@@ -131,7 +131,8 @@ trait ViewSpecBase extends SpecBase {
       createGovukLayout(),
       create_head(),
       create_scripts(),
-      new govukPhaseBanner(new govukTag())
+      new govukPhaseBanner(new govukTag()),
+      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader)
     )
   }
 
