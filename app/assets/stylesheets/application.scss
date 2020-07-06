@@ -5,6 +5,8 @@ $govuk-assets-path: "/voa-bar-xml-frontend/assets/lib/govuk-frontend/govuk/asset
 $hmrc-assets-path: "/voa-bar-xml-frontend/assets/lib/hmrc-frontend/hmrc/";
 @import "lib/hmrc-frontend/hmrc/all";
 
+@import "partials/header";
+
 .app-reference-number {
   display: block;
   font-weight: bold;
