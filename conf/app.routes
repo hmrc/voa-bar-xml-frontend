@@ -56,6 +56,7 @@ POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadCo
 
 GET         /welcome                              controllers.WelcomeController.onPageLoad()
 GET         /goToStartWebForm                     controllers.WelcomeController.goToStartWebFormPage()
+GET         /goToCouncilTaxStart                  controllers.WelcomeController.goToCouncilTaxStartPage()
 
 GET         /login                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 POST        /login                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)

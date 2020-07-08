@@ -36,12 +36,11 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
     behave like normalPage(createView, messageKeyPrefix)
   }
 
-  // FIXME update as part as https://jira.tools.tax.service.gov.uk/browse/VOA-2065
-//  "The Council Tax links to the goToCouncilTaxStartPage method" in {
-//    val doc = asDocument(createView())
-//    val href = doc.getElementById("councilTaxLink").attr("href")
-//    assert(href == controllers.routes.WelcomeController.goToStartWebFormPage().url.toString)
-//  }
+  "The Council Tax links to the goToCouncilTaxStartPage method" in {
+    val doc = asDocument(createView())
+    val href = doc.getElementById("councilTaxLink").attr("href")
+    assert(href == controllers.routes.WelcomeController.goToCouncilTaxStartPage().url.toString)
+  }
 
   // Welcome page containing form for navigation
 

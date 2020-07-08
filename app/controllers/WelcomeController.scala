@@ -50,4 +50,8 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
   def goToStartWebFormPage() =  (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(WelcomeFormId, NormalMode)(request.userAnswers))
   }
+
+  def goToCouncilTaxStartPage() = (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(WelcomeId, NormalMode)(request.userAnswers))
+  }
 }
