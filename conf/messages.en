@@ -8,6 +8,7 @@ date.year = Year
 file = File
 submission = Submission
 submission.view = View submission history
+submission.view.description = Text to describe the action.
 
 error.boolean = Please give an answer
 error.invalid_date = Give a correct date
@@ -168,14 +169,13 @@ login.error.password.length = Password must be 100 characters or less
 login.error.auth = Needs to log in
 
 welcome.title = Welcome
-welcome.heading = Welcome,
+welcome.heading = Choose a task
 welcome.BA = Billing Authority Reports
 welcome.want.to = I want to
-welcome.councilTax.url = Council Tax
-welcome.councilTax.description = Submit your Council Tax reports and view your previous Council Tax submissions.
-submissionCategory.council_tax_webform = create a Council Tax report
-submissionCategory.council_tax_xml_upload = Upload a file of Council Tax reports
-
+welcome.council_tax_webform = Create a report
+welcome.council_tax_webform.description = Text to describe the action.
+welcome.council_tax_upload = Upload a report
+welcome.council_tax_upload.description = Text to describe the action.
 reportStatus.title = Report Status
 reportStatus.heading = Submission history,
 

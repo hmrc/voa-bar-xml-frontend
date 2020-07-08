@@ -25,10 +25,7 @@ import connectors.DataCacheConnector
 import identifiers.{VOAAuthorisedId, WelcomeFormId, WelcomeId}
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
-import views.html.welcome
-import forms.SubmissionTypeFormProvider
-import play.api.data.Form
-import utils.{Navigator, UserAnswers}
+import utils.Navigator
 
 import scala.concurrent.ExecutionContext
 
@@ -45,28 +42,12 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(welcome(appConfig, SubmissionTypeFormProvider(), NormalMode, username))
+        case Some(username) => Ok(welcome(appConfig, NormalMode, username))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
 
-  def onSubmit = getData.async {
-    implicit request =>
-      SubmissionTypeFormProvider().bindFromRequest.fold(
-        (formWithErrors: Form[String]) =>
-          dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-            case Some(username) => BadRequest(welcome(appConfig, formWithErrors, NormalMode, username))
-            case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
-          },
-        value => {
-          dataCacheConnector.save[String](request.externalId, WelcomeId.toString, value).map ( cacheMap =>
-            Redirect(navigator.nextPage(WelcomeFormId, NormalMode)(new UserAnswers(cacheMap)))
-          )
-        }
-      )
-  }
-
-  def goToCouncilTaxStartPage() = (getData andThen requireData) { implicit request =>
-    Redirect(navigator.nextPage(WelcomeId, NormalMode)(request.userAnswers))
+  def goToStartWebFormPage() =  (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(WelcomeFormId, NormalMode)(request.userAnswers))
   }
 }

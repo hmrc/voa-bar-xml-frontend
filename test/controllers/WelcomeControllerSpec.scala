@@ -31,7 +31,6 @@ import scala.concurrent.ExecutionContext
 class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
-  val form = SubmissionTypeFormProvider()(messages)
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
@@ -51,7 +50,7 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
-  def viewAsString() = createWelcomeView()(frontendAppConfig, form, NormalMode, username)(fakeRequest, messages).toString
+  def viewAsString() = createWelcomeView()(frontendAppConfig, NormalMode, username)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 
@@ -69,8 +68,8 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-    "return a redirect when calling goToCouncilTaxStartPage" in {
-      val result = loggedInController().goToCouncilTaxStartPage()(fakeRequest)
+    "return a redirect when calling goToStartWebFormPage" in {
+      val result = loggedInController().goToStartWebFormPage()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }

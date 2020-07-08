@@ -30,47 +30,24 @@
 )
 
 
-@(appConfig: FrontendAppConfig, form: Form[String], mode: Mode, baCode: String)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, mode: Mode, baCode: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = if(form.errors.nonEmpty) {
-        Some(messages("error.title.prefix") + ": " + messages("welcome.title"))
-    } else {
-        Some(messages("welcome.title"))
-    }
+    pageTitle = Some(messages("welcome.title"))
+
 ) {
 
-    @if(form.errors.nonEmpty) {
-        @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
-    }
 
-    <span class="govuk-caption-xl">@messages("service.name")</span>
-    <h1 class="govuk-heading-xl">@messages("welcome.heading") @BillingAuthorities.find(baCode)</h1>
+    <h1 class="govuk-heading-xl">@messages("welcome.heading")</h1>
 
     @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
-        @formWithCSRF(
-            action = routes.WelcomeController.onSubmit(),
-            'autoComplete -> "off"
-        ) {
-
-            @govukRadios(Radios(
-                fieldset = Some(Fieldset(legend = Some(Legend(Text(messages("welcome.want.to")))))),
-                errorMessage = form.errors.asTextErrorMessageForField("submissionCategory"),
-                name = "submissionCategory",
-                items = SubmissionTypeFormProvider.options
-            ))
-
-            <p><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></p>
-
-            @govukButton(Button(attributes = Map("id" -> "submit"),
-                name = Some("submit"), content = Text(messages("site.continue"))
-            ))
-        }
-    } else {
-        <h3 class="heading-medium">
-            <a class="govuk-link" href= @routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.councilTax.url")</a>
-        </h3>
-
-        <p class="govuk-body">@messages("welcome.councilTax.description")</p>
+        <h3 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.WelcomeController.goToStartWebFormPage().url id="create">@messages("welcome.council_tax_webform")</a></h3>
+        <p class="govuk-body">@messages("welcome.council_tax_webform.description")</p>
     }
+    <h3 class="govuk-heading-m"><a class="govuk-link" href=# id="upload">@messages("welcome.council_tax_upload")</a></h3>
+    <p class="govuk-body">@messages("welcome.council_tax_upload.description")</p>
+
+    <h3 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></h3>
+    <p class="govuk-body">@messages("submission.view.description")</p>
+
 }
