@@ -41,13 +41,13 @@
     <h1 class="govuk-heading-xl">@messages("welcome.heading")</h1>
 
     @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
-        <h3 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.WelcomeController.goToStartWebFormPage().url id="create">@messages("welcome.council_tax_webform")</a></h3>
+        <h2 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.WelcomeController.goToStartWebFormPage().url id="create">@messages("welcome.council_tax_webform")</a></h2>
         <p class="govuk-body">@messages("welcome.council_tax_webform.description")</p>
     }
-    <h3 class="govuk-heading-m"><a class="govuk-link" href=@routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.council_tax_upload")</a></h3>
+    <h2 class="govuk-heading-m"><a class="govuk-link" href=@routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.council_tax_upload")</a></h2>
     <p class="govuk-body">@messages("welcome.council_tax_upload.description")</p>
 
-    <h3 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></h3>
+    <h2 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></h2>
     <p class="govuk-body">@messages("submission.view.description")</p>
 
 }
