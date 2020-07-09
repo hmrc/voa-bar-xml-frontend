@@ -118,11 +118,7 @@ trait ViewSpecBase extends SpecBase {
 
   def createWelcomeView(): welcome = {
     new welcome(
-      createMain_template(),
-      new formWithCSRF(),
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios,
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukButton,
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+      createMain_template()
     )
   }
 

@@ -22,11 +22,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
 @this(
-        main_template: views.html.govuk.main_template,
-        formWithCSRF: formWithCSRF,
-        govukRadios: govukRadios,
-        govukButton: govukButton,
-        errorSummary: govukErrorSummary
+        main_template: views.html.govuk.main_template
 )
 
 
@@ -34,7 +30,6 @@
 
 @main_template(
     pageTitle = Some(messages("welcome.title"))
-
 ) {
 
 
