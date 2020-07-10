@@ -28,7 +28,7 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => createWelcomeView()(frontendAppConfig, form, NormalMode, username)(welcomeFakeRequest, messages)
+  def createView = () => createWelcomeView()(frontendAppConfig, NormalMode, username)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -48,22 +48,13 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
-  def createFormView = () => createWelcomeView()(frontendAppConfig, form, NormalMode, formUsername)(welcomeFakeRequest, messages)
+  def createFormView = () => createWelcomeView()(frontendAppConfig, NormalMode, formUsername)(welcomeFakeRequest, messages)
 
   lazy val formDoc = asDocument(createFormView())
 
-  "contain radio buttons for the value" in {
-    for (option <- SubmissionTypeFormProvider.options(messages)) {
-      assertContainsRadioButton(formDoc, option.id.getOrElse(""), "submissionCategory", option.value.getOrElse(""), false)
-    }
-  }
-
-  "has a radio button with the label set to the message with key submissionCategory.council_tax_webform and that it is used once" in {
-    labelDefinedAndUsedOnce("council_tax_webform", formMessageKeyPrefix, createFormView)
-  }
-
-  "has a radio button with the label set to the message with key submissionCategory.council_tax_xml_upload and that it is used once" in {
-    labelDefinedAndUsedOnce("council_tax_xml_upload", formMessageKeyPrefix, createFormView)
+  "The view history links to the WelcomeController.goToStartWebFormPage() method" in {
+    val href = formDoc.getElementById("create").attr("href")
+    assert(href == controllers.routes.WelcomeController.goToStartWebFormPage().url.toString)
   }
 
   "The view history links to the ReportStatusController.onPageLoad method" in {
@@ -71,8 +62,5 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
     assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
   }
 
-  "contain Continue button with the value Continue" in {
-    val continueButton = formDoc.getElementById("submit").text()
-    assert(continueButton == messages("site.continue"))
-  }
+  // TODO https://jira.tools.tax.service.gov.uk/browse/VOA-2065 test link to upload page
 }

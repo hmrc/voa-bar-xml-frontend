@@ -49,10 +49,11 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(WelcomeFormId, NormalMode) (formUserAnswers) mustBe routes.UniformController.myJourney("ba-report")
       }
 
-      "on choosing Council Tax Upload link should redirect to Council Tax Start Page" in {
-        WelcomeFormId.toString mustBe "welcomeForm"
-        navigator.nextPage(WelcomeFormId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
-      }
+      // FIXME as part as https://jira.tools.tax.service.gov.uk/browse/VOA-2065
+//      "on choosing Council Tax Upload link should redirect to Council Tax Start Page" in {
+//        WelcomeFormId.toString mustBe "welcomeForm"
+//        navigator.nextPage(WelcomeFormId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
+//      }
 
       "on selecting Council Tax Upload link should redirect to Council Tax Start Page" in {
         WelcomeId.toString mustBe "welcome"
