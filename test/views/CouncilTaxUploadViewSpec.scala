@@ -63,11 +63,10 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
   "CouncilTaxUpload view" must {
     behave like normalPage(() => createView(), messageKeyPrefix, "help", "info.format", "info.multi", "info.upload", "info.files", "xml")
 
-//    FIXME as part of the login_details
-//    "Include an username element displaying the BA name based on given BA Code" in {
-//      val user = doc.getElementById("username-element").text
-//      user mustBe "Reading"
-//    }
+    "Include an username element displaying the BA name based on given BA Code" in {
+      val user = doc.getElementById("username-element").text
+      user mustBe "Reading"
+    }
 
     "Include a logout link which redirects the users to the login page" in {
       val href = doc.getElementById("signout-link").attr("href")

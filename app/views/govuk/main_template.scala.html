@@ -41,12 +41,14 @@
         content = HtmlContent("This is a new service – your <a href=\"/voa-bar-xml-frontend/feedback/tell-us\" target=\"_blank\" id=\"betaFeedback\">feedback</a> will help us to improve it.")))
 
     @baCode.map{ code =>
-        @components.login_details(code)
+        @components.signin_credentials(code)
     }
     @backLinkUrl.map{ url =>
-        @govukBackLink(
-            BackLink(href = url)
-        )
+        <div>
+            @govukBackLink(
+                BackLink(href = url)
+            )
+        </div>
     }
 
     @beforeContentBlock
