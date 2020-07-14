@@ -36,7 +36,6 @@ import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
-import views.html.councilTaxUpload
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,6 +48,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                            formProvider: FileUploadDataFormProvider,
                                            navigator: Navigator,
                                            uploadConnector: UploadConnector,
+                                           councilTaxUpload: views.html.councilTaxUpload,
                                            userReportUploadsConnector: UserReportUploadsConnector,
                                            reportStatusConnector: ReportStatusConnector,
                                            controllerComponents: MessagesControllerComponents)
@@ -61,14 +61,14 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
 
   private[controllers] val form = formProvider()
   private[controllers] val maxFileSize = configuration
-    .getInt("microservice.services.upscan.max-file-size").get
+    .get[Int]("microservice.services.upscan.max-file-size")
   private[controllers] val callBackUrl = configuration
-    .getString("microservice.services.upscan.callback-url").get
+    .get[String]("microservice.services.upscan.callback-url")
 
   private[controllers] def fileUploadDetails(username: String, password: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
     val initiateRequest = InitiateRequest(callBackUrl, maxFileSize)
-    val errorResult = Left(BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
+    val errorResult = Left(BadRequest(councilTaxUpload(username, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
     (for {
       uploadResponse <- EitherT(uploadConnector.initiate(initiateRequest))
       _ <- EitherT(userReportUploadsConnector.save(UserReportUpload(uploadResponse.reference, username, password)))
@@ -83,12 +83,6 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       initiateResponse <- EitherT(fileUploadDetails(login.username, login.password))
     } yield expectedPage(login.username, initiateResponse))
       .valueOr(fallBackPage => fallBackPage)
-  }
-
-  private[controllers] def badRequest(message: String)(implicit request: OptionalDataRequest[_]): Future[Result] = {
-    def badRequestResult(username: String, initiateResponse: InitiateResponse) =
-      BadRequest(councilTaxUpload(username, appConfig, form.withGlobalError(message), Some(initiateResponse)))
-    loadPage(badRequestResult)
   }
 
   private[controllers] def parseUploadConfirmation(request: Request[JsValue]): Either[Error, UploadConfirmation] = {
@@ -138,7 +132,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
   def onPageLoad = getData.async {
     implicit request => {
       def okResult(username: String, initiateResponse: InitiateResponse) =
-        Ok(councilTaxUpload(username, appConfig, form, Some(initiateResponse)))
+        Ok(councilTaxUpload(username, form, Some(initiateResponse)))
       loadPage(okResult)
     }
   }

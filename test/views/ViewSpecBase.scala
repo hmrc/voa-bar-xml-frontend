@@ -22,16 +22,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
 import base.SpecBase
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.Lang
-import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukFooter, GovukHeader, govukPhaseBanner, govukTag}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukErrorMessage, GovukFooter, GovukHeader, GovukHint, GovukLabel, govukBackLink, govukDetails, govukErrorMessage, govukFileUpload, govukPhaseBanner, govukTag}
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import views.html.govuk.{head, scripts}
-import views.html.{login, welcome}
+import views.html.{login, councilTaxUpload, welcome}
 
 trait ViewSpecBase extends SpecBase {
 
@@ -122,13 +122,23 @@ trait ViewSpecBase extends SpecBase {
     )
   }
 
+  def createUploadView(): councilTaxUpload = {
+    new councilTaxUpload(
+      createMain_template(),
+      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
+      new govukDetails(),
+      new formWithCSRF()
+    )
+  }
+
   def createMain_template(): views.html.govuk.main_template = {
     new views.html.govuk.main_template(
       createGovukLayout(),
       create_head(),
       create_scripts(),
       new govukPhaseBanner(new govukTag()),
-      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader)
+      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
+      new govukBackLink()
     )
   }
 

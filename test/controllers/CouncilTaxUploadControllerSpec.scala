@@ -22,7 +22,7 @@ import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnecto
 import controllers.actions._
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadConfirmation, UploadRequest}
+import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadRequest}
 import models._
 import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
@@ -33,13 +33,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FakeNavigator
-import views.html.councilTaxUpload
+import views.ViewSpecBase
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
-class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSugar {
+class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
   implicit def hc: HeaderCarrier = HeaderCarrier()
 
@@ -118,7 +118,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, createUploadView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
   def notLoggedInController(
@@ -128,10 +128,10 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with MockitoSuga
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, createUploadView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
-  def viewAsString(form: Form[_] = form) = councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(fakeRequest, messages).toString
+  def viewAsString(form: Form[_] = form) = createUploadView()(username, form, Some(initiateResponse))(fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 

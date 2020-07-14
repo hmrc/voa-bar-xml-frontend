@@ -28,8 +28,8 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
 
   val mockUserAnswers = mock[UserAnswers]
 
-  val formUserAnswers = new FakeUserAnswers(Login("", ""), "council_tax_webform")
-  val uploadUserAnswers = new FakeUserAnswers(Login("", ""), "council_tax_xml_upload")
+  val formUserAnswers = new FakeUserAnswers(Login("", ""))
+  val uploadUserAnswers = new FakeUserAnswers(Login("", ""))
 
   "Navigator" when {
 
@@ -49,20 +49,9 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(WelcomeFormId, NormalMode) (formUserAnswers) mustBe routes.UniformController.myJourney("ba-report")
       }
 
-      // FIXME as part as https://jira.tools.tax.service.gov.uk/browse/VOA-2065
-//      "on choosing Council Tax Upload link should redirect to Council Tax Start Page" in {
-//        WelcomeFormId.toString mustBe "welcomeForm"
-//        navigator.nextPage(WelcomeFormId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
-//      }
-
-      "on selecting Council Tax Upload link should redirect to Council Tax Start Page" in {
-        WelcomeId.toString mustBe "welcome"
-        navigator.nextPage(WelcomeId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxStartController.onPageLoad()
-      }
-
-      "on clicking Council Tax Start now button should redirect to Council Tax Upload Page" in {
+      "on selecting Council Tax Upload link should redirect to Council Tax Upload Page" in {
         CouncilTaxStartId.toString mustBe "counciltaxstart"
-        navigator.nextPage(CouncilTaxStartId, NormalMode) (mockUserAnswers) mustBe routes.CouncilTaxUploadController.onPageLoad()
+        navigator.nextPage(CouncilTaxStartId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxUploadController.onPageLoad()
       }
     }
 

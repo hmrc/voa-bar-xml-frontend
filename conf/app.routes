@@ -46,17 +46,14 @@ GET         /unauthorised                         controllers.UnauthorisedContro
 GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
 GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
 
-GET         /council-tax/home                     controllers.CouncilTaxStartController.onPageLoad()
-GET         /goToCouncilTaxUpload                 controllers.CouncilTaxStartController.goToCouncilTaxUploadPage()
-
 GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad()
 POST        /council-tax/upload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
-POST        /council-tax/upload/:reference controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
+POST        /council-tax/upload/:reference        controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
 POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 
 GET         /welcome                              controllers.WelcomeController.onPageLoad()
 GET         /goToStartWebForm                     controllers.WelcomeController.goToStartWebFormPage()
-GET         /goToCouncilTaxStart                  controllers.WelcomeController.goToCouncilTaxStartPage()
+GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage()
 
 GET         /login                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 POST        /login                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)

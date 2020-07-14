@@ -36,10 +36,10 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
     behave like normalPage(createView, messageKeyPrefix)
   }
 
-  "The Council Tax links to the goToCouncilTaxStartPage method" in {
+  "The Council Tax links to the goToCouncilTaxUploadPage method" in {
     val doc = asDocument(createView())
     val href = doc.getElementById("councilTaxLink").attr("href")
-    assert(href == controllers.routes.WelcomeController.goToCouncilTaxStartPage().url.toString)
+    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url.toString)
   }
 
   // Welcome page containing form for navigation

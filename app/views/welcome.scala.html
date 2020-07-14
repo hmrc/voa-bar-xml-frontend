@@ -29,7 +29,8 @@
 @(appConfig: FrontendAppConfig, mode: Mode, baCode: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = Some(messages("welcome.title"))
+    pageTitle = Some(messages("welcome.title")),
+    baCode = Some(baCode)
 ) {
 
 
@@ -39,7 +40,7 @@
         <h2 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.WelcomeController.goToStartWebFormPage().url id="create">@messages("welcome.council_tax_webform")</a></h2>
         <p class="govuk-body">@messages("welcome.council_tax_webform.description")</p>
     }
-    <h2 class="govuk-heading-m"><a class="govuk-link" href=@routes.WelcomeController.goToCouncilTaxStartPage().url id="councilTaxLink">@messages("welcome.council_tax_upload")</a></h2>
+    <h2 class="govuk-heading-m"><a class="govuk-link" href=@routes.WelcomeController.goToCouncilTaxUploadPage().url id="councilTaxLink">@messages("welcome.council_tax_upload")</a></h2>
     <p class="govuk-body">@messages("welcome.council_tax_upload.description")</p>
 
     <h2 class="govuk-heading-m"><a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a></h2>

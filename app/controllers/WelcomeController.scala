@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import identifiers.{VOAAuthorisedId, WelcomeFormId, WelcomeId}
+import identifiers.{CouncilTaxStartId, VOAAuthorisedId, WelcomeFormId}
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
 import utils.Navigator
@@ -51,7 +51,7 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
     Redirect(navigator.nextPage(WelcomeFormId, NormalMode)(request.userAnswers))
   }
 
-  def goToCouncilTaxStartPage() = (getData andThen requireData) { implicit request =>
-    Redirect(navigator.nextPage(WelcomeId, NormalMode)(request.userAnswers))
+  def goToCouncilTaxUploadPage() = (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(CouncilTaxStartId, NormalMode)(request.userAnswers))
   }
 }
