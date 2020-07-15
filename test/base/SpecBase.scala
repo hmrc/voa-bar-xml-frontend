@@ -44,12 +44,9 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
   def messages: Messages = messagesApi.preferred(fakeRequest)
 
   class FakeUserAnswers(login: Login,
-                        subCat: String,
                         cacheMap: CacheMap = new CacheMap("", Map())) extends UserAnswers(cacheMap) {
 
     override def login: Option[Login] = Some(login)
-
-    override def submissionCategory: Option[String] = Some(subCat)
   }
 
 }

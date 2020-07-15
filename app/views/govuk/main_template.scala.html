@@ -17,27 +17,41 @@
 @import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
-@import views.html.govuk.head
-@import views.html.govuk.scripts
+@import views.html.govuk.{head => headTemplate}
+@import views.html.govuk.{scripts => scriptsTemplate}
 
 @this(
         govukLayout: govukLayout,
-        head: head,
-        scripts: scripts,
+        head: headTemplate,
+        scripts: scriptsTemplate,
         govukPhaseBanner: govukPhaseBanner,
-        siteHeader: components.siteHeader
+        siteHeader: components.siteHeader,
+        govukBackLink: GovukBackLink
 )
 
 @(pageTitle: Option[String] = None,
         beforeContentBlock: Option[Html] = None,
+        backLinkUrl: Option[String] = None,
+        baCode: Option[String] = None,
         showSignOut: Boolean = true
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @beforeBLock = {
     @govukPhaseBanner(PhaseBanner(tag = Option(Tag(Text("BETA"))),
         content = HtmlContent("This is a new service – your <a href=\"/voa-bar-xml-frontend/feedback/tell-us\" target=\"_blank\" id=\"betaFeedback\">feedback</a> will help us to improve it.")))
-    @beforeContentBlock
 
+    @baCode.map{ code =>
+        @components.signin_credentials(code)
+    }
+    @backLinkUrl.map{ url =>
+        <div>
+            @govukBackLink(
+                BackLink(href = url)
+            )
+        </div>
+    }
+
+    @beforeContentBlock
 }
 
 

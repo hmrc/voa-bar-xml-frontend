@@ -27,12 +27,13 @@ trait ViewBehaviours extends ViewSpecBase {
 
     "behave like a normal page" when {
       "rendered" must {
-        "have the correct banner title" in {
-          val doc = asDocument(view())
-          val nav = doc.getElementById("proposition-menu")
-          val span = nav.children.first
-          span.text mustBe messagesApi("site.service_name")
-        }
+        // FIXME when unified design https://jira.tools.tax.service.gov.uk/browse/VOA-2066
+//        "have the correct banner title" in {
+//          val doc = asDocument(view())
+//          val nav = doc.getElementById("proposition-menu")
+//          val span = nav.children.first
+//          span.text mustBe messagesApi("site.service_name")
+//        }
 
         "display the correct browser title" in {
           val doc = asDocument(view())

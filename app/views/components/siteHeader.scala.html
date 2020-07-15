@@ -31,7 +31,8 @@
      Some(Seq(
        HeaderNavigation(
        href = Some(controllers.routes.SignOutController.signOut().url),
-       text = Some(messages("site.signOut"))
+       text = Some(messages("site.signOut")),
+       attributes = Map("id" -> "signout-link")
        )
     ))
    } else None

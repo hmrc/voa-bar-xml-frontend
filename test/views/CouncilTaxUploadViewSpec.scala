@@ -16,15 +16,12 @@
 
 package views
 
-import controllers.routes
 import forms.FileUploadDataFormProvider
-import models.{NormalMode}
 import models.UpScanRequests.{InitiateResponse, UploadRequest}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
-import views.html.councilTaxUpload
 
-class CouncilTaxUploadViewSpec extends ViewBehaviours {
+class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
   val username = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
@@ -55,17 +52,16 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
   )
   private def createView(displayInitiateResponse: Boolean = true) = {
     if (displayInitiateResponse) {
-      councilTaxUpload(username, frontendAppConfig, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
+      createUploadView()(username, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
     } else {
-      councilTaxUpload(username, frontendAppConfig, form)(councilTaxUploadFakeRequest, messages)
+      createUploadView()(username, form)(councilTaxUploadFakeRequest, messages)
     }
   }
 
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(() => createView(), messageKeyPrefix, "info.format", "info.multi", "info.upload", "info.files", "message1",
-      "message2", "xml")
+    behave like normalPage(() => createView(), messageKeyPrefix, "help", "info.format", "info.multi", "info.upload", "info.files", "xml")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.getElementById("username-element").text
@@ -73,21 +69,14 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours {
     }
 
     "Include a logout link which redirects the users to the login page" in {
-      val href = doc.getElementById("logout-link").attr("href")
-      href mustBe controllers.routes.LoginController.onPageLoad(NormalMode).url.toString
+      val href = doc.getElementById("signout-link").attr("href")
+      href mustBe controllers.routes.SignOutController.signOut().url
     }
 
-    "Have a home link in the top navigation bar which links to the welcome page and display '> Upload' next to the home link" in {
-      val href = doc.getElementById("homelink").attr("href")
-      val currentPageName = doc.getElementById("upload-element").text
-      href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "Upload"
-    }
-
-    "contain Submit button with the value Submit" in {
+    "contain Submit button with the value Upload" in {
       val doc = asDocument(createView())
       val submitButton = doc.getElementById("submit").text()
-      submitButton mustBe messages("site.submit")
+      submitButton mustBe messages("councilTaxUpload.submit.button")
     }
 
     "contain Upscan expected hidden inputs" in {

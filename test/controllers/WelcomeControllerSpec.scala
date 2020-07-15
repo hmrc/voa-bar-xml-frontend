@@ -18,7 +18,6 @@ package controllers
 
 import connectors.FakeDataCacheConnector
 import controllers.actions._
-import forms.SubmissionTypeFormProvider
 import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.mvc.MessagesControllerComponents
