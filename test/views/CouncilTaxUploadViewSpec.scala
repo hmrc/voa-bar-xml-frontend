@@ -64,7 +64,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
     behave like normalPage(() => createView(), messageKeyPrefix, "help", "info.format", "info.multi", "info.upload", "info.files", "xml")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.getElementById("username-element").text
+      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
       user mustBe "Reading"
     }
 
