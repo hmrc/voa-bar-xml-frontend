@@ -17,6 +17,7 @@
 package models
 
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
@@ -50,4 +51,10 @@ final case class ReportStatus(
                                filename: Option[String] = None,
                                totalReports: Option[Int] = None,
                                report: Option[JsObject] = None
-                             )
+                             ){
+  val formattedCreated: String = {
+    val dtf = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
+    created.format(dtf)
+  }
+
+}

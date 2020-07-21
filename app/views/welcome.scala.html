@@ -15,18 +15,14 @@
  *@
 
 @import config.FrontendAppConfig
-@import forms.SubmissionTypeFormProvider
-@import models.Mode
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
 @this(
         main_template: views.html.govuk.main_template
 )
 
 
-@(appConfig: FrontendAppConfig, mode: Mode, baCode: String)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, baCode: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     pageTitle = Some(messages("welcome.title")),

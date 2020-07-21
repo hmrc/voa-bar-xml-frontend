@@ -20,14 +20,13 @@ import java.util.Locale
 
 import javax.inject.{Inject, Singleton}
 import models.UpScanRequests._
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Logger}
 import play.mvc.Http.Status
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import models.{Error, Login, VoaBarUpload}
-import play.api.Mode.Mode
 import play.api.i18n.{Lang, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,11 +41,11 @@ class UploadConnector @Inject()(http: HttpClient,
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
   private[connectors] val baseSegment = "/voa-bar/"
   private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
-  private[connectors] val upScanConfig = configuration.getConfig("microservice.services.upscan").get
-  private[connectors] val upScanPort = upScanConfig.getString("port").get
-  private[connectors] val upScanHost = upScanConfig.getString("host").get
-  private[connectors] val upScanProtocol = upScanConfig.getString("protocol").get
-  private[connectors] val initiateUrl = s"$upScanProtocol://$upScanHost:$upScanPort${upScanConfig.getString("initiate.url").get}"
+  private[connectors] val upScanConfig = configuration.get[Configuration]("microservice.services.upscan")
+  private[connectors] val upScanPort = upScanConfig.get[String]("port")
+  private[connectors] val upScanHost = upScanConfig.get[String]("host")
+  private[connectors] val upScanProtocol = upScanConfig.get[String]("protocol")
+  private[connectors] val initiateUrl = s"$upScanProtocol://$upScanHost:$upScanPort${upScanConfig.get[String]("initiate.url")}"
 
   val logger = Logger(this.getClass)
 

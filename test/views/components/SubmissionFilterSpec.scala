@@ -21,6 +21,7 @@ import views.behaviours.ViewBehaviours
 import views.html.components.submission_filter
 
 class SubmissionFilterSpec extends ViewBehaviours {
+  // TODO Handle pending filter https://jira.tools.tax.service.gov.uk/browse/VOA-2117
   "Submission Filter component" should {
     "have a failed filter" in {
       val doc = asDocument(submission_filter(messages))
