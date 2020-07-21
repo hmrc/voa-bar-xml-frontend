@@ -24,33 +24,11 @@
 @this(
         main_template: views.html.govuk.main_template,
         govukFileUpload: GovukFileUpload,
-        govukDetails: GovukDetails,
         formWithCSRF: FormWithCSRF
 )
 
 
 @(baCode: String, fileUploadForm: Form[_], initiateResponse: Option[InitiateResponse] = None)(implicit request: Request[_], messages: Messages)
-
-    @summary = {
-        <span class="govuk-details__summary-text">
-            @messages("councilTaxUpload.help")
-        </span>
-    }
-
-    @content = {
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("councilTaxUpload.info.format")</li>
-        <li>@messages("councilTaxUpload.info.multi")</li>
-        <li>@messages("councilTaxUpload.info.upload")</li>
-        <li>@messages("councilTaxUpload.info.files")</li>
-    </ul>
-    }
-
-    @hint = {
-        <span id="account-number-hint" class="govuk-hint">
-            @messages("councilTaxUpload.xml")
-        </span>
-    }
 
     @main_template(
         pageTitle = Some(messages("councilTaxUpload.title")),
@@ -79,16 +57,7 @@
                     id = "file",
                     name = "file",
                     classes = "govuk-form-group",
-                    hint = Some(Hint(content = HtmlContent(hint))),
                     attributes = Map("accept" -> "application/xml", "_type" -> "file", "class" -> "upload", "required"  -> "required")
-                )
-            )
-
-            @govukDetails(
-                Details(
-                    classes = "govuk-details",
-                    summary = HtmlContent(summary),
-                    content = HtmlContent(content)
                 )
             )
 

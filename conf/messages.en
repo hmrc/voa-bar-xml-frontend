@@ -8,7 +8,6 @@ date.year = Year
 file = File
 submission = Submission
 submission.view = View submission history
-submission.view.description = Text to describe the action.
 
 error.boolean = Please give an answer
 error.invalid_date = Give a correct date
@@ -157,19 +156,13 @@ confirmation.options.history = View your previous Council Tax submissions
 
 councilTaxUpload.title = Upload report
 councilTaxUpload.heading = Upload a file
-councilTaxUpload.help = Help with uploading an XML file
-councilTaxUpload.info.format = Files must be in XML format
-councilTaxUpload.info.multi = Multiple reports can be contained in a single file
-councilTaxUpload.info.upload = Only one file can be selected at a time
-councilTaxUpload.info.files = Previous XML files should not be resubmitted
 councilTaxUpload.error.xml.required = XML File Required
 councilTaxUpload.error.xml.length = Maximum file size is 2 Mb
 councilTaxUpload.error.xml.fileType =  Only XML files are permitted
 councilTaxUpload.error.fileUploadService = Issues with the upload service. Please, contact BARS@voa.gsi.gov.uk.
-councilTaxUpload.xml = Must be in XML format
 councilTaxUpload.download.error = Error while downloading file
 councilTaxUpload.error.transferXml = Error while uploading file
-councilTaxUpload.submit.button = Upload
+councilTaxUpload.submit.button = Submit
 
 login.title = Sign in
 login.heading = Sign in
@@ -187,10 +180,8 @@ welcome.title = Welcome
 welcome.heading = Choose a task
 welcome.BA = Billing Authority Reports
 welcome.want.to = I want to
-welcome.council_tax_webform = Create a report
-welcome.council_tax_webform.description = Text to describe the action.
-welcome.council_tax_upload = Upload a report
-welcome.council_tax_upload.description = Text to describe the action.
+welcome.council_tax_webform = Create a Council Tax report
+welcome.council_tax_upload = Upload a file of Council Tax reports
 reportStatus.title = Report Status
 reportStatus.heading = Submission history,
 

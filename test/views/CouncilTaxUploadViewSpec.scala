@@ -61,7 +61,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(() => createView(), messageKeyPrefix, "help", "info.format", "info.multi", "info.upload", "info.files", "xml")
+    behave like normalPage(() => createView(), messageKeyPrefix,  "title" ,"submit.button")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.select("body > div > dl > div:nth-child(2) > dd").text

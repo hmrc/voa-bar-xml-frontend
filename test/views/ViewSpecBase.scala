@@ -126,7 +126,6 @@ trait ViewSpecBase extends SpecBase {
     new councilTaxUpload(
       createMain_template(),
       new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
-      new govukDetails(),
       new formWithCSRF()
     )
   }
