@@ -32,7 +32,6 @@ import play.api.libs.json.JsValue
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import views.html.reportStatus
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -44,6 +43,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        receiptService: ReceiptService,
+                                       reportStatus: views.html.reportStatus,
                                        controllerComponents: MessagesControllerComponents
                                       )(implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
@@ -81,14 +81,14 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatuses <- EitherT(reportStatuses(login, filter))
-      } yield Ok(reportStatus(login.username, appConfig, reportStatuses, filter)))
+      } yield Ok(reportStatus(login.username, reportStatuses, filter)))
         .valueOr(f => f)
   }
 
   private def getPDF(reportStatus: ReportStatus)(implicit request: Request[_]): Future[Either[Result, Array[Byte]]] = {
     Future{receiptService.producePDF(reportStatus) match {
         case Success(content) => Right(content)
-        case Failure(exception) => Left(InternalServerError(error(messagesApi.preferred(request), appConfig)))
+        case Failure(_) => Left(InternalServerError(error(messagesApi.preferred(request), appConfig)))
       }
     }
   }

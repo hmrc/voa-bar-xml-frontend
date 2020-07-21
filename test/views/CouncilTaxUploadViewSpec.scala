@@ -68,7 +68,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
       user mustBe "Reading"
     }
 
-    "Include a logout link which redirects the users to the login page" in {
+    "Include a signout link which redirects the users to the login page" in {
       val href = doc.getElementById("signout-link").attr("href")
       href mustBe controllers.routes.SignOutController.signOut().url
     }

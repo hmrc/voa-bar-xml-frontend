@@ -34,6 +34,30 @@ home.reports.current.progress = Current progress
 home.reports.no.current.progress = No submissions currently in progress.
 home.reports.last = Last uploaded
 
+report.subheading = Showing only the last 90 days of submissions.
+report.key.status = Status
+report.key.type = Type
+report.value.type = Council Tax
+report.key.report.submitted = Reports submitted
+report.key.file = File
+report.key.date = Date
+report.key.error = Error
+report.link.print = Print this page
+report.link.start.again = Start again
+
+report.status.pending.title = Submitted (pending)
+report.status.verified.title = Submitted (pending)
+report.status.failed.title = Error
+report.status.unknown.title = Submitted (pending)
+report.status.submitted.title = Submitted (pending)
+report.status.cancelled.title = Submitted (pending)
+report.status.done.title = Submitted (completed)
+
+report.filter.all = All Submissions
+report.filter.failed = Show only submissions with errors
+report.filter.done = Show only pending submissions
+report.filter.pending = Show only completed submissions
+
 report.status.UNKNOWN = unknown
 report.status.CANCELLED = cancelled
 report.status.failed = failed
@@ -78,10 +102,6 @@ error.2001.message = There is a problem with the file, please contact your suppl
 error.3000.message = There is a problem with the system, please try again later.
 error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact your support team.
 error.5000.message = Unknown error.
-
-report.filter.failed = Failed Submissions
-report.filter.all = All Submissions
-report.filter.done = Completed Submissions
 
 reports.notFound = Reports not found
 
@@ -193,7 +213,7 @@ copy.feedback.anotherForm=Submit another form
 label.feedback.error=There was an error sending your feedback.
 copy.form.help.thankyouvacated=Thank you for submitting this feedback, there will be no need for you to continue with the on-line form and we will contact you if we need more information.
 
-status.submissionId.title = Submission ID:
+status.submissionId.title = Submission ID
 status.history.title = History
 status.submitted.title = Submitted
 status.done.title = Submitted

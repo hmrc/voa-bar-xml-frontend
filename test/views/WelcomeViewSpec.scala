@@ -28,7 +28,7 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => createWelcomeView()(frontendAppConfig, NormalMode, username)(welcomeFakeRequest, messages)
+  def createView = () => createWelcomeView()(frontendAppConfig, username)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -48,7 +48,7 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
-  def createFormView = () => createWelcomeView()(frontendAppConfig, NormalMode, formUsername)(welcomeFakeRequest, messages)
+  def createFormView = () => createWelcomeView()(frontendAppConfig, formUsername)(welcomeFakeRequest, messages)
 
   lazy val formDoc = asDocument(createFormView())
 

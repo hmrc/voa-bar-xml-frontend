@@ -53,14 +53,11 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
   def tempFile: TemporaryFile = tempCreator.create(file.toPath)
 
   val upScanConfigPath = "microservice.services.upscan"
-  val upScanConfig = configuration.getConfig(upScanConfigPath)
-    .getOrElse(throw new ConfigException.Missing(upScanConfigPath))
+  val upScanConfig = configuration.get[Configuration](upScanConfigPath)
   val upScanCallBackUrlPath = "callback-url"
-  val upScanCallBackUrl = upScanConfig.getString(upScanCallBackUrlPath)
-    .getOrElse(throw new ConfigException.Missing(upScanCallBackUrlPath))
+  val upScanCallBackUrl = upScanConfig.get[String](upScanCallBackUrlPath)
   val maximumFileSizePath = "max-file-size"
-  val maximumFileSize = upScanConfig.getInt(maximumFileSizePath)
-    .getOrElse(throw new ConfigException.Missing(maximumFileSizePath))
+  val maximumFileSize = upScanConfig.get[Int](maximumFileSizePath)
 
   def servicesConfig = injector.instanceOf[ServicesConfig]
 

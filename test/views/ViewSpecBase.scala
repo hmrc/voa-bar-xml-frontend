@@ -31,7 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import views.html.govuk.{head, scripts}
-import views.html.{login, councilTaxUpload, welcome}
+import views.html.{login, councilTaxUpload, welcome, reportStatus}
 
 trait ViewSpecBase extends SpecBase {
 
@@ -128,6 +128,13 @@ trait ViewSpecBase extends SpecBase {
       new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
       new govukDetails(),
       new formWithCSRF()
+    )
+  }
+
+  def createReportStatusView(): reportStatus = {
+    new reportStatus(
+      createMain_template(),
+      new govukSummaryList()
     )
   }
 

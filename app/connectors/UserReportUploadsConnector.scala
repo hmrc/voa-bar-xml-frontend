@@ -34,10 +34,10 @@ class DefaultUserReportUploadsConnector @Inject() (
   extends  UserReportUploadsConnector with BaseConnector {
   val hc: HeaderCarrier = HeaderCarrier()
 
-  val voaBarConfig = configuration.getConfig("microservice.services.voa-bar").get
-  val host = voaBarConfig.getString("host").get
-  val port = voaBarConfig.getString("port").get
-  val protocol = voaBarConfig.getString("protocol").get
+  val voaBarConfig = configuration.get[Configuration]("microservice.services.voa-bar")
+  val host = voaBarConfig.get[String]("host")
+  val port = voaBarConfig.get[String]("port")
+  val protocol = voaBarConfig.get[String]("protocol")
   val serviceUrl = s"$protocol://$host:$port/voa-bar" //TODO - Refactor with services config
 
 

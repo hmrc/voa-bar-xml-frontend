@@ -17,22 +17,31 @@
 @import models.{Failed, Done}
 
 @(messages: Messages, filter: Option[String] = None)
+<ul class="govuk-list">
+    @if(Seq(Some(Failed.value), Some(Pending.value), Some(Done.value)).contains(filter)) {
+    <li>
+        <a href="@routes.ReportStatusController.onPageLoad()" class="govuk-link">@messages("report.filter.all")</a>
+    </li>
+    }
 
-@if(Seq(Some(Failed.value), Some(Done.value)).contains(filter)) {
-  <p>
-    <a href="@routes.ReportStatusController.onPageLoad()">@messages("report.filter.all")</a>
-  </p>
-}
+    @if(filter != Some(Done.value)) {
+    <li>
+        <a href="@routes.ReportStatusController.onPageLoad(Some(Done.value))" class="govuk-link">@messages("report.filter.done")</a>
+    </li>
+    }
 
-@if(filter != Some(Failed.value)) {
-  <p>
-    <a href="@routes.ReportStatusController.onPageLoad(Some(Failed.value))">@messages("report.filter.failed")</a>
-  </p>
-}
+    @if(filter != Some(Pending.value)) {
+    <li>
+        <a href="@routes.ReportStatusController.onPageLoad(Some(Pending.value))" class="govuk-link">@messages("report.filter.pending")</a>
+    </li>
+    }
 
-@if(filter != Some(Done.value)) {
-  <p>
-    <a href="@routes.ReportStatusController.onPageLoad(Some(Done.value))">@messages("report.filter.done")</a>
-  </p>
-}
+
+
+    @if(filter != Some(Failed.value)) {
+    <li>
+        <a href="@routes.ReportStatusController.onPageLoad(Some(Failed.value))" class="govuk-link">@messages("report.filter.failed")</a>
+    </li>
+    }
+</ul>
 
