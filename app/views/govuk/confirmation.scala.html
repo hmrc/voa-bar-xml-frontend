@@ -29,14 +29,21 @@
     cr03SubmissionConfirmation:cr03SubmissionConfirmation
 )
 
-@(  report: ReportStatus,
+@(
+    baCode: String,
+    report: ReportStatus,
     cr03Submission: Option[Cr03Submission]
 )(implicit request: Request[_], messages: Messages)
 
 @dateFormat = @{DateTimeFormatter.ofPattern("d MMMM y H:mm")}
 
+@panelContent = {
+    @messages("submission") @report.id.substring(0, 8)
+}
+
 @mainTemplate(
-    pageTitle = Option("Confirmation - Billing Authority ")
+    pageTitle = Option("Confirmation - Billing Authority "),
+    baCode = Some(baCode)
 ) {
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(report.id)" />
@@ -44,25 +51,19 @@
 
     @govukPanel(Panel(
         headingLevel = 1, title = Text( messages(s"status.${report.status.getOrElse(Pending.value).toLowerCase}.title") ),
-        content = Text(s"${messages("submission")} ID ${report.id.substring(0, 8)}")
+        content = Text(s"${messages("submission")} ${report.id.substring(0, 8)}")
     ))
 
     @if(cr03Submission.isDefined) {
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
         @cr03SubmissionConfirmation(cr03Submission.get)
     }
 
-    <h3 class="govuk-heading-m">What I should do next?</h3>
-    <p class="govuk-body">Send additional information to bars@@voa.gsi.gov.uk</p>
+    <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@{report.id}">@messages("feedback.email")</a></p>
+    <p class="govuk-body">@messages("feedback.contact2")</p>
 
-    <p class="govuk-body">
-        Billing authority report : @{report.id.substring(0, 8)}<br />
-        Submitted : @report.created.format(dateFormat)
-    </p>
-    <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="@routes.WelcomeController.onPageLoad()">Submit more council tax reports</a><br />
-        <a class="govuk-link govuk-link--no-visited-state" href="@routes.ReportStatusController.onPageLoad(None)">View submission history</a>
-    </p>
+    <p class="js-hidden"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
-
+    <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link">@messages("report.link.start.again")</a>
 
 }
