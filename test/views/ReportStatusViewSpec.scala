@@ -55,31 +55,6 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
       href mustBe controllers.routes.SignOutController.signOut().url
     }
 
-    "Contain a submission title equal to 'SUBMITTED' if the report status is submitted" in {
-
-      val status = doc(Seq(reportStatus1)).select("#main-content > div > div > dl:nth-child(5) > div:nth-child(1) > dd").text
-      status mustBe messages("report.status.submitted.title")
-    }
-
-    "Contain a submission title equal to 'VERIFIED' if the report status is validated" in {
-      val status = doc(Seq(reportStatus2)).select("#main-content > div > div > dl:nth-child(5) > div:nth-child(1) > dd").text
-      status mustBe messages("report.status.verified.title")
-    }
-
-    "Contain a submission title equal to 'FAILED' if the report status is invalidated" in {
-      val status = doc(Seq(reportStatus3)).select("#main-content > div > div > dl:nth-child(5) > div:nth-child(1) > dd").text
-      status mustBe messages("report.status.failed.title")
-    }
-
-    "Contain a submission title equal to 'DONE' if the report status is forwarded" in {
-      val status = doc(Seq(reportStatus4)).select("#main-content > div > div > dl:nth-child(5) > div:nth-child(1) > dd").text
-      status mustBe messages("report.status.done.title")
-    }
-
-    "Contain a submission title equal to 'PENDING' if the report status is forwarded" in {
-      val status = doc(Seq(reportStatus5)).select("#main-content > div > div > dl:nth-child(5) > div:nth-child(1) > dd").text
-      status mustBe messages("report.status.pending.title")
-    }
 
   }
 }

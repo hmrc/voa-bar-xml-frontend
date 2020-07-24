@@ -14,76 +14,53 @@
  * limitations under the License.
  *@
 
-@import models.{Submitted, Done, Verified, Failed}
-@import utils.FormHelpers._
-@import helper._
-@import controllers.ReportDeleteController
-@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-<div class="bordered-box submission-panel" id="@reportStatus.id">
+@(reportStatus: ReportStatus, govukSummaryList: GovukSummaryList, dlClass: String = "govuk-!-margin-bottom-9")(implicit messages: Messages, request: Request[_])
 
-    @submission_delete(reportStatus, baCode)
 
-    @reportStatus.status match {
-        case Some(Done.value) => {
-        <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>
-        @components.submission_body(reportStatus)
-        }
-        case Some(Submitted.value) => {
-        <span id="submission-title" class="flag flag--on-left-side">@messages("status.submitted.title")</span>
-        @components.submission_body(reportStatus)
-        }
-        case Some(Failed.value) => {
-        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
-        <div class="submission-body">
-            <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
-            <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
-            @if(reportStatus.filename.isDefined) {
-            <p><b class="bold">@messages("file")</b>: @getAlternativeText(reportStatus.filename, "filename unavailable")</p>
-            }
-            <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
-                @reportStatus.created.toLocalTime</i>
-            </p>
-            <p>
-                @components.submission_error(reportStatus.errors)
-            </p>
-            @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.id).url, id = "print-button", className = "button print-hidden js-visible")
-        </div>
-        }
-        case _ if(reportStatus.created.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
-        <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
-        <div class="submission-body">
-            <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
-            <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
-            <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
-                @reportStatus.created.toLocalTime</i>
-            </p>
-            <p>
-            <div class="notice">
-                <i class="icon icon-important">
-                    <span class="visually-hidden">Warning</span>
-                </i>
-                <strong class="bold-small">
-                    @messages("status.failed.timeout")
-                </strong>
-            </div>
-            </p>
-        </div>
-        }
-        case Some(Verified.value) => {
-            <span id="submission-title" class="flag flag--on-left-side">@messages("status.verified.title")</span>
-            @components.submission_body(reportStatus)
-            <div class="panel panel-border-wide">
-                <p>
-                    @messages("status.verified.description")
-                </p>
-            </div>
-        }
-        case _ => {
-            <span id="submission-title" class="flag flag--on-left-side">@messages("status.pending.title")</span>
-            @components.submission_body(reportStatus)
-        }
-    }
 
-</div>
-<br />
+@govukSummaryList(
+    SummaryList(
+        rows =
+            Seq(
+                SummaryListRow(
+                    key = Key(Text(messages("report.key.status")), "govuk-!-width-one-half"),
+                    value = Value(Text(messages(s"report.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")), if (reportStatus.status.contains(Failed.value)) "govuk-error-message" else "")
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
+                    value = Value(Text(messages("report.value.type")))
+                )
+            )  ++
+            (if(!reportStatus.status.contains(Failed.value)) {
+                reportStatus.totalReports.map{ totalReports =>
+                    Seq(SummaryListRow(
+                        key = Key(Text(messages("report.key.report.submitted")), "govuk-!-width-one-half"),
+                        value = Value(Text(totalReports.toString))
+                    ))
+                }.getOrElse(Nil)
+            } else Nil) ++
+            Seq(
+                SummaryListRow(
+                    key = Key(Text(messages("report.key.file")), "govuk-!-width-one-half"),
+                    value = Value(Text(reportStatus.filename.getOrElse("File not found")))
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("report.key.date")), "govuk-!-width-one-half"),
+                    value = Value(Text(reportStatus.formattedCreated))
+                )
+            ) ++
+            (if(reportStatus.status.contains(Failed.value)) {
+                Seq(
+                    SummaryListRow(
+                        key = Key(Text(messages("report.key.error")), "govuk-!-width-one-half"),
+                        value = Value(HtmlContent(components.submission_error2(reportStatus.errors)))
+                )
+            )
+            } else Nil)
+        ,
+        classes = "@dlClass",
+        Map("id" -> "summary-list")
+    )
+)

@@ -18,11 +18,9 @@ package views
 
 import java.time.ZonedDateTime
 
-import controllers.routes
-import models.{Done, NormalMode, ReportStatus}
+import models.{Done, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
-import views.html.confirmation
 
 class ConfirmationViewSpec extends ViewBehaviours {
 
@@ -37,51 +35,29 @@ class ConfirmationViewSpec extends ViewBehaviours {
   )
 
   def createView =
-    () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
+    () => createConfirmationView()(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
   def createViewWithStatus =
-    () => confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
+    () => createConfirmationView()(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title",
-      "options.another", "options.history", "submissionId")
+    behave like normalPage(createView, messageKeyPrefix, "submissionId")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.getElementById("username-element").text
+      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
       user mustBe "Bristol"
     }
 
-    "Include a logout link which redirects the users to the login page" in {
-      val href = doc.getElementById("logout-link").attr("href")
-      href mustBe controllers.routes.LoginController.onPageLoad(NormalMode).url.toString
+    "Include a signout link which redirects the users to the signout page" in {
+      val href = doc.getElementById("signout-link").attr("href")
+      href mustBe controllers.routes.SignOutController.signOut().url
     }
 
-    "Have a home link in the top navigation bar which links to the welcome page and display '> Confirmation' next to the home link" in {
-      val href = doc.getElementById("homelink").attr("href")
-      val currentPageName = doc.getElementById("confirmation-element").text
-      href mustBe routes.WelcomeController.onPageLoad().url.toString
-      currentPageName mustBe "Submission"
-    }
-
-    "Include an upload link which redirects the users to council tax upload page" in {
-      val href = doc.getElementById("upload-link").attr("href")
-      href mustBe controllers.routes.CouncilTaxUploadController.onPageLoad().url.toString
-    }
-
-    "Include a history link which redirects the users to council tax submissions history page" in {
-      val href = doc.getElementById("history-link").attr("href")
-      href mustBe controllers.routes.ReportStatusController.onPageLoad().url.toString
-    }
-
-    "Include a Download receipt button when completed" in {
+    "Include a print link when completed" in {
       val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
-      downloadButton mustBe messages("site.print.button")
+      downloadButton mustBe messages("report.link.print")
     }
 
-    "Include a hidden VOA Logo and have the aria-hidden attribute set to true" in {
-      val logoHiddenAttribute = doc.getElementsByClass("voa-logo").attr("aria-hidden")
-      logoHiddenAttribute mustBe "true"
-    }
   }
 }

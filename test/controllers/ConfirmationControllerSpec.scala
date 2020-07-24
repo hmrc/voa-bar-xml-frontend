@@ -19,32 +19,31 @@ package controllers
 import java.time.{LocalDate, ZonedDateTime}
 import java.util.UUID
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
-import models.{Login, NormalMode, Pending, ReportStatus, Submitted}
+import models.{Login, NormalMode, ReportStatus, Submitted}
 import play.api.test.Helpers._
-import views.html.confirmation
 import org.mockito.scalatest.MockitoSugar
-import play.api.i18n.Messages
-import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{MessagesControllerComponents, Request}
-import play.twirl.api.Html
+import play.api.libs.json.Json
+import play.api.mvc.MessagesControllerComponents
+import views.ViewSpecBase
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
+class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
+  def confirmationView = app.injector.instanceOf[views.html.confirmation]
 
   val username = "AUser"
   val submissionId = "SID372463"
   val login = Login("foo", "bar")
+  val login2 = Login(username, "bar")
   val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, status = Some(Submitted.value))
   val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
@@ -55,23 +54,23 @@ class ConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login)
+    FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
-    reportConfirmationView(report, cr03Report)(fakeRequest, messages).toString
+    reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmationView(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
   def refreshViewAsString() =
-    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
+    confirmationView(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 

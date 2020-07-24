@@ -26,12 +26,12 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.Lang
-import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukErrorMessage, GovukFooter, GovukHeader, GovukHint, GovukLabel, govukBackLink, govukFileUpload, govukPhaseBanner, govukTag, govukSummaryList}
+import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import views.html.govuk.{head, scripts}
-import views.html.{login, councilTaxUpload, welcome, reportStatus}
+import views.html.{login, councilTaxUpload, welcome, reportStatus, confirmation}
 
 trait ViewSpecBase extends SpecBase {
 
@@ -133,6 +133,14 @@ trait ViewSpecBase extends SpecBase {
     new reportStatus(
       createMain_template(),
       new govukSummaryList()
+    )
+  }
+
+  def createConfirmationView(): confirmation = {
+    new confirmation(
+      createMain_template(),
+      new govukSummaryList(),
+      new govukPanel()
     )
   }
 
