@@ -23,8 +23,7 @@
 
 @this(
         main_template: views.html.govuk.main_template,
-        govukFileUpload: GovukFileUpload,
-        formWithCSRF: FormWithCSRF
+        govukFileUpload: GovukFileUpload
 )
 
 
@@ -37,7 +36,7 @@
     ) {
 
     <h1 class="govuk-label-wrapper">
-        <label class="govuk-label govuk-label--l" for="file"> @messages("councilTaxUpload.heading")</label>
+        <label class="govuk-label govuk-label--l" for="file">@messages("councilTaxUpload.heading")</label>
     </h1>
 
     @components.error_summary(fileUploadForm.errors)
@@ -47,8 +46,8 @@
         <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(ir.reference))
 />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value=@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference)) />
-        @formWithCSRF(action = new play.api.mvc.Call("POST", ir.uploadRequest.href), args = 'enctype -> "multipart/form-data", 'id -> "councilTaxUploadForm"){
 
+        <form id="councilTaxUploadForm" method="POST" action=@(ir.uploadRequest.href) enctype="multipart/form-data">
             @ir.uploadRequest.fields.map{ case (key, value) =>
                 <input type="hidden" name="@key" value="@value">
             }
@@ -63,6 +62,6 @@
             )
 
             <button id="submit" href="summary" role="button" draggable="false" class="govuk-button" data-module="govuk-button">@messages("councilTaxUpload.submit.button")</button>
-        }
+        </form>
     }
 }

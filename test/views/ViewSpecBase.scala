@@ -26,7 +26,7 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.Lang
-import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukErrorMessage, GovukFooter, GovukHeader, GovukHint, GovukLabel, govukBackLink, govukDetails, govukFileUpload, govukPhaseBanner, govukTag, govukSummaryList}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, GovukErrorMessage, GovukFooter, GovukHeader, GovukHint, GovukLabel, govukBackLink, govukFileUpload, govukPhaseBanner, govukTag, govukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
@@ -125,8 +125,7 @@ trait ViewSpecBase extends SpecBase {
   def createUploadView(): councilTaxUpload = {
     new councilTaxUpload(
       createMain_template(),
-      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
-      new formWithCSRF()
+      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel)
     )
   }
 
