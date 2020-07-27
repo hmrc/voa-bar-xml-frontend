@@ -43,11 +43,12 @@
     @components.error_summary(fileUploadForm.errors)
 
     @initiateResponse.map { ir =>
+        <input type="hidden" id="councilTaxUploadReportError" value=@(routes.CouncilTaxUploadController.onError(ir.reference)) />
+        <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(ir.reference))
+/>
+        <input type="hidden" id="councilTaxUploadPrepareUpload" value=@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference)) />
         @formWithCSRF(action = new play.api.mvc.Call("POST", ir.uploadRequest.href), args = 'enctype -> "multipart/form-data", 'id -> "councilTaxUploadForm"){
-            <input type="hidden" id="councilTaxUploadReportError" value=@(routes.CouncilTaxUploadController.onError(ir.reference)) />
-            <input type="hidden" id="councilTaxUploadFormRedirect" value=@(routes.ConfirmationController.onPageLoad(initiateResponse.get.reference))
-            />
-            <input type="hidden" id="councilTaxUploadPrepareUpload" value=@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference)) />
+
             @ir.uploadRequest.fields.map{ case (key, value) =>
                 <input type="hidden" name="@key" value="@value">
             }
