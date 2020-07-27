@@ -18,17 +18,13 @@
 
 @(errors: Option[Seq[Error]])(implicit messages: Messages)
 
-@if(errors.isDefined) {
-    @for(error <- errors.get) {
-        <div class="submission-error">
-            <h2 class="heading-medium">
-                Error @error.code: @messages(s"error.${error.code}.message")
-            </h2>
-            <ul class="list list-bullet ">
-                @error.values.map{v =>
-                <li>@v</li>
-                }
-            </ul>
-        </div>
+@errors.map { errorsSeq =>
+    @for(error <- errorsSeq) {
+        <p>Error @error.code: @messages(s"error.${error.code}.message")</p>
+        <ul class="list list-bullet ">
+            @error.values.map{v =>
+            <li>@v</li>
+            }
+        </ul>
     }
 }

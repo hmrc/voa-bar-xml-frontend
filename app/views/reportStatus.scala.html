@@ -31,66 +31,29 @@
     baCode = Some(baCode)
 ) {
 
-    <h1 class="govuk-heading-l">@messages("reports.history.title")</h1>
+        <h1 class="govuk-heading-l">@messages("reports.history.title")</h1>
 
-    <p class="govuk-body">@messages("report.subheading")</p>
+        <p class="govuk-body">@messages("report.subheading")</p>
 
-    @components.submission_filter(messages, filter)
+        @components.submission_filter(messages, filter)
 
-    @if(reportStatuses.isEmpty){
-        <p class="lede">
-            @messages("reports.notFound")
-        </p>
-    }else{
-
+        @if(reportStatuses.isEmpty){
+            <p class="lede">
+                @messages("reports.notFound")
+            </p>
+        }else{
         @reportStatuses.map{ reportStatus =>
             <h2 class="govuk-heading-m">@messages("status.submissionId.title") @reportStatus.id.split("-").head</h2>
-                @govukSummaryList(
-                    SummaryList(
-                        rows =
-                            Seq(
-                                SummaryListRow(
-                                    key = Key(Text(messages("report.key.status")), "govuk-!-width-one-half"),
-                                    value = Value(Text(messages(s"report.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")), if (reportStatus.status.contains(Failed.value)) "govuk-error-message" else "")
-                                ),
-                                SummaryListRow(
-                                    key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
-                                    value = Value(Text(messages("report.value.type")))
-                                )
-                            )  ++
-                            (if(!reportStatus.status.contains(Failed.value)) {
-                                Seq(SummaryListRow(
-                                key = Key(Text(messages("report.key.report.submitted")), "govuk-!-width-one-half"),
-                                value = Value(Text(reportStatus.totalReports.getOrElse(0).toString))
-                                ))
-                            } else Nil) ++
-                            Seq(
-                                SummaryListRow(
-                                    key = Key(Text(messages("report.key.file")), "govuk-!-width-one-half"),
-                                    value = Value(Text(reportStatus.filename.getOrElse("File not found")))
-                                ),
-                                SummaryListRow(
-                                    key = Key(Text(messages("report.key.date")), "govuk-!-width-one-half"),
-                                    value = Value(Text(reportStatus.formattedCreated))
-                                )
-                            ) ++
-                                (if(reportStatus.status.contains(Failed.value)) {
-                                Seq(
-                                    SummaryListRow(
-                                        key = Key(Text(messages("report.key.error")), "govuk-!-width-one-half"),
-                                        value = Value(HtmlContent(components.submission_error2(reportStatus.errors)))
-                                    )
-                                )
-                                } else Nil)
-                ,
-                    classes = "govuk-!-margin-bottom-9"
-                )
+            @components.submission_panel2(
+                reportStatus,
+                govukSummaryList
             )
-    }
+        }
 
-    <p class="js-hidden"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
+        <p class="js-hidden"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
-    <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link">@messages("report.link.start.again")</a>
+        <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link">@messages("report.link.start.again")</a>
+
     }
 
 }

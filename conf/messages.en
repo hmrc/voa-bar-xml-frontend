@@ -143,8 +143,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Submission
-confirmation.submissionId = Submission ID: 
+confirmation.heading = Report
+confirmation.submissionId = Submission ID
 confirmation.subheading = We are processing your reports
 confirmation.file.received = We have received your file and we are processing your reports.
 confirmation.file.success = We have received your file and have processed it successfully.
@@ -233,7 +233,9 @@ status.report.title = Report No
 status.report.para = failed with the following errors:
 
 feedback.description =This is a new service -your <a href="https://www.smartsurvey.co.uk/s/BARSsurvey/" target="_blank">feedback</a> will help us to improve it.
-feedback.contact=Should you wish to supply any additional information to support your reports, please email BARS@voa.gsi.gov.uk
+feedback.contact= If you need to send additional information, email
+feedback.contact2= Please include the billing authority report number in the subject line.
+feedback.email=bars@voa.gsi.gov.uk
 
 
 #web-bars
@@ -249,7 +251,7 @@ ba-ref.error.minLength=Enter a billing authority reference
 ba-ref.error.maxLength=Billing authority reference must be 25 characters or fewer
 ba-ref.error.allowedChars=Billing authority reference must only contain letters a to z, hyphens, spaces and apostrophes
 
-UPRN.pageLabel=Unique property reference number (UPRN)
+UPRN.pageLabel=Unique property reference number
 UPRN.label=
 UPRN.error.minLength=
 UPRN.error.maxLength=UPRN must be 12 characters or fewer
@@ -367,7 +369,7 @@ planning-ref.error.minLength=Enter a planning reference
 planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
 planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes
 
-why-no-planning-ref.pageLabel=Why is there no planning reference?
+why-no-planning-ref.pageLabel=Reason for no planning reference
 why-no-planning-ref.required=Select why you don’t have a planning reference
 why-no-planning-ref.why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
 why-no-planning-ref.why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable

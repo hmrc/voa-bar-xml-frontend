@@ -35,12 +35,12 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
       override def list(key: String, args: Any*): List[Html] = Nil
     })
-    SummaryList(sum.rows.map(x => x.copy(actions = None)))
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
   }
 
   def summaryList(in: Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
     val baReport = SummaryListRow(
-      key = Key(HtmlContent(messages("ba-report.pageLabel"))),
+      key = Key(HtmlContent(messages("ba-report.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baReport)),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("ba-report").url,
@@ -48,7 +48,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
       ))
     )
     val baRef = SummaryListRow(
-      key = Key(HtmlContent(messages("ba-ref.pageLabel"))),
+      key = Key(HtmlContent(messages("ba-ref.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baRef)),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("ba-ref").url,
@@ -57,7 +57,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     )
 
     val uprn = SummaryListRow(
-      key = Key(HtmlContent(messages("UPRN.pageLabel"))),
+      key = Key(HtmlContent(messages("UPRN.pageLabel")), "govuk-!-width-one-half"),
       value = Value(in.uprn.map(Text).getOrElse(HtmlContent(messages("summary.uprn.notEntered")))),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("UPRN").url,
@@ -79,7 +79,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     ))
 
     val propertyAddress = SummaryListRow(
-      key = Key(HtmlContent(messages("property-address.pageLabel"))),
+      key = Key(HtmlContent(messages("property-address.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(addressContent)),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("property-address").url,
@@ -99,7 +99,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     ))
 
     val contactDetails = SummaryListRow(
-      key = Key(HtmlContent(messages("property-contact-details.pageLabel"))),
+      key = Key(HtmlContent(messages("property-contact-details.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(contactDetailsContent)),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("property-contact-details").url,
@@ -107,7 +107,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
       ))
     )
     val sameAddressQuestion = SummaryListRow(
-      key = Key(HtmlContent(messages("same-contact-address.pageLabel"))),
+      key = Key(HtmlContent(messages("same-contact-address.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(
         messages(if(in.sameContactAddress)"same-contact-address.same-contact-address.Yes" else "same-contact-address.same-contact-address.No")
       )),
@@ -131,7 +131,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
       ))
 
       SummaryListRow(
-        key = Key(HtmlContent(messages("contact-address.pageLabel"))),
+        key = Key(HtmlContent(messages("contact-address.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(addressContent)),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("contact-address").url,
@@ -143,7 +143,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
     val effectiveDate = SummaryListRow(
-      key = Key(HtmlContent(messages("effective-date.pageLabel"))),
+      key = Key(HtmlContent(messages("effective-date.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(formatter.format(in.effectiveDate))),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("effective-date").url,
@@ -152,7 +152,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     )
 
     val havePlanningRef = SummaryListRow(
-      key = Key(HtmlContent(messages("have-planning-ref.pageLabel"))),
+      key = Key(HtmlContent(messages("have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(if(in.havePlaningReference) messages("have-planning-ref.have-planning-ref.Yes") else messages("have-planning-ref.have-planning-ref.No"))),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("have-planning-ref").url,
@@ -162,7 +162,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
     val planningRef = in.planningRef.map { planningRef =>
       SummaryListRow(
-        key = Key(HtmlContent(messages("planning-ref.pageLabel"))),
+        key = Key(HtmlContent(messages("planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(Text(planningRef)),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("planning-ref").url,
@@ -173,7 +173,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
     val noPlanningRef = in.noPlanningReference.map { noPlanningRef =>
       SummaryListRow(
-        key = Key(HtmlContent(messages("why-no-planning-ref.pageLabel"))),
+        key = Key(HtmlContent(messages("why-no-planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(messages("why-no-planning-ref.why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("why-no-planning-ref").url,
@@ -184,7 +184,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
     val comments =
       SummaryListRow(
-        key = Key(HtmlContent(messages("comments.pageLabel"))),
+        key = Key(HtmlContent(messages("comments.pageLabel")), "govuk-!-width-one-half"),
         value = Value(in.comments.map(Text).getOrElse(HtmlContent(messages("summary.comments.none")))),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("comments").url,
