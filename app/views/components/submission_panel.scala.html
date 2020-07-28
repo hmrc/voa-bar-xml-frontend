@@ -55,7 +55,7 @@
                 Seq(
                     SummaryListRow(
                         key = Key(Text(messages("report.key.error")), "govuk-!-width-one-half"),
-                        value = Value(HtmlContent(components.submission_error2(reportStatus.errors)))
+                        value = Value(HtmlContent(components.submission_error(reportStatus.errors)))
                 )
             )
             } else Nil)
