@@ -44,7 +44,7 @@
         }else{
         @reportStatuses.map{ reportStatus =>
             <h2 class="govuk-heading-m">@messages("status.submissionId.title") @reportStatus.id.split("-").head</h2>
-            @components.submission_panel2(
+            @components.submission_panel(
                 reportStatus,
                 govukSummaryList
             )
