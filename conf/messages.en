@@ -143,7 +143,22 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Report
+confirmation.heading.pending = Submission
+confirmation.heading.verified = Submission
+confirmation.heading.failed = Submission
+confirmation.heading.unknown = Submission
+confirmation.heading.cancelled = Submission
+confirmation.heading.submitted = Report
+confirmation.heading.done = Report
+
+confirmation.status.pending.title = Pending
+confirmation.status.verified.title = Pending
+confirmation.status.failed.title = Error
+confirmation.status.unknown.title = Pending
+confirmation.status.submitted.title = Submitted
+confirmation.status.cancelled.title = Pending
+confirmation.status.done.title = Submitted
+
 confirmation.submissionId = Submission ID
 confirmation.subheading = We are processing your reports
 confirmation.file.received = We have received your file and we are processing your reports.

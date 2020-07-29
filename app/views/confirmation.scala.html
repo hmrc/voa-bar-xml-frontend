@@ -27,10 +27,11 @@
 @(baCode: String, submissionId: String, appConfig: FrontendAppConfig, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @panelTitle = {
-    @messages("confirmation.heading")
-    @if(reportStatus.isDefined && reportStatus.get.status.isDefined) {
-        @messages(s"status.${reportStatus.get.status.get.toLowerCase()}.title")
-    } else {
+    @reportStatus.flatMap(_.status).map{ status =>
+        @messages(s"confirmation.heading.${status.toLowerCase()}")
+        @messages(s"status.${status.toLowerCase()}.title")
+    }.getOrElse {
+        @messages(s"confirmation.heading.pending")
         @messages("status.pending.title")
     }
 }
@@ -60,9 +61,10 @@
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
                 <div class="govuk-!-padding-3 govuk-!-padding-bottom-0">
                 @components.submission_panel(
-                    rs,
-                    govukSummaryList,
-                    "govuk-!-margin-bottom-0"
+                    reportStatus = rs,
+                    govukSummaryList = govukSummaryList,
+                    dlClass = "govuk-!-margin-bottom-0",
+                    messagePrefix = "confirmation"
                 )
                 </div>
             </section>
