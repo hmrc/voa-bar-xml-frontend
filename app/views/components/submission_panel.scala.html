@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@(reportStatus: ReportStatus, govukSummaryList: GovukSummaryList, dlClass: String = "govuk-!-margin-bottom-9")(implicit messages: Messages, request: Request[_])
+@(reportStatus: ReportStatus, govukSummaryList: GovukSummaryList, dlClass: String = "govuk-!-margin-bottom-9", messagePrefix: String = "report")(implicit messages: Messages, request: Request[_])
 
 
 
@@ -26,7 +26,7 @@
             Seq(
                 SummaryListRow(
                     key = Key(Text(messages("report.key.status")), "govuk-!-width-one-half"),
-                    value = Value(Text(messages(s"report.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")), if (reportStatus.status.contains(Failed.value)) "govuk-error-message" else "")
+                    value = Value(Text(messages(s"$messagePrefix.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")), if (reportStatus.status.contains(Failed.value)) "govuk-error-message" else "")
                 ),
                 SummaryListRow(
                     key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
@@ -60,7 +60,7 @@
             )
             } else Nil)
         ,
-        classes = "@dlClass",
+        classes = dlClass,
         Map("id" -> "summary-list")
     )
 )
