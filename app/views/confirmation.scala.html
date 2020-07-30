@@ -37,9 +37,17 @@
 }
 
 @panelContent = {
+    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+        <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
+    }
     @messages("confirmation.submissionId")<br/>
     <strong>@submissionId.split("-").head</strong><br/>
-    <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
+
+    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+        <p class="print-hide">@messages("confirmation.subheading")</p>
+    } else {
+        <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
+    }
 }
 
 @main_template(
