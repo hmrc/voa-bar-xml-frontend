@@ -25,6 +25,7 @@ import identifiers.LoginId
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
 import models.{Login, NormalMode, ReportStatus, Submitted}
 import play.api.test.Helpers._
+import views.html.confirmation
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
@@ -38,7 +39,6 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
-  def confirmationView = app.injector.instanceOf[views.html.confirmation]
 
   val username = "AUser"
   val submissionId = "SID372463"
@@ -56,21 +56,21 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
     reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmationView(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
   def refreshViewAsString() =
-    confirmationView(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
+    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 

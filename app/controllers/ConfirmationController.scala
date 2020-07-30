@@ -23,11 +23,12 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import models.{Login, ReportStatus}
+import identifiers.VOAAuthorisedId
+import models.{Login, NormalMode, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import views.html.confirmation
 import cats.implicits._
 import journey.UniformJourney.Cr03Submission
-import play.api.Logger
 import play.api.libs.json.JsString
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,12 +40,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        val dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
                                        reportConfirmation: views.html.govuk.confirmation,
-                                       confirmation: views.html.confirmation,
                                        controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
-
-  val logger = Logger(this.getClass)
 
   def onPageLoad(reference: String) = getData.async {
     implicit request =>
@@ -52,14 +50,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        logger.warn(s"OnPageLoad Got report status $reportStatus")
         getCr03(reportStatus) match {
-          case None =>
-            logger.warn(s"OnPageLoad no cr03")
-            Ok(confirmation(login.username, reference, appConfig))
-          case cr03@Some(_) =>
-            logger.warn(s"OnPageLoad cr03 $cr03")
-            Ok(reportConfirmation(login.username, reportStatus, cr03))
+          case None => Ok(confirmation(login.username, reference, appConfig))
+          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
         }
       }).valueOr(failPage => failPage)
   }
@@ -84,14 +77,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        logger.warn(s"onPageRefresh Got report status $reportStatus")
         getCr03(reportStatus) match {
-          case None =>
-            logger.warn(s"onPageRefresh no cr03")
-            Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus)))
-          case cr03@Some(_) =>
-            logger.warn(s"onPageRefresh cr03 $cr03")
-            Ok(reportConfirmation(login.username, reportStatus, cr03))
+          case None => Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus)))
+          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
         }
       }).valueOr(failPage => failPage)
   }
