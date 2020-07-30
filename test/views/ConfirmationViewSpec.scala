@@ -21,6 +21,7 @@ import java.time.ZonedDateTime
 import models.{Done, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
+import views.html.confirmation
 
 class ConfirmationViewSpec extends ViewBehaviours {
 
@@ -35,29 +36,30 @@ class ConfirmationViewSpec extends ViewBehaviours {
   )
 
   def createView =
-    () => createConfirmationView()(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
   def createViewWithStatus =
-    () => createConfirmationView()(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "submissionId")
+    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title",
+      "options.another", "options.history", "submissionId")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
+      val user = doc.getElementById("username-element").text
       user mustBe "Bristol"
     }
 
-    "Include a signout link which redirects the users to the signout page" in {
-      val href = doc.getElementById("signout-link").attr("href")
-      href mustBe controllers.routes.SignOutController.signOut().url
-    }
+//    "Include a signout link which redirects the users to the signout page" in {
+//      val href = doc.getElementById("signout-link").attr("href")
+//      href mustBe controllers.routes.SignOutController.signOut().url
+//    }
 
-    "Include a print link when completed" in {
-      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
-      downloadButton mustBe messages("report.link.print")
-    }
+//    "Include a print link when completed" in {
+//      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
+//      downloadButton mustBe messages("report.link.print")
+//    }
 
   }
 }

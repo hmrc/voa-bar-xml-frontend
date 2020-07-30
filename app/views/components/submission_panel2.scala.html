@@ -1,0 +1,89 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.{Submitted, Done, Verified, Failed}
+@import utils.FormHelpers._
+@import helper._
+@import controllers.ReportDeleteController
+@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
+
+<div class="bordered-box submission-panel" id="@reportStatus.id">
+
+    @submission_delete(reportStatus, baCode)
+
+    @reportStatus.status match {
+    case Some(Done.value) => {
+    <span id="submission-title" class="flag flag-success flag--on-left-side">@messages("status.done.title")</span>
+    @components.submission_body(reportStatus)
+    }
+    case Some(Submitted.value) => {
+    <span id="submission-title" class="flag flag--on-left-side">@messages("status.submitted.title")</span>
+    @components.submission_body(reportStatus)
+    }
+    case Some(Failed.value) => {
+    <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
+    <div class="submission-body">
+        <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
+        <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+        @if(reportStatus.filename.isDefined) {
+        <p><b class="bold">@messages("file")</b>: @getAlternativeText(reportStatus.filename, "filename unavailable")</p>
+        }
+        <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
+            @reportStatus.created.toLocalTime</i>
+        </p>
+        <p>
+            @components.submission_error(reportStatus.errors)
+        </p>
+        @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.id).url, id = "print-button", className = "button print-hidden js-visible")
+    </div>
+    }
+    case _ if(reportStatus.created.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
+    <span id="submission-title" class="flag flag--urgent flag--on-left-side">@messages("status.failed.title")</span>
+    <div class="submission-body">
+        <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
+        <p><b class="bold">@messages("status.type.title")</b>: @messages("status.submissionType.CT")</p>
+        <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
+            @reportStatus.created.toLocalTime</i>
+        </p>
+        <p>
+        <div class="notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                @messages("status.failed.timeout")
+            </strong>
+        </div>
+        </p>
+    </div>
+    }
+    case Some(Verified.value) => {
+    <span id="submission-title" class="flag flag--on-left-side">@messages("status.verified.title")</span>
+    @components.submission_body(reportStatus)
+    <div class="panel panel-border-wide">
+        <p>
+            @messages("status.verified.description")
+        </p>
+    </div>
+    }
+    case _ => {
+    <span id="submission-title" class="flag flag--on-left-side">@messages("status.pending.title")</span>
+    @components.submission_body(reportStatus)
+    }
+    }
+
+</div>
+<br />
