@@ -54,8 +54,8 @@ report.status.done.title = Submitted (completed)
 
 report.filter.all = All Submissions
 report.filter.failed = Show only submissions with errors
-report.filter.done = Show only pending submissions
-report.filter.pending = Show only completed submissions
+report.filter.done = Show only completed submissions
+report.filter.pending = Show only pending submissions
 
 report.status.UNKNOWN = unknown
 report.status.CANCELLED = cancelled
