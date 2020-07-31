@@ -16,74 +16,76 @@
 
 @import config.FrontendAppConfig
 @import models.{Done, Failed, ReportStatus}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+
+@this(
+    main_template: views.html.govuk.main_template,
+    govukSummaryList: GovukSummaryList,
+    govukPanel: GovukPanel
+)
 
 @(baCode: String, submissionId: String, appConfig: FrontendAppConfig, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = messages("confirmation.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+@panelTitle = {
+    @reportStatus.flatMap(_.status).map{ status =>
+        @messages(s"confirmation.heading.${status.toLowerCase()}")
+        @messages(s"status.${status.toLowerCase()}.title")
+    }.getOrElse {
+        @messages(s"confirmation.heading.pending")
+        @messages("status.pending.title")
+    }
+}
 
-    @components.service_info(baCode)
+@panelContent = {
+    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+        <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
+    }
+    <h2>
+    @messages("confirmation.submissionId")<br/>
+    <strong>@submissionId.split("-").head</strong><br/>
+    </h2>
+
+    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
+        <p class="print-hide">@messages("confirmation.subheading")</p>
+    } else {
+        <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
+    }
+}
+
+@main_template(
+    pageTitle = Some(messages("confirmation.title")),
+    baCode = Some(baCode)
+) {
 
     @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Done.value), Some(Failed.value)).contains(reportStatus.get.status))) {
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(submissionId)" />
     }
 
-    <span class="voa-logo" aria-hidden="true"><img src="/voa-bar-xml-frontend/assets/images/voalogo.png" alt="Valuation Office Agency"></span>
+    @govukPanel(Panel(title = HtmlContent(panelTitle), headingLevel = 1,
+        content = HtmlContent(panelContent)
+    ))
 
-    <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">
-            @messages("confirmation.heading")
-            @if(reportStatus.isDefined && reportStatus.get.status.isDefined) {
-            @messages(s"status.${reportStatus.get.status.get.toLowerCase()}.title")
-            } else {
-            @messages("status.pending.title")
-            }
-        </h1>
-        @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
-            <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
-        }
-        <h3>@messages("confirmation.submissionId") @submissionId.split("-").head</h3>
-        @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
-            <p class="print-hide">@messages("confirmation.subheading")</p>
-        }
-    </div>
-
-    <h5 class="alert">
-        <p>
-            @messages("feedback.contact")
-        </p>
-    </h5>
-
-    @{
-        if(reportStatus.isDefined && reportStatus.get.status == Some(Failed.value)) {
-            <p class="lede">{messages("confirmation.file.failure")}</p>
-        } else if (reportStatus.isDefined && reportStatus.get.status == Some(Done.value)) {
-            <p class="lede">{messages("confirmation.file.success")}</p>
-        } else {
-            <p class="lede">{messages("confirmation.file.received")}</p>
+    @reportStatus.map{ rs =>
+        @if(Seq(Some(Failed.value), Some(Done.value)).contains(rs.status)) {
+            <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
+                <div class="govuk-!-padding-3 govuk-!-padding-bottom-0">
+                @components.submission_panel(
+                    reportStatus = rs,
+                    govukSummaryList = govukSummaryList,
+                    dlClass = "govuk-!-margin-bottom-0",
+                    messagePrefix = "confirmation"
+                )
+                </div>
+            </section>
         }
     }
 
-    <p class="print-hide">@messages("confirmation.window.open")</p>
+    <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>
+    <p class="govuk-body">@messages("feedback.contact2")</p>
 
-    @if(reportStatus.isDefined && Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status)) {
-        @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(submissionId).url, id = "print-button", className = "button print-hidden js-visible")
-    }
+    <p class="js-hidden"><a id="print-button" rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
-    @if(reportStatus.isDefined && Seq(Some(Failed.value), Some(Done.value)).contains(reportStatus.get.status)) {
-        @components.submission_panel2(reportStatus.get, baCode)
-    }
-
-    <div id="more-options">
-    <h2 class="heading-large">
-    @messages("confirmation.options.title")
-    </h2>
-    <ul class="list">
-        <li><a id="upload-link" href="@routes.CouncilTaxUploadController.onPageLoad()">@messages("confirmation.options.another")</a></li>
-        <li><a id="history-link" href="@routes.ReportStatusController.onPageLoad()">@messages("confirmation.options.history")</a></li>
-    </ul>
-    </div>
+    <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link">@messages("report.link.start.again")</a>
 
 }
