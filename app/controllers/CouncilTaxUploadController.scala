@@ -89,7 +89,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     request.body.validate[UploadConfirmation] match {
       case uc: JsSuccess[UploadConfirmation] => Right(uc.get)
       case _ => {
-        val errorMsg = s"Couldn't parse: \n${request.body}"
+        val errorMsg = s"Couldn't parse confirmation: \n${request.body}"
         log.warn(errorMsg)
         Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
       }
@@ -100,7 +100,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     request.body.validate[UploadConfirmationError] match {
       case uc: JsSuccess[UploadConfirmationError] => Right(uc.get)
       case _ => {
-        val errorMsg = s"Couldn't parse: \n${request.body}"
+        val errorMsg = s"Couldn't parse confirmation error: \n${request.body}"
         log.warn(errorMsg)
         Left(Error(messagesApi("councilTaxUpload.error.fileUploadService"), Seq(errorMsg)))
       }
@@ -195,6 +195,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
         NoContent
       }
       case Right(e: UploadConfirmationError) => {
+        log.warn(s"Upload Failed with: ${e}")
         onFailedConfirmation(e) //Fire and forget
         NoContent
       }
