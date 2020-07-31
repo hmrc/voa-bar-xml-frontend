@@ -143,7 +143,6 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 confirmation.title = Confirmation
-confirmation.heading = Submission
 confirmation.heading.pending = Submission
 confirmation.heading.verified = Submission
 confirmation.heading.failed = Submission
