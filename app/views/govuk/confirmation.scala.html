@@ -14,11 +14,10 @@
  * limitations under the License.
  *@
 
-@import java.time.format.DateTimeFormatter
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
-@import views.html.govuk.cr03SubmissionConfirmation
+@import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
 
 @import journey.UniformJourney.Cr03Submission
 
@@ -26,7 +25,7 @@
     mainTemplate: views.html.govuk.main_template,
     govukBackLink: govukBackLink,
     govukPanel: govukPanel,
-    cr03SubmissionConfirmation:cr03SubmissionConfirmation
+    cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate
 )
 
 @(
@@ -35,10 +34,31 @@
     cr03Submission: Option[Cr03Submission]
 )(implicit request: Request[_], messages: Messages)
 
-@dateFormat = @{DateTimeFormatter.ofPattern("d MMMM y H:mm")}
-
 @panelContent = {
-    @messages("submission") @report.id.substring(0, 8)
+
+    @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
+    <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
+    }
+    <div>
+        @messages("confirmation.submissionId")<br/>
+        <strong>@report.id.substring(0, 8)</strong><br/>
+    </div>
+
+    @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
+    <p class="print-hide">@messages("confirmation.subheading")</p>
+    } else {
+    <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
+    }
+}
+
+@panelTitle = {
+    @report.status.map{ status =>
+        @messages(s"confirmation.heading.${status.toLowerCase()}")
+        @messages(s"status.${status.toLowerCase()}.title")
+    }.getOrElse {
+        @messages(s"confirmation.heading.pending")
+        @messages("status.pending.title")
+    }
 }
 
 @mainTemplate(
@@ -50,8 +70,8 @@
     }
 
     @govukPanel(Panel(
-        headingLevel = 1, title = Text( messages(s"status.${report.status.getOrElse(Pending.value).toLowerCase}.title") ),
-        content = Text(s"${messages("submission")} ${report.id.substring(0, 8)}")
+        headingLevel = 1, title = HtmlContent(panelTitle) ,
+        content = HtmlContent(panelContent)
     ))
 
     @if(cr03Submission.isDefined) {
