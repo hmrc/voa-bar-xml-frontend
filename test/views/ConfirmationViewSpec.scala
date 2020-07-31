@@ -36,30 +36,29 @@ class ConfirmationViewSpec extends ViewBehaviours {
   )
 
   def createView =
-    () => confirmation(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
+    () => createConfirmationView()(username, submissionId, frontendAppConfig)(confirmationFakeRequest, messages)
   def createViewWithStatus =
-    () => confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
+    () => createConfirmationView()(username, submissionId, frontendAppConfig, Some(reportStatus))(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "subheading", "file.received", "window.open", "options.title",
-      "options.another", "options.history", "submissionId")
+    behave like normalPage(createView, messageKeyPrefix, "submissionId")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.getElementById("username-element").text
+      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
       user mustBe "Bristol"
     }
 
-//    "Include a signout link which redirects the users to the signout page" in {
-//      val href = doc.getElementById("signout-link").attr("href")
-//      href mustBe controllers.routes.SignOutController.signOut().url
-//    }
+    "Include a signout link which redirects the users to the signout page" in {
+      val href = doc.getElementById("signout-link").attr("href")
+      href mustBe controllers.routes.SignOutController.signOut().url
+    }
 
-//    "Include a print link when completed" in {
-//      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
-//      downloadButton mustBe messages("report.link.print")
-//    }
+    "Include a print link when completed" in {
+      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
+      downloadButton mustBe messages("report.link.print")
+    }
 
   }
 }

@@ -39,6 +39,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
+  def confirmationView = app.injector.instanceOf[views.html.confirmation]
 
   val username = "AUser"
   val submissionId = "SID372463"
@@ -56,21 +57,21 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
     reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmation(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) = confirmationView(username, submissionId, frontendAppConfig)(fakeRequest, messages).toString
   def refreshViewAsString() =
-    confirmation(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
+    confirmationView(username, submissionId, frontendAppConfig, Some(reportStatus))(fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 

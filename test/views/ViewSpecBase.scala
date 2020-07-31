@@ -136,6 +136,14 @@ trait ViewSpecBase extends SpecBase {
     )
   }
 
+  def createConfirmationView(): confirmation = {
+    new confirmation(
+      createMain_template(),
+      new govukSummaryList(),
+      new govukPanel()
+    )
+  }
+
   def createMain_template(): views.html.govuk.main_template = {
     new views.html.govuk.main_template(
       createGovukLayout(),

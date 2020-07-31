@@ -23,10 +23,8 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import identifiers.VOAAuthorisedId
-import models.{Login, NormalMode, ReportStatus}
+import models.{Login, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
-import views.html.confirmation
 import cats.implicits._
 import journey.UniformJourney.Cr03Submission
 import play.api.libs.json.JsString
@@ -40,6 +38,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        val dataCacheConnector: DataCacheConnector,
                                        reportStatusConnector: ReportStatusConnector,
                                        reportConfirmation: views.html.govuk.confirmation,
+                                       confirmation: views.html.confirmation,
                                        controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
