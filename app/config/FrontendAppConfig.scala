@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
-  private def loadConfig(key: String) = configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  private def loadConfig(key: String) = configuration.get[String](key)
 
   private lazy val contactHost = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "voabarxmlfrontend"

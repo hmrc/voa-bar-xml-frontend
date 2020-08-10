@@ -38,6 +38,7 @@ class ReportDeleteController @Inject() ( configuration: Configuration,
                                          val dataCacheConnector: DataCacheConnector,
                                          reportStatusConnector: ReportStatusConnector,
                                          controllerComponents: MessagesControllerComponents,
+                                         val errorTemplate: views.html.error_template,
                                          getData: DataRetrievalAction
   )(implicit val ec: ExecutionContext)
     extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {

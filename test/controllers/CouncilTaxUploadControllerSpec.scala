@@ -118,7 +118,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, createUploadView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, createUploadView(), createErrorTemplateView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
   def notLoggedInController(
@@ -128,7 +128,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, createUploadView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, createUploadView(), createErrorTemplateView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
   def viewAsString(form: Form[_] = form) = createUploadView()(username, form, Some(initiateResponse))(fakeRequest, messages).toString

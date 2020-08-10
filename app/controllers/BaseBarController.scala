@@ -35,8 +35,14 @@ trait BaseBarController extends FrontendBaseController {
 
   implicit val ec: ExecutionContext
 
+  val errorTemplate: views.html.error_template
+
   private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
-    views.html.error_template(messages("error.internal_server_error.title"), messages("error.internal_server_error.title"), messages("error.internal_server_error.description"), appConfig)(request, messages)
+    errorTemplate(
+      messages("error.internal_server_error.title"),
+      messages("error.internal_server_error.heading"),
+      messages("error.internal_server_error.description")
+    )(request, messages)
 
   private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
     EitherT.fromOptionF(

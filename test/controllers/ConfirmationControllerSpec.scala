@@ -40,6 +40,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
   def confirmationView = app.injector.instanceOf[views.html.confirmation]
+  def errorTemplateView = app.injector.instanceOf[views.html.error_template]
 
   val username = "AUser"
   val submissionId = "SID372463"
@@ -57,13 +58,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, errorTemplateView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, errorTemplateView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =

@@ -49,6 +49,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                            navigator: Navigator,
                                            uploadConnector: UploadConnector,
                                            councilTaxUpload: views.html.councilTaxUpload,
+                                           val errorTemplate: views.html.error_template,
                                            userReportUploadsConnector: UserReportUploadsConnector,
                                            reportStatusConnector: ReportStatusConnector,
                                            controllerComponents: MessagesControllerComponents)
