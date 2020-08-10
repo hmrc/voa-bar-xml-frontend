@@ -27,15 +27,14 @@ import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, NormalMode}
 import org.mockito.scalatest.MockitoSugar
-import play.api.mvc.{AnyContent, MessagesControllerComponents}
+import play.api.mvc.MessagesControllerComponents
 import views.ViewSpecBase
 import views.html.login
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import play.api.test.CSRFTokenHelper.CSRFRequest
-import play.api.test.FakeRequest
+
 
 
 class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
@@ -111,7 +110,10 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
 
     "return a Bad Request and errors when valid bacode is submitted but no Council Name can be found related to the bacode" in {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "ba0000"), ("password", "value"))
-      val boundForm = form.withGlobalError(messages("error.invalid_details"))
+      val boundForm =
+        form.withGlobalError(messages("error.invalid_details"))
+          .withError("username", messages("error.invalid_username"))
+          .withError("password", messages("error.invalid_password"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 
