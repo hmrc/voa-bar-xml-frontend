@@ -25,8 +25,9 @@ error.summary.title = There is a problem
 error.summary.text = Check the following
 error.select.option = Select what you want to do
 error.invalid_details = Enter a valid username and password
-error.internal_server_error.title = Error with the service
-error.internal_server_error.description = An error occurred, please try again later.
+error.internal_server_error.title = Sorry there is a problem with this service - Register of fair rents - GOV.UK
+error.internal_server_error.heading = Sorry, there is a problem with the service
+error.internal_server_error.description = Try again later.
 error.title.prefix = Error
 
 home.reports.current.progress = Current progress

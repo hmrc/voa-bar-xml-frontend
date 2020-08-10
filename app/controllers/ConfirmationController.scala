@@ -39,6 +39,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        reportStatusConnector: ReportStatusConnector,
                                        reportConfirmation: views.html.govuk.confirmation,
                                        confirmation: views.html.confirmation,
+                                       val errorTemplate: views.html.error_template,
                                        controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {

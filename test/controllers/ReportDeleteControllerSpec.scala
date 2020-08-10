@@ -40,6 +40,8 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def bodyParser = app.injector.instanceOf[BodyParsers.Default]
 
+  def errorTemplateView =  app.injector.instanceOf[views.html.error_template]
+
   val login = Login("foo", "bar")
 
   "ReportDeleteController" must {
@@ -49,8 +51,8 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
-      val controller = new ReportDeleteController(configuration, FakeDataCacheConnector, fakeReportStatusConnector(), controllerComponents,
-        new DataRetrievalActionImpl(FakeDataCacheConnector, bodyParser))
+      val controller = new ReportDeleteController(configuration, FakeDataCacheConnector, fakeReportStatusConnector(),
+        controllerComponents, errorTemplateView,new DataRetrievalActionImpl(FakeDataCacheConnector, bodyParser))
       val request = fakeRequest.withFormUrlEncodedBody("submissionId" -> submissionId).withSession(SessionKeys.sessionId -> "")
       val respose = controller.onPageSubmit().apply(request)
 

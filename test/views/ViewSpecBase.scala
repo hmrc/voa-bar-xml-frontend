@@ -31,7 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import views.html.govuk.{head, scripts}
-import views.html.{login, councilTaxUpload, welcome, reportStatus, confirmation}
+import views.html.{login, councilTaxUpload, welcome, reportStatus, confirmation, error_template}
 
 trait ViewSpecBase extends SpecBase {
 
@@ -141,6 +141,12 @@ trait ViewSpecBase extends SpecBase {
       createMain_template(),
       new govukSummaryList(),
       new govukPanel()
+    )
+  }
+
+  def createErrorTemplateView(): error_template = {
+    new error_template(
+      createMain_template()
     )
   }
 
