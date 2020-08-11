@@ -45,10 +45,16 @@
     <strong>@submissionId.split("-").head</strong><br/>
     </div>
 
-    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
-        <p class="print-hide">@messages("confirmation.subheading")</p>
-    } else {
-        <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
+    @reportStatus.flatMap(_.status) match {
+        case Some(Failed.value) => {
+            <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.failed")</span>
+        }
+        case Some(Done.value)|Some(Submitted.value) => {
+            <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.done")</span>
+        }
+        case _ => {
+            <p class="print-hide">@messages("confirmation.subheading")</p>
+        }
     }
 }
 
