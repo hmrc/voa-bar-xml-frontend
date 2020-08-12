@@ -111,7 +111,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     "return a Bad Request and errors when valid bacode is submitted but no Council Name can be found related to the bacode" in {
       val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "ba0000"), ("password", "value"))
       val boundForm =
-        form.withGlobalError(messages("error.invalid_details"))
+        form
           .withError("username", messages("error.invalid_username"))
           .withError("password", messages("error.invalid_password"))
 
