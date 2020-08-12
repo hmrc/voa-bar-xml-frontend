@@ -183,7 +183,8 @@ councilTaxUpload.download.error = Error while downloading file
 councilTaxUpload.error.transferXml = Error while uploading file
 councilTaxUpload.submit.button = Submit
 
-login.title = Sign in
+# Use only in test
+login.title = Sign in - Billing Authority Reports - GOV.UK
 login.heading = Sign in
 login.subheading = Billing Authority Reports
 login.username = Username
