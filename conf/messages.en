@@ -24,14 +24,12 @@ error.required = Please enter a value
 error.summary.title = There is a problem
 error.summary.text = Check the following
 error.select.option = Select what you want to do
-error.invalid_details = Enter a valid username and password
 error.invalid_username = Enter a valid username
 error.invalid_password = Enter a valid password
-error.internal_server_error.title = Sorry there is a problem with this service - Register of fair rents - GOV.UK
+error.internal_server_error.title = Sorry there is a problem with this service - Billing Authority Reports - GOV.UK
 error.internal_server_error.heading = Sorry, there is a problem with the service
 error.internal_server_error.description = Try again later.
-error.title.prefix = Error
-
+error.title.prefix = 'Error: '
 home.reports.current.progress = Current progress
 home.reports.no.current.progress = No submissions currently in progress.
 home.reports.last = Last uploaded
@@ -134,6 +132,7 @@ site.submit = Submit
 site.continue = Continue
 site.service_name = Billing Authority Reports
 service.name = Billing Authority Reports
+service.title = {0} - Billing Authority Reports - GOV.UK
 service.homePageUrl = /voa-bar-xml-frontend/welcome
 
 site.textarea.char_limit = (Limit is {0} characters)
@@ -164,7 +163,7 @@ confirmation.status.done.title = Submitted
 
 confirmation.submissionId = Submission ID
 confirmation.subheading = We are processing your reports
-confirmation.subheading.failed = We have received your file, but were unable to process it due to errors
+confirmation.subheading.failed = We have received your file, but were unable to process them due to errors
 confirmation.subheading.done = We have successfully processed your report
 confirmation.file.received = We have received your file and we are processing your reports.
 confirmation.file.success = We have received your file and have processed it successfully.

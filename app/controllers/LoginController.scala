@@ -82,7 +82,6 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                     Logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
                     val formWithLoginErrors =
                       form
-                        .withGlobalError(Messages("error.invalid_details"))
                           .withError("username", Messages("error.invalid_username"))
                           .withError("password", Messages("error.invalid_password"))
                     Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
@@ -92,7 +91,6 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
               case Failure(_) => {
                 val formWithLoginErrors =
                   form
-                    .withGlobalError(Messages("error.invalid_details"))
                     .withError("username", Messages("error.invalid_username"))
                     .withError("password", Messages("error.invalid_password"))
                 Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))

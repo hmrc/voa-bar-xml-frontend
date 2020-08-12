@@ -35,9 +35,9 @@
 
 @main_template(
     pageTitle = if(form.errors.nonEmpty) {
-        Some(messages("error.title.prefix") + ": " + messages("login.title"))
+        Some(messages("error.title.prefix") + messages("service.title", messages("login.heading")))
     } else {
-        Some(messages("login.title"))
+        Some(messages("service.title", messages("login.heading")))
     },
     showSignOut = false
 ) {

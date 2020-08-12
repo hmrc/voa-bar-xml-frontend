@@ -55,8 +55,8 @@ GET         /welcome                              controllers.WelcomeController.
 GET         /goToStartWebForm                     controllers.WelcomeController.goToStartWebFormPage()
 GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage()
 
-GET         /login                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
-POST        /login                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)
+GET         /sign-in                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+POST        /sign-in                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)
 GET         /changeLogin                          controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeLogin                          controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
