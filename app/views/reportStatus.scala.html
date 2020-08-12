@@ -35,8 +35,6 @@
 
         <p class="govuk-body">@messages("report.subheading")</p>
 
-        @components.submission_filter(messages, filter)
-
         @if(reportStatuses.isEmpty){
             <p class="lede">
                 @messages("reports.notFound")
