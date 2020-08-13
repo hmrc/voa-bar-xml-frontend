@@ -133,7 +133,7 @@ site.continue = Continue
 site.service_name = Billing Authority Reports
 service.name = Billing Authority Reports
 service.title = {0} - Billing Authority Reports - GOV.UK
-service.homePageUrl = /voa-bar-xml-frontend/welcome
+service.homePageUrl = /voa-bar-xml-frontend/online-or-upload
 
 site.textarea.char_limit = (Limit is {0} characters)
 site.login = Sign in
