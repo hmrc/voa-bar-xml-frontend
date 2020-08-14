@@ -19,6 +19,7 @@ package models
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
@@ -55,6 +56,11 @@ final case class ReportStatus(
   val formattedCreated: String = {
     val dtf = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
     created.format(dtf)
+  }
+
+  def title(messages: Messages): String = {
+    val defaultStatus = status.getOrElse(Pending.value).toLowerCase
+    messages(s"confirmation.heading.$defaultStatus") + " " + messages(s"status.$defaultStatus.title")
   }
 
 }

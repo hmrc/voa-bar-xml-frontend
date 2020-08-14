@@ -27,13 +27,7 @@
 @(baCode: String, submissionId: String, appConfig: FrontendAppConfig, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @panelTitle = {
-    @reportStatus.flatMap(_.status).map{ status =>
-        @messages(s"confirmation.heading.${status.toLowerCase()}")
-        @messages(s"status.${status.toLowerCase()}.title")
-    }.getOrElse {
-        @messages(s"confirmation.heading.pending")
-        @messages("status.pending.title")
-    }
+    @reportStatus.map(_.title(messages)).getOrElse {@messages("confirmation.heading.pending") @messages("status.pending.title")}
 }
 
 @panelContent = {
@@ -59,7 +53,7 @@
 }
 
 @main_template(
-    pageTitle = Some(messages("confirmation.title")),
+    pageTitle = Some(messages("service.title", reportStatus.map(_.title(messages)).getOrElse{messages("confirmation.heading.pending") + " " +  messages("status.pending.title")})),
     baCode = Some(baCode)
 ) {
 

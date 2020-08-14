@@ -25,7 +25,7 @@
 @(appConfig: FrontendAppConfig, baCode: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = Some(messages("welcome.title")),
+    pageTitle = Some(messages("service.title", messages("welcome.heading"))),
     baCode = Some(baCode)
 ) {
 
@@ -35,14 +35,14 @@
     <ul class="govuk-list">
         <li>
             @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
-                <a class="govuk-link" href=@controllers.routes.WelcomeController.goToStartWebFormPage().url id="create">@messages("welcome.council_tax_webform")</a>
+                <a class="govuk-link" href="@controllers.routes.WelcomeController.goToStartWebFormPage().url" id="create">@messages("welcome.council_tax_webform")</a>
             }
         </li>
         <li>
-            <a class="govuk-link" href=@routes.WelcomeController.goToCouncilTaxUploadPage().url id="councilTaxLink">@messages("welcome.council_tax_upload")</a>
+            <a class="govuk-link" href="@routes.WelcomeController.goToCouncilTaxUploadPage().url" id="councilTaxLink">@messages("welcome.council_tax_upload")</a>
         </li>
         <li>
-            <a class="govuk-link" href=@controllers.routes.ReportStatusController.onPageLoad().url id="submissions">@messages("submission.view")</a>
+            <a class="govuk-link" href="@controllers.routes.ReportStatusController.onPageLoad().url" id="submissions">@messages("submission.view")</a>
         </li>
     </ul>
 

@@ -4,7 +4,7 @@ echo "Applying migration Welcome"
 
 echo "Adding routes to conf/app.routes"
 echo "" >> ../conf/app.routes
-echo "GET        /welcome                       controllers.WelcomeController.onPageLoad()" >> ../conf/app.routes
+echo "GET        /online-or-upload                       controllers.WelcomeController.onPageLoad()" >> ../conf/app.routes
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en

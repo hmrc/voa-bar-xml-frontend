@@ -52,17 +52,11 @@
 }
 
 @panelTitle = {
-    @report.status.map{ status =>
-        @messages(s"confirmation.heading.${status.toLowerCase()}")
-        @messages(s"status.${status.toLowerCase()}.title")
-    }.getOrElse {
-        @messages(s"confirmation.heading.pending")
-        @messages("status.pending.title")
-    }
+    @report.title(messages)
 }
 
 @mainTemplate(
-    pageTitle = Option("Confirmation - Billing Authority "),
+    pageTitle = Some(messages("service.title", report.title(messages))),
     baCode = Some(baCode)
 ) {
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
