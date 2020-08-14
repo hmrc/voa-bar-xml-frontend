@@ -101,6 +101,7 @@ error.2000.message = There is a problem with the file, please contact your suppl
 error.2001.message = There is a problem with the file, please contact your supplier with this message:
 error.3000.message = There is a problem with the system, please try again later.
 error.4000.message = File was not uploaded to UpScan because it was not an XML file, please contact your support team.
+error.4500.message = The report was not processed in the time available. It may succeed if you try again.
 error.5000.message = Unknown error.
 
 reports.notFound = Reports not found
