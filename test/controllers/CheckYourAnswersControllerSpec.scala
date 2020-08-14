@@ -20,7 +20,6 @@ import play.api.test.Helpers._
 import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
 import play.api.mvc.MessagesControllerComponents
 import viewmodels.AnswerSection
-import views.html.check_your_answers
 
 import scala.concurrent.ExecutionContext
 
@@ -28,15 +27,17 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase {
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def checkYourAnswerView = app.injector.instanceOf[views.html.check_your_answers]
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CheckYourAnswersController(frontendAppConfig, messagesApi, dataRetrievalAction, new DataRequiredActionImpl(ec), controllerComponents)
+    new CheckYourAnswersController(frontendAppConfig, messagesApi, dataRetrievalAction,
+      new DataRequiredActionImpl(ec), checkYourAnswerView, controllerComponents)
 
   "Check Your Answers Controller" must {
     "return 200 and the correct view for a GET" in {
       val result = controller().onPageLoad()(fakeRequest)
       status(result) mustBe OK
-      contentAsString(result) mustBe check_your_answers(frontendAppConfig, Seq(AnswerSection(None, Seq())))(fakeRequest, messages).toString
+      contentAsString(result) mustBe checkYourAnswerView(frontendAppConfig, Seq(AnswerSection(None, Seq())))(fakeRequest, messages).toString
     }
 
     "redirect to Session Expired for a GET if not existing data is found" in {

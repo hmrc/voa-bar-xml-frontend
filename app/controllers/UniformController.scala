@@ -15,7 +15,6 @@
  */
 
 package controllers
-import java.util.UUID
 
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
@@ -24,13 +23,9 @@ import ltbs.uniform._
 import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
-import ltbs.uniform.common.web.{FormField, FormFieldStats, JourneyConfig}
 import models.requests.OptionalDataRequest
-import play.api.Logger
 import play.api.i18n.{Messages => _, _}
-import play.api.libs.json.Json
 import play.api.mvc._
-import play.twirl.api.{Html, HtmlFormat}
 import services.Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController

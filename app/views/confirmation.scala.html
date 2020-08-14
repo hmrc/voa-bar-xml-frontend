@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
 @import models.{Done, Failed, ReportStatus}
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
@@ -24,7 +23,7 @@
     govukPanel: GovukPanel
 )
 
-@(baCode: String, submissionId: String, appConfig: FrontendAppConfig, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
+@(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @panelTitle = {
     @reportStatus.map(_.title(messages)).getOrElse {@messages("confirmation.heading.pending") @messages("status.pending.title")}

@@ -23,20 +23,22 @@ import utils.CheckYourAnswersHelper
 import viewmodels.AnswerSection
 import views.html.check_your_answers
 import config.FrontendAppConfig
-import play.api.mvc.{ControllerComponents, MessagesControllerComponents}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 class CheckYourAnswersController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
+                                           checkYourAnswer: check_your_answers,
                                            controllerComponents: MessagesControllerComponents
                                           ) extends FrontendController(controllerComponents) with I18nSupport {
 
   def onPageLoad() = (getData andThen requireData) { implicit request =>
 
+      // TODO Can I delete this unused variable / class ???
       val checkYourAnswersHelper = new CheckYourAnswersHelper(request.userAnswers)
       val sections = Seq(AnswerSection(None, Seq()))
-      Ok(check_your_answers(appConfig, sections))
+      Ok(checkYourAnswer(appConfig, sections))
   }
 }

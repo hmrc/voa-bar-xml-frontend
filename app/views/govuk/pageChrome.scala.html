@@ -46,13 +46,11 @@
 
 @mainTemplate(
     pageTitle = Some(
-        if(errors.isEmpty) messages(key.mkString(".") + ".pageLabel") else "Error: " + messages(key.mkString(".") + ".pageLabel")
-        )
+        if(errors.isEmpty) messages("service.title", messages(key.mkString("", ".", ".pageLabel"))) else "Error: " + messages("service.title", messages(key.mkString("", ".", ".pageLabel")))
+        ),
+    //second element from breadcrumbs, head is always current element.
+    backLinkUrl = Some(breadcrumbs.tail.headOption.getOrElse(controllers.routes.WelcomeController.onPageLoad().url))
 ) {
-    @*second element from breadcrumbs, head is always current element. *@
-    @govukBackLink(BackLink(
-        href=breadcrumbs.tail.headOption.getOrElse(controllers.routes.WelcomeController.onPageLoad().url), content = Text("Back")
-    ))
 
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
         ('novalidate -> "novalidate"), ('autoComplete -> "off")
