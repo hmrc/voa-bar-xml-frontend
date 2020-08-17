@@ -51,7 +51,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
         getCr03(reportStatus) match {
-          case None => Ok(confirmation(login.username, reference, appConfig))
+          case None => Ok(confirmation(login.username, reference))
           case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
         }
       }).valueOr(failPage => failPage)
@@ -78,7 +78,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
         getCr03(reportStatus) match {
-          case None => Ok(confirmation(login.username, reportStatus.id, appConfig, Some(reportStatus)))
+          case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
           case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
         }
       }).valueOr(failPage => failPage)

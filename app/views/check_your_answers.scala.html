@@ -17,12 +17,15 @@
 @import config.FrontendAppConfig
 @import viewmodels.{Section, AnswerSection, RepeaterAnswerSection}
 
+@this(
+    main_template: views.html.govuk.main_template
+)
+
 @(appConfig: FrontendAppConfig, answerSections: Seq[Section])(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = messages("checkYourAnswers.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+    pageTitle = Some(messages("service.title", messages("checkYourAnswers.title")))
+    ) {
 
     <h1 class="heading-xlarge">@messages("checkYourAnswers.heading")</h1>
 
