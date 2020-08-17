@@ -84,6 +84,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                       form
                           .withError("username", Messages("error.invalid_username"))
                           .withError("password", Messages("error.invalid_password"))
+                          .fill(Login("", ""))
                     Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
                   }
                 }
@@ -93,6 +94,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                   form
                     .withError("username", Messages("error.invalid_username"))
                     .withError("password", Messages("error.invalid_password"))
+                    .fill(Login("", ""))
                 Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
               }
             }
