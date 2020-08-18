@@ -23,7 +23,8 @@
 
 @this(
         main_template: views.html.govuk.main_template,
-        govukFileUpload: GovukFileUpload
+        govukFileUpload: GovukFileUpload,
+        errorSummary: govukErrorSummary
 )
 
 
@@ -39,11 +40,12 @@
         baCode = Some(baCode)
     ) {
 
+    @if(fileUploadForm.errors.nonEmpty) {
+        @errorSummary(ErrorSummary(errorList = fileUploadForm.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+    }
     <h1 class="govuk-label-wrapper">
         <label class="govuk-label govuk-label--l" for="file">@messages("councilTaxUpload.heading")</label>
     </h1>
-
-    @components.error_summary(fileUploadForm.errors)
 
     @initiateResponse.map { ir =>
         <input type="hidden" id="councilTaxUploadReportError" value="@(routes.CouncilTaxUploadController.onError(ir.reference))" />
@@ -61,7 +63,13 @@
                     id = "file",
                     name = "file",
                     classes = "govuk-form-group upload",
-                    attributes = Map("accept" -> "application/xml", "required"  -> "required")
+                    errorMessage = fileUploadForm.errors.asTextErrorMessageForField("file"),
+                    attributes =
+                        Map(
+                            "accept" -> "application/xml",
+                            "required"  -> "required",
+                            "oninvalid" ->  ("window.location.href='" + routes.CouncilTaxUploadController.onPageLoad(true).url + "#file';")
+                        )
                 )
             )
 

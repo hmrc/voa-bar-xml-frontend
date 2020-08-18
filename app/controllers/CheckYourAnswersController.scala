@@ -19,7 +19,6 @@ package controllers
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction}
-import utils.CheckYourAnswersHelper
 import viewmodels.AnswerSection
 import views.html.check_your_answers
 import config.FrontendAppConfig
@@ -36,8 +35,6 @@ class CheckYourAnswersController @Inject()(appConfig: FrontendAppConfig,
 
   def onPageLoad() = (getData andThen requireData) { implicit request =>
 
-      // TODO Can I delete this unused variable / class ???
-      val checkYourAnswersHelper = new CheckYourAnswersHelper(request.userAnswers)
       val sections = Seq(AnswerSection(None, Seq()))
       Ok(checkYourAnswer(appConfig, sections))
   }

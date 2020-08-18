@@ -84,6 +84,7 @@ report.pdf.details.summary.verified = The report contain no security issues and 
 report.pdf.details.summary.pending = The report is being verified.
 report.pdf.details.summary.submitted = The report is being processed.
 
+error.file.empty = Choose a file to upload
 error.1000.message = Invalid character in the Name or Address field, this field can only have these characters:  A-Z, 0-9, -, &, +, @, &, :, /, commas, and spaces.
 error.1001.message = There must be only one proposed address for this report type.
 error.1002.message = There must not be any existing address for this report type.
