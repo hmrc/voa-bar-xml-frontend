@@ -125,7 +125,8 @@ trait ViewSpecBase extends SpecBase {
   def createUploadView(): councilTaxUpload = {
     new councilTaxUpload(
       createMain_template(),
-      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel)
+      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
+      new govukErrorSummary()
     )
   }
 

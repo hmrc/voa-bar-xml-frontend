@@ -119,7 +119,11 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     }
   }
 
-  private[controllers] def sendContent(xmlUrl: String, uploadConfirmation: UploadConfirmation, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
+  private[controllers] def sendContent(
+          xmlUrl: String,
+          uploadConfirmation: UploadConfirmation,
+          login: Login
+  )(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
     (for {
       userDataByReference <- EitherT(userReportUploadsConnector.getById(uploadConfirmation.reference, login: Login))
       userData <- EitherT.fromOption[Future](userDataByReference,
@@ -130,10 +134,17 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
         .valueOr(Left(_))
   }
 
-  def onPageLoad = getData.async {
+  def onPageLoad(showEmptyError: Boolean) = getData.async {
     implicit request => {
+      val formWithError =
+       if (showEmptyError) {
+         form
+           .withError("file", messagesApi("error.file.empty"))
+       } else {
+         form
+       }
       def okResult(username: String, initiateResponse: InitiateResponse) =
-        Ok(councilTaxUpload(username, form, Some(initiateResponse)))
+        Ok(councilTaxUpload(username, formWithError, Some(initiateResponse)))
       loadPage(okResult)
     }
   }

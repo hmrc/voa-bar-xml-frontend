@@ -136,14 +136,14 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
   "CouncilTaxUpload Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController(uploadConnector).onPageLoad(fakeRequest)
+      val result = loggedInController(uploadConnector).onPageLoad(false)(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
     }
 
     "if not authorized by VOA must go to the login page" in {
-      val result = notLoggedInController(uploadConnector).onPageLoad()(fakeRequest)
+      val result = notLoggedInController(uploadConnector).onPageLoad(false)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
