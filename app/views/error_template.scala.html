@@ -21,10 +21,10 @@
    main_template: views.html.govuk.main_template
 )
 
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
+@(heading: String, message: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-   pageTitle = Some(pageTitle)
+   pageTitle = Some(messages("service.title", heading))
 ) {
 
    <h1 class="govuk-heading-l">

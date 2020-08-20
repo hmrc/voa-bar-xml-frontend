@@ -26,7 +26,6 @@ error.summary.text = Check the following
 error.select.option = Select what you want to do
 error.invalid_username = Enter a valid username
 error.invalid_password = Enter a valid password
-error.internal_server_error.title = Sorry there is a problem with this service - Billing Authority Reports - GOV.UK
 error.internal_server_error.heading = Sorry, there is a problem with the service
 error.internal_server_error.description = Try again later.
 error.title.prefix = 'Error: '
