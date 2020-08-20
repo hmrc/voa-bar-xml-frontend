@@ -48,9 +48,9 @@
             )
         }
 
-        <p class="js-hidden"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
+        <p class="js-hidden govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
-        <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link">@messages("report.link.start.again")</a>
+        <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
 
     }
 

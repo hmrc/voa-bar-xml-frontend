@@ -26,6 +26,7 @@
         scripts: scriptsTemplate,
         govukPhaseBanner: govukPhaseBanner,
         siteHeader: components.siteHeader,
+        siteFooter: components.siteFooter,
         govukBackLink: GovukBackLink,
         govukSummaryList: GovukSummaryList
 )
@@ -76,20 +77,28 @@
     headBlock = Some(head()),
     beforeContentBlock = Option(beforeBLock),
     headerBlock = Some(siteHeader(showSignOut)),
-    footerItems = Seq(
-        FooterItem(
-            href = Some("/help/cookies"),
-            text = Some("Cookies")),
-        FooterItem(
-            href = Some("/help/privacy"),
-            text = Some("Privacy policy")),
-        FooterItem(
-            href = Some("/help/terms-and-conditions"),
-            text = Some("Terms and conditions")),
-        FooterItem(
-            href = Some("https://www.gov.uk/help"),
-            text = Some("Help using GOV.UK"))
-
+    footerBlock =
+        Some(
+            siteFooter(
+                Seq(
+                    FooterItem(
+                        href = Some("/help/cookies"),
+                        text = Some("Cookies")
+                    ),
+                    FooterItem(
+                        href = Some("/help/privacy"),
+                        text = Some("Privacy policy")
+                    ),
+                    FooterItem(
+                        href = Some("/help/terms-and-conditions"),
+                        text = Some("Terms and conditions")
+                    ),
+                    FooterItem(
+                        href = Some("https://www.gov.uk/help"),
+                        text = Some("Help using GOV.UK")
+                    )
+                )
+            )
         ),
     bodyEndBlock = Some(scripts())
 )(contentBlock)
