@@ -26,7 +26,7 @@
             Seq(
                 SummaryListRow(
                     key = Key(Text(messages("report.key.status")), "govuk-!-width-one-half"),
-                    value = Value(Text(messages(s"$messagePrefix.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")), if (reportStatus.status.contains(Failed.value)) "govuk-error-message" else "")
+                    value = Value(Text(messages(s"$messagePrefix.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")))
                 ),
                 SummaryListRow(
                     key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
