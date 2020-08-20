@@ -158,6 +158,7 @@ trait ViewSpecBase extends SpecBase {
       create_scripts(),
       new govukPhaseBanner(new govukTag()),
       new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
+      new views.html.components.siteFooter(uk.gov.hmrc.govukfrontend.views.html.components.GovukFooter),
       new govukBackLink(),
       new govukSummaryList()
     )
