@@ -39,7 +39,6 @@ trait BaseBarController extends FrontendBaseController {
 
   private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
     errorTemplate(
-      messages("error.internal_server_error.title"),
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")
     )(request, messages)

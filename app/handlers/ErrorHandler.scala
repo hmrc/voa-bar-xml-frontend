@@ -29,7 +29,7 @@ class ErrorHandler @Inject()(
                             ) extends FrontendErrorHandler with I18nSupport {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
-    errorTemplate(pageTitle, heading, message)
+    errorTemplate(heading, message)
 
   override def internalServerErrorTemplate(implicit request: Request[_]): Html =
     standardErrorTemplate(
