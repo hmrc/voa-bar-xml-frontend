@@ -138,52 +138,57 @@ $(document).ready(function() {
       // =====================================================
       $("#councilTaxUploadForm").submit(function(e){
         e.preventDefault();
-        var councilTaxUploadForm = this;
-
-        function submitError(error, jqXHR){
-            var payload = {
-                code: error,
-                values: [],
-                errorDetail: jqXHR
+        const fileLength = $("#file")[0].files.length;
+        if(fileLength === 0){
+            window.location = $("#councilTaxUploadEmptyFileError").val() + '#file';
+        } else {
+            var councilTaxUploadForm = this;
+            function submitError(error, jqXHR){
+                var payload = {
+                    code: error,
+                    values: [],
+                    errorDetail: jqXHR
+                };
+                $.ajax({
+                      url: $("#councilTaxUploadReportError").val(),
+                      type: "POST",
+                      data: JSON.stringify(payload),
+                      contentType: 'application/json'
+                }).complete(function(){
+                    window.location = $("#councilTaxUploadFormRedirect").val();
+                });
             };
-            $.ajax({
-                  url: $("#councilTaxUploadReportError").val(),
-                  type: "POST",
-                  data: JSON.stringify(payload),
-                  contentType: 'application/json'
-            }).complete(function(){
-                window.location = $("#councilTaxUploadFormRedirect").val();
-            });
-        };
 
-        function fileUpload(form){
+            function fileUpload(form){
+                $.ajax({
+                      url: form.action,
+                      type: "POST",
+                      data: new FormData(form),
+                      processData: false,
+                      contentType: false,
+                      crossDomain: true
+                }).error(function(jqXHR, textStatus, errorThrown ){
+                    submitError("4000", jqXHR)
+                }).done(function(){
+                    window.location = $("#councilTaxUploadFormRedirect").val();
+                });
+            };
+
             $.ajax({
-                  url: form.action,
-                  type: "POST",
-                  data: new FormData(form),
-                  processData: false,
-                  contentType: false,
-                  crossDomain: true
+                url: $("#councilTaxUploadPrepareUpload").val(),
+                method: "POST",
+                contentType: "application/json",
+                data: '{}',
+                xhrFields: {
+                    withCredentials: true
+                }
             }).error(function(jqXHR, textStatus, errorThrown ){
-                submitError("4000", jqXHR)
+                submitError("5000", jqXHR)
             }).done(function(){
-                window.location = $("#councilTaxUploadFormRedirect").val();
+                fileUpload(councilTaxUploadForm);
             });
-        };
+        }
 
-        $.ajax({
-            url: $("#councilTaxUploadPrepareUpload").val(),
-            method: "POST",
-            contentType: "application/json",
-            data: '{}',
-            xhrFields: {
-                withCredentials: true
-            }
-        }).error(function(jqXHR, textStatus, errorThrown ){
-            submitError("5000", jqXHR)
-        }).done(function(){
-            fileUpload(councilTaxUploadForm);
-        });
       });
       // =====================================================
       // Refresh status page
