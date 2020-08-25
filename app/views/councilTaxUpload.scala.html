@@ -48,11 +48,12 @@
     </h1>
 
     @initiateResponse.map { ir =>
+        <input type="hidden" id="councilTaxUploadEmptyFileError" value="@(routes.CouncilTaxUploadController.onPageLoad(true))" />
         <input type="hidden" id="councilTaxUploadReportError" value="@(routes.CouncilTaxUploadController.onError(ir.reference))" />
         <input type="hidden" id="councilTaxUploadFormRedirect" value="@(routes.ConfirmationController.onPageLoad(ir.reference))" />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value="@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference))" />
 
-        <form id="councilTaxUploadForm" method="POST" action="@(ir.uploadRequest.href)" enctype="multipart/form-data">
+        <form id="councilTaxUploadForm" method="POST" action="@(ir.uploadRequest.href)" enctype="multipart/form-data" novalidate="novalidate">
             @ir.uploadRequest.fields.map{ case (key, value) =>
                 <input type="hidden" name="@key" value="@value">
             }
@@ -66,8 +67,7 @@
                     attributes =
                         Map(
                             "accept" -> "application/xml",
-                            "required"  -> "required",
-                            "oninvalid" ->  ("window.location.href='" + routes.CouncilTaxUploadController.onPageLoad(true).url + "#file';")
+                            "required"  -> "required"
                         )
                 )
             )
