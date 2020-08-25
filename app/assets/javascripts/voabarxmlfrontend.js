@@ -140,7 +140,7 @@ $(document).ready(function() {
         e.preventDefault();
         const fileLength = $("#file")[0].files.length;
         if(fileLength === 0){
-            window.location = $("#councilTaxUploadEmptyFileError").val() + '#file';
+            window.location = $("#councilTaxUploadEmptyFileError").val();
         } else {
             var councilTaxUploadForm = this;
             function submitError(error, jqXHR){
