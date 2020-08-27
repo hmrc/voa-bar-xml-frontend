@@ -20,7 +20,7 @@
 
 @errors.map { errorsSeq =>
     @for(error <- errorsSeq) {
-        <p>Error @error.code: @messages(s"error.${error.code}.message")</p>
+        Error @error.code: @messages(s"error.${error.code}.message")
         <ul class="list list-bullet ">
             @error.values.map{v =>
             <li>@v</li>
