@@ -64,8 +64,10 @@
     }
 
     @govukPanel(Panel(
-        headingLevel = 1, title = HtmlContent(panelTitle) ,
-        content = HtmlContent(panelContent)
+        headingLevel = 1,
+        title = HtmlContent(panelTitle),
+        content = HtmlContent(panelContent),
+        attributes = Map("aria-live" -> "polite")
     ))
 
     @if(cr03Submission.isDefined) {
