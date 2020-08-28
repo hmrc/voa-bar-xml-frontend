@@ -39,8 +39,13 @@
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @beforeBLock = {
-    @govukPhaseBanner(PhaseBanner(tag = Option(Tag(Text("BETA"))),
-        content = HtmlContent("This is a new service – your <a href=\"/voa-bar-xml-frontend/feedback/tell-us\" target=\"_blank\" id=\"betaFeedback\">feedback</a> will help us to improve it.")))
+    @govukPhaseBanner(
+        PhaseBanner(
+            tag = Option(Tag(Text("BETA"))),
+            content = HtmlContent("This is a new service – your <a href=\"/voa-bar-xml-frontend/feedback/tell-us\" target=\"_blank\" id=\"betaFeedback\">feedback</a> will help us to improve it."),
+            classes = "govuk-!-display-none-print"
+        )
+    )
 
     @backLinkUrl.map{ url =>
         <div>
