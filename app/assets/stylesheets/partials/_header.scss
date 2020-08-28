@@ -7,3 +7,10 @@
         }
     }
 }
+
+.js-enabled .govuk-header__menu-button {
+    display: none;
+}
+.js-enabled .govuk-header__navigation {
+    display: block;
+}
