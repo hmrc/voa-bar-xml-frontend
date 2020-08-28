@@ -60,8 +60,12 @@
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(submissionId)" />
     }
 
-    @govukPanel(Panel(title = HtmlContent(panelTitle), headingLevel = 1,
-        content = HtmlContent(panelContent)
+    @govukPanel(
+        Panel(
+            title = HtmlContent(panelTitle),
+            headingLevel = 1,
+            content = HtmlContent(panelContent),
+            attributes = Map("aria-live" -> "polite")
     ))
 
     @reportStatus.map{ rs =>
