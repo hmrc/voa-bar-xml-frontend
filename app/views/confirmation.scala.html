@@ -26,62 +26,59 @@
 @(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
 
 @panelTitle = {
-    @reportStatus.map(_.title(messages)).getOrElse {@messages("confirmation.heading.pending") @messages("status.pending.title")}
+    @reportStatus.map(_.title(messages)).getOrElse {@messages("confirmation.heading.pending")}
 }
 
 @panelContent = {
-    @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Failed.value),Some(Done.value)).contains(reportStatus.get.status))) {
-        <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
-    }
     <div>
     @messages("confirmation.submissionId")<br/>
     <strong>@submissionId.split("-").head</strong><br/>
     </div>
 
-    @reportStatus.flatMap(_.status) match {
-        case Some(Failed.value) => {
-            <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.failed")</span>
-        }
-        case Some(Done.value)|Some(Submitted.value) => {
-            <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.done")</span>
-        }
-        case _ => {
-            <p class="print-hide">@messages("confirmation.subheading")</p>
-        }
-    }
+    <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.done")</span>
 }
 
 @main_template(
-    pageTitle = Some(messages("service.title", reportStatus.map(_.title(messages)).getOrElse{messages("confirmation.heading.pending") + " " +  messages("status.pending.title")})),
+    pageTitle = Some(messages("service.title", reportStatus.map(_.title(messages)).getOrElse{messages("confirmation.heading.pending")})),
     baCode = Some(baCode)
 ) {
 
     @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Done.value), Some(Failed.value)).contains(reportStatus.get.status))) {
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(submissionId)" />
     }
+    <div id="status" aria-live="polite">
+        @if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
+                @govukPanel(
+                    Panel(
+                        title = HtmlContent(panelTitle),
+                        headingLevel = 1,
+                        content = HtmlContent(panelContent)
+                    )
+                )
 
-    @govukPanel(
-        Panel(
-            title = HtmlContent(panelTitle),
-            headingLevel = 1,
-            content = HtmlContent(panelContent),
-            attributes = Map("aria-live" -> "polite")
-    ))
+        } else if(reportStatus.flatMap(_.status) == Some(Failed.value)) {
+            <h1 class="govuk-heading-l">@messages("confirmation.heading.failed")</h1>
+
+            <p class="govuk-body">@messages("confirmation.subheading.failed")</p>
+        } else {
+            <h1 class="govuk-heading-l">@messages("confirmation.heading.pending")</h1>
+
+            <p class="govuk-body">@messages("confirmation.subheading")</p>
+        }
+    </div>
 
     @reportStatus.map{ rs =>
-        @if(Seq(Some(Failed.value), Some(Done.value)).contains(rs.status)) {
-            <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
-                <div class="govuk-!-padding-3 govuk-!-padding-bottom-0">
-                @components.submission_panel(
-                    reportStatus = rs,
-                    govukSummaryList = govukSummaryList,
-                    dlClass = "govuk-!-margin-bottom-0",
-                    messagePrefix = "confirmation"
-                )
-                </div>
-            </section>
-        }
+        <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-0">@messages("confirmation.submission.details")</h2>
+            <div class="govuk-!-padding-3 govuk-!-padding-bottom-0">
+            @components.submission_panel(
+                reportStatus = rs,
+                govukSummaryList = govukSummaryList,
+                dlClass = "govuk-!-margin-bottom-0",
+                messagePrefix = "confirmation"
+            )
+            </div>
+        </section>
     }
 
     <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>

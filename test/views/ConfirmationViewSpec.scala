@@ -43,7 +43,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
   lazy val doc = asDocument(createView())
 
   "Confirmation view" must {
-    behave like normalPage(createView, messageKeyPrefix, "submissionId")
+    behave like normalPage(createViewWithStatus, messageKeyPrefix, "submission.details")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.select("body > div > dl > div:nth-child(2) > dd").text

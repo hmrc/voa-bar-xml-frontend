@@ -60,7 +60,7 @@ final case class ReportStatus(
 
   def title(messages: Messages): String = {
     val defaultStatus = status.getOrElse(Pending.value).toLowerCase
-    messages(s"confirmation.heading.$defaultStatus") + " " + messages(s"status.$defaultStatus.title")
+    messages(s"confirmation.heading.$defaultStatus")
   }
 
 }

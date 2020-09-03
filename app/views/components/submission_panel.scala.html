@@ -25,8 +25,8 @@
         rows =
             Seq(
                 SummaryListRow(
-                    key = Key(Text(messages("report.key.status")), "govuk-!-width-one-half"),
-                    value = Value(Text(messages(s"$messagePrefix.status.${reportStatus.status.getOrElse("unknown").toLowerCase}.title")))
+                    key = Key(Text(messages("report.key.submissionId")), "govuk-!-width-one-half"),
+                    value = Value(Text(reportStatus.id.split("-").head))
                 ),
                 SummaryListRow(
                     key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
