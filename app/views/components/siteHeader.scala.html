@@ -14,12 +14,22 @@
  * limitations under the License.
  *@
 
+@import play.api.Configuration
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 
-@this(govukHeader: GovukHeader)
+@this(
+    govukHeader: GovukHeader,
+    configuration: Configuration
+)
 
-@(showSignOut: Boolean = true)(implicit messages: Messages)
+@(showSignOut: Boolean = true, needsTimeoutWarning:Boolean = true)(implicit messages: Messages)
+
+@if(needsTimeoutWarning){
+    <input type="hidden" id="signOutUrl" value=@configuration.get[String]("signout.url") />
+    <input type="hidden" id="signOutTimeout" value=@configuration.get[String]("signout.timeout") />
+    <input type="hidden" id="signOutCountdown" value=@configuration.get[String]("signout.countdown") />
+}
 
 @govukHeader(
   Header(

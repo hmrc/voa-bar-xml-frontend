@@ -411,3 +411,10 @@ comments.error.invalidIsoString=Comments must only contain letters a to z, hyphe
 summary.submit=Submit
 summary.comments.none=None
 summary.uprn.notEntered=Not entered
+
+
+#SESSION TIMEOUT
+##############################
+sessionTimeout.heading=You have been signed out due to inactivity
+sessionTimeout.copy=You will need to sign in again. If you have entered any details, these have not been saved
+sessionTimeout.link=Sign in

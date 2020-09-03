@@ -204,4 +204,7 @@ $(document).ready(function() {
       window.VoaFeedback.feedbackOverrides();
       window.VoaFeedback.toggleHelp();
       window.VoaFeedback.helpForm();
+
+      //timeout.js
+      window.VoaTimeout.timeOutReminder();
   }
