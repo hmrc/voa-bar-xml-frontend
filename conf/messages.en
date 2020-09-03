@@ -34,6 +34,7 @@ home.reports.no.current.progress = No submissions currently in progress.
 home.reports.last = Last uploaded
 
 report.subheading = Showing only the last 90 days of submissions.
+report.key.submissionId = Submission ID
 report.key.status = Status
 report.key.type = Type
 report.value.type = Council Tax
@@ -148,14 +149,13 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 # Used only in tests
-confirmation.title = Submission pending - Billing Authority Reports - GOV.UK
-confirmation.heading.pending = Submission
-confirmation.heading.verified = Submission
-confirmation.heading.failed = Submission
-confirmation.heading.unknown = Submission
-confirmation.heading.cancelled = Submission
-confirmation.heading.submitted = Report
-confirmation.heading.done = Report
+confirmation.title = Report submitted - Billing Authority Reports - GOV.UK
+
+confirmation.heading.pending = Submission pending
+confirmation.heading.failed = Submission failed
+confirmation.heading.unknown = Submission pending
+confirmation.heading.submitted = Report submitted
+confirmation.heading.done = Report submitted
 
 confirmation.status.pending.title = Pending
 confirmation.status.verified.title = Pending
@@ -167,7 +167,7 @@ confirmation.status.done.title = Submitted
 
 confirmation.submissionId = Submission ID
 confirmation.subheading = We are processing your reports
-confirmation.subheading.failed = We have received your reports, but were unable to process them due to errors
+confirmation.subheading.failed = We have received your reports, but were unable to process them due to errors.
 confirmation.subheading.done = We have successfully processed your reports
 confirmation.file.received = We have received your file and we are processing your reports.
 confirmation.file.success = We have received your file and have processed it successfully.
@@ -176,6 +176,7 @@ confirmation.window.open = You do not need to keep this window open.
 confirmation.options.title = More Options
 confirmation.options.another = Upload more Council Tax reports
 confirmation.options.history = View your previous Council Tax submissions
+confirmation.submission.details = Submission details
 
 # User in test only
 councilTaxUpload.title = Upload a file - Billing Authority Reports - GOV.UK
