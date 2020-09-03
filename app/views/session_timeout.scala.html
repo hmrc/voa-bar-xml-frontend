@@ -20,7 +20,6 @@
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
 @import controllers._
-@import models.Mode
 
 @this(
     main_template: views.html.govuk.main_template
@@ -33,9 +32,9 @@
     pageTitle = Some(messages("service.title", messages("sessionTimeout.heading"))),
     showSignOut = false
 ) {
-    <h1 class="govuk-heading-xl">@Messages("sessionTimeout.heading")</h1>
+    <h1 class="govuk-heading-l">@Messages("sessionTimeout.heading")</h1>
 
-    <p>@Messages("sessionTimeout.copy")</p>
+    <p class="govuk-body">@Messages("sessionTimeout.copy")</p>
 
-    <p><a href="routes.TimeoutController.timeout">@Messages("sessionTimeout.link")</a></p>
+    <p><a href="@routes.TimeoutController.timeout">@Messages("sessionTimeout.link")</a></p>
 }

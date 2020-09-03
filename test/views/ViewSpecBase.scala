@@ -173,12 +173,18 @@ trait ViewSpecBase extends SpecBase {
     val configuration = Configuration(config)
     val serviceConfig = new ServicesConfig(configuration, new RunMode(configuration, play.api.Mode.Test))
     val appConfig = new FrontendAppConfig(configuration, serviceConfig)
-    new scripts(appConfig)
+    new scripts(appConfig, configuration)
   }
 
   def createGovukLayout(): govukLayout = {
     new govukLayout(uk.gov.hmrc.govukfrontend.views.html.components.GovukTemplate, GovukHeader, GovukFooter, GovukBackLink)
   }
+
+  def createSessionTimeoutView(): views.html.session_timeout =
+    new views.html.session_timeout(
+      createMain_template()
+    )
+
 
 
 }

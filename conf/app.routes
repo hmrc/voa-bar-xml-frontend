@@ -66,8 +66,8 @@ GET        /sign-out                              controllers.SignOutController.
 
 ### Timeout
 ### -----------------------
-GET        /timeout                               controllers.TimeoutController.onPageLoad()
-GET        /timeout/redirect                      controllers.TimeoutController.timeout()
+GET        /this-service-has-been-reset           controllers.TimeoutController.onPageLoad()
+GET        /this-service-has-been-reset/redirect  controllers.TimeoutController.timeout()
 
 
 GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
