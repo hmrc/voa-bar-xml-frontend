@@ -56,7 +56,7 @@
 }
 
 @mainTemplate(
-    pageTitle = Some(messages("service.title", report.title(messages))),
+    pageTitle = Some(messages("service.title", messages("confirmation.heading"))),
     baCode = Some(baCode)
 ) {
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {

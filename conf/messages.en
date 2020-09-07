@@ -149,7 +149,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 # Used only in tests
-confirmation.title = Report submitted - Billing Authority Reports - GOV.UK
+confirmation.title = Your submission - Billing Authority Reports - GOV.UK
+confirmation.heading = Your submission
 
 confirmation.heading.pending = Submission pending
 confirmation.heading.failed = Submission failed
