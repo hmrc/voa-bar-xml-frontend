@@ -81,9 +81,10 @@
         </section>
     }
 
-    <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>
-    <p class="govuk-body">@messages("feedback.contact2")</p>
-
+    @if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
+        <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>
+        <p class="govuk-body">@messages("feedback.contact2")</p>
+    }
     <p class="js-hidden govuk-!-display-none-print"><a id="print-button" rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
     <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
