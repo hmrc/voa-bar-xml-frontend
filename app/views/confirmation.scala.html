@@ -39,7 +39,7 @@
 }
 
 @main_template(
-    pageTitle = Some(messages("service.title", reportStatus.map(_.title(messages)).getOrElse{messages("confirmation.heading.pending")})),
+    pageTitle = Some(messages("service.title", messages("confirmation.heading"))),
     baCode = Some(baCode)
 ) {
 
