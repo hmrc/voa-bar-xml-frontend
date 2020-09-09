@@ -59,7 +59,8 @@ object Dependencies {
     "org.jsoup" % "jsoup" % "1.12.1" % scope,
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
     "org.mockito" %% "mockito-scala-scalatest" % "1.7.1" % scope,
-    "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope
+    "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope,
+    "com.typesafe.akka" %% "akka-testkit" % "2.5.18" % scope
   )
 
   val appDependencies = compileDependencies ++ testDependencies("test") ++ testDependencies("it")

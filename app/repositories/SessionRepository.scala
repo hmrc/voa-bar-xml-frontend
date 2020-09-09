@@ -48,9 +48,9 @@ class ReactiveMongoRepository(config: Configuration, mongo: () => DefaultDB)
   extends ReactiveRepository[DatedCacheMap, BSONObjectID](config.get[String]("appName"), mongo, DatedCacheMap.formats) {
 
   val fieldName = "lastUpdated"
-  val createdIndexName = "userAnswersExpiry"
+  val createdIndexName = "userAnswersExpiryIndex"
   val expireAfterSeconds = "expireAfterSeconds"
-  val timeToLiveInSeconds: Int = config.get[Int]("mongodb.timeToLiveInSeconds")
+  val timeToLiveInSeconds = config.get[Int]("mongodb.timeToLiveInSeconds")
 
   createIndex(fieldName, createdIndexName, timeToLiveInSeconds)
 
