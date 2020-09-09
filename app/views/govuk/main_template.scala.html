@@ -80,8 +80,8 @@
 @govukLayout(
     pageTitle = pageTitle,
     headBlock = Some(head()),
-    beforeContentBlock = Option(beforeBLock),
     headerBlock = Some(siteHeader(showSignOut)),
+    beforeContentBlock = Option(beforeBLock),
     footerBlock =
         Some(
             siteFooter(
@@ -105,5 +105,5 @@
                 )
             )
         ),
-    bodyEndBlock = Some(scripts())
+    bodyEndBlock = Some(scripts(showSignOut))
 )(contentBlock)

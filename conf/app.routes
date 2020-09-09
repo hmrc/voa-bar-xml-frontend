@@ -64,6 +64,11 @@ POST        /changeLogin                          controllers.LoginController.on
 ### -----------------------
 GET        /sign-out                              controllers.SignOutController.signOut()
 
+### Timeout
+### -----------------------
+GET        /this-service-has-been-reset           controllers.TimeoutController.onPageLoad()
+GET        /this-service-has-been-reset/redirect  controllers.TimeoutController.timeout()
+
 
 GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
