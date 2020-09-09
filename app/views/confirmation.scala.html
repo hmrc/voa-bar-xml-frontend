@@ -16,9 +16,13 @@
 
 @import models.{Done, Failed, ReportStatus}
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components.confirmation_status_panel
+@import views.html.components.confirmation_detail_panel
 
 @this(
     main_template: views.html.govuk.main_template,
+    confirmationStatusPanel: confirmation_status_panel,
+    confirmationDetailPanel: confirmation_detail_panel,
     govukSummaryList: GovukSummaryList,
     govukPanel: GovukPanel
 )
@@ -43,48 +47,19 @@
     baCode = Some(baCode)
 ) {
 
+    <input type="hidden" id="reportStatus" value="@reportStatus.flatMap(_.status).getOrElse(Pending.value)" />
+
     @if(!reportStatus.isDefined || (reportStatus.isDefined && !Seq(Some(Done.value), Some(Failed.value)).contains(reportStatus.get.status))) {
-        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(submissionId)" />
+        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(submissionId)" />
     }
+
     <div id="status" aria-live="polite">
-        @if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
-                @govukPanel(
-                    Panel(
-                        title = HtmlContent(panelTitle),
-                        headingLevel = 1,
-                        content = HtmlContent(panelContent)
-                    )
-                )
-
-        } else if(reportStatus.flatMap(_.status) == Some(Failed.value)) {
-            <h1 class="govuk-heading-l">@messages("confirmation.heading.failed")</h1>
-
-            <p class="govuk-body">@messages("confirmation.subheading.failed")</p>
-        } else {
-            <h1 class="govuk-heading-l">@messages("confirmation.heading.pending")</h1>
-
-            <p class="govuk-body">@messages("confirmation.subheading")</p>
-        }
+        @confirmationStatusPanel(submissionId, reportStatus)
     </div>
 
-    @reportStatus.map{ rs =>
-        <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-0">@messages("confirmation.submission.details")</h2>
-            <div class="govuk-!-padding-3 govuk-!-padding-bottom-0">
-            @components.submission_panel(
-                reportStatus = rs,
-                govukSummaryList = govukSummaryList,
-                dlClass = "govuk-!-margin-bottom-0",
-                messagePrefix = "confirmation"
-            )
-            </div>
-        </section>
-    }
-
-    @if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
-        <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>
-        <p class="govuk-body">@messages("feedback.contact2")</p>
-    }
+    <span id="confirmationDetailPanel">
+        @confirmationDetailPanel(submissionId, reportStatus)
+    </span>
     <p class="js-hidden govuk-!-display-none-print"><a id="print-button" rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
     <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>

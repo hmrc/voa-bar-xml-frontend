@@ -26,14 +26,16 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.Lang
+import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 import views.html.govuk.{head, scripts}
-import views.html.{login, councilTaxUpload, welcome, reportStatus, confirmation, error_template}
+import views.html.{confirmation, councilTaxUpload, error_template, login, reportStatus, welcome}
 
-trait ViewSpecBase extends SpecBase {
+trait ViewSpecBase extends SpecBase with Injecting {
 
   implicit def lang = Lang(Locale.UK)
 
@@ -140,6 +142,8 @@ trait ViewSpecBase extends SpecBase {
   def createConfirmationView(): confirmation = {
     new confirmation(
       createMain_template(),
+      inject[confirmation_status_panel],
+      inject[confirmation_detail_panel],
       new govukSummaryList(),
       new govukPanel()
     )

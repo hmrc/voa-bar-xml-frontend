@@ -45,6 +45,7 @@ GET         /unauthorised                         controllers.UnauthorisedContro
 
 GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
 GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
+GET         /council-tax/jobs/checkStatus         controllers.ConfirmationController.onStatusCheck(submissionId: String)
 
 GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad(showEmptyError: Boolean ?= false)
 POST        /council-tax/upload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
