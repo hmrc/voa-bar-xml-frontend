@@ -60,7 +60,7 @@ object Dependencies {
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
     "org.mockito" %% "mockito-scala-scalatest" % "1.7.1" % scope,
     "org.scalacheck" %% "scalacheck" % scalacheckVersion % scope,
-    "com.typesafe.akka" %% "akka-testkit" % "2.5.18" % scope
+    "com.typesafe.akka" %% "akka-testkit" % akkaVersion % scope
   )
 
   val appDependencies = compileDependencies ++ testDependencies("test") ++ testDependencies("it")
