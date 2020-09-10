@@ -29,18 +29,24 @@ import views.html.confirmation
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
+import play.api.test.Injecting
 import views.ViewSpecBase
+import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
   def confirmationView = app.injector.instanceOf[views.html.confirmation]
   def errorTemplateView = app.injector.instanceOf[views.html.error_template]
+
+  def confirmationStatusPanel = inject[confirmation_status_panel]
+  def confirmationDetailPanel = inject[confirmation_detail_panel]
+
 
   val username = "AUser"
   val submissionId = "SID372463"
@@ -58,13 +64,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, errorTemplateView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, errorTemplateView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =

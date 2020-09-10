@@ -23,11 +23,12 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import models.{Login, ReportStatus}
+import models.{ConfirmationPayload, Failed, Login, Pending, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import cats.implicits._
 import journey.UniformJourney.Cr03Submission
 import play.api.libs.json.JsString
+import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +40,8 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
                                        reportStatusConnector: ReportStatusConnector,
                                        reportConfirmation: views.html.govuk.confirmation,
                                        confirmation: views.html.confirmation,
+                                       confirmationStatusPanel: confirmation_status_panel,
+                                       confirmationDetailPanel: confirmation_detail_panel,
                                        val errorTemplate: views.html.error_template,
                                        controllerComponents: MessagesControllerComponents)
                                       (implicit val ec: ExecutionContext)
@@ -55,6 +58,27 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
           case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
         }
       }).valueOr(failPage => failPage)
+  }
+
+  def onStatusCheck(reference: String) = getData.async { implicit request =>
+    import play.api.libs.json._
+    import ConfirmationPayload._
+
+    (for {
+      login <- EitherT(cachedLogin(request.externalId))
+      reportStatus <- EitherT(getReportStatus(reference, login))
+    } yield {
+
+      // I like this wicked trick, we render same html and send it via ajax and just paste with javascript to the page
+      // It's not react, but at least we can be sure that both will render same page.
+      val confirmationStatusPanelContent = confirmationStatusPanel(reportStatus.id, Option(reportStatus)).body
+      val confirmationDetailPanelContent = confirmationDetailPanel(reportStatus.id, Option(reportStatus)).body
+
+      Ok(Json.toJson(
+        ConfirmationPayload(reportStatus.status.getOrElse(Pending.value),
+          confirmationStatusPanelContent, confirmationDetailPanelContent)
+      ))
+    }).valueOr(failPage => failPage)
   }
 
   private def getReportStatus(reference: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] = {
