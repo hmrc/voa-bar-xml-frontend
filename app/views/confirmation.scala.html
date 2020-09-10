@@ -53,7 +53,7 @@
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(submissionId)" />
     }
 
-    <div id="status">
+    <div id="status" aria-live="polite">
         @confirmationStatusPanel(submissionId, reportStatus)
     </div>
 
