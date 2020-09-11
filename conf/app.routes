@@ -37,7 +37,7 @@ POST        /comments                             controllers.UniformController.
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /this-service-has-been-reset          controllers.SessionExpiredController.onPageLoad
+GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad
 
 GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad
 
