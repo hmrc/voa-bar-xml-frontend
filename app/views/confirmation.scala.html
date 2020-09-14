@@ -23,8 +23,7 @@
     main_template: views.html.govuk.main_template,
     confirmationStatusPanel: confirmation_status_panel,
     confirmationDetailPanel: confirmation_detail_panel,
-    govukSummaryList: GovukSummaryList,
-    govukPanel: GovukPanel
+    govukSummaryList: GovukSummaryList
 )
 
 @(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
