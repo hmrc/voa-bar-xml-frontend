@@ -39,13 +39,13 @@ class UploadConnector @Inject()(http: HttpClient,
 
   //implicit val hc: HeaderCarrier = HeaderCarrier()
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
+  private[connectors] val upscanUrl = servicesConfig.baseUrl("upscan")
+
   private[connectors] val baseSegment = "/voa-bar/"
   private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
+
   private[connectors] val upScanConfig = configuration.get[Configuration]("microservice.services.upscan")
-  private[connectors] val upScanPort = upScanConfig.get[String]("port")
-  private[connectors] val upScanHost = upScanConfig.get[String]("host")
-  private[connectors] val upScanProtocol = upScanConfig.get[String]("protocol")
-  private[connectors] val initiateUrl = s"$upScanProtocol://$upScanHost:$upScanPort${upScanConfig.get[String]("initiate.url")}"
+  private[connectors] val initiateUrl = s"${upscanUrl}${upScanConfig.get[String]("initiate.url")}"
 
   val logger = Logger(this.getClass)
 
