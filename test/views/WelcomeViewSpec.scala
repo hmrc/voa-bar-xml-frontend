@@ -16,12 +16,10 @@
 
 package views
 
-import forms.SubmissionTypeFormProvider
-import models.NormalMode
 import play.routing.Router.Tags.ROUTE_CONTROLLER
-import views.behaviours.govuk.QuestionViewBehaviours
+import views.behaviours.ViewBehaviours
 
-class WelcomeViewSpec extends QuestionViewBehaviours[String] {
+class WelcomeViewSpec extends ViewBehaviours {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
@@ -44,7 +42,6 @@ class WelcomeViewSpec extends QuestionViewBehaviours[String] {
 
   // Welcome page containing form for navigation
 
-  val form = SubmissionTypeFormProvider()(messages)
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
