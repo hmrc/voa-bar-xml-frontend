@@ -60,6 +60,19 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       }).valueOr(failPage => failPage)
   }
 
+  def onPageRefresh(reference: String) = getData.async {
+    implicit request =>
+      (for {
+        login <- EitherT(cachedLogin(request.externalId))
+        reportStatus <- EitherT(getReportStatus(reference, login))
+      } yield {
+        getCr03(reportStatus) match {
+          case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
+          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
+        }
+      }).valueOr(failPage => failPage)
+  }
+
   def onStatusCheck(reference: String) = getData.async { implicit request =>
     import play.api.libs.json._
     import ConfirmationPayload._
@@ -95,16 +108,5 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       .flatMap(x => x.get("submission")).flatMap(x => Cr03Submission.format.reads(x).asOpt)
   }
 
-  def onPageRefresh(reference: String) = getData.async {
-    implicit request =>
-      (for {
-        login <- EitherT(cachedLogin(request.externalId))
-        reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield {
-        getCr03(reportStatus) match {
-          case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
-          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
-        }
-      }).valueOr(failPage => failPage)
-  }
+
 }

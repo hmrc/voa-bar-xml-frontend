@@ -4,6 +4,8 @@ $govuk-assets-path: "/voa-bar-xml-frontend/assets/lib/govuk-frontend/govuk/asset
 
 @import "partials/header";
 
+@import "partials/spinner";
+
 @import "partials/print";
 
 .app-reference-number {
