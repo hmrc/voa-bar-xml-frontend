@@ -144,8 +144,7 @@ trait ViewSpecBase extends SpecBase with Injecting {
       createMain_template(),
       inject[confirmation_status_panel],
       inject[confirmation_detail_panel],
-      new govukSummaryList(),
-      new govukPanel()
+      new govukSummaryList()
     )
   }
 

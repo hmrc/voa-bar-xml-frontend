@@ -18,13 +18,14 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
+@import views.html.components.confirmation_status_panel
 
 @import journey.UniformJourney.Cr03Submission
 
 @this(
     mainTemplate: views.html.govuk.main_template,
+    confirmationStatusPanel: confirmation_status_panel,
     govukBackLink: govukBackLink,
-    govukPanel: govukPanel,
     cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate
 )
 
@@ -59,16 +60,16 @@
     pageTitle = Some(messages("service.title", messages("confirmation.heading"))),
     baCode = Some(baCode)
 ) {
+    <input type="hidden" id="reportStatus" value="@report.status.getOrElse(Pending.value)" />
+
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
-        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onPageRefresh(report.id)" />
+        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(report.id)" />
     }
 
-    @govukPanel(Panel(
-        headingLevel = 1,
-        title = HtmlContent(panelTitle),
-        content = HtmlContent(panelContent),
-        attributes = Map("aria-live" -> "polite")
-    ))
+
+    <div id="status" aria-live="polite">
+        @confirmationStatusPanel(report.id, Some(report))
+    </div>
 
     @if(cr03Submission.isDefined) {
         <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
