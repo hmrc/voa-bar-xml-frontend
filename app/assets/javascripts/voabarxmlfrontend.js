@@ -170,7 +170,7 @@ $(document).ready(function() {
                 }).error(function(jqXHR, textStatus, errorThrown ){
                     submitError("4000", jqXHR)
                 }).done(function(){
-                    window.location = $("#councilTaxUploadFormRedirect").val();
+                      refreshPage();
                 });
             };
 
@@ -186,6 +186,14 @@ $(document).ready(function() {
                 submitError("5000", jqXHR)
             }).done(function(){
                 fileUpload(councilTaxUploadForm);
+                // Disable UI
+                $("#heading").after(
+                "<div id=\"processing\" aria-live=\"polite\" class=\"govuk-!-margin-bottom-5\">" +
+                "<h2 class=\"govuk-heading-m\">We are checking your file, please wait</h2>" +
+                "<div><div class=\"ccms-loader\"></div></div></div>"
+                )
+                $("#file").attr('disabled', 'disabled')
+                $("#submit").addClass('govuk-button--disabled')
             });
         }
 
@@ -193,35 +201,34 @@ $(document).ready(function() {
       // =====================================================
       // Refresh status page
       // =====================================================
-      var refreshUrl = $("#refreshUrl").val();
-      if (refreshUrl) {
-          window.refreshIntervalId = setInterval(function () {
-              console.debug("scheduling ajax call, refreshUrl", refreshUrl)
-              $.getJSON(refreshUrl, function (data, textStatus, jqXhr) {
-                  if (jqXhr.status === 200) {
-                      if ($("#reportStatus").val() !== data.status) {
-                          console.debug("status changed, updating page", data.status);
+      function refreshPage(){
+            var refreshUrl = $("#refreshUrl").val();
+            if (refreshUrl) {
+                window.refreshIntervalId = setInterval(function () {
+                    console.debug("scheduling ajax call, refreshUrl", refreshUrl)
 
-                          //Modify DOM
-                          $("#status").html($(data.statusPanel));
-                          $("#confirmationDetailPanel").html($(data.detailPanel));
-                          $("#reportStatus").val(data.status);
+                    $.getJSON(refreshUrl, function (data, textStatus, jqXhr) {
+                        if (jqXhr.status === 200) {
+                            if ($("#reportStatus").val() !== data.status) {
+                                console.debug("status changed, updating page", data.status);
 
-                          console.debug("page updated");
-                          if (data.status === "Failed" || data.status === "Submitted" || data.status === "Done") {
-                              console.debug("Reached final status, removing refresh", status)
-                              clearInterval(window.refreshIntervalId);
-                              console.debug("interval cleared");
-                          }
-                      } else {
-                          console.debug("status didn't change, we not updating anything");
-                      }
-                  } else {
-                      console.log("Something went wrong", jqXhr);
-                  }
-              });
-          }, 3000);
-          console.log("intervalRefreshScheduled, id: ", window.refreshIntervalId);
+                                if (data.status === "Failed" || data.status === "Submitted" || data.status === "Done") {
+                                    console.debug("Reached final status, removing refresh", status)
+                                    clearInterval(window.refreshIntervalId);
+                                    window.location = $("#councilTaxUploadFormRedirect").val();
+                                    console.debug("interval cleared");
+                                }
+                            } else {
+                                console.debug("status didn't change, we not updating anything");
+                            }
+                        } else {
+                            console.log("Something went wrong", jqXhr);
+                        }
+                    });
+                }, 3000);
+                console.log("intervalRefreshScheduled, id: ", window.refreshIntervalId);
+            }
+
       }
 
       //feedback.js

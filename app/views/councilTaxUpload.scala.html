@@ -29,6 +29,13 @@
 
 @(baCode: String, fileUploadForm: Form[_], initiateResponse: Option[InitiateResponse] = None)(implicit request: Request[_], messages: Messages)
 
+@label = {
+
+<h1 class="govuk-label-wrapper" id="heading">
+    <label class="govuk-label govuk-label--l" for="file">@messages("councilTaxUpload.heading")</label>
+</h1>
+
+}
     @main_template(
         pageTitle = if(fileUploadForm.errors.nonEmpty) {
             Some(messages("error.title.prefix") + messages("service.title", messages("councilTaxUpload.heading")))
@@ -47,8 +54,9 @@
     @initiateResponse.map { ir =>
         <input type="hidden" id="councilTaxUploadEmptyFileError" value="@(routes.CouncilTaxUploadController.onPageLoad(true))" />
         <input type="hidden" id="councilTaxUploadReportError" value="@(routes.CouncilTaxUploadController.onError(ir.reference))" />
-        <input type="hidden" id="councilTaxUploadFormRedirect" value="@(routes.ConfirmationController.onPageLoad(ir.reference))" />
+        <input type="hidden" id="councilTaxUploadFormRedirect" value="@(routes.ConfirmationController.onPageRefresh(ir.reference))" />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value="@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference))" />
+        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(ir.reference)" />
 
         <form id="councilTaxUploadForm" method="POST" action="@(ir.uploadRequest.href)" enctype="multipart/form-data" novalidate>
             @ir.uploadRequest.fields.map{ case (key, value) =>
@@ -61,10 +69,7 @@
                     name = "file",
                     label =
                         Label(
-                            forAttr = Some("file"),
-                            content = Text(messages("councilTaxUpload.heading")),
-                            isPageHeading = true,
-                            classes = "govuk-label--l"
+                            content = HtmlContent(label)
                         ),
                     errorMessage = fileUploadForm.errors.asTextErrorMessageForField("file"),
                     attributes =
