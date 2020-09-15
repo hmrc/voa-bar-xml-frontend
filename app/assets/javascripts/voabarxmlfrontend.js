@@ -199,10 +199,10 @@ $(document).ready(function() {
 
       });
       // =====================================================
-      // Refresh status page
+      // CouncilTaxUpload Refresh status page
       // =====================================================
       function refreshPage(){
-            var refreshUrl = $("#refreshUrl").val();
+            var refreshUrl = $("#councilTaxUploadRefreshUrl").val();
             if (refreshUrl) {
                 window.refreshIntervalId = setInterval(function () {
                     console.debug("scheduling ajax call, refreshUrl", refreshUrl)
@@ -230,6 +230,41 @@ $(document).ready(function() {
             }
 
       }
+
+    // =====================================================
+    // WebForm Confirmation Refresh status page
+    // =====================================================
+    var refreshUrl = $("#refreshUrl").val();
+    if (refreshUrl) {
+        window.refreshIntervalId = setInterval(function () {
+            console.debug("scheduling ajax call, refreshUrl", refreshUrl)
+            $.getJSON(refreshUrl, function (data, textStatus, jqXhr) {
+                if (jqXhr.status === 200) {
+                    if ($("#reportStatus").val() !== data.status) {
+                        console.debug("status changed, updating page", data.status);
+
+                        //Modify DOM
+                        $("#status").html($(data.statusPanel));
+                        $("#confirmationDetailPanel").html($(data.detailPanel));
+                        $("#reportStatus").val(data.status);
+
+                        console.debug("page updated");
+                        if (data.status === "Failed" || data.status === "Submitted" || data.status === "Done") {
+                            console.debug("Reached final status, removing refresh", status)
+                            clearInterval(window.refreshIntervalId);
+                            console.debug("interval cleared");
+                        }
+                    } else {
+                        console.debug("status didn't change, we not updating anything");
+                    }
+                } else {
+                    console.log("Something went wrong", jqXhr);
+                }
+            });
+        }, 3000);
+        console.log("intervalRefreshScheduled, id: ", window.refreshIntervalId);
+    }
+
 
       //feedback.js
       window.VoaFeedback.feedbackOverrides();

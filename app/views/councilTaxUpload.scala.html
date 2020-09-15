@@ -56,7 +56,7 @@
         <input type="hidden" id="councilTaxUploadReportError" value="@(routes.CouncilTaxUploadController.onError(ir.reference))" />
         <input type="hidden" id="councilTaxUploadFormRedirect" value="@(routes.ConfirmationController.onPageRefresh(ir.reference))" />
         <input type="hidden" id="councilTaxUploadPrepareUpload" value="@(routes.CouncilTaxUploadController.onPrepareUpload(ir.reference))" />
-        <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(ir.reference)" />
+        <input type="hidden" id="councilTaxUploadRefreshUrl" value="@routes.ConfirmationController.onStatusCheck(ir.reference)" />
 
         <form id="councilTaxUploadForm" method="POST" action="@(ir.uploadRequest.href)" enctype="multipart/form-data" novalidate>
             @ir.uploadRequest.fields.map{ case (key, value) =>
