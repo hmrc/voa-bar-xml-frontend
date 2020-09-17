@@ -187,7 +187,7 @@ $(document).ready(function() {
             }).done(function(){
                 fileUpload(councilTaxUploadForm);
                 // Disable UI
-                $("#heading").after(
+                $("#file").before(
                 "<div id=\"processing\" aria-live=\"polite\" class=\"govuk-!-margin-bottom-5\">" +
                 "<h2 class=\"govuk-heading-m\">We are checking your file, please wait</h2>" +
                 "<div><div class=\"ccms-loader\"></div></div></div>"
