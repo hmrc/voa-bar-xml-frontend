@@ -56,9 +56,9 @@
         @confirmationStatusPanel(submissionId, reportStatus)
     </div>
 
-    <span id="confirmationDetailPanel">
-        @confirmationDetailPanel(submissionId, reportStatus)
-    </span>
+
+    @confirmationDetailPanel(submissionId, reportStatus)
+
     <p class="js-hidden govuk-!-display-none-print"><a id="print-button" rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
     <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
