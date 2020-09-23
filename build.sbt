@@ -7,7 +7,7 @@ import net.ground5hark.sbt.concat.Import._
 import com.typesafe.sbt.uglify.Import._
 import com.typesafe.sbt.digest.Import._
 import play.sbt.routes.RoutesKeys
-import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin, _}
+import uk.gov.hmrc.{SbtAutoBuildPlugin, _}
 import DefaultBuildSettings.{defaultSettings, scalaSettings, integrationTestSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
@@ -19,7 +19,7 @@ lazy val plugins : Seq[Plugins] = Seq.empty
 lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(playSettings : _*)
   .settings( majorVersion := 0 )

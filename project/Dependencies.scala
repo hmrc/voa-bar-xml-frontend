@@ -7,7 +7,7 @@ object Dependencies {
 
   private val playHealthVersion = "3.15.0-play-26"
   private val logbackJsonLoggerVersion = "4.8.0"
-  private val govukTemplateVersion = "5.55.0-play-26"
+  private val govukTemplateVersion = "5.57.0-play-26"
   private val playUiVersion = "8.12.0-play-26"
   private val scalaTestPlusPlayVersion = "3.1.3"
   private val pegdownVersion = "1.6.0"
@@ -15,7 +15,7 @@ object Dependencies {
   private val simpleReactiveMongo = "7.30.0-play-26"
   private val playConditionalFormMappingVersion = "1.3.0-play-26"
   private val playLanguageVersion = "4.4.0-play-26"
-  private val bootstrapVersion = "1.15.0"
+  private val bootstrapVersion = "1.16.0"
   private val scalacheckVersion = "1.14.1"
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
@@ -38,6 +38,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
+    "uk.gov.hmrc"       %% "play-frontend-hmrc" % "0.19.0-play-26",
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,
     "com.luketebbs.uniform" %% "core" % "4.10.0",
