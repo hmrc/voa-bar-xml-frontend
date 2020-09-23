@@ -31,6 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 import views.html.govuk.{head, scripts}
 import views.html.{confirmation, councilTaxUpload, error_template, login, reportStatus, welcome}
@@ -163,7 +164,8 @@ trait ViewSpecBase extends SpecBase with Injecting {
       new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
       new views.html.components.siteFooter(uk.gov.hmrc.govukfrontend.views.html.components.GovukFooter),
       new govukBackLink(),
-      new govukSummaryList()
+      new govukSummaryList(),
+      inject[AccessibilityStatementConfig]
     )
   }
 
