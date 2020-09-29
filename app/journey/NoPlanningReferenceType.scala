@@ -16,7 +16,7 @@
 
 package journey
 
-import play.api.libs.json.{Format, JsError, JsObject, JsResult, JsString, JsSuccess, JsValue, Json, OFormat}
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 
 sealed trait NoPlanningReferenceType
 

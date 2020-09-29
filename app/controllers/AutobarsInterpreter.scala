@@ -17,16 +17,15 @@
 package controllers
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 import cats.data.NonEmptyList
 import controllers.uniform.Cr03SubmissionWebTell
-import javax.inject.Inject
-import journey.UniformJourney.Cr03Submission
-import journey.{LocalDateFormFieldEncoding, No, NoPlanningReferenceType, Yes, YesNoType}
+import journey.{CouncilTaxBandType, LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldEncoding, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList, WebMonad, WebMonadConstructor}
+import ltbs.uniform.common.web.{
+  CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct,
+  InferFormFieldProduct, InferListingPages, ProductFieldList
+}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
 import ltbs.uniform._
 import play.api.Logger
@@ -39,11 +38,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
 
-import scala.collection.immutable.ListMap
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
 class AutobarsInterpreter (
                            results: Results,
@@ -234,6 +230,10 @@ class AutobarsInterpreter (
     val coproductValues = cfl.inner.map(_._1).toSet
     val items = if(coproductValues == NoPlanningReferenceType.order.toSet) {
       NoPlanningReferenceType.order
+    } else if (coproductValues == ReasonReportType.order.toSet){
+      ReasonReportType.order
+    } else if (coproductValues == CouncilTaxBandType.order.toSet){
+      CouncilTaxBandType.order
     } else if (coproductValues == Set("Yes", "No")) {
       List("Yes", "No")
     } else {
@@ -245,7 +245,7 @@ class AutobarsInterpreter (
         id=Option(name),
         value=Option(name),
         content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}${name}")),
-        checked = value.map(_ == name).getOrElse(false)
+        checked = value.contains(name)
       )
     }
 

@@ -39,6 +39,18 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
   }
 
   def summaryList(in: Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
+
+    val reasonReport = in.reasonReport.map { rr =>
+      SummaryListRow(
+        key = Key(HtmlContent(messages("reason-report.pageLabel")), "govuk-!-width-one-half"),
+        value = Value(HtmlContent(messages("reason-report.reason-report." + rr.getClass.getSimpleName.replace("$","")))),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("reason-report").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+    }
+
     val baReport = SummaryListRow(
       key = Key(HtmlContent(messages("ba-report.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baReport)),
@@ -117,6 +129,17 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
       ))
     )
 
+    val councilTaxBand = in.councilTaxBand.map { ct  =>
+      SummaryListRow(
+        key = Key(HtmlContent(messages("council-tax-band.pageLabel")), "govuk-!-width-one-half"),
+        value = Value(HtmlContent(messages("council-tax-band.council-tax-band." + ct.getClass.getSimpleName.replace("$","")))),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("council-tax-band").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+    }
+
     val contactAddress = in.contactAddress.map { contactAddress =>
       val addressContent = HtmlFormat.fill(List(
         HtmlFormat.escape(contactAddress.line1),Html("<br />"),
@@ -194,12 +217,14 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
 
     SummaryList(Seq(
+      reasonReport,
       Option(baReport),
       Option(baRef),
       Option(uprn),
       Option(propertyAddress),
       Option(contactDetails),
       Option(sameAddressQuestion),
+      councilTaxBand,
       contactAddress,
       Option(effectiveDate),
       Option(havePlanningRef),

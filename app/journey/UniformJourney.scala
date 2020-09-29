@@ -34,15 +34,17 @@ object UniformJourney {
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   object Cr03Submission { val format = Json.format[Cr03Submission] }
-  case class Cr03Submission(baReport: String, baRef: String, uprn: Option[String], address: Address,
+  case class Cr03Submission(reasonReport: Option[ReasonReportType], baReport: String, baRef: String, uprn: Option[String], address: Address,
                             propertyContactDetails: ContactDetails,
-                            sameContactAddress: Boolean, contactAddress: Option[Address],
+                            sameContactAddress: Boolean, councilTaxBand: Option[CouncilTaxBandType], contactAddress: Option[Address],
                             effectiveDate: LocalDate, havePlaningReference: Boolean,
                             planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
 
-  type AskTypes = NoPlanningReferenceType :: LocalDate :: YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
+  type AskTypes =
+    CouncilTaxBandType :: ReasonReportType :: NoPlanningReferenceType :: LocalDate ::
+      YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = Cr03Submission :: Long :: NilTypes
 
   //RestrictedStringType
@@ -53,23 +55,30 @@ object UniformJourney {
   val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
   // $COVERAGE-OFF$
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr03Submission] = {
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr01Feature: Boolean): F[Cr03Submission] = {
     import interpreter._
 
     for {
+      reasonReport <- ask[ReasonReportType]("reason-report") when cr01Feature
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = longAddressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      sameContactAddress <- ask[YesNoType]("same-contact-address")
-      contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when (sameContactAddress == No)
+      sameContactAddress <- ask[YesNoType]("same-contact-address") when reasonReport.contains(AddProperty)
+      councilTaxBand <- ask[CouncilTaxBandType]("council-tax-band") when(
+          cr01Feature && reasonReport.contains(RemoveProperty)
+        )
+      contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when(
+        sameContactAddress.contains(No) || (cr01Feature && reasonReport.contains(RemoveProperty))
+        )
       effectiveDate <- ask[LocalDate]("effective-date")
       havePlanningRef <- ask[YesNoType]("have-planning-ref")
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
-      ctForm = Cr03Submission(baReport, baRef, uprn, address,propertyContactDetails, sameContactAddress == Yes, contactAddress,
+      ctForm = Cr03Submission(reasonReport, baReport, baRef, uprn, address, propertyContactDetails,
+                sameContactAddress.contains(Yes), councilTaxBand, contactAddress,
                 effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
       _ <- tell[Cr03Submission]("check-answers", ctForm)
