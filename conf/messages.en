@@ -155,6 +155,7 @@ confirmation.title = Report submitted - Billing Authority Reports - GOV.UK
 confirmation.heading.pending = Submission pending
 confirmation.heading.failed = Submission failed
 confirmation.heading.unknown = Submission pending
+confirmation.heading.verified = Submission pending
 confirmation.heading.submitted = Report submitted
 confirmation.heading.done = Report submitted
 
