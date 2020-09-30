@@ -38,18 +38,50 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
   }
 
-  def summaryList(in: Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
-
+  private def reasonSummaryList(in: Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {
     val reasonReport = in.reasonReport.map { rr =>
       SummaryListRow(
         key = Key(HtmlContent(messages("what-is-the-reason-for-the-report.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(HtmlContent(messages("what-is-the-reason-for-the-report.what-is-the-reason-for-the-report." + rr.getClass.getSimpleName.replace("$","")))),
+        value = Value(HtmlContent(messages("what-is-the-reason-for-the-report.what-is-the-reason-for-the-report." +
+          rr.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("what-is-the-reason-for-the-report").url,
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
     }
+
+    val removalReason = in.removalReason.map { rr =>
+      SummaryListRow(
+        key = Key(HtmlContent(messages("why-should-it-be-removed.pageLabel")), "govuk-!-width-one-half"),
+        value = Value(HtmlContent(messages("why-should-it-be-removed.why-should-it-be-removed." + rr.getClass.getSimpleName.replace("$","")))),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("why-should-it-be-removed").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+    }
+
+    val otherReason = in.otherReason.map { or =>
+      SummaryListRow(
+        key = Key(HtmlContent(messages("other-reason.pageLabel")), "govuk-!-width-one-half"),
+        value = Value(Text(or)),
+        actions = Some(Actions(items = Seq(
+          ActionItem(controllers.routes.UniformController.myJourney("why-should-it-be-removed").url,
+            HtmlContent(messages("check-answers.changeLabel"))))
+        ))
+      )
+    }
+
+    Seq(
+      reasonReport,
+      removalReason,
+      otherReason).flatten
+
+  }
+
+  def summaryList(in: Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
+
 
     val baReport = SummaryListRow(
       key = Key(HtmlContent(messages("ba-report.pageLabel")), "govuk-!-width-one-half"),
@@ -216,8 +248,9 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
       )
 
 
-    SummaryList(Seq(
-      reasonReport,
+    SummaryList(
+      reasonSummaryList(in, messages) ++
+      Seq(
       Option(baReport),
       Option(baRef),
       Option(uprn),

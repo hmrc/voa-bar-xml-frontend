@@ -9,6 +9,10 @@ GET         /assets/*file                         controllers.Assets.versioned(p
 
 GET         /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
 POST        /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
+GET         /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+POST        /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+GET         /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
+POST        /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
 GET         /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
 POST        /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
 GET         /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")

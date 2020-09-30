@@ -34,7 +34,8 @@ object UniformJourney {
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   object Cr03Submission { val format = Json.format[Cr03Submission] }
-  case class Cr03Submission(reasonReport: Option[ReasonReportType], baReport: String, baRef: String, uprn: Option[String], address: Address,
+  case class Cr03Submission(reasonReport: Option[ReasonReportType],removalReason: Option[RemovalReasonType], otherReason: Option[String],
+                            baReport: String, baRef: String, uprn: Option[String], address: Address,
                             propertyContactDetails: ContactDetails,
                             sameContactAddress: Boolean, councilTaxBand: Option[CouncilTaxBandType], contactAddress: Option[Address],
                             effectiveDate: LocalDate, havePlaningReference: Boolean,
@@ -43,7 +44,7 @@ object UniformJourney {
 
 
   type AskTypes =
-    CouncilTaxBandType :: ReasonReportType :: NoPlanningReferenceType :: LocalDate ::
+    CouncilTaxBandType :: ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = Cr03Submission :: Long :: NilTypes
 
@@ -60,6 +61,8 @@ object UniformJourney {
 
     for {
       reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report") when cr01Feature
+      removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when (cr01Feature && reasonReport.contains(RemoveProperty))
+      otherReason <- ask[String]("other-reason", validation = otherReasonValidation) when (cr01Feature && removalReason.contains(OtherReason))
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
@@ -77,7 +80,7 @@ object UniformJourney {
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
-      ctForm = Cr03Submission(reasonReport, baReport, baRef, uprn, address, propertyContactDetails,
+      ctForm = Cr03Submission(reasonReport, removalReason, otherReason,  baReport, baRef, uprn, address, propertyContactDetails,
                 sameContactAddress.contains(Yes), councilTaxBand, contactAddress,
                 effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
@@ -86,6 +89,11 @@ object UniformJourney {
   }
   // $COVERAGE-ON$
 
+  def otherReasonValidation(a: String) = {
+    (lengthBetween(1, 32, "error.minLength", "error.maxLength").apply(a) andThen (
+      Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)))
+      .leftMap(_.prefixWith("other-reason"))
+  }
   def baReportValidation(a: String) = {
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)))
