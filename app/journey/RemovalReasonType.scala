@@ -45,28 +45,28 @@ object RemovalReasonType {
   implicit val format: Format[RemovalReasonType] = new Format[RemovalReasonType] {
     override def reads(json: JsValue): JsResult[RemovalReasonType] = {
       json match  {
-        case JsString("It has been demolished") => JsSuccess(Demolition)
-        case JsString("It is in disrepair") => JsSuccess(Disrepair)
-        case JsString("It is being renovated") => JsSuccess(Renovating)
-        case JsString("It is not complete") => JsSuccess(NotComplete)
-        case JsString("It has been banded too soon") => JsSuccess(BandedTooSoon)
-        case JsString("The caravan has been removed from the site") => JsSuccess(CaravanRemoved)
-        case JsString("It is a duplicate of another property") => JsSuccess(Duplicate)
-        case JsString("Other reason") => JsSuccess(OtherReason)
+        case JsString("Demolition") => JsSuccess(Demolition)
+        case JsString("Disrepair") => JsSuccess(Disrepair)
+        case JsString("Renovating") => JsSuccess(Renovating)
+        case JsString("NotComplete") => JsSuccess(NotComplete)
+        case JsString("BandedTooSoon") => JsSuccess(BandedTooSoon)
+        case JsString("CaravanRemoved") => JsSuccess(CaravanRemoved)
+        case JsString("Duplicate") => JsSuccess(Duplicate)
+        case JsString("OtherReason") => JsSuccess(OtherReason)
         case x => JsError(s"Unable to deserialize RemovalReasonType $x")
       }
     }
 
     override def writes(o: RemovalReasonType): JsValue = {
       o match  {
-        case Demolition       => JsString("It has been demolished")
-        case Disrepair        => JsString("It is in disrepair")
-        case Renovating       => JsString("It is being renovated")
-        case NotComplete      => JsString("It is not complete")
-        case BandedTooSoon    => JsString("It has been banded too soon")
-        case CaravanRemoved   => JsString("The caravan has been removed from the site")
-        case Duplicate        => JsString("It is a duplicate of another property")
-        case OtherReason      => JsString("Other reason")
+        case Demolition       => JsString("Demolition")
+        case Disrepair        => JsString("Disrepair")
+        case Renovating       => JsString("Renovating")
+        case NotComplete      => JsString("NotComplete")
+        case BandedTooSoon    => JsString("BandedTooSoon")
+        case CaravanRemoved   => JsString("CaravanRemoved")
+        case Duplicate        => JsString("Duplicate")
+        case OtherReason      => JsString("OtherReason")
       }
     }
   }
