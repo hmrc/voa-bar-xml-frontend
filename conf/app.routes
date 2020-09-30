@@ -7,6 +7,12 @@ GET         /                                     controllers.LoginController.on
 GET         /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
 
 
+GET         /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
+POST        /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
+GET         /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+POST        /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+GET         /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
+POST        /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
 GET         /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
 POST        /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
 GET         /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
@@ -19,6 +25,8 @@ GET         /check-answers                        controllers.UniformController.
 POST        /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
 GET         /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
 POST        /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
+GET         /council-tax-band                     controllers.UniformController.myJourney(id = "council-tax-band")
+POST        /council-tax-band                     controllers.UniformController.myJourney(id = "council-tax-band")
 GET         /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
 POST        /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
 GET         /contact-address                      controllers.UniformController.myJourney(id = "contact-address")

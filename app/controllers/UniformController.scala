@@ -24,6 +24,7 @@ import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
 import models.requests.OptionalDataRequest
+import play.api.Configuration
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
 import services.Cr03Service
@@ -35,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UniformController @Inject()(messagesApi: MessagesApi,
+                                  config: Configuration,
                                   pageChrome: pageChrome,
                                   govukInput: govukInput,
                                   govukRadios: govukRadios,
@@ -44,6 +46,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   appConfig: FrontendAppConfig,
                                   cr03Service: Cr03Service,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
+
+  implicit val cr01FeatureEnabled = config.getOptional[Boolean]("feature.cr01.enabled").contains(true)
 
   implicit val mongoPersistance: PersistenceEngine[OptionalDataRequest[AnyContent]] = new PersistenceEngine[OptionalDataRequest[AnyContent]]() {
 
@@ -80,11 +84,11 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import UniformJourney._
 
 
-    val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))
+    val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))(cr01FeatureEnabled)
     if(request.userAnswers.flatMap(_.login).isEmpty) {
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
-    }else {
+    } else {
       playProgram.run(targetId, purgeStateUponCompletion = true) { cr03Submission: Cr03Submission =>
         cr03Service.storeSubmission(cr03Submission, request.userAnswers.get.login.get).map { submissionId =>
           Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))

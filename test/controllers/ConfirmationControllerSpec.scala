@@ -22,10 +22,10 @@ import java.util.UUID
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
+import journey.AddProperty
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
 import models.{Login, NormalMode, ReportStatus, Submitted}
 import play.api.test.Helpers._
-import views.html.confirmation
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
@@ -130,10 +130,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   }
 
   def aCr03Report: Cr03Submission = {
-    Cr03Submission("baRepro", "baRer", None,
+    Cr03Submission(Some(AddProperty), "baRepro", "baRer", None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-      false,
+      false, None,
       Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
       LocalDate.now(), true, Option("1122"), None, Some("comment")
     )
