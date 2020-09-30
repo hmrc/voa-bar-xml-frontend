@@ -53,7 +53,7 @@ object RemovalReasonType {
         case JsString("The caravan has been removed from the site") => JsSuccess(CaravanRemoved)
         case JsString("It is a duplicate of another property") => JsSuccess(Duplicate)
         case JsString("Other reason") => JsSuccess(OtherReason)
-        case x => JsError(s"Unable to deserialize ReasonReportType $x")
+        case x => JsError(s"Unable to deserialize RemovalReasonType $x")
       }
     }
 

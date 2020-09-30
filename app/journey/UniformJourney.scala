@@ -68,7 +68,7 @@ object UniformJourney {
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = longAddressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      sameContactAddress <- ask[YesNoType]("same-contact-address") when reasonReport.contains(AddProperty)
+      sameContactAddress <- ask[YesNoType]("same-contact-address") when !cr01Feature || reasonReport.contains(AddProperty)
       councilTaxBand <- ask[CouncilTaxBandType]("council-tax-band") when(
           cr01Feature && reasonReport.contains(RemoveProperty)
         )
