@@ -59,7 +59,7 @@ object UniformJourney {
     import interpreter._
 
     for {
-      reasonReport <- ask[ReasonReportType]("reason-report") when cr01Feature
+      reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report") when cr01Feature
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)

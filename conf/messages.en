@@ -267,10 +267,10 @@ feedback.email=bars@voa.gsi.gov.uk
 
 #web-bars
 
-reason-report.pageLabel=What is the reason for the report?
-reason-report.required=Select why you don’t have a planning reference
-reason-report.reason-report.AddProperty=Add a property to the Council Tax list (CR3)
-reason-report.reason-report.RemoveProperty=Remove a property to the Council Tax list (CR1)
+what-is-the-reason-for-the-report.pageLabel=What is the reason for the report?
+what-is-the-reason-for-the-report.required=Select what is the reason for the report
+what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.AddProperty=Add a property to the Council Tax list (CR3)
+what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.RemoveProperty=Remove a property to the Council Tax list (CR1)
 
 ba-report.pageLabel=Billing authority report
 ba-report.label=

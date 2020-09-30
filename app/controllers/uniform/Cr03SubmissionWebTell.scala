@@ -42,10 +42,10 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
     val reasonReport = in.reasonReport.map { rr =>
       SummaryListRow(
-        key = Key(HtmlContent(messages("reason-report.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(HtmlContent(messages("reason-report.reason-report." + rr.getClass.getSimpleName.replace("$","")))),
+        key = Key(HtmlContent(messages("what-is-the-reason-for-the-report.pageLabel")), "govuk-!-width-one-half"),
+        value = Value(HtmlContent(messages("what-is-the-reason-for-the-report.what-is-the-reason-for-the-report." + rr.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.myJourney("reason-report").url,
+          ActionItem(controllers.routes.UniformController.myJourney("what-is-the-reason-for-the-report").url,
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
