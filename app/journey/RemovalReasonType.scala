@@ -60,13 +60,13 @@ object RemovalReasonType {
     override def writes(o: RemovalReasonType): JsValue = {
       o match  {
         case Demolition       => JsString("It has been demolished")
-        case Disrepair        => JsString("RemoveProperty")
-        case Renovating       => JsString("AddProperty")
-        case NotComplete      => JsString("RemoveProperty")
-        case BandedTooSoon    => JsString("AddProperty")
-        case CaravanRemoved   => JsString("RemoveProperty")
-        case Duplicate        => JsString("AddProperty")
-        case OtherReason      => JsString("RemoveProperty")
+        case Disrepair        => JsString("It is in disrepair")
+        case Renovating       => JsString("It is being renovated")
+        case NotComplete      => JsString("It is not complete")
+        case BandedTooSoon    => JsString("It has been banded too soon")
+        case CaravanRemoved   => JsString("The caravan has been removed from the site")
+        case Duplicate        => JsString("It is a duplicate of another property")
+        case OtherReason      => JsString("Other reason")
       }
     }
   }
