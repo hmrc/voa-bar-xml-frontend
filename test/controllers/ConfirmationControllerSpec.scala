@@ -27,7 +27,7 @@ import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
 import models.{Login, NormalMode, ReportStatus, Submitted, Verified}
 import play.api.test.Helpers._
 import org.mockito.scalatest.MockitoSugar
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Injecting
 import views.ViewSpecBase
@@ -120,8 +120,23 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       contentAsString(result) mustBe refreshViewAsString()
     }
 
+    "return OK and the correct view for the status check" in {
+      val result = loggedInController().onStatusCheck(submissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsJson(result).as[JsObject].keys.contains("status") mustBe true
+      contentAsJson(result).as[JsObject].keys.contains("statusPanel") mustBe true
+    }
+
     "if while refreshing not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageRefresh(submissionId)(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "if while checking the status not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onStatusCheck(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)

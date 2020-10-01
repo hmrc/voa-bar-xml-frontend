@@ -16,46 +16,52 @@
 
 package journey
 
+import journey.RemovalReasonType._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.{JsString, Json}
-import NoPlanningReferenceType._
 
 import scala.reflect.runtime.{universe => ru}
 
-class NoPlanningReferenceTypeSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
+class RemovalReasonTypeSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
 
-  "NoPlanningReferenceType" should "have all instance in Lister for to render radio buttons in order" in {
+  "RemovalReasonType" should "have all instance in Lister for to render radio buttons in order" in {
 
-    val traitType = ru.typeOf[NoPlanningReferenceType]
+    val traitType = ru.typeOf[RemovalReasonType]
     val traitClazz = traitType.typeSymbol.asClass
 
-    traitClazz.knownDirectSubclasses.map(_.name.toString) should contain theSameElementsAs NoPlanningReferenceType.order
+    traitClazz.knownDirectSubclasses.map(_.name.toString) should contain theSameElementsAs RemovalReasonType.order
 
   }
 
   it should "deserialize" in {
     List(
-      "WithoutPlanningPermission",
-      "NotApplicablePlanningPermission",
-      "NotRequiredPlanningPermission",
-      "PermittedDevelopment",
-      "NoPlanningApplicationSubmitted"
-    ).foreach{ planningPermission =>
-      val json = JsString(planningPermission)
+      "Demolition",
+      "Disrepair",
+      "Renovating",
+      "NotComplete",
+      "BandedTooSoon",
+      "CaravanRemoved",
+      "Duplicate",
+      "OtherReason"
+    ).foreach{ removalReasonTypeString =>
+      val json = JsString(removalReasonTypeString)
       Json.fromJson(json).isSuccess shouldBe true
     }
   }
 
   it should "serialize" in {
     List(
-      WithoutPlanningPermission,
-      NotApplicablePlanningPermission,
-      NotRequiredPlanningPermission,
-      PermittedDevelopment,
-      NoPlanningApplicationSubmitted
-    ).foreach { noPlanningPermission =>
-      Json.toJson(noPlanningPermission) shouldBe JsString(noPlanningPermission.toString)
+      Demolition,
+      Disrepair,
+      Renovating,
+      NotComplete,
+      BandedTooSoon,
+      CaravanRemoved,
+      Duplicate,
+      OtherReason
+    ).foreach { removalReasonType =>
+      Json.toJson(removalReasonType) shouldBe JsString(removalReasonType.toString)
     }
   }
 

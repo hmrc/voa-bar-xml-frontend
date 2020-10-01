@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package utils
+package controllers
 
-import com.google.inject.AbstractModule
-import play.api.libs.concurrent.AkkaGuiceSupport
+import play.api.mvc.MessagesControllerComponents
+import play.api.test.Helpers._
+import views.html.session_expired
 
-class MongoCleanupModule extends AbstractModule with AkkaGuiceSupport {
+class SignOutControllerSpec extends ControllerSpecBase {
 
-  override def configure(): Unit = {
-    bindActor[MongoCleanupActor]("MongoCleanupActor")
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
+  "Signout Controller" must {
+    "return 303 for a GET" in {
+      val result = new SignOutController(controllerComponents, frontendAppConfig).signOut()(fakeRequest)
+      status(result) mustBe SEE_OTHER
+    }
   }
-
 }
