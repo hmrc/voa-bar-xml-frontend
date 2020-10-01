@@ -24,7 +24,7 @@ import controllers.actions._
 import identifiers.LoginId
 import journey.{AddProperty, Demolition}
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
-import models.{Login, NormalMode, ReportStatus, Submitted}
+import models.{Login, NormalMode, ReportStatus, Submitted, Verified}
 import play.api.test.Helpers._
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.Json
@@ -80,7 +80,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
     reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None, submissionId: String = submissionId) =
     confirmationView(username, submissionId)(fakeRequest, messages).toString
   def refreshViewAsString() =
     confirmationView(username, submissionId, Some(reportStatus))(fakeRequest, messages).toString
@@ -92,6 +92,18 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
+    }
+
+    "return OK and the correct view for a GET - when status is verified" in {
+      val verifiedSubmissionId = "VID372463"
+      val verifiedReportStatus = ReportStatus(verifiedSubmissionId, ZonedDateTime.now, status = Some(Verified.value))
+      when(reportStatusConnectorMock.getByReference(eqTo(verifiedSubmissionId), any[Login]))
+        .thenReturn(Future(Right(verifiedReportStatus)))
+
+      val result = loggedInController().onPageLoad(verifiedSubmissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe viewAsString(verifiedReportStatus, submissionId = verifiedSubmissionId)
     }
 
     "if not authorized by VOA must go to the login page" in {

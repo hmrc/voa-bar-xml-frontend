@@ -16,10 +16,17 @@
 
 package utils
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 
-object DateFormatter {
-  def formatDate(dateTime: ZonedDateTime) =
-    dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))
+import org.scalatest.{FlatSpec, MustMatchers}
+
+class DateFormatterSpec extends FlatSpec with MustMatchers {
+
+  "DateFormatter" should "format date" in {
+    val dateTime = ZonedDateTime.of(
+      2020,10,1, 10,0,0,
+      0, ZoneId.of("Europe/London"))
+    DateFormatter.formatDate(dateTime) mustBe "01 October 2020 at 10:00"
+  }
+
 }
