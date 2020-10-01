@@ -22,7 +22,7 @@ import java.util.UUID
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
-import journey.AddProperty
+import journey.{AddProperty, Demolition}
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
 import models.{Login, NormalMode, ReportStatus, Submitted}
 import play.api.test.Helpers._
@@ -64,13 +64,17 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView, confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView,
+      confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView, confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
+      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView,
+
+
+      confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
   }
 
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
@@ -130,7 +134,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   }
 
   def aCr03Report: Cr03Submission = {
-    Cr03Submission(Some(AddProperty), "baRepro", "baRer", None,
+    Cr03Submission(Some(AddProperty),Some(Demolition), None, "baRepro", "baRer", None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
       false, None,
