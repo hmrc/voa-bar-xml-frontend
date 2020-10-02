@@ -21,5 +21,5 @@ import java.time.format.DateTimeFormatter
 
 object DateFormatter {
   def formatDate(dateTime: ZonedDateTime) =
-    s"""${dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))}"""
+    dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))
 }

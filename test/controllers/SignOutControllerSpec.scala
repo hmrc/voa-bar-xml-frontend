@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package identifiers
+package controllers
 
-case object CouncilTaxUploadId extends Identifier {
-  override def toString: String = "counciltaxupload"
+import play.api.mvc.MessagesControllerComponents
+import play.api.test.Helpers._
+import views.html.session_expired
+
+class SignOutControllerSpec extends ControllerSpecBase {
+
+  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
+  "Signout Controller" must {
+    "return 303 for a GET" in {
+      val result = new SignOutController(controllerComponents, frontendAppConfig).signOut()(fakeRequest)
+      status(result) mustBe SEE_OTHER
+    }
+  }
 }

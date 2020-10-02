@@ -16,13 +16,17 @@
 
 package utils
 
-import com.google.inject.AbstractModule
-import play.api.libs.concurrent.AkkaGuiceSupport
+import java.time.{ZoneId, ZonedDateTime}
 
-class MongoCleanupModule extends AbstractModule with AkkaGuiceSupport {
+import org.scalatest.{FlatSpec, MustMatchers}
 
-  override def configure(): Unit = {
-    bindActor[MongoCleanupActor]("MongoCleanupActor")
+class DateFormatterSpec extends FlatSpec with MustMatchers {
+
+  "DateFormatter" should "format date" in {
+    val dateTime = ZonedDateTime.of(
+      2020,10,1, 10,0,0,
+      0, ZoneId.of("Europe/London"))
+    DateFormatter.formatDate(dateTime) mustBe "01 October 2020 at 10:00"
   }
 
 }

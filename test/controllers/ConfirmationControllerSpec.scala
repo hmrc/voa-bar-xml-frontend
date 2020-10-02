@@ -24,10 +24,10 @@ import controllers.actions._
 import identifiers.LoginId
 import journey.{AddProperty, Demolition}
 import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
-import models.{Login, NormalMode, ReportStatus, Submitted}
+import models.{Login, NormalMode, ReportStatus, Submitted, Verified}
 import play.api.test.Helpers._
 import org.mockito.scalatest.MockitoSugar
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Injecting
 import views.ViewSpecBase
@@ -80,7 +80,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
     reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
+  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None, submissionId: String = submissionId) =
     confirmationView(username, submissionId)(fakeRequest, messages).toString
   def refreshViewAsString() =
     confirmationView(username, submissionId, Some(reportStatus))(fakeRequest, messages).toString
@@ -92,6 +92,18 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
+    }
+
+    "return OK and the correct view for a GET - when status is verified" in {
+      val verifiedSubmissionId = "VID372463"
+      val verifiedReportStatus = ReportStatus(verifiedSubmissionId, ZonedDateTime.now, status = Some(Verified.value))
+      when(reportStatusConnectorMock.getByReference(eqTo(verifiedSubmissionId), any[Login]))
+        .thenReturn(Future(Right(verifiedReportStatus)))
+
+      val result = loggedInController().onPageLoad(verifiedSubmissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe viewAsString(verifiedReportStatus, submissionId = verifiedSubmissionId)
     }
 
     "if not authorized by VOA must go to the login page" in {
@@ -108,8 +120,23 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       contentAsString(result) mustBe refreshViewAsString()
     }
 
+    "return OK and the correct view for the status check" in {
+      val result = loggedInController().onStatusCheck(submissionId)(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsJson(result).as[JsObject].keys.contains("status") mustBe true
+      contentAsJson(result).as[JsObject].keys.contains("statusPanel") mustBe true
+    }
+
     "if while refreshing not authorized by VOA must go to the login page" in {
       val result = notLoggedInController().onPageRefresh(submissionId)(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(onwardRoute.url)
+    }
+
+    "if while checking the status not authorized by VOA must go to the login page" in {
+      val result = notLoggedInController().onStatusCheck(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
