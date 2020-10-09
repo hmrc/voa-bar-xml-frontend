@@ -27,7 +27,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components.govukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
 
-class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr01Cr03Submission, Html] {
+class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr01Cr03Submission, Html] {
 
   def confirmationSummary(in: Cr01Cr03Submission, messages: Messages): SummaryList = {
     val sum = summaryList(in, new UniformMessages[Html] {

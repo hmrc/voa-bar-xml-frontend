@@ -18,8 +18,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.govukfrontend.views.html.helpers._
 
-@import journey.UniformJourney.Cr03Submission
-@import controllers.uniform.Cr03SubmissionWebTell
+@import journey.UniformJourney.Cr01Cr03Submission
+@import controllers.uniform.Cr01Cr03SubmissionWebTell
 @import ltbs.uniform.UniformMessages
 
 @this(
@@ -27,9 +27,9 @@
 )
 
 
-@(cr03Submission: Cr03Submission)(implicit request: Request[_], messages: Messages)
+@(cr01cr03Submission: Cr01Cr03Submission)(implicit request: Request[_], messages: Messages)
 
 @summaryList(
- (new Cr03SubmissionWebTell(summaryList)).confirmationSummary(cr03Submission, messages)
+ (new Cr01Cr03SubmissionWebTell(summaryList)).confirmationSummary(cr01cr03Submission, messages)
 )
 
