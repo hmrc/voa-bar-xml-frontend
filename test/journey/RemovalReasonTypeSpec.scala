@@ -38,9 +38,9 @@ class RemovalReasonTypeSpec extends FlatSpec with Matchers with TableDrivenPrope
     List(
       "Demolition",
       "Disrepair",
+      "Derelict",
       "Renovating",
-      "NotComplete",
-      "BandedTooSoon",
+      "BandedTooSoonOrNotComplete",
       "CaravanRemoved",
       "Duplicate",
       "OtherReason"
@@ -54,9 +54,9 @@ class RemovalReasonTypeSpec extends FlatSpec with Matchers with TableDrivenPrope
     List(
       Demolition,
       Disrepair,
+      Derelict,
       Renovating,
-      NotComplete,
-      BandedTooSoon,
+      BandedTooSoonOrNotComplete,
       CaravanRemoved,
       Duplicate,
       OtherReason

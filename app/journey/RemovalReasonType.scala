@@ -22,9 +22,9 @@ sealed trait RemovalReasonType
 
 case object Demolition extends RemovalReasonType
 case object Disrepair extends RemovalReasonType
+case object Derelict extends RemovalReasonType
 case object Renovating extends RemovalReasonType
-case object NotComplete extends RemovalReasonType
-case object BandedTooSoon extends RemovalReasonType
+case object BandedTooSoonOrNotComplete extends RemovalReasonType
 case object CaravanRemoved extends RemovalReasonType
 case object Duplicate extends RemovalReasonType
 case object OtherReason extends RemovalReasonType
@@ -34,9 +34,9 @@ object RemovalReasonType {
   val order = List[String] (
     "Demolition",
     "Disrepair",
+    "Derelict",
     "Renovating",
-    "NotComplete",
-    "BandedTooSoon",
+    "BandedTooSoonOrNotComplete",
     "CaravanRemoved",
     "Duplicate",
     "OtherReason"
@@ -47,9 +47,9 @@ object RemovalReasonType {
       json match  {
         case JsString("Demolition") => JsSuccess(Demolition)
         case JsString("Disrepair") => JsSuccess(Disrepair)
+        case JsString("Derelict") => JsSuccess(Derelict)
         case JsString("Renovating") => JsSuccess(Renovating)
-        case JsString("NotComplete") => JsSuccess(NotComplete)
-        case JsString("BandedTooSoon") => JsSuccess(BandedTooSoon)
+        case JsString("BandedTooSoonOrNotComplete") => JsSuccess(BandedTooSoonOrNotComplete)
         case JsString("CaravanRemoved") => JsSuccess(CaravanRemoved)
         case JsString("Duplicate") => JsSuccess(Duplicate)
         case JsString("OtherReason") => JsSuccess(OtherReason)
@@ -59,14 +59,14 @@ object RemovalReasonType {
 
     override def writes(o: RemovalReasonType): JsValue = {
       o match  {
-        case Demolition       => JsString("Demolition")
-        case Disrepair        => JsString("Disrepair")
-        case Renovating       => JsString("Renovating")
-        case NotComplete      => JsString("NotComplete")
-        case BandedTooSoon    => JsString("BandedTooSoon")
-        case CaravanRemoved   => JsString("CaravanRemoved")
-        case Duplicate        => JsString("Duplicate")
-        case OtherReason      => JsString("OtherReason")
+        case Demolition                 => JsString("Demolition")
+        case Disrepair                  => JsString("Disrepair")
+        case Derelict                   => JsString("Derelict")
+        case Renovating                 => JsString("Renovating")
+        case BandedTooSoonOrNotComplete => JsString("BandedTooSoonOrNotComplete")
+        case CaravanRemoved             => JsString("CaravanRemoved")
+        case Duplicate                  => JsString("Duplicate")
+        case OtherReason                => JsString("OtherReason")
       }
     }
   }

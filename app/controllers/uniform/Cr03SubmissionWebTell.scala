@@ -18,7 +18,7 @@ package controllers.uniform
 
 import java.time.format.DateTimeFormatter
 
-import journey.UniformJourney.Cr03Submission
+import journey.UniformJourney.Cr01Cr03Submission
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
 import play.api.i18n.Messages
@@ -27,9 +27,9 @@ import uk.gov.hmrc.govukfrontend.views.html.components.govukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
 
-class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr03Submission, Html] {
+class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr01Cr03Submission, Html] {
 
-  def confirmationSummary(in: Cr03Submission, messages: Messages): SummaryList = {
+  def confirmationSummary(in: Cr01Cr03Submission, messages: Messages): SummaryList = {
     val sum = summaryList(in, new UniformMessages[Html] {
       override def get(key: String, args: Any*): Option[Html] = Option(Html(messages(key, args)))
 
@@ -38,7 +38,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
     SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
   }
 
-  private def reasonSummaryList(in: Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {
+  private def reasonSummaryList(in: Cr01Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {
     val reasonReport = in.reasonReport.map { rr =>
       SummaryListRow(
         key = Key(HtmlContent(messages("what-is-the-reason-for-the-report.pageLabel")), "govuk-!-width-one-half"),
@@ -80,8 +80,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
 
   }
 
-  def summaryList(in: Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
-
+  def summaryList(in: Cr01Cr03Submission, messages: UniformMessages[Html]): SummaryList = {
 
     val baReport = SummaryListRow(
       key = Key(HtmlContent(messages("ba-report.pageLabel")), "govuk-!-width-one-half"),
@@ -268,7 +267,7 @@ class Cr03SubmissionWebTell (govUkSumaryList: govukSummaryList) extends GenericW
   }
 
 
-  override def render(in: Cr03Submission, key: String, messages: UniformMessages[Html]): Html = {
+  override def render(in: Cr01Cr03Submission, key: String, messages: UniformMessages[Html]): Html = {
     govUkSumaryList(summaryList(in, messages))
   }
 }

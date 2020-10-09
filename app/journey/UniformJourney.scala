@@ -33,20 +33,20 @@ object UniformJourney {
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
-  object Cr03Submission { val format = Json.format[Cr03Submission] }
-  case class Cr03Submission(reasonReport: Option[ReasonReportType],removalReason: Option[RemovalReasonType], otherReason: Option[String],
-                            baReport: String, baRef: String, uprn: Option[String], address: Address,
-                            propertyContactDetails: ContactDetails,
-                            sameContactAddress: Boolean, councilTaxBand: Option[CouncilTaxBandType], contactAddress: Option[Address],
-                            effectiveDate: LocalDate, havePlaningReference: Boolean,
-                            planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
+  object Cr01Cr03Submission { val format = Json.format[Cr01Cr03Submission] }
+  case class Cr01Cr03Submission(reasonReport: Option[ReasonReportType], removalReason: Option[RemovalReasonType], otherReason: Option[String],
+                                baReport: String, baRef: String, uprn: Option[String], address: Address,
+                                propertyContactDetails: ContactDetails,
+                                sameContactAddress: Boolean, councilTaxBand: Option[CouncilTaxBandType], contactAddress: Option[Address],
+                                effectiveDate: LocalDate, havePlaningReference: Boolean,
+                                planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
 
   type AskTypes =
     CouncilTaxBandType :: ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
-  type TellTypes = Cr03Submission :: Long :: NilTypes
+  type TellTypes = Cr01Cr03Submission :: Long :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -56,7 +56,7 @@ object UniformJourney {
   val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
   // $COVERAGE-OFF$
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr01Feature: Boolean): F[Cr03Submission] = {
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr01Feature: Boolean): F[Cr01Cr03Submission] = {
     import interpreter._
 
     for {
@@ -80,11 +80,11 @@ object UniformJourney {
       planningRef <- ask[String]("planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
-      ctForm = Cr03Submission(reasonReport, removalReason, otherReason,  baReport, baRef, uprn, address, propertyContactDetails,
+      ctForm = Cr01Cr03Submission(reasonReport, removalReason, otherReason,  baReport, baRef, uprn, address, propertyContactDetails,
                 sameContactAddress.contains(Yes), councilTaxBand, contactAddress,
                 effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
-      _ <- tell[Cr03Submission]("check-answers", ctForm)
+      _ <- tell[Cr01Cr03Submission]("check-answers", ctForm)
     } yield ctForm
   }
   // $COVERAGE-ON$
@@ -209,7 +209,7 @@ object UniformJourney {
 
           val res = maxLength[String](maxLen, maxLenMsg).apply(value) andThen (Rule.matchesRegex(
             restrictedStringTypeRegex, formatMsg).apply(_))
-          val res2: Validated[ ErrorTree, Option[String]] = res.map(x => Option(x))
+          val res2: Validated[ErrorTree, Option[String]] = res.map(x => Option(x))
           res2
         }
       }

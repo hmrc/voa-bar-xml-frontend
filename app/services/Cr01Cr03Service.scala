@@ -22,40 +22,40 @@ import java.util.UUID
 import com.google.inject.ImplementedBy
 import connectors.ReportStatusConnector
 import javax.inject.{Inject, Singleton}
-import journey.UniformJourney.Cr03Submission
+import journey.UniformJourney.Cr01Cr03Submission
 import models.{Login, Pending, ReportStatus}
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[DefaultCr03Service])
-trait Cr03Service {
-  def storeSubmission(submission: Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
+@ImplementedBy(classOf[DefaultCr01Cr03Service])
+trait Cr01Cr03Service {
+  def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
 }
 
 @Singleton
-class DefaultCr03Service @Inject() (reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr03Service {
+class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr01Cr03Service {
 
-  override def storeSubmission(submission: Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
+  override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
     val submissionId = UUID.randomUUID()
-    val cr03Report = createReport(submission)
+    val cr01cr03Report = createReport(submission)
     val report = ReportStatus(
       id = submissionId.toString,
       created = ZonedDateTime.now(),
       baCode = Option(login.username),
       status = Option(Pending.value),
       totalReports = Option(1),
-      report = Option(cr03Report)
+      report = Option(cr01cr03Report)
     )
     reportConnector.save(report, login).map( _ => submissionId)
   }
 
-  def createReport(submission: Cr03Submission): JsObject = {
-    val jsObj = Cr03Submission.format.writes(submission)
+  def createReport(submission: Cr01Cr03Submission): JsObject = {
+    val jsObj = Cr01Cr03Submission.format.writes(submission)
 
     Json.obj(
-      "type" -> "Cr03Submission",
+      "type" -> "Cr01Cr03Submission",
       "submission" -> jsObj
     )
   }

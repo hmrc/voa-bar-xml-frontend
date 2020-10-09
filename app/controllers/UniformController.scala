@@ -27,7 +27,7 @@ import models.requests.OptionalDataRequest
 import play.api.Configuration
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
-import services.Cr03Service
+import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.govuk.pageChrome
@@ -44,7 +44,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   dataCaheConnector: DataCacheConnector,
                                   getData: DataRetrievalAction,
                                   appConfig: FrontendAppConfig,
-                                  cr03Service: Cr03Service,
+                                  cr01cr03Service: Cr01Cr03Service,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   implicit val cr01FeatureEnabled = config.getOptional[Boolean]("feature.cr01.enabled").contains(true)
@@ -89,8 +89,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
     } else {
-      playProgram.run(targetId, purgeStateUponCompletion = true) { cr03Submission: Cr03Submission =>
-        cr03Service.storeSubmission(cr03Submission, request.userAnswers.get.login.get).map { submissionId =>
+      playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission: Cr01Cr03Submission =>
+        cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.get.login.get).map { submissionId =>
           Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
         }
 
