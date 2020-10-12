@@ -20,7 +20,7 @@
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
 @import views.html.components.confirmation_status_panel
 
-@import journey.UniformJourney.Cr03Submission
+@import journey.UniformJourney.Cr01Cr03Submission
 
 @this(
     mainTemplate: views.html.govuk.main_template,
@@ -32,7 +32,7 @@
 @(
     baCode: String,
     report: ReportStatus,
-    cr03Submission: Option[Cr03Submission]
+    cr03Submission: Option[Cr01Cr03Submission]
 )(implicit request: Request[_], messages: Messages)
 
 @panelContent = {

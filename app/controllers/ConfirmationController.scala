@@ -23,10 +23,10 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import models.{ConfirmationPayload, Failed, Login, Pending, ReportStatus}
+import models.{ConfirmationPayload, Login, Pending, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import cats.implicits._
-import journey.UniformJourney.Cr03Submission
+import journey.UniformJourney.Cr01Cr03Submission
 import play.api.libs.json.JsString
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
@@ -53,9 +53,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        getCr03(reportStatus) match {
+        getCr01Cr03(reportStatus) match {
           case None => Ok(confirmation(login.username, reference))
-          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
+          case cr01cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr01cr03))
         }
       }).valueOr(failPage => failPage)
   }
@@ -66,9 +66,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        getCr03(reportStatus) match {
+        getCr01Cr03(reportStatus) match {
           case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
-          case cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr03))
+          case cr01cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr01cr03))
         }
       }).valueOr(failPage => failPage)
   }
@@ -101,11 +101,14 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     ))
   }
 
-  private def getCr03(reportStatus: ReportStatus): Option[Cr03Submission] = {
+  private def getCr01Cr03(reportStatus: ReportStatus): Option[Cr01Cr03Submission] = {
     reportStatus.report
       .map(_.value)
-      .filter(x => x.get("type").map {case x: JsString => x.value == "Cr03Submission"}.getOrElse(false))
-      .flatMap(x => x.get("submission")).flatMap(x => Cr03Submission.format.reads(x).asOpt)
+      .filter(x => x.get("type").exists {
+        case x: JsString => x.value == "Cr01Cr03Submission"
+        case _ => false
+      })
+      .flatMap(x => x.get("submission")).flatMap(x => Cr01Cr03Submission.format.reads(x).asOpt)
   }
 
 

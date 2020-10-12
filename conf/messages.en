@@ -276,10 +276,10 @@ why-should-it-be-removed.pageLabel=Why should it be removed?
 why-should-it-be-removed.required=Select a reason for a removal
 why-should-it-be-removed.why-should-it-be-removed.Demolition=It has been demolished
 why-should-it-be-removed.why-should-it-be-removed.Disrepair=It is in disrepair
+why-should-it-be-removed.why-should-it-be-removed.Derelict=It is derelict
 why-should-it-be-removed.why-should-it-be-removed.Renovating=It is being renovated
-why-should-it-be-removed.why-should-it-be-removed.NotComplete=It is not complete
-why-should-it-be-removed.why-should-it-be-removed.BandedTooSoon=It has been banded too soon
-why-should-it-be-removed.why-should-it-be-removed.CaravanRemoved=The caravan has been removed from the site
+why-should-it-be-removed.why-should-it-be-removed.BandedTooSoonOrNotComplete=It was banded too soon or is not complete
+why-should-it-be-removed.why-should-it-be-removed.CaravanRemoved=The caravan is not sole and main residence or has been removed from site
 why-should-it-be-removed.why-should-it-be-removed.Duplicate=It is a duplicate of another property
 why-should-it-be-removed.why-should-it-be-removed.OtherReason=Other reason
 

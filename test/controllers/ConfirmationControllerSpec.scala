@@ -22,8 +22,8 @@ import java.util.UUID
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
-import journey.{AddProperty, Demolition}
-import journey.UniformJourney.{Address, ContactDetails, Cr03Submission}
+import journey.{AddProperty, Demolition, RemoveProperty}
+import journey.UniformJourney.{Address, ContactDetails, Cr01Cr03Submission}
 import models.{Login, NormalMode, ReportStatus, Submitted, Verified}
 import play.api.test.Helpers._
 import org.mockito.scalatest.MockitoSugar
@@ -77,10 +77,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
   }
 
-  def cr03ViewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None) =
-    reportConfirmationView(username, report, cr03Report)(fakeRequest, messages).toString
+  def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
+    reportConfirmationView(username, report, cr01cr03Report)(fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr03Report: Option[Cr03Submission] = None, submissionId: String = submissionId) =
+  def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
     confirmationView(username, submissionId)(fakeRequest, messages).toString
   def refreshViewAsString() =
     confirmationView(username, submissionId, Some(reportStatus))(fakeRequest, messages).toString
@@ -146,8 +146,8 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val submissionId = UUID.randomUUID().toString
       val cr03Report = aCr03Report
       val cr03Json = Json.obj(
-        "type" -> "Cr03Submission",
-        "submission" -> Cr03Submission.format.writes(cr03Report)
+        "type" -> "Cr01Cr03Submission",
+        "submission" -> Cr01Cr03Submission.format.writes(cr03Report)
       )
       val cr03ReportStatus = reportStatus.copy(report = Option(cr03Json), id = submissionId)
 
@@ -156,12 +156,40 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe cr03ViewAsString(cr03ReportStatus, Some(cr03Report))
+      contentAsString(result) mustBe cr01cr03ViewAsString(cr03ReportStatus, Some(cr03Report))
     }
   }
 
-  def aCr03Report: Cr03Submission = {
-    Cr03Submission(Some(AddProperty),Some(Demolition), None, "baRepro", "baRer", None,
+  def aCr03Report: Cr01Cr03Submission = {
+    Cr01Cr03Submission(Some(AddProperty),None, None, "baRepro", "baRer", None,
+      Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
+      ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
+      false, None,
+      Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
+      LocalDate.now(), true, Option("1122"), None, Some("comment")
+    )
+  }
+
+  "if CR01 report is present, it should render confirmation page with all details" in {
+    val submissionId = UUID.randomUUID().toString
+    val cr01Report = aCr01Report
+    val cr01Json = Json.obj(
+      "type" -> "Cr01Cr03Submission",
+      "submission" -> Cr01Cr03Submission.format.writes(cr01Report)
+    )
+    val cr01ReportStatus = reportStatus.copy(report = Option(cr01Json), id = submissionId)
+
+    when(reportStatusConnectorMock.getByReference(eqTo(submissionId), any[Login]))
+      .thenReturn(Future(Right(cr01ReportStatus)))
+    val result = loggedInController().onPageRefresh(submissionId)(fakeRequest)
+
+    status(result) mustBe OK
+    contentAsString(result) mustBe cr01cr03ViewAsString(cr01ReportStatus, Some(cr01Report))
+  }
+
+
+  def aCr01Report: Cr01Cr03Submission = {
+    Cr01Cr03Submission(Some(RemoveProperty),Some(Demolition), None, "baRepro", "baRer", None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
       false, None,

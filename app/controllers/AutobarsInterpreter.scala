@@ -19,7 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import cats.data.NonEmptyList
-import controllers.uniform.Cr03SubmissionWebTell
+import controllers.uniform.Cr01Cr03SubmissionWebTell
 import journey.{CouncilTaxBandType, LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList}
@@ -83,7 +83,7 @@ class AutobarsInterpreter (
     override def render(in: Long, key: String, messages: UniformMessages[Html]): Html = Html(s"in: ${in}, key:${messages}")
   }
 
-  implicit val ctTaxFormWebTell = new Cr03SubmissionWebTell(new govukSummaryList())
+  implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
