@@ -34,17 +34,17 @@ object UniformJourney {
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   object Cr01Cr03Submission { val format = Json.format[Cr01Cr03Submission] }
-  case class Cr01Cr03Submission(reasonReport: Option[ReasonReportType], removalReason: Option[RemovalReasonType], otherReason: Option[String],
+  case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[String],
                                 baReport: String, baRef: String, uprn: Option[String], address: Address,
                                 propertyContactDetails: ContactDetails,
-                                sameContactAddress: Boolean, councilTaxBand: Option[CouncilTaxBandType], contactAddress: Option[Address],
+                                sameContactAddress: Boolean, contactAddress: Option[Address],
                                 effectiveDate: LocalDate, havePlaningReference: Boolean,
                                 planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
 
   type AskTypes =
-    CouncilTaxBandType :: ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
+    ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
   type TellTypes = Cr01Cr03Submission :: Long :: NilTypes
 
@@ -60,20 +60,17 @@ object UniformJourney {
     import interpreter._
 
     for {
-      reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report") when cr01Feature
-      removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when (cr01Feature && reasonReport.contains(RemoveProperty))
-      otherReason <- ask[String]("other-reason", validation = otherReasonValidation) when (cr01Feature && removalReason.contains(OtherReason))
+      reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report")
+      removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
+      otherReason <- ask[String]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
       address <- ask[Address]("property-address", validation = longAddressValidation)
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
-      sameContactAddress <- ask[YesNoType]("same-contact-address") when !cr01Feature || reasonReport.contains(AddProperty)
-      councilTaxBand <- ask[CouncilTaxBandType]("council-tax-band") when(
-          cr01Feature && reasonReport.contains(RemoveProperty)
-        )
+      sameContactAddress <- ask[YesNoType]("same-contact-address") when reasonReport == AddProperty
       contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when(
-        sameContactAddress.contains(No) || (cr01Feature && reasonReport.contains(RemoveProperty))
+        sameContactAddress.contains(No) || (reasonReport == RemoveProperty)
         )
       effectiveDate <- ask[LocalDate]("effective-date")
       havePlanningRef <- ask[YesNoType]("have-planning-ref")
@@ -81,7 +78,7 @@ object UniformJourney {
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
       ctForm = Cr01Cr03Submission(reasonReport, removalReason, otherReason,  baReport, baRef, uprn, address, propertyContactDetails,
-                sameContactAddress.contains(Yes), councilTaxBand, contactAddress,
+                sameContactAddress.contains(Yes), contactAddress,
                 effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
       _ <- tell[Cr01Cr03Submission]("check-answers", ctForm)

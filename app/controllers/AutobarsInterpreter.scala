@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import cats.data.NonEmptyList
 import controllers.uniform.Cr01Cr03SubmissionWebTell
-import journey.{CouncilTaxBandType, LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
+import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList}
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
@@ -229,10 +229,8 @@ class AutobarsInterpreter (
       NoPlanningReferenceType.order
     } else if (coproductValues == ReasonReportType.order.toSet){
       ReasonReportType.order
-    } else if (coproductValues == RemovalReasonType.order.toSet){
+    } else if (coproductValues == RemovalReasonType.order.toSet) {
       RemovalReasonType.order
-    } else if (coproductValues == CouncilTaxBandType.order.toSet){
-      CouncilTaxBandType.order
     } else if (coproductValues == Set("Yes", "No")) {
       List("Yes", "No")
     } else {

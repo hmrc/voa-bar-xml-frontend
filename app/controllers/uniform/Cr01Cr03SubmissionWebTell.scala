@@ -39,17 +39,16 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
   }
 
   private def reasonSummaryList(in: Cr01Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {
-    val reasonReport = in.reasonReport.map { rr =>
+    val reasonReport =
       SummaryListRow(
         key = Key(HtmlContent(messages("what-is-the-reason-for-the-report.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(messages("what-is-the-reason-for-the-report.what-is-the-reason-for-the-report." +
-          rr.getClass.getSimpleName.replace("$","")))),
+          in.reasonReport.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.myJourney("what-is-the-reason-for-the-report").url,
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
-    }
 
     val removalReason = in.removalReason.map { rr =>
       SummaryListRow(
@@ -73,10 +72,7 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
       )
     }
 
-    Seq(
-      reasonReport,
-      removalReason,
-      otherReason).flatten
+    reasonReport :: List(removalReason,otherReason).flatten
 
   }
 
@@ -159,17 +155,6 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
-
-    val councilTaxBand = in.councilTaxBand.map { ct  =>
-      SummaryListRow(
-        key = Key(HtmlContent(messages("council-tax-band.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(HtmlContent(messages("council-tax-band.council-tax-band." + ct.getClass.getSimpleName.replace("$","")))),
-        actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.myJourney("council-tax-band").url,
-            HtmlContent(messages("check-answers.changeLabel"))))
-        ))
-      )
-    }
 
     val contactAddress = in.contactAddress.map { contactAddress =>
       val addressContent = HtmlFormat.fill(List(
@@ -256,7 +241,6 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
       Option(propertyAddress),
       Option(contactDetails),
       Option(sameAddressQuestion),
-      councilTaxBand,
       contactAddress,
       Option(effectiveDate),
       Option(havePlanningRef),
