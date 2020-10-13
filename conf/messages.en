@@ -262,7 +262,7 @@ status.report.para = failed with the following errors:
 feedback.description =This is a new service -your <a href="https://www.smartsurvey.co.uk/s/BARSsurvey/" target="_blank">feedback</a> will help us to improve it.
 feedback.contact= If you need to send additional information, email
 feedback.contact2= Please include the billing authority report number in the subject line.
-feedback.email=bars@voa.gsi.gov.uk
+feedback.email=barsubmissionstandards@voa.gov.uk
 
 
 #web-bars
