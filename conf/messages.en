@@ -360,17 +360,6 @@ same-contact-address.same-contact-address.No=No
 check-answers.pageLabel=Check your answers
 check-answers.changeLabel=Change
 
-council-tax-band.pageLabel=Council Tax Band
-council-tax-band.council-tax-band.A=A
-council-tax-band.council-tax-band.B=B
-council-tax-band.council-tax-band.C=C
-council-tax-band.council-tax-band.D=D
-council-tax-band.council-tax-band.E=E
-council-tax-band.council-tax-band.F=F
-council-tax-band.council-tax-band.G=G
-council-tax-band.council-tax-band.H=H
-council-tax-band.council-tax-band.I=I
-
 contact-address.pageLabel=Contact address
 contact-address.line1.label=Address line 1
 contact-address.line1.minLength=Enter the first line of the address

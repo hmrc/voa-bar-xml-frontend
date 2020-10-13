@@ -161,11 +161,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   }
 
   def aCr03Report: Cr01Cr03Submission = {
-    Cr01Cr03Submission(Some(AddProperty),None, None, "baRepro", "baRer", None,
+    Cr01Cr03Submission(AddProperty,None, None, "baRepro", "baRer", None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-      false, None,
-      Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
+      false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
       LocalDate.now(), true, Option("1122"), None, Some("comment")
     )
   }
@@ -189,11 +188,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
 
   def aCr01Report: Cr01Cr03Submission = {
-    Cr01Cr03Submission(Some(RemoveProperty),Some(Demolition), None, "baRepro", "baRer", None,
+    Cr01Cr03Submission(RemoveProperty,Some(Demolition), None, "baRepro", "baRer", None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-      false, None,
-      Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
+      false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
       LocalDate.now(), true, Option("1122"), None, Some("comment")
     )
   }
