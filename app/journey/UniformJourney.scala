@@ -23,7 +23,8 @@ import ltbs.uniform._
 import cats.implicits._
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
-import play.api.libs.json.Json
+import play.api.libs.json._
+
 
 import scala.language.higherKinds
 
@@ -31,10 +32,16 @@ object UniformJourney {
 
   object Address { implicit val format = Json.format[Address] }
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
+  case class OtherReasonWrapper(value : String)
+  object OtherReasonWrapper {
+    import play.api.libs.functional.syntax._
+  implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
+    implicitly[Format[String]].inmap(OtherReasonWrapper.apply, unlift(OtherReasonWrapper.unapply))
+  }
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
   object Cr01Cr03Submission { val format = Json.format[Cr01Cr03Submission] }
-  case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[String],
+  case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[OtherReasonWrapper],
                                 baReport: String, baRef: String, uprn: Option[String], address: Address,
                                 propertyContactDetails: ContactDetails,
                                 sameContactAddress: Boolean, contactAddress: Option[Address],
@@ -45,7 +52,7 @@ object UniformJourney {
 
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
-      YesNoType :: ContactDetails :: Address :: Option[String] :: String :: NilTypes
+      YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
   type TellTypes = Cr01Cr03Submission :: Long :: NilTypes
 
   //RestrictedStringType
@@ -62,7 +69,7 @@ object UniformJourney {
     for {
       reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report")
       removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
-      otherReason <- ask[String]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
+      otherReason <- ask[OtherReasonWrapper]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
@@ -86,10 +93,10 @@ object UniformJourney {
   }
   // $COVERAGE-ON$
 
-  def otherReasonValidation(a: String) = {
-    (lengthBetween(1, 32, "error.minLength", "error.maxLength").apply(a) andThen (
+  def otherReasonValidation(a: OtherReasonWrapper) = {
+    (lengthBetween(1, 32, "error.minLength", "error.maxLength").apply(a.value) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)))
-      .leftMap(_.prefixWith("other-reason"))
+      .leftMap(_.prefixWith("other-reason")).map(OtherReasonWrapper.apply)
   }
   def baReportValidation(a: String) = {
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
