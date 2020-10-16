@@ -54,22 +54,22 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
 
   it should "validate Address" in {
     val address = Address("99  Fosse Way %+", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
-    UniformJourney.longAddressValidation(address).toEither.right.value mustBe(address)
+    UniformJourney.longAddressValidation("some-address")(address).toEither.right.value mustBe(address)
   }
 
   it should "reject invalid address" in {
     val address = Address("", "ARDNAGOINE", None, None, "HHGGD")
-    UniformJourney.longAddressValidation(address).toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.longAddressValidation("some-address")(address).toEither.left.value mustBe a[ErrorTree]
   }
 
   it should "validate short address with 35 characters" in {
     val address = Address("12345678901234567890123456789012345", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
-    UniformJourney.shortAddressValidation(address).toEither.right.value mustBe(address)
+    UniformJourney.shortAddressValidation("some-address")(address).toEither.right.value mustBe(address)
   }
 
   it should "reject short address with more that 35 characters" in {
     val address = Address("123456789012345678901234567890123456", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
-    UniformJourney.shortAddressValidation(address).toEither.left.value mustBe a[ErrorTree]
+    UniformJourney.shortAddressValidation("some-address")(address).toEither.left.value mustBe a[ErrorTree]
   }
 
   it should "Validate correct contact details" in {
