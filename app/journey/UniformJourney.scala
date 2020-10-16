@@ -73,10 +73,10 @@ object UniformJourney {
       baReport <- ask[String]("ba-report", validation = baReportValidation )
       baRef <- ask[String]("ba-ref", validation = baReferenceValidation)
       uprn <-ask[Option[String]]("UPRN", validation = uprnValidation)
-      address <- ask[Address]("property-address", validation = longAddressValidation)
+      address <- ask[Address]("property-address", validation = longAddressValidation("property-address"))
       propertyContactDetails <- ask[ContactDetails]("property-contact-details", validation = propertyContactDetailValidator)
       sameContactAddress <- ask[YesNoType]("same-contact-address") when reasonReport == AddProperty
-      contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation) when(
+      contactAddress <- ask[Address]("contact-address", validation = shortAddressValidation("contact-address")) when(
         sameContactAddress.contains(No) || (reasonReport == RemoveProperty)
         )
       effectiveDate <- ask[LocalDate]("effective-date")
@@ -173,10 +173,10 @@ object UniformJourney {
     result.leftMap(_.prefixWith("property-contact-details"))
   }
 
-  def shortAddressValidation(a: Address):Validated[ErrorTree, Address] = addressValidation(35)(a)
-  def longAddressValidation(a: Address): Validated[ErrorTree, Address] = addressValidation(100)(a)
+  def shortAddressValidation(errorPrefix: String)(a: Address):Validated[ErrorTree, Address] = addressValidation(35, errorPrefix)(a)
+  def longAddressValidation(errorPrefix: String)(a: Address): Validated[ErrorTree, Address] = addressValidation(100, errorPrefix)(a)
 
-  def addressValidation(maxLen: Int)(a: Address): Validated[ErrorTree, Address] = {
+  def addressValidation(maxLen: Int, errorPrefix: String)(a: Address): Validated[ErrorTree, Address] = {
 
     val line1 = (lengthBetween(1, maxLen, "line1.minLength",
       "line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(restrictedStringTypeRegex,
@@ -196,7 +196,7 @@ object UniformJourney {
 
     val result = (line1, line2, line3, line4, postcode).mapN(Address.apply)
 
-    result.leftMap(_.prefixWith("property-address"))
+    result.leftMap(_.prefixWith(errorPrefix))
   }
 
   def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage:String) = new Rule[String] {

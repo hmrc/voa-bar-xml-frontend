@@ -106,12 +106,7 @@ class AutobarsInterpreter (
                             messages: UniformMessages[Html]): Html =  {
         import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
-        val errorMessage = errors.get(NonEmptyList.one(fieldKey))
-          .orElse {
-            errors.valueAtRoot.filter(_ => pageKey == fieldKey)
-          }
-          .map(x => x.head.prefixWith(pageKey).render[Html](messages))
-          .map(x => ErrorMessage(content = HtmlContent(x)))
+        val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
         val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
 
@@ -231,12 +226,7 @@ class AutobarsInterpreter (
                         data: Input, errors: ErrorTree,
                         messages: UniformMessages[Html]): Html = {
 
-      val rootError = errors.get(NonEmptyList.one(fieldKey))
-        .orElse {
-          errors.valueAtRoot.filter(_ => pageKey == fieldKey)
-        }
-        .map(x => x.head.prefixWith(pageKey).render[Html](messages))
-        .map(x => ErrorMessage(content = HtmlContent(x)))
+      val rootError = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
       val dayClass = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "day").map(_ => " govuk-input--error")).getOrElse(""))
       val monthClass = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "month").map(_ => " govuk-input--error")).getOrElse(""))
@@ -301,6 +291,31 @@ class AutobarsInterpreter (
       )
     }
 
-    govukRadios(Radios(items = radiosItems, name = fieldKey.head))
+    val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
+
+    govukRadios(
+      Radios(
+        idPrefix = Some(fieldKey.mkString("_")),
+        items = radiosItems,
+        name = fieldKey.head,
+        errorMessage = errorMessage,
+        attributes = Map("id" -> fieldKey.mkString("_"), "name" -> fieldKey.mkString("."))
+      ))
+  }
+
+  private def renderErrorMessage[A](
+     pageKey: List[String],
+     fieldKey: List[String],
+     errors: ErrorTree,
+     messages: UniformMessages[Html]
+  ): Option[ErrorMessage] = {
+    errors.get(NonEmptyList.one(fieldKey))
+      .orElse {
+        errors.valueAtRoot.filter(_ => pageKey == fieldKey)
+      }
+      .map { errorMsgNel =>
+        val html = errorMsgNel.head.prefixWith(pageKey).render[Html](messages)
+        ErrorMessage(content = HtmlContent(html))
+      }
   }
 }

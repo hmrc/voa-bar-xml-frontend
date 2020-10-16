@@ -58,7 +58,8 @@
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
                 errors.map { error =>
-                    ErrorLink(Some(error._1.head.mkString("#","_", "")),
+                        val errorLink = if (error._1.head.isEmpty)  key.mkString("#","_", "") else error._1.head.mkString("#","_", "")
+                    ErrorLink(Some(errorLink),
                         HtmlContent(error._2.head.prefixWith(key).render[Html](messages2)))
                 }.toList
             }, title = Text(messages("error.summary.title"))))
