@@ -283,8 +283,8 @@ why-should-it-be-removed.why-should-it-be-removed.CaravanRemoved=The caravan is 
 why-should-it-be-removed.why-should-it-be-removed.Duplicate=It is a duplicate of another property
 why-should-it-be-removed.why-should-it-be-removed.OtherReason=Other reason
 
-other-reason.pageLabel=Other Reason?
-other-reason.label=Reason for removal
+other-reason.pageLabel=Other reason for removal
+other-reason.hint=Maximum 32 characters
 other-reason.error.minLength=Enter a reason for removal
 other-reason.error.maxLength=Reason for removal must be 32 characters or fewer
 other-reason.error.allowedChars=Reason for removal must only contain letters a to z, hyphens, spaces and apostrophes

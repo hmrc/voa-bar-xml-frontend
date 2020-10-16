@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import cats.data.NonEmptyList
 import controllers.uniform.Cr01Cr03SubmissionWebTell
+import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList}
@@ -29,7 +30,7 @@ import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios, govukSummaryList}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Empty, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
@@ -159,6 +160,60 @@ class AutobarsInterpreter (
                         breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                         data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = {
       stringField._render(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
+    }
+  }
+
+  implicit val otherReasonField = new FormField[OtherReasonWrapper, Html] {
+    override def decode(out: Input): Either[ErrorTree, OtherReasonWrapper] = out.toStringField().toEither.map(OtherReasonWrapper.apply)
+    override def encode(in: OtherReasonWrapper): Input = Input.one(List(in.value))
+
+    override def render(pageKey: List[String],
+                        fieldKey: List[String],
+                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                        data: Input, errors: ErrorTree,
+                        messages: UniformMessages[Html]): Html = _render(
+      pageKey, fieldKey, breadcrumbs, data, errors, messages)
+
+
+    def _render(pageKey: List[String],
+                fieldKey: List[String],
+                breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                data: Input, errors: ErrorTree,
+                messages: UniformMessages[Html]): Html =  {
+      import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
+
+      val errorMessage = errors.get(NonEmptyList.one(fieldKey))
+        .orElse {
+          errors.valueAtRoot.filter(_ => pageKey == fieldKey)
+        }
+        .map(x => x.head.prefixWith(pageKey).render[Html](messages))
+        .map(x => ErrorMessage(content = HtmlContent(x)))
+
+      val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
+
+      logger.debug(
+        s"""
+           |pageKey : ${pageKey}
+           |fieldKey: ${fieldKey}
+           |Errors:
+           |  ${errors.mkString(" \n")}
+           |
+           |Value:
+           |  ${data.mkString(" \n")}
+           |
+           |""".stripMargin)
+
+      val hint = Option(Hint(content = HtmlContent(messages("other-reason.hint"))))
+
+      govukInput(GovInput(
+        id = fieldKey.mkString("_"),
+        name = fieldKey.mkString("."),
+        label = Label(content = Empty),
+        classes="govuk-input",
+        value = fieldValue,
+        errorMessage = errorMessage,
+        hint = hint
+      ))
     }
   }
 

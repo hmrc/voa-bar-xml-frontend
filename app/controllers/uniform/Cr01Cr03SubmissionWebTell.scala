@@ -64,9 +64,9 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
     val otherReason = in.otherReason.map { or =>
       SummaryListRow(
         key = Key(HtmlContent(messages("other-reason.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(Text(or)),
+        value = Value(Text(or.value)),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.myJourney("why-should-it-be-removed").url,
+          ActionItem(controllers.routes.UniformController.myJourney("other-reason").url,
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
