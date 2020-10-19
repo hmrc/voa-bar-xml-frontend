@@ -298,8 +298,7 @@ class AutobarsInterpreter (
         idPrefix = Some(fieldKey.mkString("_")),
         items = radiosItems,
         name = fieldKey.head,
-        errorMessage = errorMessage,
-        attributes = Map("id" -> fieldKey.mkString("_"), "name" -> fieldKey.mkString("."))
+        errorMessage = errorMessage
       ))
   }
 
