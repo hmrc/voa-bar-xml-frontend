@@ -17,18 +17,20 @@
 package controllers
 
 import connectors.FakeDataCacheConnector
-import controllers.actions._
+import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
 import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.filters.csrf.CSRF.{Token, TokenInfo}
 import utils.FakeNavigator
 import views.ViewSpecBase
 
 import scala.concurrent.ExecutionContext
 
-class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
@@ -43,8 +45,10 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new WelcomeController(frontendAppConfig, configuration, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
+    new TaskListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createTaskListView()
+    )(ec)
+
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -53,12 +57,14 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
-  def viewAsString() = createWelcomeView()(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString
 
-  "Welcome Controller" must {
+
+  def viewAsString() = createTaskListView()(username)(fakeRequest, messages).toString
+
+  "Logging Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController().onPageLoad(fakeRequest)
+      val result = loggedInController().onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
@@ -71,19 +77,10 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-    "return a redirect when calling goToStartWebFormPage" in {
-      val result = loggedInController().goToStartWebFormPage()(fakeRequest)
-      status(result) mustBe SEE_OTHER
-    }
+      "return a redirect when calling goToAddPropertyPage" in {
+        val result = loggedInController().goToAddPropertyPage()(fakeRequest)
+        status(result) mustBe SEE_OTHER
+      }
 
-    "return a redirect when calling goToCouncilTaxUploadPage" in {
-      val result = loggedInController().goToCouncilTaxUploadPage()(fakeRequest)
-      status(result) mustBe SEE_OTHER
-    }
-
-    "return a redirect when calling goToTaskListLoadPage" in {
-      val result = loggedInController().goToTaskListLoadPage()(fakeRequest)
-      status(result) mustBe SEE_OTHER
-    }
   }
 }

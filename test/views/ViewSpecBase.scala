@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 import views.html.govuk.{head, scripts}
-import views.html.{confirmation, councilTaxUpload, error_template, login, reportStatus, welcome}
+import views.html.{confirmation, councilTaxUpload, error_template, login, reportStatus, welcome, task_list}
 
 trait ViewSpecBase extends SpecBase with Injecting {
 
@@ -121,6 +121,12 @@ trait ViewSpecBase extends SpecBase with Injecting {
 
   def createWelcomeView(): welcome = {
     new welcome(
+      createMain_template()
+    )
+  }
+
+  def createTaskListView(): task_list = {
+    new task_list(
       createMain_template()
     )
   }

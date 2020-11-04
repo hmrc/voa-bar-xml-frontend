@@ -53,6 +53,16 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         CouncilTaxStartId.toString mustBe "counciltaxstart"
         navigator.nextPage(CouncilTaxStartId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxUploadController.onPageLoad()
       }
+
+      "on selecting Add Property Journey link should redirect to Add Property Journey Page" in {
+        AddPropertyId.toString mustBe "addproperty"
+        navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addPropertyJourney("add-property-ba-report")
+      }
+
+      "on selecting Task List should redirect to Task List Page" in {
+        TaskListId.toString mustBe "tasklist"
+        navigator.nextPage(TaskListId, NormalMode) (uploadUserAnswers) mustBe routes.TaskListController.onPageLoad()
+      }
     }
 
     "in Check mode" must {
