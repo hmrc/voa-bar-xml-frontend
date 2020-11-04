@@ -29,7 +29,9 @@ class Navigator @Inject()() {
   private val routeMap: Map[Identifier, UserAnswers => Call] = Map(
     LoginId -> (_ => routes.WelcomeController.onPageLoad()),
     WelcomeFormId -> (_ => routes.UniformController.myJourney("ba-report")),
-    CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad())
+    CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
+    TaskListId ->  (_ => routes.TaskListController.onPageLoad()),
+    AddPropertyId -> (_ => routes.UniformController.addPropertyJourney("add-property-ba-report"))
   )
 
   private val editRouteMap: Map[Identifier, UserAnswers => Call] = Map(

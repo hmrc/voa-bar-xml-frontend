@@ -20,6 +20,7 @@ import connectors.FakeDataCacheConnector
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import models.NormalMode
+import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
@@ -31,25 +32,28 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
+  val cr05FeatureFlag = false
+
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  val configuration =  Configuration("feature.cr05.enabled" -> false)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new WelcomeController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
+    new WelcomeController(frontendAppConfig, configuration, dataRetrievalAction, new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new WelcomeController(frontendAppConfig,  dataRetrievalAction, new DataRequiredActionImpl(ec),
+    new WelcomeController(frontendAppConfig, configuration,  dataRetrievalAction, new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
   }
 
-  def viewAsString() = createWelcomeView()(frontendAppConfig, username)(fakeRequest, messages).toString
+  def viewAsString() = createWelcomeView()(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

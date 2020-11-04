@@ -23,10 +23,11 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
+  val cr05FeatureFlag = false
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => createWelcomeView()(frontendAppConfig, username)(welcomeFakeRequest, messages)
+  def createView = () => createWelcomeView()(frontendAppConfig, username, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -45,7 +46,7 @@ class WelcomeViewSpec extends ViewBehaviours {
   val formUsername = "BA1445"
   val formMessageKeyPrefix = "submissionCategory"
 
-  def createFormView = () => createWelcomeView()(frontendAppConfig, formUsername)(welcomeFakeRequest, messages)
+  def createFormView = () => createWelcomeView()(frontendAppConfig, formUsername, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
   lazy val formDoc = asDocument(createFormView())
 

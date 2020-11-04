@@ -8,6 +8,8 @@ $govuk-assets-path: "/voa-bar-xml-frontend/assets/lib/govuk-frontend/govuk/asset
 
 @import "partials/print";
 
+@import "partials/task-list";
+
 .app-reference-number {
   display: block;
   font-weight: bold;

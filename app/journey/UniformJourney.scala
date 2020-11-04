@@ -35,12 +35,12 @@ object UniformJourney {
   case class OtherReasonWrapper(value : String)
   object OtherReasonWrapper {
     import play.api.libs.functional.syntax._
-  implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
-    implicitly[Format[String]].inmap(OtherReasonWrapper.apply, unlift(OtherReasonWrapper.unapply))
+    implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
+      implicitly[Format[String]].inmap(OtherReasonWrapper.apply, unlift(OtherReasonWrapper.unapply))
   }
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
-  object Cr01Cr03Submission { val format = Json.format[Cr01Cr03Submission] }
+  object Cr01Cr03Submission { implicit val format = Json.format[Cr01Cr03Submission] }
   case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[OtherReasonWrapper],
                                 baReport: String, baRef: String, uprn: Option[String], address: Address,
                                 propertyContactDetails: ContactDetails,
@@ -49,6 +49,17 @@ object UniformJourney {
                                 planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
+  object Cr05Submission {
+    import Cr01Cr03Submission._
+    val storageKey = "CR05"
+    implicit val format: Format[Cr05Submission] = Json.format[Cr05Submission]
+    val initial = Cr05Submission(Nil, Nil)
+  }
+
+  case class Cr05Submission(
+    splitProperties: Seq[Cr01Cr03Submission],
+    mergeProperties: Seq[Cr01Cr03Submission]
+  )
 
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
@@ -62,10 +73,35 @@ object UniformJourney {
   // More strict validation that in XML https://emailregex.com/
   val emailAddressRegex = """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
-  // $COVERAGE-OFF$
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr01Feature: Boolean): F[Cr01Cr03Submission] = {
-    import interpreter._
 
+  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr01Cr03Submission] = {
+    import interpreter._
+    for {
+      baReport <- ask[String]("add-property-ba-report", validation = baReportValidation)
+      baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation)
+      uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation)
+      address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"))
+      propertyContactDetails <- ask[ContactDetails]("add-property-property-contact-details", validation = propertyContactDetailValidator)
+      sameContactAddress <- ask[YesNoType]("add-property-same-contact-address")
+      contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address")) when (
+        sameContactAddress == No
+      )
+      effectiveDate <- ask[LocalDate]("add-property-effective-date")
+      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
+      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
+      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
+      comments <- ask[Option[String]]("add-property-comments", validation = commentsValidation)
+      ctForm = Cr01Cr03Submission(SplitProperty, None, None, baReport, baRef, uprn, address, propertyContactDetails,
+        sameContactAddress == Yes, contactAddress,
+        effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
+
+      _ <- tell[Cr01Cr03Submission]("add-property-check-answers", ctForm)
+    } yield ctForm
+  }
+
+  // $COVERAGE-OFF$
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr01Cr03Submission] = {
+    import interpreter._
     for {
       reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report")
       removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
@@ -85,8 +121,8 @@ object UniformJourney {
       noPlanningReference <- ask[NoPlanningReferenceType]("why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("comments", validation = commentsValidation)
       ctForm = Cr01Cr03Submission(reasonReport, removalReason, otherReason,  baReport, baRef, uprn, address, propertyContactDetails,
-                sameContactAddress.contains(Yes), contactAddress,
-                effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
+        sameContactAddress.contains(Yes), contactAddress,
+        effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
 
       _ <- tell[Cr01Cr03Submission]("check-answers", ctForm)
     } yield ctForm

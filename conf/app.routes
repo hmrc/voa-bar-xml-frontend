@@ -39,6 +39,43 @@ GET         /why-no-planning-ref                  controllers.UniformController.
 POST        /why-no-planning-ref                  controllers.UniformController.myJourney(id = "why-no-planning-ref")
 GET         /comments                             controllers.UniformController.myJourney(id = "comments")
 POST        /comments                             controllers.UniformController.myJourney(id = "comments")
+# CR05
+
+GET         /task-list                            controllers.TaskListController.onPageLoad()
+GET         /start-add-property                   controllers.TaskListController.goToAddPropertyPage()
+GET         /add-property                         controllers.UniformController.addPropertyJourney(id = "add-property")
+POST        /add-property                         controllers.UniformController.addPropertyJourney(id = "add-property")
+
+GET         /add-property-ba-report               controllers.UniformController.addPropertyJourney(id = "add-property-ba-report")
+POST        /add-property-ba-report               controllers.UniformController.addPropertyJourney(id = "add-property-ba-report")
+GET         /add-property-ba-ref                  controllers.UniformController.addPropertyJourney(id = "add-property-ba-ref")
+POST        /add-property-ba-ref                  controllers.UniformController.addPropertyJourney(id = "add-property-ba-ref")
+GET         /add-property-UPRN                    controllers.UniformController.addPropertyJourney(id = "add-property-UPRN")
+POST        /add-property-UPRN                    controllers.UniformController.addPropertyJourney(id = "add-property-UPRN")
+GET         /add-property-property-address                     controllers.UniformController.addPropertyJourney(id = "add-property-property-address")
+POST        /add-property-property-address                     controllers.UniformController.addPropertyJourney(id = "add-property-property-address")
+GET         /add-property-check-answers                        controllers.UniformController.addPropertyJourney(id = "add-property-check-answers")
+POST        /add-property-check-answers                        controllers.UniformController.addPropertyJourney(id = "add-property-check-answers")
+GET         /add-property-property-contact-details             controllers.UniformController.addPropertyJourney(id = "add-property-property-contact-details")
+POST        /add-property-property-contact-details             controllers.UniformController.addPropertyJourney(id = "add-property-property-contact-details")
+GET         /add-property-same-contact-address                 controllers.UniformController.addPropertyJourney(id = "add-property-same-contact-address")
+POST        /add-property-same-contact-address                 controllers.UniformController.addPropertyJourney(id = "add-property-same-contact-address")
+GET         /add-property-contact-address                      controllers.UniformController.addPropertyJourney(id = "add-property-contact-address")
+POST        /add-property-contact-address                      controllers.UniformController.addPropertyJourney(id = "add-property-contact-address")
+GET         /add-property-effective-date                       controllers.UniformController.addPropertyJourney(id = "add-property-effective-date")
+POST        /add-property-effective-date                       controllers.UniformController.addPropertyJourney(id = "add-property-effective-date")
+GET         /add-property-have-planning-ref                    controllers.UniformController.addPropertyJourney(id = "add-property-have-planning-ref")
+POST        /add-property-have-planning-ref                    controllers.UniformController.addPropertyJourney(id = "add-property-have-planning-ref")
+GET         /add-property-planning-ref                         controllers.UniformController.addPropertyJourney(id = "add-property-planning-ref")
+POST        /add-property-planning-ref                         controllers.UniformController.addPropertyJourney(id = "add-property-planning-ref")
+GET         /add-property-why-no-planning-ref                  controllers.UniformController.addPropertyJourney(id = "add-property-why-no-planning-ref")
+POST        /add-property-why-no-planning-ref                  controllers.UniformController.addPropertyJourney(id = "add-property-why-no-planning-ref")
+GET         /add-property-comments                             controllers.UniformController.addPropertyJourney(id = "add-property-comments")
+POST        /add-property-comments                             controllers.UniformController.addPropertyJourney(id = "add-property-comments")
+
+GET         /add-property-check-answers-2                      controllers.UniformController.addPropertyJourney(id = "add-property-check-answers-2")
+POST        /add-property-check-answers-2                      controllers.UniformController.addPropertyJourney(id = "add-property-check-answers-2")
+
 
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
@@ -61,6 +98,7 @@ POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadCo
 GET         /online-or-upload                     controllers.WelcomeController.onPageLoad()
 GET         /goToStartWebForm                     controllers.WelcomeController.goToStartWebFormPage()
 GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage()
+GET         /goToTaskList                         controllers.WelcomeController.goToTaskListLoadPage()
 
 GET         /sign-in                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 POST        /sign-in                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)

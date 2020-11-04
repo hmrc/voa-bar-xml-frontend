@@ -21,6 +21,8 @@ import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsVal
 sealed trait ReasonReportType
 
 case object AddProperty extends ReasonReportType
+case object SplitProperty extends ReasonReportType
+case object MergeProperty extends ReasonReportType
 case object RemoveProperty extends ReasonReportType
 
 
@@ -34,6 +36,8 @@ object ReasonReportType {
     override def reads(json: JsValue): JsResult[ReasonReportType] = {
       json match  {
         case JsString("AddProperty") => JsSuccess(AddProperty)
+        case JsString("SplitProperty") => JsSuccess(SplitProperty)
+        case JsString("MergeProperty") => JsSuccess(MergeProperty)
         case JsString("RemoveProperty") => JsSuccess(RemoveProperty)
         case x => JsError(s"Unable to deserialize ReasonReportType $x")
       }
@@ -42,6 +46,8 @@ object ReasonReportType {
     override def writes(o: ReasonReportType): JsValue = {
       o match  {
         case AddProperty       => JsString("AddProperty")
+        case SplitProperty       => JsString("SplitProperty")
+        case MergeProperty       => JsString("MergeProperty")
         case RemoveProperty => JsString("RemoveProperty")
       }
     }
