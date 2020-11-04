@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 
 import scala.concurrent.ExecutionContext
-// $COVERAGE-OFF$
+
 class TaskListController @Inject()(appConfig: FrontendAppConfig,
                                    getData: DataRetrievalAction,
                                    requireData: DataRequiredAction,
@@ -56,4 +56,3 @@ class TaskListController @Inject()(appConfig: FrontendAppConfig,
   }
 
 }
-// $COVERAGE-ON$
