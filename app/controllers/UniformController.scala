@@ -41,13 +41,13 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   govukInput: govukInput,
                                   govukRadios: govukRadios,
                                   govukDateInput: govukDateInput,
-                                  dataCaheConnector: DataCacheConnector,
+                                  dataCacheConnector: DataCacheConnector,
                                   getData: DataRetrievalAction,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
-  implicit val cr01FeatureEnabled = config.getOptional[Boolean]("feature.cr01.enabled").contains(true)
+  implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
   implicit val mongoPersistance: PersistenceEngine[OptionalDataRequest[AnyContent]] = new PersistenceEngine[OptionalDataRequest[AnyContent]]() {
 
@@ -68,11 +68,11 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
 
     def load(externalId: String): Future[_root_.ltbs.uniform.interpreters.playframework.DB] = {
-      dataCaheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
+      dataCacheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
     }
 
     def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
-      dataCaheConnector.save(externalId, storageKey, db).map(_ => ())
+      dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
     }
 
   }
@@ -83,8 +83,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-
-    val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))(cr01FeatureEnabled)
+    val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))
     if(request.userAnswers.flatMap(_.login).isEmpty) {
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
@@ -93,7 +92,29 @@ class UniformController @Inject()(messagesApi: MessagesApi,
         cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.get.login.get).map { submissionId =>
           Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
         }
+      }
+    }
+  }
 
+  def addPropertyJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+    import interpreter._
+    import UniformJourney._
+
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)))
+    if(request.userAnswers.flatMap(_.login).isEmpty) {
+      implicit val messages = cc.messagesApi.preferred(request)
+      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+    } else {
+      addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
+        dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap  { savedCr05Submission =>
+          val cr05Submisson = savedCr05Submission.fold(Cr05Submission(List(cr05AddProperty), Nil)){ existingSubmission =>
+            val mergeProperties = existingSubmission.mergeProperties
+            existingSubmission.copy(mergeProperties = mergeProperties :+ cr05AddProperty)
+          }
+          dataCacheConnector.save(request.externalId, Cr05Submission.storageKey, cr05Submisson).map { _ =>
+            Redirect(routes.TaskListController.onPageLoad())
+          }
+        }
       }
     }
   }

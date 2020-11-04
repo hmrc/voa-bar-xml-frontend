@@ -436,6 +436,149 @@ summary.submit=Submit
 summary.comments.none=None
 summary.uprn.notEntered=Not entered
 
+# CR05
+split-property.pageLabel=Split Property
+
+add-property-ba-report.pageLabel=Billing authority report
+add-property-ba-report.label=
+add-property-ba-report.error.minLength=Enter a billing authority report number
+add-property-ba-report.error.maxLength=Billing authority report must be 12 characters or fewer
+add-property-ba-report.error.allowedChars=Billing authority report must only contain letters a to z, hyphens, spaces and apostrophes
+
+add-property-ba-ref.pageLabel=Billing authority reference
+add-property-ba-ref.label=
+add-property-ba-ref.error.minLength=Enter a billing authority reference
+add-property-ba-ref.error.maxLength=Billing authority reference must be 25 characters or fewer
+add-property-ba-ref.error.allowedChars=Billing authority reference must only contain letters a to z, hyphens, spaces and apostrophes
+
+add-property-UPRN.pageLabel=Unique property reference number
+add-property-UPRN.label=
+add-property-UPRN.error.minLength=
+add-property-UPRN.error.maxLength=UPRN must be 12 characters or fewer
+add-property-UPRN.error.allowedChars=UPRN must be a number
+
+add-property-property-address.pageLabel=Property address
+add-property-property-address.line1.label=Address line 1
+add-property-property-address.line1.minLength=Enter the first line of the address
+add-property-property-address.line1.maxLength=First line of address must be 100 characters or fewer
+add-property-property-address.line1.allowedChars=First line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-property-address.line2.label=Address line 2
+add-property-property-address.line2.minLength=Enter the second line of the address
+add-property-property-address.line2.maxLength=Second line of address must be 100 characters or fewer
+add-property-property-address.line2.allowedChars=Second line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-property-address.line3.label=Address line 3 (optional)
+add-property-property-address.line3.maxLength=Third line of address must be 100 characters or fewer
+add-property-property-address.line3.allowedChars=Third line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-property-address.line4.label=Address line 4 (optional)
+add-property-property-address.line4.maxLength=Fourth line of address must be 100 characters or fewer
+add-property-property-address.line4.allowedChars=Fourth line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-property-address.postcode.label=Postcode
+add-property-property-address.postcode.minLength=Enter a postcode
+add-property-property-address.postcode.allowedChar=Postcode must only include letters a to z and numbers 0 to 9
+add-property-property-address.postcode.eror=Enter a real postcode
+
+
+add-property-property-contact-details.pageLabel=Property contact details
+add-property-property-contact-details.firstName.label=First name
+add-property-property-contact-details.firstName.minLength=Enter a first name
+add-property-property-contact-details.firstName.maxLength=First name must be 35 characters or fewer
+add-property-property-contact-details.firstName.allowedChars=First name must only contain letters a to z, hyphens, spaces and apostrophes
+
+add-property-property-contact-details.lastName.label=Last name
+add-property-property-contact-details.lastName.minLength=Enter a last name
+add-property-property-contact-details.lastName.maxLength=Last name must be 35 characters or fewer
+add-property-property-contact-details.lastName.allowedChars=Last name must only contain letters a to z, hyphens, spaces and apostrophes
+
+add-property-property-contact-details.email.label=Email address (optional)
+add-property-property-contact-details.email.format=Enter an email address in the correct format, like name@example.com
+
+add-property-property-contact-details.phoneNumber.label=Phone number (optional)
+add-property-property-contact-details.phoneNumber.format=Enter a phone number, like 01632 960 001
+
+add-property-same-contact-address.pageLabel=Do you want to use the same address for the contact?
+add-property-same-contact-address.required=Select ‘yes’ if you want to use the same address for the contact
+
+add-property-same-contact-address.add-property-same-contact-address.Yes=Yes
+add-property-same-contact-address.add-property-same-contact-address.No=No
+
+add-property-check-answers.pageLabel=Check your answers
+add-property-check-answers.changeLabel=Change
+
+add-property-contact-address.pageLabel=Contact address
+add-property-contact-address.line1.label=Address line 1
+add-property-contact-address.line1.minLength=Enter the first line of the address
+add-property-contact-address.line1.maxLength=First line of address must be 35 characters or fewer
+add-property-contact-address.line1.allowedChars=First line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-contact-address.line2.label=Address line 2
+add-property-contact-address.line2.minLength=Enter the second line of the address
+add-property-contact-address.line2.maxLength=Second line of address must be 35 characters or fewer
+add-property-contact-address.line2.allowedChars=Second line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-contact-address.line3.label=Address line 3 (optional)
+add-property-contact-address.line3.maxLength=Third line of address must be 35 characters or fewer
+add-property-contact-address.line3.allowedChars=Third line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-contact-address.line4.label=Address line 4 (optional)
+add-property-contact-address.line4.maxLength=Fourth line of address must be 35 characters or fewer
+add-property-contact-address.line4.allowedChars=Fourth line of address must only contain letters a to z, hyphens, spaces, full stops and apostrophes
+
+add-property-contact-address.postcode.label=Postcode
+add-property-contact-address.postcode.minLength=Enter a postcode
+add-property-contact-address.postcode.allowedChar=Postcode must only include letters a to z and numbers 0 to 9
+add-property-contact-address.postcode.eror=Enter a real postcode
+
+
+add-property-effective-date.pageLabel=Effective date
+add-property-effective-date.hint=For example, 23 3 2020
+add-property-effective-date.day=Day
+add-property-effective-date.month=Month
+add-property-effective-date.year=Year
+add-property-effective-date.error.mandatory=Enter an effective date
+add-property-effective-date.error.mandatory.dayMonth=Effective date must include a day and month
+add-property-effective-date.error.mandatory.dayYear=Effective date must include a day and year
+add-property-effective-date.error.mandatory.monthYear=Effective date must include a month and year
+add-property-effective-date.error.mandatory.day=Effective date must include a day
+add-property-effective-date.error.mandatory.month=Effective date must include a month
+add-property-effective-date.error.mandatory.year=Effective date must include a year
+
+add-property-effective-date.error.day.number=Effective date must have a day that is a number
+add-property-effective-date.error.day.range=Effective date must have a day that is a number between 1 and 31
+
+add-property-effective-date.error.month.number=Effective date must have a month that is a number
+add-property-effective-date.error.month.range=Effective date must have a month that is a number between 1 and 12
+
+add-property-effective-date.error.year.number=Effective date must have a year that is a number
+add-property-effective-date.error.year.range=Effective date must be between 1 April 1993 and today
+
+add-property-have-planning-ref.pageLabel=Do you have a planning reference?
+add-property-have-planning-ref.label=
+add-property-have-planning-ref.add-property-have-planning-ref.Yes=Yes
+add-property-have-planning-ref.add-property-have-planning-ref.No=No
+add-property-have-planning-ref.required=Select ‘yes’ if you have a planning reference
+
+add-property-planning-ref.pageLabel=Planning reference
+add-property-planning-ref.label=
+add-property-planning-ref.error.minLength=Enter a planning reference
+add-property-planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
+add-property-planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes
+
+add-property-why-no-planning-ref.pageLabel=Reason for no planning reference
+add-property-why-no-planning-ref.required=Select why you don’t have a planning reference
+add-property-why-no-planning-ref.add-property-why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
+add-property-why-no-planning-ref.add-property-why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable
+add-property-why-no-planning-ref.add-property-why-no-planning-ref.NotRequiredPlanningPermission=Planning permission is not required
+add-property-why-no-planning-ref.add-property-why-no-planning-ref.PermittedDevelopment=It’s a permitted development
+add-property-why-no-planning-ref.add-property-why-no-planning-ref.NoPlanningApplicationSubmitted=No planning application has been submitted
+
+add-property-comments.pageLabel=Comments
+add-property-comments.label=
+add-property-comments.error.maxLength=Comments must be 226 characters or fewer
+add-property-comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
 
 #SESSION TIMEOUT
 ##############################

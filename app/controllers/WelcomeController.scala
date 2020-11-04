@@ -22,14 +22,16 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import identifiers.{CouncilTaxStartId, VOAAuthorisedId, WelcomeFormId}
+import identifiers.{CouncilTaxStartId, TaskListId, VOAAuthorisedId, WelcomeFormId}
 import models.NormalMode
+import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import utils.Navigator
 
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
+                                  config: Configuration,
                                   getData: DataRetrievalAction,
                                   requireData: DataRequiredAction,
                                   navigator: Navigator,
@@ -38,11 +40,13 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
                                   welcome: views.html.welcome
                                  ) (implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
+  val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+
 
   def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-        case Some(username) => Ok(welcome(appConfig, username))
+        case Some(username) => Ok(welcome(appConfig, username, cr05FeatureEnabled))
         case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
@@ -53,5 +57,9 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
 
   def goToCouncilTaxUploadPage() = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(CouncilTaxStartId, NormalMode)(request.userAnswers))
+  }
+
+  def goToTaskListLoadPage() = (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(TaskListId, NormalMode)(request.userAnswers))
   }
 }
