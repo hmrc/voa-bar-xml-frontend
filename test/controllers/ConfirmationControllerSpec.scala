@@ -30,6 +30,7 @@ import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Injecting
+import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
@@ -47,6 +48,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def confirmationStatusPanel = inject[confirmation_status_panel]
   def confirmationDetailPanel = inject[confirmation_detail_panel]
 
+  implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
   val username = "AUser"
   val submissionId = "SID372463"

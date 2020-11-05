@@ -23,7 +23,6 @@ import controllers.routes
 import models.requests.{DataRequest, OptionalDataRequest}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRequiredActionImpl @Inject() (val executionContext: ExecutionContext) extends DataRequiredAction {

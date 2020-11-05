@@ -47,12 +47,14 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     val sessionCookieCrypto = mock[SessionCookieCrypto](withSettings.lenient())
     when(sessionCookieCrypto.crypto).thenReturn(encrypter)
     val http = mock[DefaultHttpClient](withSettings.lenient())
+
     when(http.GET[HtmlPartial](any[String])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HtmlPartial.Success(None, Html("<div/>"))))
+
     when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String,String)]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HttpResponse(OK)))
+
     new FeedbackController(
-      messagesApi,
       getEmptyCacheMap,
       frontendAppConfig,
       sessionCookieCrypto,

@@ -55,7 +55,7 @@ class ReportDeleteController @Inject() ( configuration: Configuration,
         s"""Response\n\n
            |Status code ${deleteStatus.status} \n
            |body: ${deleteStatus.body}\n
-           |headers: ${deleteStatus.allHeaders.mkString("\n  ", "\n  ", "")}
+           |headers: ${deleteStatus.headers.mkString("\n  ", "\n  ", "")}
            | """.stripMargin)
     }).valueOr(f => f)
 

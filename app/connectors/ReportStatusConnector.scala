@@ -22,12 +22,12 @@ import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import models.{Error, Login, ReportStatus}
 import models.ReportStatus._
-import play.api.{Configuration, Environment, Logger}
-import play.api.Mode.Mode
+import play.api.{Configuration, Logger}
 import play.api.mvc.Result
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,20 +35,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class DefaultReportStatusConnector @Inject()(
                                       val configuration: Configuration,
                                       http: HttpClient,
-                                      environment: Environment,
                                       val serviceConfig: ServicesConfig)
                                      (implicit ec: ExecutionContext)
   extends ReportStatusConnector with BaseConnector {
 
+
   val logger = Logger(this.getClass)
   val serviceUrl = s"${serviceConfig.baseUrl("voa-bar")}/voa-bar"
-  val hc: HeaderCarrier = HeaderCarrier()
 
-  def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]] = {
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
+  override def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] = {
     val filterParam = filter.fold("")(f => s"filter=$f")
-    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions?$filterParam")
+
+    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions?$filterParam", Seq.empty, defaultHeaders(login.username, login.password))
       .map(Right(_))
       .recover{
         case ex: Throwable => {
@@ -58,10 +56,8 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  def getAll(login: Login): Future[Either[Error, Seq[ReportStatus]]] = {
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions/all")
+  override def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] = {
+    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions/all", Seq.empty, defaultHeaders(login.username, login.password))
       .map(Right(_))
       .recover{
         case ex: Throwable => {
@@ -71,10 +67,8 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]] = {
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.GET[ReportStatus](s"$serviceUrl/submissions/$reference")
+  override  def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]] = {
+    http.GET[ReportStatus](s"$serviceUrl/submissions/$reference", Seq.empty, defaultHeaders(login.username, login.password))
       .map(Right(_))
       .recover{
         case ex: Throwable => {
@@ -84,10 +78,9 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]] = {
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
-    http.PUT(s"$serviceUrl/submissions?upsert=true", reportStatus)
+  override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
+
+    http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions?upsert=true", reportStatus, defaultHeaders(login.username, login.password))
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
@@ -97,10 +90,10 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]] = {
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers: _*)
-    http.PUT(s"$serviceUrl/submissions/user-info", ReportStatus(reference, ZonedDateTime.now, baCode = Some(login.username)))
+  override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
+    http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions/user-info",
+      ReportStatus(reference, ZonedDateTime.now, baCode = Some(login.username)),
+      defaultHeaders(login.username, login.password))
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
@@ -110,18 +103,10 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  override def deleteByReference(reference: String, login: Login)(hc: HeaderCarrier): Future[Either[Result, HttpResponse]] = {
-    //Prevent Feature to fail.
-    implicit val httpReads: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-      override def read(method: String, url: String, response: HttpResponse): HttpResponse = {
-        response
-      }
-    }
-
+  override def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Result, HttpResponse]] = {
     logger.warn(s"Deletion of submission report, reference: ${reference}, user ${login.username}")
-    val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.DELETE(s"$serviceUrl/submissions/$reference").map { status =>
+
+    http.DELETE[HttpResponse](s"$serviceUrl/submissions/$reference", defaultHeaders(login.username, login.password)).map { status =>
       logger.warn(s"Status of deletion for reference ${status.status}, body: ${status.body}")
       Right(status)
     }
@@ -130,10 +115,10 @@ class DefaultReportStatusConnector @Inject()(
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
 trait ReportStatusConnector {
-  def saveUserInfo(reference: String, login: Login): Future[Either[Error, Unit.type]]
-  def save(reportStatus: ReportStatus, login: Login): Future[Either[Error, Unit.type]]
-  def get(login: Login, filter: Option[String] = None): Future[Either[Error, Seq[ReportStatus]]]
-  def getAll(login: Login): Future[Either[Error, Seq[ReportStatus]]]
-  def getByReference(reference: String, login: Login): Future[Either[Error, ReportStatus]]
-  def deleteByReference(reference: String, login: Login)(hc: HeaderCarrier): Future[Either[Result, HttpResponse]]
+  def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
+  def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
+  def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
+  def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
+  def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]]
+  def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Result, HttpResponse]]
 }

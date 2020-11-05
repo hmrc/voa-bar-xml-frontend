@@ -18,36 +18,30 @@ package connectors
 
 import javax.inject.Inject
 import play.api.Logger
-import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import models.Login
 
 import scala.util.{Failure, Success, Try}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import play.api.Mode.Mode
-import play.api.{Configuration, Environment}
+import scala.concurrent.{ExecutionContext, Future}
+import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
-                               val serviceConfig: ServicesConfig,
-                               environment: Environment) {
+                               val serviceConfig: ServicesConfig)(implicit ec: ExecutionContext) {
 
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
   val serviceUrl = serviceConfig.baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
   val jsonContentTypeHeader = ("Content-Type", "application/json")
 
-  def send(input: Login) = sendJson(Json.toJson(input))
+  def send(input: Login)(implicit hc: HeaderCarrier) = sendJson(Json.toJson(input))
 
-  def sendJson(json: JsValue): Future[Try[Int]] = {
-    http.POST(s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
+  def sendJson(json: JsValue)(implicit hc: HeaderCarrier): Future[Try[Int]] = {
+    http.POST[JsValue, HttpResponse](s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
       .map {
         response =>
           response.status match {

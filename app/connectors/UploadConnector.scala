@@ -22,11 +22,12 @@ import javax.inject.{Inject, Singleton}
 import models.UpScanRequests._
 import play.api.{Configuration, Logger}
 import play.mvc.Http.Status
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import models.{Error, Login, VoaBarUpload}
 import play.api.i18n.{Lang, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +38,6 @@ class UploadConnector @Inject()(http: HttpClient,
                                 messages: MessagesApi)
                                (implicit ec: ExecutionContext) {
 
-  //implicit val hc: HeaderCarrier = HeaderCarrier()
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
   private[connectors] val upscanUrl = servicesConfig.baseUrl("upscan")
 
@@ -60,7 +60,7 @@ class UploadConnector @Inject()(http: HttpClient,
 
     val uploadData = VoaBarUpload(id, xmlUrl)
 
-    http.POST(s"$serviceUrl${baseSegment}upload", uploadData, headers)
+    http.POST[VoaBarUpload, HttpResponse](s"$serviceUrl${baseSegment}upload", uploadData, headers)
       .map {
         response =>
           response.status match {

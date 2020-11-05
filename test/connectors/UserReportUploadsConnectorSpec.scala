@@ -41,6 +41,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
   private lazy val configuration = injector.instanceOf(classOf[Configuration])
   private val login = Login("foo", "bar")
   implicit private val hc = HeaderCarrier()
+
   "DefaultUserReportUploadsConnector" must {
     "have a method that save user and report information that" must {
       "return a successful result when valid arguments are provided" in {
@@ -69,9 +70,9 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
     "have a method that get user and report information that" must {
       "a successful result when a valid reference id is provided" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.GET[Option[UserReportUpload]](any[String])
-          (any[HttpReads[Option[UserReportUpload]]], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some(userReportUpload)))
+        when(httpMock.GET[Option[UserReportUpload]](any[String], anySeq, anySeq)(
+          any[HttpReads[Option[UserReportUpload]]], any[HeaderCarrier], any[ExecutionContext]))
+            .thenAnswer(Future.successful(Some(userReportUpload)))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpMock, configuration)
 
         val result = await(userReportUploadsRepository.getById(reference, login))
@@ -80,7 +81,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       }
       "return a failed result when the repository fails" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.GET[Option[UserReportUpload]](any[String])
+        when(httpMock.GET[Option[UserReportUpload]](any[String], anySeq, anySeq)
           (any[HttpReads[Option[UserReportUpload]]], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.failed(exception))
         val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpMock, configuration)

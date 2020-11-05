@@ -41,8 +41,6 @@ import scala.io.Source
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
-  implicit def hc: HeaderCarrier = HeaderCarrier()
-
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def ec = app.injector.instanceOf[ExecutionContext]
@@ -94,20 +92,20 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
   when(uploadConnectorF.initiate(any[InitiateRequest])(any[HeaderCarrier])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
 
   val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
-  when(userReportUploadsConnectorMock.save(any[UserReportUpload])) thenReturn Future(Right(Unit))
-  when(userReportUploadsConnectorMock.getById(any[String], any[Login])) thenReturn Future(Right(Some(userReport)))
+  when(userReportUploadsConnectorMock.save(any[UserReportUpload])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
+  when(userReportUploadsConnectorMock.getById(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Some(userReport)))
 
   val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
-  when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])) thenReturn Future(Left(error))
-  when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])) thenReturn Future(Left(error))
+  when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])(any[HeaderCarrier])) thenReturn Future(Left(error))
+  when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Left(error))
 
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
 
   val reportStatusConnectorFailMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])) thenReturn Future(Left(error))
-  when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Left(error))
+  when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Left(error))
+  when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Left(error))
 
   def loggedInController(
                       connector: UploadConnector,
