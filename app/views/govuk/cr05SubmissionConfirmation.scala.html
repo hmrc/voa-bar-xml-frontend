@@ -1,0 +1,46 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
+
+@import journey.UniformJourney.Cr01Cr03Submission
+@import controllers.uniform.Cr05SubmissionWebTell
+@import ltbs.uniform.UniformMessages
+
+@this(
+  summaryList: govukSummaryList
+)
+
+
+@(propertyToBeSplit: Cr01Cr03Submission, splitPropertiesList: List[Cr01Cr03Submission], messages: UniformMessages[Html])
+
+<h2 class="govuk-heading-m">The property to be split</h2>
+
+@summaryList(
+ (new Cr05SubmissionWebTell(this)).confirmationSummary(propertyToBeSplit, messages)
+)
+
+@splitPropertiesList.zipWithIndex.map { case (property, index) =>
+ <h2 class="govuk-heading-m">New property @{index + 1}</h2>
+
+ @summaryList(
+  (new Cr05SubmissionWebTell(this)).confirmationSummary(property, messages)
+ )
+}
+
+

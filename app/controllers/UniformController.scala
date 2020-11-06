@@ -30,7 +30,7 @@ import play.api.mvc._
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import views.html.govuk.pageChrome
+import views.html.govuk.{cr05SubmissionConfirmation, pageChrome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,6 +45,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   getData: DataRetrievalAction,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
+                                  cr05SubmissionConfirmation: cr05SubmissionConfirmation,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
@@ -77,7 +78,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput)
+  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionConfirmation)
 
   def myJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
     import interpreter._
@@ -96,27 +97,98 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
   }
 
-  def addPropertyJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+  def addCommonSectionJourney(targetId: String)= getData.async { implicit request: OptionalDataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
-    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)))
+    val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)))
     if(request.userAnswers.flatMap(_.login).isEmpty) {
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
     } else {
-      addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
-        dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap  { savedCr05Submission =>
-          val cr05Submisson = savedCr05Submission.fold(Cr05Submission(List(cr05AddProperty), Nil)){ existingSubmission =>
-            val mergeProperties = existingSubmission.mergeProperties
-            existingSubmission.copy(mergeProperties = mergeProperties :+ cr05AddProperty)
+      addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
+        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05SubmissionBuilder =>
+          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None)){ existingCr05SubmissionBuilder =>
+            existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
           }
-          dataCacheConnector.save(request.externalId, Cr05Submission.storageKey, cr05Submisson).map { _ =>
+          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
             Redirect(routes.TaskListController.onPageLoad())
           }
         }
       }
     }
+  }
+
+  def addPropertyJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+    import interpreter._
+    import UniformJourney._
+
+    val addPropertyProgram = addPropertyHelper2[WM](create[TellTypes, AskTypes](messages(request)))
+    if(request.userAnswers.flatMap(_.login).isEmpty) {
+      implicit val messages = cc.messagesApi.preferred(request)
+      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+    } else {
+      addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
+        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
+          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, Some(cr05AddProperty), None)){ existingSubmission =>
+
+              if (existingSubmission.propertyToBeSplit.isEmpty){
+                existingSubmission.copy(propertyToBeSplit = Some(cr05AddProperty))
+              } else {
+                val splitProperties =
+                existingSubmission.splitProperties.fold(Some(List(cr05AddProperty))){ sp =>
+                  Some(sp :+ cr05AddProperty)
+                }
+                existingSubmission.copy(splitProperties = splitProperties)
+              }
+          }
+          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
+            Redirect(routes.TaskListController.onPageLoad())
+          }
+        }
+      }
+    }
+  }
+
+  def cr05CheckAnswerJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+    import interpreter._
+    import UniformJourney._
+
+    dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap { maybeCr05Submission =>
+      maybeCr05Submission match {
+        case None =>
+          // TODO Log / Return some kind of error
+          implicit val messages = cc.messagesApi.preferred(request)
+          Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+        case Some(cr05Submission) =>
+          if(request.userAnswers.flatMap(_.login).isEmpty) {
+            implicit val messages = cc.messagesApi.preferred(request)
+            Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+          } else {
+            val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
+            addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
+              Future.successful(Redirect(routes.WelcomeController.onPageLoad()))
+            }
+          }
+      }
+    }
+//    val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))
+//    if(request.userAnswers.flatMap(_.login).isEmpty) {
+//      implicit val messages = cc.messagesApi.preferred(request)
+//      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+//    } else {
+//      addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
+//        dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap  { savedCr05Submission =>
+//          val cr05Submisson = savedCr05Submission.fold(Cr05Submission(List(cr05AddProperty), Nil)){ existingSubmission =>
+//            val mergeProperties = existingSubmission.mergeProperties
+//            existingSubmission.copy(mergeProperties = mergeProperties :+ cr05AddProperty)
+//          }
+//          dataCacheConnector.save(request.externalId, Cr05Submission.storageKey, cr05Submisson).map { _ =>
+//            Redirect(routes.TaskListController.onPageLoad())
+//          }
+//        }
+//      }
+//    }
   }
 
 }

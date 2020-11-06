@@ -19,9 +19,9 @@ package controllers
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions._
-import identifiers.{AddPropertyId, VOAAuthorisedId}
+import identifiers.{AddPropertyId, AddPropertyReportDetailsId, CheckYourAnswersId, VOAAuthorisedId}
 import javax.inject.Inject
-import journey.UniformJourney.Cr05Submission
+import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
@@ -42,8 +42,7 @@ class TaskListController @Inject()(appConfig: FrontendAppConfig,
 
   def onPageLoad() = getData.async {
     implicit request =>
-
-      dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap  { maybeCr05Submission =>
+      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
           case Some(username) => Ok(taskList(username, maybeCr05Submission))
           case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
@@ -51,8 +50,16 @@ class TaskListController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
+  def goToAddPropertyReportDetailPage() =  (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(AddPropertyReportDetailsId, NormalMode)(request.userAnswers))
+  }
+
   def goToAddPropertyPage() =  (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers))
+  }
+
+  def goToCheckYourAnswersPage() =  (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(CheckYourAnswersId, NormalMode)(request.userAnswers))
   }
 
 }

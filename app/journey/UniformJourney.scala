@@ -49,6 +49,29 @@ object UniformJourney {
                                 planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
+  case class Cr05Common(baReport: String, baRef: String,havePlaningReference: Boolean,
+                          planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType])
+  object Cr05Common { implicit val format = Json.format[Cr05Common] }
+  case class Cr05AddProperty(uprn: Option[String], address: Address,
+                             propertyContactDetails: ContactDetails,
+                             sameContactAddress: Boolean, contactAddress: Option[Address],
+                             effectiveDate: LocalDate, comments: Option[String])
+  object Cr05AddProperty { implicit val format = Json.format[Cr05AddProperty] }
+
+  case class Cr05SubmissionBuilder(
+      cr05CommonSection: Option[Cr05Common],
+      propertyToBeSplit: Option[Cr05AddProperty],
+      splitProperties: Option[List[Cr05AddProperty]]
+  )
+
+  object Cr05SubmissionBuilder {
+    import Cr05Common._
+    import Cr05AddProperty._
+    val storageKey = "XXX"
+    implicit val format: Format[Cr05SubmissionBuilder] = Json.format[Cr05SubmissionBuilder]
+  }
+
+  // $COVERAGE-OFF$
   object Cr05Submission {
     import Cr01Cr03Submission._
     val storageKey = "CR05"
@@ -60,11 +83,11 @@ object UniformJourney {
     splitProperties: Seq[Cr01Cr03Submission],
     mergeProperties: Seq[Cr01Cr03Submission]
   )
-
+  // $COVERAGE-ON$
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
-  type TellTypes = Cr01Cr03Submission :: Long :: NilTypes
+  type TellTypes = Cr05Submission :: Cr01Cr03Submission :: Long :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -75,31 +98,44 @@ object UniformJourney {
 
 
   // $COVERAGE-OFF$
-  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr01Cr03Submission] = {
+  def addPropertyCommon[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05Common] = {
     import interpreter._
     for {
       baReport <- ask[String]("add-property-ba-report", validation = baReportValidation)
       baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation)
+      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
+      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
+      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
+      ctForm = Cr05Common(baReport, baRef, havePlanningRef == Yes, planningRef, noPlanningReference)
+    } yield ctForm
+  }
+
+  def addPropertyHelper2[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05AddProperty] = {
+    import interpreter._
+    for {
       uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation)
       address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"))
       propertyContactDetails <- ask[ContactDetails]("add-property-property-contact-details", validation = propertyContactDetailValidator)
       sameContactAddress <- ask[YesNoType]("add-property-same-contact-address")
       contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address")) when (
         sameContactAddress == No
-      )
+        )
       effectiveDate <- ask[LocalDate]("add-property-effective-date")
-      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
-      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
-      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
       comments <- ask[Option[String]]("add-property-comments", validation = commentsValidation)
-      ctForm = Cr01Cr03Submission(SplitProperty, None, None, baReport, baRef, uprn, address, propertyContactDetails,
+      ctForm = Cr05AddProperty(uprn, address, propertyContactDetails,
         sameContactAddress == Yes, contactAddress,
-        effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference, comments)
+        effectiveDate, comments)
 
-      _ <- tell[Cr01Cr03Submission]("add-property-check-answers", ctForm)
+//      _ <- tell[Cr05AddProperty]("add-property-check-answers", ctForm)
     } yield ctForm
   }
 
+  def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05Submission): F[Cr05Submission] = {
+    import interpreter._
+    for {
+      _ <- tell[Cr05Submission]("cr05-check-answers", cr05Submission)
+    } yield cr05Submission
+  }
 
   def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr01Cr03Submission] = {
     import interpreter._

@@ -54,14 +54,25 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(CouncilTaxStartId, NormalMode) (uploadUserAnswers) mustBe routes.CouncilTaxUploadController.onPageLoad()
       }
 
+      "on selecting Add Property Report Detail Journey link should redirect to Add Property Journey Report Details Page" in {
+        AddPropertyReportDetailsId.toString mustBe "addpropertyreportdetailsid"
+        navigator.nextPage(AddPropertyReportDetailsId, NormalMode) (uploadUserAnswers) mustBe
+          routes.UniformController.addCommonSectionJourney("add-property-ba-report")
+      }
+
       "on selecting Add Property Journey link should redirect to Add Property Journey Page" in {
         AddPropertyId.toString mustBe "addproperty"
-        navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addPropertyJourney("add-property-ba-report")
+        navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addPropertyJourney("add-property-UPRN")
       }
 
       "on selecting Task List should redirect to Task List Page" in {
         TaskListId.toString mustBe "tasklist"
         navigator.nextPage(TaskListId, NormalMode) (uploadUserAnswers) mustBe routes.TaskListController.onPageLoad()
+      }
+
+      "on selecting Check your answer should redirect to Check your answer Page" in {
+        CheckYourAnswersId.toString mustBe "checkyouranswer"
+        navigator.nextPage(CheckYourAnswersId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.cr05CheckAnswerJourney()
       }
     }
 

@@ -19,7 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import cats.data.NonEmptyList
-import controllers.uniform.Cr01Cr03SubmissionWebTell
+import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05SubmissionWebTell}
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
@@ -36,6 +36,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
+import views.html.govuk.cr05SubmissionConfirmation
 
 import scala.concurrent.ExecutionContext
 
@@ -45,7 +46,8 @@ class AutobarsInterpreter (
                            page_chrome: views.html.govuk.pageChrome,
                            govukInput: govukInput,
                            govukRadios: govukRadios,
-                           govukDateInput: govukDateInput
+                           govukDateInput: govukDateInput,
+                           cr05SubmissionConfirmation: cr05SubmissionConfirmation
                          )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
@@ -85,6 +87,8 @@ class AutobarsInterpreter (
   }
 
   implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
+
+  implicit val cr05SubmissionWebTell = new Cr05SubmissionWebTell(cr05SubmissionConfirmation)
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither

@@ -30,7 +30,9 @@ class Navigator @Inject()() {
     WelcomeFormId -> (_ => routes.UniformController.myJourney("ba-report")),
     CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
     TaskListId ->  (_ => routes.TaskListController.onPageLoad()),
-    AddPropertyId -> (_ => routes.UniformController.addPropertyJourney("add-property-ba-report"))
+    AddPropertyReportDetailsId -> (_ => routes.UniformController.addCommonSectionJourney("add-property-ba-report")),
+    AddPropertyId -> (_ => routes.UniformController.addPropertyJourney("add-property-UPRN")),
+    CheckYourAnswersId -> (_ => routes.UniformController.cr05CheckAnswerJourney())
   )
 
   private val editRouteMap: Map[Identifier, UserAnswers => Call] = Map(
