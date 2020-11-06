@@ -21,9 +21,7 @@ object Dependencies {
   private val pdfBoxVersion = "2.0.13"
   private val playPartialsVersion = "6.11.0-play-26"
   private val playFrontendGovUkVersion = "0.53.0-play-26"
-  private val akkaVersion     = "2.5.23"
-  private val akkaHttpVersion = "10.0.15"
-
+  private val akkaVersion     = "2.5.26"
 
   val compileDependencies = Seq(
     ws,
@@ -44,14 +42,6 @@ object Dependencies {
     "com.luketebbs.uniform" %% "core" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-play26" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-cli" % "4.10.0"
-  )
-
-  val dependencyOverrides = Seq(
-    "com.typesafe.akka" %% "akka-stream"    % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-protobuf"  % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-slf4j"     % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-actor"     % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion force()
   )
 
   def testDependencies(scope: String) = Seq(
