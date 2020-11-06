@@ -28,6 +28,7 @@ import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, NormalMode}
 import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
 import views.html.login
 
@@ -48,6 +49,8 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
 
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def ec = app.injector.instanceOf[ExecutionContext]
+
+  implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
   val loginConnector = mock[LoginConnector]
   when(loginConnector.send(any[Login])) thenReturn Future.successful(Success(200))

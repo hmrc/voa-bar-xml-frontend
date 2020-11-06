@@ -21,8 +21,9 @@ import javax.inject.{Inject, Singleton}
 import models.{Error, Login}
 import play.api.Configuration
 import models.UserReportUpload
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,7 +33,6 @@ class DefaultUserReportUploadsConnector @Inject() (
                                                     val configuration: Configuration
                                                    )(implicit executionContext: ExecutionContext)
   extends  UserReportUploadsConnector with BaseConnector {
-  val hc: HeaderCarrier = HeaderCarrier()
 
   val voaBarConfig = configuration.get[Configuration]("microservice.services.voa-bar")
   val host = voaBarConfig.get[String]("host")
@@ -41,20 +41,18 @@ class DefaultUserReportUploadsConnector @Inject() (
   val serviceUrl = s"$protocol://$host:$port/voa-bar" //TODO - Refactor with services config
 
 
-  override def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]] = {
-    val headers = defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.PUT(s"$serviceUrl/user-report-upload", userReportUpload)
+  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
+    http.PUT[UserReportUpload, HttpResponse](s"$serviceUrl/user-report-upload", userReportUpload, defaultHeaders(userReportUpload.userId, userReportUpload.userPassword))
       .map(_ => Right(Unit))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
       }
   }
 
-  override def getById(id: String, login: Login): Future[Either[Error, Option[UserReportUpload]]] = {
+  override def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]] = {
     val headers = defaultHeaders(login.username, login.password)
-    implicit val headerCarrier = hc.withExtraHeaders(headers:_*)
-    http.GET[Option[UserReportUpload]](s"$serviceUrl/user-report-upload/$id")
+
+    http.GET[Option[UserReportUpload]](s"$serviceUrl/user-report-upload/$id", Seq.empty, headers)
       .map(Right(_))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
@@ -64,6 +62,6 @@ class DefaultUserReportUploadsConnector @Inject() (
 
 @ImplementedBy(classOf[DefaultUserReportUploadsConnector])
 trait UserReportUploadsConnector {
-  def save(userReportUpload: UserReportUpload): Future[Either[Error, Unit.type]]
-  def getById(id: String, login: Login): Future[Either[Error, Option[UserReportUpload]]]
+  def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
+  def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]]
 }

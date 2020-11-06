@@ -44,6 +44,8 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
   val password = "pass"
   lazy val login = Login(username, password).encrypt
 
+  implicit def hc: HeaderCarrier = HeaderCarrier()
+
   def getHttpMock(returnedStatus: Int) = {
     val httpMock = mock[HttpClient]
     when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
@@ -63,7 +65,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-        val connector = new LoginConnector(httpMock, configuration, servicesConfig, environment)
+        val connector = new LoginConnector(httpMock, configuration, servicesConfig)
 
         await(connector.send(login))
 
@@ -76,7 +78,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       }
 
       "return a 200 status when the send method is successfull using login model" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig, environment)
+        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig)
         val result = await(connector.send(login))
         result match {
           case Success(status) => status mustBe 200
@@ -85,7 +87,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       }
 
       "return a failure representing the error when send method fails" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration, servicesConfig,  environment)
+        val connector = new LoginConnector(getHttpMock(500), configuration, servicesConfig)
         val result = await(connector.send(login))
         assert(result.isFailure)
       }
@@ -102,7 +104,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
         val httpMock = getHttpMock(200)
-        val connector = new LoginConnector(httpMock, configuration, servicesConfig, environment)
+        val connector = new LoginConnector(httpMock, configuration, servicesConfig)
 
         await(connector.sendJson(minimalJson))
 
@@ -114,7 +116,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       }
 
       "return a 200 status when the send method is successful" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig, environment)
+        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig)
         val result = await(connector.sendJson(minimalJson))
         result match {
           case Success(status) => status mustBe 200
@@ -123,7 +125,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       }
 
       "return failure respresenting the error if the backend service call fails using minimal Json" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration,servicesConfig, environment)
+        val connector = new LoginConnector(getHttpMock(500), configuration,servicesConfig)
         val result = await(connector.sendJson(minimalJson))
         assert(result.isFailure)
       }
@@ -132,7 +134,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
         val httpMock = mock[HttpClient]
         when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
           any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(new RuntimeException)
-        val connector = new LoginConnector(httpMock, configuration,servicesConfig, environment)
+        val connector = new LoginConnector(httpMock, configuration,servicesConfig)
         val result = await(connector.sendJson(minimalJson))
         assert(result.isFailure)
       }

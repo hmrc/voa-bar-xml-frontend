@@ -26,27 +26,31 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.PlainText
-import uk.gov.hmrc.http.{HttpGet, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HttpGet, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials._
 
-class FeedbackController @Inject() (
-  override val messagesApi: MessagesApi,
-  getData: DataRetrievalAction,
-  appConfig: FrontendAppConfig,
-  sessionCookieCrypto: SessionCookieCrypto,
-  http: HttpClient,
-  controllerComponents: MessagesControllerComponents,
-  serviceConfig: ServicesConfig,
-  configuration: Configuration
-)(implicit ec: scala.concurrent.ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport  {
+import scala.concurrent.ExecutionContext
+
+class FeedbackController @Inject()( getData: DataRetrievalAction,
+                                    appConfig: FrontendAppConfig,
+                                    sessionCookieCrypto: SessionCookieCrypto,
+                                    http: HttpClient,
+                                    controllerComponents: MessagesControllerComponents,
+                                    serviceConfig: ServicesConfig,
+                                    configuration: Configuration
+                                  )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport {
+
   implicit val formPartialRetriever: FormPartialRetriever = new FormPartialRetriever {
     override def httpGet: HttpGet = http
+
     override def crypto: (String) => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
   }
+
   val contactFrontendPartialBaseUrl = serviceConfig.baseUrl("contact-frontend")
   val serviceIdentifier = "VOA_BAR"
   val serviceName = configuration.get[String]("appName")
@@ -60,40 +64,32 @@ class FeedbackController @Inject() (
 
   val hmrcHelpWithPageFormUrl = s"$contactFrontendPartialBaseUrl/contact/problem_reports_ajax?service=$serviceIdentifier"
 
-
-  // The default HTTPReads will wrap the response in an exception and make the body inaccessible
-  implicit val readPartialsForm: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-    def read(method: String, url: String, response: HttpResponse) = response
-  }
-
   private def urlEncode(value: String) = URLEncoder.encode(value, "UTF-8")
 
-  //override def crypto: String => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
-
   def inPageFeedback = Action { implicit request =>
-        Ok(views.html.inpagefeedback(Some(hmrcBetaFeedbackFormUrl), appConfig, None))
+    Ok(views.html.inpagefeedback(Some(hmrcBetaFeedbackFormUrl), appConfig, None))
   }
 
   def sendBetaFeedbackToHmrc = getData.async { implicit request =>
-        request.body.asFormUrlEncoded.map { formData =>
-          implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
-          http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData )(readPartialsForm, headerCarrier, ec) map { res => res.status match {
-            case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
-            case 400 => BadRequest(views.html.inpagefeedback(None, appConfig, Some(Html(res.body))))
-            case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
-          }
-          }
-        }.getOrElse(throw new Exception("Empty Feedback Form"))
+    request.body.asFormUrlEncoded.map { formData =>
+      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData, Seq("Csrf-Token" -> "nocheck")) map { res =>
+        res.status match {
+          case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
+          case 400 => BadRequest(views.html.inpagefeedback(None, appConfig, Some(Html(res.body))))
+          case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
+        }
+      }
+    }.getOrElse(throw new Exception("Empty Feedback Form"))
   }
 
   def sendBetaFeedbackToHmrcNoLogin = Action.async { implicit request =>
     request.body.asFormUrlEncoded.map { formData =>
-      implicit val headerCarrier = hc.withExtraHeaders("Csrf-Token"-> "nocheck")
-      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData)(readPartialsForm, headerCarrier, ec) map { res => res.status match {
-        case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
-        case 400 => BadRequest(views.html.inpagefeedbackNoLogin(None, appConfig, Some(Html(res.body))))
-        case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
-      }
+      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData, Seq("Csrf-Token" -> "nocheck")) map { res =>
+        res.status match {
+          case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
+          case 400 => BadRequest(views.html.inpagefeedbackNoLogin(None, appConfig, Some(Html(res.body))))
+          case _ => InternalServerError(views.html.feedbackError(appConfig = appConfig))
+        }
       }
     }.getOrElse(throw new Exception("Empty Feedback Form"))
   }

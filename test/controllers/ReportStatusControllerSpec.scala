@@ -38,7 +38,8 @@ import scala.util.Success
 
 class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
-  implicit val hc = mock[HeaderCarrier]
+  //implicit val hc = mock[HeaderCarrier]
+
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
   val username = "AUser"
@@ -72,7 +73,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
-    when(reportStatusConnectorMock.get(any[Login], any[Option[String]])).thenReturn(Future(Right(fakeReports)))
+    when(reportStatusConnectorMock.get(any[Login], any[Option[String]])(any[HeaderCarrier])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
 
@@ -132,7 +133,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "Throw a runtime exception when  the Report Status returns an exception" in {
       val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
-      when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
+      when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
 
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
@@ -147,7 +148,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "return OK when trying to download a report status" in {
       val reportStatusConnectorMock = mock[ReportStatusConnector]
-      when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn Future(Right(rs1))
+      when(reportStatusConnectorMock.getByReference(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(rs1))
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
@@ -163,7 +164,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "return OK when trying to download all the report statuses" in {
       val reportStatusConnectorMock = mock[ReportStatusConnector]
-      when(reportStatusConnectorMock.getAll(any[Login])) thenReturn (Future(Right(Seq(rs1))))
+      when(reportStatusConnectorMock.getAll(any[Login])(any[HeaderCarrier])) thenReturn (Future(Right(Seq(rs1))))
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
@@ -178,7 +179,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "return 500 when trying to download all the report statuses" in {
       val reportStatusConnectorMock = mock[ReportStatusConnector]
-      when(reportStatusConnectorMock.getAll(any[Login])) thenReturn Future(Left(Error("error", Seq())))
+      when(reportStatusConnectorMock.getAll(any[Login])(any[HeaderCarrier])) thenReturn Future(Left(Error("error", Seq())))
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
