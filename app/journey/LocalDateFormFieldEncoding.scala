@@ -19,9 +19,8 @@ package journey
 import java.time.LocalDate
 
 import cats.data.NonEmptyList
-import ltbs.uniform.{ErrorMsg, ErrorTree, Input}
-import ltbs.uniform.common.web.{Codec, FormFieldEncoding}
-import ltbs.uniform._
+import ltbs.uniform.common.web.FormFieldEncoding
+import ltbs.uniform.{ErrorMsg, ErrorTree, Input, _}
 
 import scala.util.Try
 

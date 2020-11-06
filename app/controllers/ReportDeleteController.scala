@@ -19,18 +19,16 @@ package controllers
 import cats.data.EitherT
 import cats.implicits._
 import connectors.{DataCacheConnector, ReportStatusConnector}
+import controllers.ReportDeleteController.submissionId
 import controllers.actions.DataRetrievalAction
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import views.html.reportStatus
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.Try
-import ReportDeleteController.submissionId
 
 
 @Singleton

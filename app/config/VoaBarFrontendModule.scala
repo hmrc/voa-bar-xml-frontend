@@ -21,7 +21,6 @@ import play.api.{Configuration, Environment, Logger}
 import play.api.inject.{Binding, Module}
 import uk.gov.hmrc.play.bootstrap.FrontendModule
 import uk.gov.hmrc.play.bootstrap.filters.AuditFilter
-import uk.gov.hmrc.play.bootstrap.filters.frontend.FrontendAuditFilter
 
 /**
   * Custom frontend module. It bind everything from FrontendModule but change binding for FrontendAuditFilter.
