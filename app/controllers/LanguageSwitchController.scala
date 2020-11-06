@@ -17,10 +17,10 @@
 package controllers
 
 import com.google.inject.Inject
-import play.api.Configuration
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, Controller, MessagesControllerComponents}
 import config.FrontendAppConfig
+import play.api.Configuration
+import play.api.i18n.Lang
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
 class LanguageSwitchController @Inject() ( languageUtils: LanguageUtils,

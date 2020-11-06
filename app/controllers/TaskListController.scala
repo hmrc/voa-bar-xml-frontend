@@ -42,7 +42,7 @@ class TaskListController @Inject()(appConfig: FrontendAppConfig,
 
   def onPageLoad() = getData.async {
     implicit request =>
-      import utils.Formats.uniformDBFormat
+
       dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap  { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
           case Some(username) => Ok(taskList(username, maybeCr05Submission))

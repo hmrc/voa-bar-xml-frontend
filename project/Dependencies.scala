@@ -8,22 +8,20 @@ object Dependencies {
   private val playHealthVersion = "3.15.0-play-26"
   private val logbackJsonLoggerVersion = "4.8.0"
   private val govukTemplateVersion = "5.58.0-play-26"
-  private val playUiVersion = "8.13.0-play-26"
+  private val playUiVersion = "8.14.0-play-26"
   private val scalaTestPlusPlayVersion = "3.1.3"
   private val pegdownVersion = "1.6.0"
   private val httpCachingClientVersion = "9.1.0-play-26"
   private val simpleReactiveMongo = "7.30.0-play-26"
   private val playConditionalFormMappingVersion = "1.3.0-play-26"
-  private val playLanguageVersion = "4.4.0-play-26"
-  private val bootstrapVersion = "1.16.0"
+  private val playLanguageVersion = "4.5.0-play-26"
+  private val bootstrapVersion = "2.0.0"
   private val scalacheckVersion = "1.14.1"
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
-  private val playPartialsVersion = "6.11.0-play-26"
+  private val playPartialsVersion = "7.0.0-play-26"
   private val playFrontendGovUkVersion = "0.53.0-play-26"
-  private val akkaVersion     = "2.5.23"
-  private val akkaHttpVersion = "10.0.15"
-
+  private val akkaVersion     = "2.5.26"
 
   val compileDependencies = Seq(
     ws,
@@ -44,14 +42,6 @@ object Dependencies {
     "com.luketebbs.uniform" %% "core" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-play26" % "4.10.0",
     "com.luketebbs.uniform" %% "interpreter-cli" % "4.10.0"
-  )
-
-  val dependencyOverrides = Seq(
-    "com.typesafe.akka" %% "akka-stream"    % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-protobuf"  % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-slf4j"     % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-actor"     % akkaVersion     force(),
-    "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion force()
   )
 
   def testDependencies(scope: String) = Seq(

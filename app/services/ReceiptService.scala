@@ -33,6 +33,7 @@ import scala.language.reflectiveCalls
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
+@Singleton
 class DefaultReceiptService @Inject() (
                                  messages: MessagesApi
                                ) extends ReceiptService {

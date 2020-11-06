@@ -23,7 +23,14 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
-sealed trait ReportStatusType { val value: String = getClass.asSubclass(getClass).getSimpleName.replace("$", "") }
+sealed trait ReportStatusType {
+  val value: String = {
+    val a: Class[_ <: ReportStatusType] = getClass.asSubclass(getClass)
+    val u: String = a.getSimpleName.replace("$", "")
+    u
+  }
+}
+
 case object Pending extends ReportStatusType
 case object Verified extends ReportStatusType
 case object Failed extends ReportStatusType
@@ -35,7 +42,7 @@ case object Done extends ReportStatusType
 object ReportStatus {import ReactiveMongoFormats.mongoEntity
 
   implicit val format =  mongoEntity {
-
+    //TODO maybe never used
     implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
 
     Json.format[ReportStatus]

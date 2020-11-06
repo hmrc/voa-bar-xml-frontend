@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import javax.inject.Inject
 import models.NormalMode
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

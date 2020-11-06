@@ -22,7 +22,7 @@ import config.FrontendAppConfig
 import controllers.actions.DataRetrievalAction
 import javax.inject.Inject
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.PlainText

@@ -21,7 +21,6 @@ import play.api.mvc.Call
 import controllers.routes
 import identifiers._
 import models.{CheckMode, Mode, NormalMode}
-import play.api.Logger
 
 @Singleton
 class Navigator @Inject()() {
