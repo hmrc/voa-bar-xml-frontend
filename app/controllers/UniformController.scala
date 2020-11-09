@@ -123,7 +123,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-    val addPropertyProgram = addPropertyHelper2[WM](create[TellTypes, AskTypes](messages(request)))
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)))
     if(request.userAnswers.flatMap(_.login).isEmpty) {
       implicit val messages = cc.messagesApi.preferred(request)
       Future.successful(Unauthorized(views.html.unauthorised(appConfig)))

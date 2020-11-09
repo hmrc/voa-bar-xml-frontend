@@ -67,7 +67,7 @@ object UniformJourney {
   object Cr05SubmissionBuilder {
     import Cr05Common._
     import Cr05AddProperty._
-    val storageKey = "XXX"
+    val storageKey = "ADD_PROPERTY"
     implicit val format: Format[Cr05SubmissionBuilder] = Json.format[Cr05SubmissionBuilder]
   }
 
@@ -110,7 +110,7 @@ object UniformJourney {
     } yield ctForm
   }
 
-  def addPropertyHelper2[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05AddProperty] = {
+  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05AddProperty] = {
     import interpreter._
     for {
       uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation)
@@ -126,7 +126,7 @@ object UniformJourney {
         sameContactAddress == Yes, contactAddress,
         effectiveDate, comments)
 
-//      _ <- tell[Cr05AddProperty]("add-property-check-answers", ctForm)
+//      _ <- tell[Cr05AddProperty]("add-property-check-answers", ctForm) TODO check your answer
     } yield ctForm
   }
 
