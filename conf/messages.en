@@ -580,6 +580,8 @@ add-property-comments.label=
 add-property-comments.error.maxLength=Comments must be 226 characters or fewer
 add-property-comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
 
+cr05-check-answers.pageLabel=Check your answers before sending your report
+
 #SESSION TIMEOUT
 ##############################
 sessionTimeout.title = You have been signed out due to inactivity - Billing Authority Reports - GOV.UK

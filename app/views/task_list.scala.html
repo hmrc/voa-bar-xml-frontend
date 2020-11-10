@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import journey.UniformJourney.Cr05Submission
+@import journey.UniformJourney.Cr05SubmissionBuilder
 
 @this(
     main_template: views.html.govuk.main_template
 )
 
 
-@(baCode: String, cr05Submission: Option[Cr05Submission] = None)(implicit request: Request[_], messages: Messages)
+@(baCode: String, cr05Submission: Option[Cr05SubmissionBuilder] = None)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     pageTitle = Some(messages("service.title", messages("welcome.heading"))),
@@ -35,21 +35,46 @@
     <ol class="app-task-list">
         <li>
             <h2 class="app-task-list__section">
-                <span class="app-task-list__section-number">1. </span> Tell us about the property to be split
+                <span class="app-task-list__section-number">1. </span> Add property report details
             </h2>
             <ul class="app-task-list__items">
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
-                    <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
+                    <a href="@routes.TaskListController.goToAddPropertyReportDetailPage().url" aria-describedby="add-property-status">
                     Add property report details
                     </a>
                 </span>
-                    @if(cr05Submission.exists(_.splitProperties.nonEmpty)){
-                    <strong class="govuk-tag app-task-list__tag" id="add-property-status">Completed</strong>
+                    @if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
+                        <strong class="govuk-tag app-task-list__tag" id="add-property-report-detail">Completed</strong>
                     } else {
-                    <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status">Not started</strong>
+                        <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-report-detail">Not started</strong>
                     }
+                </li>
+            </ul>
+        </li>
 
+        <li>
+            <h2 class="app-task-list__section">
+                <span class="app-task-list__section-number">2. </span> Tell us about the property to be split
+            </h2>
+            <ul class="app-task-list__items">
+                <li class="app-task-list__item">
+                <span class="app-task-list__task-name">
+                    @if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
+                        <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
+                        Add a property
+                        </a>
+                    } else {
+                        Add a property
+                    }
+                </span>
+                    @if(cr05Submission.exists(_.propertyToBeSplit.isDefined)){
+                        <strong class="govuk-tag app-task-list__tag" id="add-property-status">Completed</strong>
+                    } else if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
+                        <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status">Not started</strong>
+                    } else {
+                        <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status">Cannot start yet</strong>
+                    }
                 </li>
             </ul>
         </li>
@@ -62,18 +87,17 @@
 
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
-                    @if(cr05Submission.exists(_.splitProperties.nonEmpty)){
+                    @if(cr05Submission.exists(_.propertyToBeSplit.isDefined)){
                         <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
                             Property 1
                         </a>
-
                     } else {
                          Property 1
                     }
                 </span>
-                    @if(cr05Submission.exists(_.mergeProperties.nonEmpty)){
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.nonEmpty))){
                     <strong class="govuk-tag app-task-list__tag" id="medical-information-status">Completed</strong>
-                    } else if(cr05Submission.exists(_.splitProperties.nonEmpty)){
+                    } else if(cr05Submission.exists(_.propertyToBeSplit.isDefined)){
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="medical-information-status">Not started</strong>
                     } else {
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="medical-information-status">Cannot start yet</strong>
@@ -81,7 +105,7 @@
                 </li>
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
-                    @if(cr05Submission.exists(_.mergeProperties.length >= 1)){
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.length >= 1))){
                         <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
                         Property 2
                         </a>
@@ -89,23 +113,23 @@
                         Property 2
                     }
                 </span>
-                    @if(cr05Submission.exists(_.mergeProperties.length == 1)){
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.length == 1))){
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="medical-information-status-2">Not started</strong>
-                    } else if(cr05Submission.exists(_.mergeProperties.length > 1)){
+                    } else if(cr05Submission.exists(_.splitProperties.exists(_.length > 1))){
                     <strong class="govuk-tag app-task-list__tag" id="medical-information-status-2">Completed</strong>
                     } else {
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="medical-information-status-2">Cannot start yet</strong>
                     }
                 </li>
-                @if(cr05Submission.exists(_.mergeProperties.length > 1)){
-                <li class="app-task-list__item">
-                    <span class="app-task-list__task-name">
-                      <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
-                        Add another property
-                      </a>
-                    </span>
-                    <strong class="govuk-tag app-task-list__tag govuk-tag--grey app-task-list__tag" id="add-property-status">Optional</strong>
-                </li>
+                @if(cr05Submission.exists(_.splitProperties.exists(_.length > 1))){
+                    <li class="app-task-list__item">
+                        <span class="app-task-list__task-name">
+                          <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
+                            Add another property
+                          </a>
+                        </span>
+                        <strong class="govuk-tag app-task-list__tag govuk-tag--grey app-task-list__tag" id="add-property-status">Optional</strong>
+                    </li>
                 }
             </ul>
         </li>
@@ -117,8 +141,8 @@
             <ul class="app-task-list__items">
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
-                    @if(cr05Submission.exists(_.mergeProperties.length >= 2)){
-                        <a href="#" aria-describedby="add-property-status">
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.length >= 2))){
+                        <a href="@routes.TaskListController.goToCheckYourAnswersPage().url" aria-describedby="add-property-status">
                         Submit your information
                         </a>
                     } else {
@@ -126,7 +150,7 @@
                     }
 
                 </span>
-                    @if(cr05Submission.exists(_.mergeProperties.length >= 2)){
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.length >= 2))){
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="submit-pay-status">Not started</strong>
                     } else {
                     <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="submit-pay-status">Cannot start yet</strong>
