@@ -250,7 +250,6 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
     ).flatten)
   }
 
-
   override def render(in: Cr01Cr03Submission, key: String, messages: UniformMessages[Html]): Html = {
     govUkSumaryList(summaryList(in, messages))
   }

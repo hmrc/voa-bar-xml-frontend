@@ -580,6 +580,8 @@ add-property-comments.label=
 add-property-comments.error.maxLength=Comments must be 226 characters or fewer
 add-property-comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
 
+add-property-check-answers-common.pageLabel=Check your answers
+add-property-check-answers-property.pageLabel=Check your answers
 cr05-check-answers.pageLabel=Check your answers before sending your report
 
 #SESSION TIMEOUT
