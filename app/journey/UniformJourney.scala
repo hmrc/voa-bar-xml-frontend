@@ -49,13 +49,14 @@ object UniformJourney {
                                 planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
 
 
-  case class Cr05Common(baReport: String, baRef: String,havePlaningReference: Boolean,
-                          planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType])
+  case class Cr05Common(baReport: String, baRef: String, effectiveDate: LocalDate)
   object Cr05Common { implicit val format = Json.format[Cr05Common] }
   case class Cr05AddProperty(uprn: Option[String], address: Address,
                              propertyContactDetails: ContactDetails,
-                             sameContactAddress: Boolean, contactAddress: Option[Address],
-                             effectiveDate: LocalDate, comments: Option[String])
+                             sameContactAddress: Boolean, contactAddress: Option[Address]
+                             ,havePlaningReference: Boolean,
+                             planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType]
+                             )
   object Cr05AddProperty { implicit val format = Json.format[Cr05AddProperty] }
 
   case class Cr05SubmissionBuilder(
@@ -65,15 +66,12 @@ object UniformJourney {
   )
 
   object Cr05SubmissionBuilder {
-    import Cr05Common._
-    import Cr05AddProperty._
     val storageKey = "ADD_PROPERTY"
     implicit val format: Format[Cr05SubmissionBuilder] = Json.format[Cr05SubmissionBuilder]
   }
 
   // $COVERAGE-OFF$
   object Cr05Submission {
-    import Cr01Cr03Submission._
     val storageKey = "CR05"
     implicit val format: Format[Cr05Submission] = Json.format[Cr05Submission]
     val initial = Cr05Submission(Nil, Nil)
@@ -87,7 +85,7 @@ object UniformJourney {
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
-  type TellTypes = Cr05Submission :: Cr01Cr03Submission :: Long :: NilTypes
+  type TellTypes = Cr05Common :: Cr05AddProperty :: Cr05Submission :: Cr01Cr03Submission :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -103,10 +101,9 @@ object UniformJourney {
     for {
       baReport <- ask[String]("add-property-ba-report", validation = baReportValidation)
       baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation)
-      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
-      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
-      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
-      ctForm = Cr05Common(baReport, baRef, havePlanningRef == Yes, planningRef, noPlanningReference)
+      effectiveDate <- ask[LocalDate]("add-property-effective-date")
+      ctForm = Cr05Common(baReport, baRef, effectiveDate)
+      _ <- tell[Cr05Common]("add-property-check-answers-common", ctForm)
     } yield ctForm
   }
 
@@ -120,13 +117,13 @@ object UniformJourney {
       contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address")) when (
         sameContactAddress == No
         )
-      effectiveDate <- ask[LocalDate]("add-property-effective-date")
-      comments <- ask[Option[String]]("add-property-comments", validation = commentsValidation)
+      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
+      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
+      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
       ctForm = Cr05AddProperty(uprn, address, propertyContactDetails,
-        sameContactAddress == Yes, contactAddress,
-        effectiveDate, comments)
+        sameContactAddress == Yes, contactAddress, havePlanningRef == Yes, planningRef, noPlanningReference)
 
-//      _ <- tell[Cr05AddProperty]("add-property-check-answers", ctForm) TODO check your answer
+      _ <- tell[Cr05AddProperty]("add-property-check-answers-property", ctForm)
     } yield ctForm
   }
 

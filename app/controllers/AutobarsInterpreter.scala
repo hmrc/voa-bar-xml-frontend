@@ -19,7 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import cats.data.NonEmptyList
-import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05SubmissionWebTell}
+import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionWebTell}
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
@@ -82,13 +82,13 @@ class AutobarsInterpreter (
       key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
   }
 
-  implicit val webTellLong = new WebTell[Long] {
-    override def render(in: Long, key: String, messages: UniformMessages[Html]): Html = Html(s"in: ${in}, key:${messages}")
-  }
-
   implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
 
   implicit val cr05SubmissionWebTell = new Cr05SubmissionWebTell(cr05SubmissionConfirmation)
+
+  implicit val cr05CommonWebTell = new Cr05CommonWebTell(new govukSummaryList())
+
+  implicit val cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new govukSummaryList())
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
