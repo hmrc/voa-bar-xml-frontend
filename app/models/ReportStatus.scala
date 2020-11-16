@@ -42,9 +42,6 @@ case object Done extends ReportStatusType
 object ReportStatus {import ReactiveMongoFormats.mongoEntity
 
   implicit val format =  mongoEntity {
-    //TODO maybe never used
-    implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
-
     Json.format[ReportStatus]
   }
 }

@@ -31,7 +31,12 @@ import scala.language.higherKinds
 object UniformJourney {
 
   object Address { implicit val format = Json.format[Address] }
-  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String)
+  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String){
+    val displayAddress = {
+      val addressList = List(line1, line2) ++ List(line3, line4).flatten ++ List(postcode)
+      addressList.mkString(", ")
+    }
+  }
   case class OtherReasonWrapper(value : String)
   object OtherReasonWrapper {
     import play.api.libs.functional.syntax._

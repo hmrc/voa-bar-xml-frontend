@@ -21,6 +21,7 @@ object Dependencies {
   private val pdfBoxVersion = "2.0.13"
   private val playPartialsVersion = "7.0.0-play-26"
   private val playFrontendGovUkVersion = "0.53.0-play-26"
+  private val playFrontendHmrcVersion  = "0.24.0-play-26"
   private val akkaVersion     = "2.5.26"
 
   val compileDependencies = Seq(
@@ -36,7 +37,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
-    "uk.gov.hmrc"       %% "play-frontend-hmrc" % "0.19.0-play-26",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc" % playFrontendHmrcVersion,
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,
     "com.luketebbs.uniform" %% "core" % "4.10.0",
