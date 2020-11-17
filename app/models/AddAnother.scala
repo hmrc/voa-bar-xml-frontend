@@ -21,9 +21,11 @@ import play.api.data.Forms.{boolean, mapping, optional}
 
 case class AddAnother(value: Option[Boolean])
 object YesNoForm {
+
   val yesNoForm = Form(
     mapping(
-      "add-another" -> optional(boolean),
+      "add-another" -> optional(boolean)
     )(AddAnother.apply)(AddAnother.unapply)
   )
+
 }
