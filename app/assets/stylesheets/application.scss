@@ -1,6 +1,9 @@
 $govuk-assets-path: "/voa-bar-xml-frontend/assets/lib/govuk-frontend/govuk/assets/";
+$hmrc-assets-path: "/voa-bar-xml-frontend/assets/lib/hmrc-frontend/hmrc/";
 
 @import "lib/govuk-frontend/govuk/all";
+
+@import "lib/hmrc-frontend/hmrc/all";
 
 @import "partials/header";
 

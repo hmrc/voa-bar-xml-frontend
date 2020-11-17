@@ -29,7 +29,6 @@ import models.{BillingAuthorities, Login, Mode}
 import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import utils.{Navigator, UserAnswers}
-import views.html.login
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

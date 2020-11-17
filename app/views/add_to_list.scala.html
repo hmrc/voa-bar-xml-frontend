@@ -1,0 +1,106 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import journey.UniformJourney.Cr05SubmissionBuilder
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+
+
+
+@this(
+    main_template: views.html.govuk.main_template,
+    formWithCSRF: FormWithCSRF
+)
+
+
+@(baCode: String, cr05Submission: Cr05SubmissionBuilder)(implicit request: Request[_], messages: Messages)
+
+@main_template(
+    pageTitle = Some(messages("service.title", messages("welcome.heading"))),
+    baCode = Some(baCode)
+) {
+
+      @cr05Submission.splitProperties.map { splitPropertiesList =>
+            <h1 class="govuk-heading-l">You have created @{splitPropertiesList.length} properties </h1>
+      }.getOrElse{
+            <h1 class="govuk-heading-l">Create a property</h1>
+      }
+
+      <span class="govuk-hint">The property must be split into at least two new properties.</span>
+      <div class="govuk-form-group">
+
+        @cr05Submission.splitProperties.map { maybeSplitProperties =>
+          <ul class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+           @maybeSplitProperties.map { splitProperties =>
+               <li class="hmrc-add-to-a-list__contents">
+                    <span class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
+                      @splitProperties.address.displayAddress
+                    </span>
+                   <span class="hmrc-add-to-a-list__remove">
+                      <a class="govuk-link" href="#">
+                        <span aria-hidden="true">Remove</span>
+                        <span class="govuk-visually-hidden">Remove @splitProperties.address.displayAddress</span>
+                      </a>
+                    </span>
+               </li>
+           }
+          </ul>
+        }
+
+
+      </div>
+
+        @formWithCSRF(action = routes.AddToListController.addProperty(),
+        ('novalidate -> "novalidate"), ('autoComplete -> "off")
+        ) {
+            @if(cr05Submission.splitProperties.exists(_.length > 1)) {
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="add-another-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend govuk-fieldset__legend--m">
+                        Do you need to create another property?
+                    </legend>
+                    <span id="add-another-hint" class="govuk-hint">
+                     You can create up to five properties.
+                   </span>
+                    <div class="govuk-radios govuk-radios--inline">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="add-another" name="add-another" type="radio" value="true">
+                            <label class="govuk-label govuk-radios__label" for="add-another">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="add-another-2" name="add-another" type="radio" value="false">
+                            <label class="govuk-label govuk-radios__label" for="add-another-2">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button">
+                continue
+            </button>
+            } else {
+            <input type="hidden" value="true" id="add-another" name="add-another">
+            <button class="govuk-button" data-module="govuk-button">
+                Add a property
+            </button>
+            }
+        }
+
+
+}

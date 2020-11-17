@@ -143,7 +143,11 @@ class UniformController @Inject()(messagesApi: MessagesApi,
               }
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
-            Redirect(routes.TaskListController.onPageLoad())
+            if (cr05Submission.propertyToBeSplit.isDefined && cr05Submission.splitProperties.exists(_.length <= 1)){
+              Redirect(routes.AddToListController.onPageLoad())
+            } else {
+              Redirect(routes.TaskListController.onPageLoad())
+            }
           }
         }
       }

@@ -15,8 +15,6 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.govukfrontend.views.html.helpers._
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
 @import views.html.components.confirmation_status_panel
 
@@ -50,10 +48,6 @@
     } else {
     <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
     }
-}
-
-@panelTitle = {
-    @report.title(messages)
 }
 
 @mainTemplate(
