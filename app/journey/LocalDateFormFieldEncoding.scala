@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import cats.data.NonEmptyList
 import ltbs.uniform.common.web.FormFieldEncoding
-import ltbs.uniform.{ErrorMsg, ErrorTree, Input, _}
+import ltbs.uniform.{ErrorMsg, ErrorTree, Input}
 
 import scala.util.Try
 

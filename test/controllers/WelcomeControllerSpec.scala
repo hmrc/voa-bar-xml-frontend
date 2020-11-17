@@ -36,7 +36,7 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val configuration =  Configuration("feature.cr05.enabled" -> false)
+  val configuration =  Configuration("feature.cr05.enabled" -> cr05FeatureFlag)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 

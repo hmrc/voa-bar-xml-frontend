@@ -41,7 +41,7 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
                                   )(implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
 
-  def onPageLoad() = getData.async {
+  def onPageLoad = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
@@ -51,7 +51,7 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  def addProperty() = (getData andThen requireData) {
+  def addProperty = (getData andThen requireData) {
     implicit request =>
       yesNoForm.bindFromRequest.fold(
         formWithErrors => ???,

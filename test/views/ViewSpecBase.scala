@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 import views.html.govuk.{head, scripts}
-import views.html.{confirmation, councilTaxUpload, error_template, login, reportStatus, welcome, task_list}
+import views.html.{add_to_list, confirmation, councilTaxUpload, error_template, login, reportStatus, task_list, welcome}
 
 trait ViewSpecBase extends SpecBase with Injecting {
 
@@ -128,6 +128,13 @@ trait ViewSpecBase extends SpecBase with Injecting {
   def createTaskListView(): task_list = {
     new task_list(
       createMain_template()
+    )
+  }
+
+  def createAddToListView(): add_to_list = {
+    new add_to_list(
+      createMain_template(),
+      new formWithCSRF()
     )
   }
 
