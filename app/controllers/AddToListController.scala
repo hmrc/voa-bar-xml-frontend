@@ -19,30 +19,17 @@ package controllers
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions._
-import identifiers.{AddPropertyId, AddPropertyReportDetailsId, CheckYourAnswersId, VOAAuthorisedId}
+import identifiers.{AddPropertyId, VOAAuthorisedId}
 import javax.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
-import models.{NormalMode}
-import play.api.data.{Form, Forms}
-import play.api.data.Forms.{mapping}
+import models.NormalMode
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 
 import scala.concurrent.ExecutionContext
-import play.api.data.Forms._
-import play.api.data.Form
-
-
-case class AddAnother(value: Option[Boolean])
-object YesNoForm {
-  val yesNoForm = Form(
-    mapping(
-      "add-another" -> optional(boolean),
-    )(AddAnother.apply)(AddAnother.unapply)
-  )
-}
+import models.YesNoForm._
 
 class AddToListController @Inject()(appConfig: FrontendAppConfig,
                                     getData: DataRetrievalAction,
@@ -53,8 +40,6 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
                                     addToList: views.html.add_to_list
                                   )(implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
-
-  import YesNoForm._
 
   def onPageLoad() = getData.async {
     implicit request =>
