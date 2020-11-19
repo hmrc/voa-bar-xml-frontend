@@ -21,7 +21,6 @@ import controllers.routes
 import forms.LoginFormProvider
 import models.{NormalMode, Login}
 import views.behaviours.govuk.QuestionViewBehaviours
-import views.html.login
 
 class LoginViewSpec extends QuestionViewBehaviours[Login] {
 

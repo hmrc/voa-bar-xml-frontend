@@ -21,7 +21,6 @@ import java.time.ZonedDateTime
 import models.{Done, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
-import views.html.confirmation
 
 class ConfirmationViewSpec extends ViewBehaviours {
 
