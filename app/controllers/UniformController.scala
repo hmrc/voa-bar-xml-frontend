@@ -158,7 +158,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-    dataCacheConnector.getEntry[Cr05Submission](request.externalId, Cr05Submission.storageKey) flatMap { maybeCr05Submission =>
+    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
       maybeCr05Submission match {
         case None =>
           // TODO Log / Return some kind of error

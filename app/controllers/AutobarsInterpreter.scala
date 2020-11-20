@@ -19,7 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import cats.data.NonEmptyList
-import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionWebTell}
+import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
@@ -84,7 +84,7 @@ class AutobarsInterpreter (
 
   implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
 
-  implicit val cr05SubmissionWebTell = new Cr05SubmissionWebTell(cr05SubmissionConfirmation)
+  implicit val cr05SubmissionWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionConfirmation)
 
   implicit val cr05CommonWebTell = new Cr05CommonWebTell(new govukSummaryList())
 
