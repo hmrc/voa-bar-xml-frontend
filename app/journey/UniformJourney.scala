@@ -90,7 +90,7 @@ object UniformJourney {
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
-  type TellTypes = Cr05Common :: Cr05AddProperty :: Cr05Submission :: Cr01Cr03Submission :: NilTypes
+  type TellTypes = Cr05Common :: Cr05AddProperty :: Cr05SubmissionBuilder :: Cr01Cr03Submission :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -132,10 +132,10 @@ object UniformJourney {
     } yield ctForm
   }
 
-  def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05Submission): F[Cr05Submission] = {
+  def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {
     import interpreter._
     for {
-      _ <- tell[Cr05Submission]("cr05-check-answers", cr05Submission)
+      _ <- tell[Cr05SubmissionBuilder]("cr05-check-answers", cr05Submission)
     } yield cr05Submission
   }
 

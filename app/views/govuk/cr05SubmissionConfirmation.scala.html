@@ -16,8 +16,8 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@import journey.UniformJourney.Cr01Cr03Submission
-@import controllers.uniform.Cr05SubmissionWebTell
+@import controllers.uniform.{Cr05AddPropertyWebTell, Cr05CommonWebTell}
+@import journey.UniformJourney.Cr05SubmissionBuilder
 @import ltbs.uniform.UniformMessages
 
 @this(
@@ -25,20 +25,32 @@
 )
 
 
-@(propertyToBeSplit: Cr01Cr03Submission, splitPropertiesList: List[Cr01Cr03Submission], messages: UniformMessages[Html])
+@(cr05Submission: Cr05SubmissionBuilder, messages: UniformMessages[Html])
 
-<h2 class="govuk-heading-m">The property to be split</h2>
+     @cr05Submission.cr05CommonSection.map { cs =>
+        <h2 class="govuk-heading-m">The property to be split</h2>
+        @summaryList(
+            (new Cr05CommonWebTell(summaryList)).summaryList(cs, messages)
+        )
+     }
 
-@summaryList(
- (new Cr05SubmissionWebTell(this)).confirmationSummary(propertyToBeSplit, messages)
-)
+     @cr05Submission.propertyToBeSplit.map { pts =>
+       <h2 class="govuk-heading-m">The property to be split</h2>
 
-@splitPropertiesList.zipWithIndex.map { case (property, index) =>
- <h2 class="govuk-heading-m">New property @{index + 1}</h2>
+       @summaryList(
+       (new Cr05AddPropertyWebTell(summaryList)).summaryList(cr05Submission.propertyToBeSplit.get, messages)
+       )
+     }
 
- @summaryList(
-  (new Cr05SubmissionWebTell(this)).confirmationSummary(property, messages)
- )
-}
+    @cr05Submission.splitProperties.map { spList =>
+        @spList.zipWithIndex.map { case (sp, index) =>
+            <h2 class="govuk-heading-m">New property @(index + 1)</h2>
+
+            @summaryList(
+                (new Cr05AddPropertyWebTell(summaryList)).summaryList(cr05Submission.propertyToBeSplit.get, messages)
+            )
+        }
+    }
+
 
 
