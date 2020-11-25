@@ -108,7 +108,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     } else {
       addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05SubmissionBuilder =>
-          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None)){ existingCr05SubmissionBuilder =>
+          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None, None)){ existingCr05SubmissionBuilder =>
             existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
@@ -130,7 +130,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     } else {
       addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
-          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, Some(cr05AddProperty), None)){ existingSubmission =>
+          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, Some(cr05AddProperty), None, None)){ existingSubmission =>
 
               if (existingSubmission.propertyToBeSplit.isEmpty){
                 existingSubmission.copy(propertyToBeSplit = Some(cr05AddProperty))
@@ -143,11 +143,29 @@ class UniformController @Inject()(messagesApi: MessagesApi,
               }
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
-            if (cr05Submission.propertyToBeSplit.isDefined && cr05Submission.splitProperties.exists(_.length <= 1)){
               Redirect(routes.AddToListController.onPageLoad())
-            } else {
+          }
+        }
+      }
+    }
+  }
+
+  def addCommentJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+    import interpreter._
+    import UniformJourney._
+
+    val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)))
+    if(request.userAnswers.flatMap(_.login).isEmpty) {
+      implicit val messages = cc.messagesApi.preferred(request)
+      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+    } else {
+      addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
+        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
+          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, None, None, comments)){ existingSubmission =>
+            existingSubmission.copy(comments = comments)
+          }
+          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
               Redirect(routes.TaskListController.onPageLoad())
-            }
           }
         }
       }

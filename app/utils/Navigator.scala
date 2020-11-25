@@ -32,6 +32,7 @@ class Navigator @Inject()() {
     TaskListId ->  (_ => routes.TaskListController.onPageLoad()),
     AddPropertyReportDetailsId -> (_ => routes.UniformController.addCommonSectionJourney("add-property-ba-report")),
     AddPropertyId -> (_ => routes.UniformController.addPropertyJourney("add-property-UPRN")),
+    AddCommentId -> (_ => routes.UniformController.addCommentJourney()),
     CheckYourAnswersId -> (_ => routes.UniformController.cr05CheckAnswerJourney())
   )
 

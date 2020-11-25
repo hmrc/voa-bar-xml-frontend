@@ -575,14 +575,14 @@ add-property-why-no-planning-ref.add-property-why-no-planning-ref.NotRequiredPla
 add-property-why-no-planning-ref.add-property-why-no-planning-ref.PermittedDevelopment=It’s a permitted development
 add-property-why-no-planning-ref.add-property-why-no-planning-ref.NoPlanningApplicationSubmitted=No planning application has been submitted
 
-add-property-comments.pageLabel=Comments
-add-property-comments.label=
-add-property-comments.error.maxLength=Comments must be 226 characters or fewer
-add-property-comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
-
 add-property-check-answers-common.pageLabel=Check your answers
 add-property-check-answers-property.pageLabel=Check your answers
 cr05-check-answers.pageLabel=Check your answers before sending your report
+
+add-comments.pageLabel=Comments
+add-comments.label=
+add-comments.error.maxLength=Comments must be 226 characters or fewer
+add-comments.error.invalidIsoString=Comments must only contain letters a to z, hyphens, spaces and apostrophes
 
 #SESSION TIMEOUT
 ##############################
