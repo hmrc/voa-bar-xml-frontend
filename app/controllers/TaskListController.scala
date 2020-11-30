@@ -19,7 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions._
-import identifiers.{AddPropertyId, AddPropertyReportDetailsId, CheckYourAnswersId, VOAAuthorisedId}
+import identifiers._
 import javax.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
@@ -56,6 +56,10 @@ class TaskListController @Inject()(appConfig: FrontendAppConfig,
 
   def goToAddPropertyPage() =  (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers))
+  }
+
+  def goToAddComments()= (getData andThen requireData) { implicit request =>
+    Redirect(navigator.nextPage(AddCommentId, NormalMode)(request.userAnswers))
   }
 
   def goToCheckYourAnswersPage() =  (getData andThen requireData) { implicit request =>

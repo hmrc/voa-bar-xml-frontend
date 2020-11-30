@@ -45,6 +45,7 @@ POST        /comments                             controllers.UniformController.
 GET         /task-list                                          controllers.TaskListController.onPageLoad()
 GET         /start-add-property                                 controllers.TaskListController.goToAddPropertyPage()
 GET         /start-add-property-report-details                  controllers.TaskListController.goToAddPropertyReportDetailPage()
+GET         /start-add-comments                                 controllers.TaskListController.goToAddComments()
 GET         /start-check-answers                                controllers.TaskListController.goToCheckYourAnswersPage()
 GET         /add-to-list                                        controllers.AddToListController.onPageLoad()
 POST        /confirm-add-property                               controllers.AddToListController.addProperty()
@@ -77,6 +78,8 @@ POST        /add-property-why-no-planning-ref                   controllers.Unif
 GET         /add-property-check-answers-property                controllers.UniformController.addPropertyJourney(id = "add-property-check-answers-property")
 POST        /add-property-check-answers-property                controllers.UniformController.addPropertyJourney(id = "add-property-check-answers-property")
 
+GET         /add-comments                                       controllers.UniformController.addCommentJourney(id = "add-comments")
+POST        /add-comments                                       controllers.UniformController.addCommentJourney(id = "add-comments")
 
 GET         /cr05-check-answers                                controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
 POST        /cr05-check-answers                                controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")

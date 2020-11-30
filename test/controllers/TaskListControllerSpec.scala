@@ -22,9 +22,7 @@ import identifiers.VOAAuthorisedId
 import models.NormalMode
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.filters.csrf.CSRF.{Token, TokenInfo}
 import utils.FakeNavigator
 import views.ViewSpecBase
 
@@ -77,10 +75,15 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-      "return a redirect when calling goToAddPropertyPage" in {
-        val result = loggedInController().goToAddPropertyPage()(fakeRequest)
-        status(result) mustBe SEE_OTHER
-      }
+    "return a redirect when calling goToAddPropertyPage" in {
+      val result = loggedInController().goToAddPropertyPage()(fakeRequest)
+      status(result) mustBe SEE_OTHER
+    }
+
+    "return a redirect when calling goToCheckYourAnswersPage" in {
+      val result = loggedInController().goToCheckYourAnswersPage()(fakeRequest)
+      status(result) mustBe SEE_OTHER
+    }
 
   }
 }

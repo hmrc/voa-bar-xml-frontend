@@ -65,6 +65,11 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
         navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addPropertyJourney("add-property-UPRN")
       }
 
+      "on selecting Add Comments Journey link should redirect to Add Comment Journey Page" in {
+        AddCommentId.toString mustBe "addcomment"
+        navigator.nextPage(AddCommentId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addCommentJourney()
+      }
+
       "on selecting Task List should redirect to Task List Page" in {
         TaskListId.toString mustBe "tasklist"
         navigator.nextPage(TaskListId, NormalMode) (uploadUserAnswers) mustBe routes.TaskListController.onPageLoad()

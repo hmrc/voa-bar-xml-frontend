@@ -67,7 +67,8 @@ object UniformJourney {
   case class Cr05SubmissionBuilder(
       cr05CommonSection: Option[Cr05Common],
       propertyToBeSplit: Option[Cr05AddProperty],
-      splitProperties: Option[List[Cr05AddProperty]]
+      splitProperties: Option[List[Cr05AddProperty]],
+      comments: Option[String]
   )
 
   object Cr05SubmissionBuilder {
@@ -130,6 +131,13 @@ object UniformJourney {
 
       _ <- tell[Cr05AddProperty]("add-property-check-answers-property", ctForm)
     } yield ctForm
+  }
+
+  def addComments[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Option[String]] = {
+    import interpreter._
+    for {
+      comments <- ask[Option[String]]("add-comments", validation = commentsValidation)
+    } yield comments
   }
 
   def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {

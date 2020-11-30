@@ -121,7 +121,35 @@
 
         <li>
             <h2 class="app-task-list__section">
-                <span class="app-task-list__section-number">4. </span> Check your answers
+                <span class="app-task-list__section-number">4. </span>  Add additional information (optional)
+            </h2>
+            <ul class="app-task-list__items">
+                <li class="app-task-list__item">
+                <span class="app-task-list__task-name">
+                    @if(cr05Submission.exists(_.splitProperties.exists(_.length >= 2))){
+                        <a href="@routes.TaskListController.goToAddComments().url" aria-describedby="add-comments">
+                         Add comments
+                        </a>
+                    } else {
+                         Add comments
+                    }
+
+                </span>
+                    @if(cr05Submission.exists(_.comments.exists(_.nonEmpty))){
+                    <strong class="govuk-tag app-task-list__tag" id="add-comments">Completed</strong>
+                    } else if(cr05Submission.exists(_.splitProperties.exists(_.length >= 2))){
+                    <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-comments">Not started</strong>
+                    } else {
+                    <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-comments">Cannot start yet</strong>
+                    }
+                </li>
+
+            </ul>
+        </li>
+
+        <li>
+            <h2 class="app-task-list__section">
+                <span class="app-task-list__section-number">5. </span> Check your answers
             </h2>
             <ul class="app-task-list__items">
                 <li class="app-task-list__item">
