@@ -16,6 +16,7 @@
 
 package views
 
+import org.jsoup.nodes.Document
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
@@ -43,22 +44,56 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   // Welcome page containing form for navigation
 
-  val formUsername = "BA1445"
-  val formMessageKeyPrefix = "submissionCategory"
+  def createFormView(formUser: String) = () => createWelcomeView()(frontendAppConfig, formUser, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
-  def createFormView = () => createWelcomeView()(frontendAppConfig, formUsername, cr05FeatureFlag)(welcomeFakeRequest, messages)
-
-  lazy val formDoc = asDocument(createFormView())
-
-  "The view history links to the WelcomeController.goToStartWebFormPage() method" in {
-    val href = formDoc.getElementById("create").attr("href")
-    assert(href == controllers.routes.WelcomeController.goToStartWebFormPage().url.toString)
+  def uploadLinkTest(ba: String, formDoc: Document) = {
+    s"The upload link to the goToCouncilTaxUploadPage method for ${ba}" in {
+      val href = formDoc.getElementById("councilTaxLink").attr("href")
+      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url.toString)
+    }
   }
 
-  "The view history links to the ReportStatusController.onPageLoad method" in {
-    val href = formDoc.getElementById("submissions").attr("href")
-    assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
+  def viewHistoryTest(ba: String, formDoc: Document) = {
+    s"The view history link to the ReportStatusController.onPageLoad method for ${ba}" in {
+      val href = formDoc.getElementById("submissions").attr("href")
+      assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
+    }
   }
+
+  def runFormNavigationTests(ba: String) = {
+    lazy val formDoc = asDocument(createFormView(ba)())
+
+    s"The webform link is not visible for ${ba}" in {
+      assertThrows[NullPointerException] {formDoc.getElementById("create").attr("href")}
+    }
+
+    uploadLinkTest(ba, formDoc)
+    viewHistoryTest(ba, formDoc)
+  }
+
+  val baCodes = Seq("BA0114", "BA5960")
+
+  baCodes.foreach(
+    runFormNavigationTests(_)
+  )
+
+  def runPilotBATests(ba: String) = {
+    lazy val formDoc = asDocument(createFormView(ba)())
+
+    s"The webform link is visible for ${ba}" in {
+      val href = formDoc.getElementById("create").attr("href")
+      assert(href == controllers.routes.WelcomeController.goToStartWebFormPage().url.toString)
+    }
+
+    uploadLinkTest(ba, formDoc)
+    viewHistoryTest(ba, formDoc)
+  }
+
+  val pilotBaCodes = Seq("BA1445", "BA3615", "BA3630", "BA3650", "BA3810")
+
+  pilotBaCodes.foreach(
+    runPilotBATests(_)
+  )
 
   // TODO https://jira.tools.tax.service.gov.uk/browse/VOA-2065 test link to upload page
 }
