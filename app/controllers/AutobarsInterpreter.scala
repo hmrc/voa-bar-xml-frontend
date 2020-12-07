@@ -302,7 +302,8 @@ class AutobarsInterpreter (
         idPrefix = Some(fieldKey.mkString("_")),
         items = radiosItems,
         name = fieldKey.head,
-        errorMessage = errorMessage
+        errorMessage = errorMessage,
+        classes = if (coproductValues.size == 2) "govuk-radios--inline" else ""
       ))
   }
 

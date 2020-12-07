@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@import controllers.uniform.{Cr05AddPropertyWebTell, Cr05CommonWebTell}
+@import controllers.uniform.{Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
 @import journey.UniformJourney.Cr05SubmissionBuilder
 @import ltbs.uniform.UniformMessages
 
@@ -51,6 +51,13 @@
             )
         }
     }
+
+    <h2 class="govuk-heading-m">Comments</h2>
+
+    @summaryList(
+        (new Cr05SubmissionBuilderWebTell(this)).commentsSummaryList(cr05Submission, messages)
+    )
+
 
 
 
