@@ -19,7 +19,6 @@ package journey
 import cats.data.Validated.{Invalid, Valid}
 import ltbs.uniform.ErrorTree
 import org.scalatest.{EitherValues, FlatSpec, MustMatchers}
-import org.scalatestplus.play.PlaySpec
 
 class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
 
