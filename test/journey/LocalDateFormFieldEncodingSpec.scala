@@ -19,8 +19,7 @@ package journey
 import java.time.LocalDate
 
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import journey.LocalDateFormFieldEncoding.{day, month, year, _}
+import journey.LocalDateFormFieldEncoding.{day, month, year}
 import ltbs.uniform.ErrorTree
 import org.scalatest.prop.TableDrivenPropertyChecks
 

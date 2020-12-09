@@ -42,8 +42,6 @@ class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
       DateTimeUtils.setCurrentMillisFixed(0)
-      val username = "AUser"
-      val login = Login("foo", "bar")
 
       val baCode = "ba1221"
       val submissionId = "1234-XX"

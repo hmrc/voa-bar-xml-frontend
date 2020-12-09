@@ -17,7 +17,6 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
-import models.FileUploadData
 import play.api.data.FormError
 
 class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
