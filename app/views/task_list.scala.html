@@ -82,35 +82,20 @@
                 <span class="app-task-list__section-number">3. </span> Tell us about the new properties created
             </h2>
             <ul class="app-task-list__items">
-
-                @cr05Submission.map{ cr05Sub =>
-                    @cr05Sub.splitProperties.map{ splitPropertiesList =>
-                        @splitPropertiesList.zipWithIndex.map { case (splitProperties, index) =>
-                            <li class="app-task-list__item">
-                                <span class="app-task-list__task-name">
-                                  <a href="@routes.AddToListController.onPageLoad().url" aria-describedby="add-property-status-@index">
-                                     @splitProperties.address.displayAddress
-                                  </a>
-                                </span>
-                                <span class="hmrc-status-tag" id="add-property-status-@index">Completed</span>
-                            </li>
-                        }
-                    }
-                }
                 <li class="app-task-list__item">
                     <span class="app-task-list__task-name">
                         @if(cr05Submission.exists(_.propertyToBeSplit.isDefined)){
                             <a href="@routes.AddToListController.onPageLoad().url" aria-describedby="add-property-status-2">
-                            Add a property
+                            View, modify or add a property
                             </a>
                         } else {
-                            Add a property
+                            View, modify or add a property
                         }
                     </span>
                         @if(cr05Submission.exists(_.propertyToBeSplit.isDefined) && cr05Submission.exists(_.splitProperties.exists(_.length <= 1))){
                         <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status-2">Not started</strong>
                         } else if(cr05Submission.exists(_.splitProperties.exists(_.length > 1))){
-
+                        <strong class="govuk-tag app-task-list__tag" id="add-property-status-2">Completed</strong>
                         } else {
                         <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status-2">Cannot start yet</strong>
                         }
