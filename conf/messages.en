@@ -419,7 +419,7 @@ planning-ref.error.minLength=Enter a planning reference
 planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
 planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes
 
-why-no-planning-ref.pageLabel=Reason for no planning reference
+why-no-planning-ref.pageLabel=Why is there no planning reference?
 why-no-planning-ref.required=Select why you don’t have a planning reference
 why-no-planning-ref.why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
 why-no-planning-ref.why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable
@@ -567,7 +567,7 @@ add-property-planning-ref.error.minLength=Enter a planning reference
 add-property-planning-ref.error.maxLength=Planning reference must be 25 characters or fewer
 add-property-planning-ref.error.invalidIsoString=Planning reference must only contain letters a to z, hyphens, spaces and apostrophes
 
-add-property-why-no-planning-ref.pageLabel=Reason for no planning reference
+add-property-why-no-planning-ref.pageLabel=Why is there no planning reference?
 add-property-why-no-planning-ref.required=Select why you don’t have a planning reference
 add-property-why-no-planning-ref.add-property-why-no-planning-ref.WithoutPlanningPermission=It was built without planning permission
 add-property-why-no-planning-ref.add-property-why-no-planning-ref.NotApplicablePlanningPermission=Planning permission is not applicable
