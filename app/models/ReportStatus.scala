@@ -39,6 +39,25 @@ case object Submitted extends ReportStatusType
 case object Cancelled extends ReportStatusType
 case object Done extends ReportStatusType
 
+
+case class ReportErrorDetail(errorCode: String, values: Seq[String] = Seq.empty[String])
+
+object ReportErrorDetail {
+  implicit val format = Json.format[ReportErrorDetail]
+
+}
+
+case class ReportError(reportNumber: Option[String],
+                       baTransaction: Option[String],
+                       uprn: Seq[Long],
+                       errors: Seq[ReportErrorDetail]
+                      )
+
+object ReportError {
+  implicit val format = Json.format[ReportError]
+}
+
+
 object ReportStatus {import ReactiveMongoFormats.mongoEntity
 
   implicit val format =  mongoEntity {
@@ -51,6 +70,7 @@ final case class ReportStatus(
                                url: Option[String] = None,
                                checksum: Option[String] = None,
                                errors: Option[Seq[Error]] = Some(Seq()),
+                               reportErrors: Seq[ReportError] = Seq(),
                                baCode: Option[String] = None,
                                status: Option[String] = Some(Pending.value),
                                filename: Option[String] = None,
