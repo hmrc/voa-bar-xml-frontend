@@ -51,7 +51,7 @@
                     value = Value(Text(reportStatus.formattedCreated))
                 )
             ) ++
-            (if(reportStatus.status.contains(Failed.value)) {
+            (if(reportStatus.status.contains(Failed.value) && reportStatus.errors.exists(_.nonEmpty)) {
                 Seq(
                     SummaryListRow(
                         key = Key(Text(messages("report.key.error")), "govuk-!-width-one-half"),

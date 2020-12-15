@@ -34,6 +34,28 @@
             messagePrefix = "confirmation"
         )
         </div>
+        @if(rs.reportErrors.nonEmpty) {
+            <h2 class="govuk-heading-m govuk-!-margin-top-5 govuk-!-margin-bottom-0">Error details</h2>
+            @for(reportError <- rs.reportErrors) {
+                <span class="govuk-!-padding-left-3">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0"
+                    >B.A. Report No. @reportError.reportNumber.getOrElse("NOT PROVIDED")</h3>
+                    <div class="govuk-caption-m govuk-!-font-size-16 govuk-!-margin-bottom-4">
+                        @reportError.uprn.mkString("Uprn: ", ",", "")
+                        @reportError.baTransaction.map { taNumber =>
+                            TransactionNumber: @taNumber
+                        }
+                    </div>
+                    <ul class="govuk-list govuk-list--bullet govuk-!-padding-left-6 govuk-!-margin-bottom-0">
+                    @for(error <- reportError.errors) {
+                        <li>
+                        @messages("reportError." + error.errorCode, error.values: _*)
+                        </li>
+                    }
+                    </ul>
+                </span>
+            }
+        }
     </section>
 }
 

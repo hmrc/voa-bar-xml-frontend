@@ -590,3 +590,21 @@ sessionTimeout.title = You have been signed out due to inactivity - Billing Auth
 sessionTimeout.heading=You have been signed out due to inactivity
 sessionTimeout.copy=You will need to sign in again. If you have entered any details, these have not been saved
 sessionTimeout.link=Sign in
+
+
+reportError.TextAddressPostcodeValidation = Postcode {0} in this report is invalid.
+reportError.OccupierContactAddressesPostcodeValidation = Occupier postcode {0} in this report is invalid.
+reportError.RemarksValidationNotEmpty = Remarks must not be empty.
+reportError.RemarksValidationTooLong = The remarks cannot exceed 240 characters. Please shorten your comments and resubmit this report.
+reportError.PropertyPlanReferenceNumberValidation = The Property Plan Reference Number must be between 1 and 25 characters.
+reportError.Cr01AndCr02MissingExistingEntryValidation = The property address is missing from this report.
+reportError.Cr03AndCr04MissingProposedEntryValidation = The proposed property address is missing from this report.
+reportError.Cr05AndCr12MissingProposedEntryValidation = The existing and proposed property addresses are missing from this report.
+reportError.Cr06AndCr07AndCr09AndCr10AndCr14MissingProposedEntryValidation =  The property address is missing from this report.
+reportError.Cr08InvalidCodeValidation=CR08: The reason code used in this report is obsolete and no longer in use. Please select another code for this report.
+reportError.Cr11InvalidCodeValidation=CR11: The reason code used in this report is obsolete and no longer in use. Please select another code for this report.
+reportError.Cr13InvalidCodeValidation=CR13: The reason code used in this report is obsolete and no longer in use. Please select another code for this report.
+reportError.Rt01AndRt04AndRt03AndRt04MissingProposedEntryValidation = The proposed property address is missing from this report.
+reportError.Rt05AndRt06AndRt07AndRt08AndRt9AndRt11MissingExistingEntryValidation = The property address is missing from this report.
+reportError.InvalidNdrCode = The reason code used in this report is obsolete and no longer in use. Please select another code for this report.
+reportError.NoNDRCode = The reason code is missing from this report.
