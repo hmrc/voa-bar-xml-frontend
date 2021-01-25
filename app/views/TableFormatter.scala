@@ -18,13 +18,12 @@ package views
 
 import javax.inject.Inject
 import models.ReportStatus
-import play.api.Configuration
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-case class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
+class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
 
   val serviceUrl = serviceConfig.baseUrl("voa-bar-xml-frontend")
   val baseSegment = "/voa-bar-xml-frontend/council-tax/jobs/refresh?submissionId="
