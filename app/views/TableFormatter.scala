@@ -1,0 +1,51 @@
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package views
+
+import javax.inject.Inject
+import models.ReportStatus
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
+
+  val serviceUrl = serviceConfig.baseUrl("voa-bar-xml-frontend")
+  val baseSegment = "/voa-bar-xml-frontend/council-tax/jobs/refresh?submissionId="
+  val url = serviceUrl + baseSegment
+
+  def formatSummaryLink(reportStatus: ReportStatus)(implicit messages: Messages) = {
+    s"<a href='${url}${reportStatus.id}'>${formatStatuslink(reportStatus.status)}</a>"
+  }
+
+  def formatStatuslink(value: Option[String])(implicit messages: Messages) : String = value match {
+    case Some("true") => Messages("confirmation.heading.submitted")
+    case _ => Messages("confirmation.heading.failed")
+  }
+
+  def formatRows(reportStatuses: Seq[ReportStatus])(implicit messages: Messages) = {
+    reportStatuses.map ( reportStatus =>
+      Seq (
+        TableRow(Text(reportStatus.formattedCreated)),
+        TableRow(Text(reportStatus.id.split("-").head)),
+        TableRow(Text(reportStatus.filename.getOrElse("Unknown"))),
+        TableRow(HtmlContent(formatSummaryLink(reportStatus)))
+      )
+    )
+  }
+}
