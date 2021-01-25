@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.ZonedDateTime
-
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
@@ -30,7 +29,8 @@ import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.ReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
-import views.ViewSpecBase
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import views.{TableFormatter, ViewSpecBase}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,6 +59,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val fakeReports = Seq(rs1, rs2, rs3)
   val fakeMapAsJson = Json.toJson(fakeReports)
   val wrongJson = Json.toJson("""{"someID": "hhewfwe777"}""")
+  def servicesConfig = injector.instanceOf[ServicesConfig]
+  val fakeTableFormatter = new TableFormatter(servicesConfig)
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
@@ -81,16 +83,16 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login2)
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(),
-      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents)
+      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents, fakeTableFormatter)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, fakeReportStatusConnector(),
-      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents)
+      dataRetrievalAction, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents, fakeTableFormatter)
   }
 
-  def viewAsString() = createReportStatusView()(username, fakeReports)(fakeRequest, messages).toString
+  def viewAsString() = createReportStatusView()(username, fakeReports, None, fakeTableFormatter)(fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
@@ -138,7 +140,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
           getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(),
-          createErrorTemplateView(), controllerComponents)
+          createErrorTemplateView(), controllerComponents, fakeTableFormatter)
 
       intercept[Exception] {
         val result = controller.onPageLoad()(fakeRequest)
@@ -155,7 +157,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi,
           FakeDataCacheConnector, reportStatusConnectorMock, getEmptyCacheMap,new DataRequiredActionImpl(ec),
-          receiptServiceMock, createReportStatusView(), createErrorTemplateView(),controllerComponents)
+          receiptServiceMock, createReportStatusView(), createErrorTemplateView(),controllerComponents, fakeTableFormatter)
 
       val result = controller.onReceiptDownload(submissionId1)(fakeRequest)
 
@@ -170,7 +172,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
-          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents)
+          getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(), createErrorTemplateView(), controllerComponents, fakeTableFormatter)
 
       val result = controller.onAllReceiptsDownload()(fakeRequest)
 
@@ -186,7 +188,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,
           getEmptyCacheMap, new DataRequiredActionImpl(ec), receiptServiceMock, createReportStatusView(),
-          createErrorTemplateView(), controllerComponents)
+          createErrorTemplateView(), controllerComponents, fakeTableFormatter)
 
       val result = controller.onAllReceiptsDownload()(fakeRequest)
 
