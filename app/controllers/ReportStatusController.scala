@@ -17,9 +17,9 @@
 package controllers
 
 import java.time.format.DateTimeFormatter
-
 import cats.data.EitherT
 import cats.implicits._
+
 import javax.inject.Inject
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
@@ -32,6 +32,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import views.TableFormatter
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -45,7 +46,8 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        receiptService: ReceiptService,
                                        reportStatus: views.html.reportStatus,
                                        val errorTemplate: views.html.error_template,
-                                       controllerComponents: MessagesControllerComponents
+                                       controllerComponents: MessagesControllerComponents,
+                                       formatter: TableFormatter,
                                       )(implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
@@ -82,7 +84,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       (for {
         login <- EitherT(cachedLogin(request.externalId))
         reportStatuses <- EitherT(reportStatuses(login, filter))
-      } yield Ok(reportStatus(login.username, reportStatuses, filter)))
+      } yield Ok(reportStatus(login.username, reportStatuses, filter, formatter)))
         .valueOr(f => f)
   }
 

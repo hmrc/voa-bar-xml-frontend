@@ -40,6 +40,7 @@ report.key.type = Type
 report.value.type = Council Tax
 report.key.report.submitted = Reports submitted
 report.key.file = File
+report.key.date.time = Date and time
 report.key.date = Submission date
 report.key.error = Error
 report.link.print = Print this page

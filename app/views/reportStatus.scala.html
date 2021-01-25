@@ -15,13 +15,15 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.TableFormatter
 
 @this(
     main_template: views.html.govuk.main_template,
-    govukSummaryList: GovukSummaryList
+    govukSummaryList: GovukSummaryList,
+    govukTable: GovukTable
 )
 
-@(baCode: String, reportStatuses: Seq[ReportStatus] = Seq(), filter: Option[String] = None)(implicit request: Request[_], messages: Messages)
+@(baCode: String, reportStatuses: Seq[ReportStatus] = Seq(), filter: Option[String] = None, formatter: TableFormatter)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     pageTitle = Some(messages("service.title", messages("reports.history.title"))),
@@ -29,27 +31,31 @@
     baCode = Some(baCode)
 ) {
 
-        <h1 class="govuk-heading-l">@messages("reports.history.title")</h1>
+    <h1 class="govuk-heading-l">@messages("reports.history.title")</h1>
 
-        <p class="govuk-body">@messages("report.subheading")</p>
+    <p class="govuk-body">@messages("report.subheading")</p>
 
-        @if(reportStatuses.isEmpty){
-            <p class="govuk-body lede">
-                @messages("reports.notFound")
-            </p>
-        }else{
-        @reportStatuses.map{ reportStatus =>
-            <h2 class="govuk-heading-m">@messages("status.submissionId.title") @reportStatus.id.split("-").head</h2>
-            @components.submission_panel(
-                reportStatus,
-                govukSummaryList
+    @if(reportStatuses.isEmpty) {
+        <p class="govuk-body lede">
+        @messages("reports.notFound")
+        </p>
+    } else {
+
+        @govukTable(
+            Table(
+                head = Some(Seq(
+                    HeadCell(Text(messages("report.key.date.time"))),
+                    HeadCell(Text(messages("report.key.submissionId"))),
+                    HeadCell(Text(messages("report.key.file"))),
+                    HeadCell(Text(messages("report.key.status")))
+                )),
+                rows = formatter.formatRows(reportStatuses)
             )
-        }
+        )
 
-        <p class="js-hidden govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
-
-        <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
+        <p class="govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
     }
 
+    <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
 }
