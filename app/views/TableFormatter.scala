@@ -34,7 +34,7 @@ class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
   }
 
   def formatStatuslink(value: Option[String])(implicit messages: Messages) : String = value match {
-    case Some("true") => Messages("confirmation.heading.submitted")
+    case Some("Done") => Messages("confirmation.heading.submitted")
     case _ => Messages("confirmation.heading.failed")
   }
 
