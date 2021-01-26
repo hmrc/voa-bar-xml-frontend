@@ -47,7 +47,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        reportStatus: views.html.reportStatus,
                                        val errorTemplate: views.html.error_template,
                                        controllerComponents: MessagesControllerComponents,
-                                       formatter: TableFormatter,
+                                       formatter: TableFormatter
                                       )(implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {

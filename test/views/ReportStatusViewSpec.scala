@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package views
 
 import java.time.ZonedDateTime
-
 import models.{Done, Failed, Pending, ReportStatus, Submitted, Verified}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.behaviours.ViewBehaviours
 
 class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
@@ -34,11 +34,12 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
   val reportStatus3 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Failed.value))
   val reportStatus4 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Done.value))
   val reportStatus5 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Pending.value))
-
+  def servicesConfig = injector.instanceOf[ServicesConfig]
+  val fakeTableFormatter = new TableFormatter(servicesConfig)
 
   val reportStatusFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ReportStatusController"))
 
-  def createView(reportStatuses: Seq[ReportStatus] = Seq()) = () => createReportStatusView()(username, reportStatuses)(reportStatusFakeRequest, messages)
+  def createView(reportStatuses: Seq[ReportStatus] = Seq()) = () => createReportStatusView()(username, reportStatuses, None, fakeTableFormatter)(reportStatusFakeRequest, messages)
 
   def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
 
