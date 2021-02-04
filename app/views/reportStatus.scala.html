@@ -18,14 +18,14 @@
 @import views.TableFormatter
 
 @this(
-    main_template: views.html.govuk.main_template,
+    main_template: main_no_container,
     govukTable: GovukTable
 )
 
 @(baCode: String, reportStatuses: Seq[ReportStatus] = Seq(), filter: Option[String] = None, formatter: TableFormatter)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = Some(messages("service.title", messages("reports.history.title"))),
+    pageTitle = messages("service.title", messages("reports.history.title")),
     backLinkUrl = Some(routes.WelcomeController.onPageLoad().url),
     baCode = Some(baCode)
 ) {
