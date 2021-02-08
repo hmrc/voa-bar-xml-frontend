@@ -17,7 +17,6 @@
 package views
 
 import java.util.Locale
-
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
@@ -29,12 +28,14 @@ import play.api.i18n.Lang
 import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
-import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
+import uk.gov.hmrc.govukfrontend.views.html.layouts.{govukLayout, govukTemplate}
+import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
+import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcFooterItems, hmrcStandardFooter}
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 import views.html.govuk.{head, scripts}
-import views.html.{add_to_list, confirmation, councilTaxUpload, error_template, login, reportStatus, task_list, welcome}
+import views.html.{add_to_list, confirmation, councilTaxUpload, error_template, login, main_no_container, reportStatus, task_list, welcome}
 
 trait ViewSpecBase extends SpecBase with Injecting {
 
@@ -148,7 +149,7 @@ trait ViewSpecBase extends SpecBase with Injecting {
 
   def createReportStatusView(): reportStatus = {
     new reportStatus(
-      createMain_template(),
+      createMain_no_container_template(),
       new govukTable()
     )
   }
@@ -179,6 +180,21 @@ trait ViewSpecBase extends SpecBase with Injecting {
       new govukBackLink(),
       new govukSummaryList(),
       inject[AccessibilityStatementConfig]
+    )
+  }
+
+  def createMain_no_container_template(): views.html.main_no_container = {
+    new main_no_container(
+      createGovukLayout(),
+      create_head(),
+      create_scripts(),
+      new govukPhaseBanner(new govukTag()),
+      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
+      new govukTemplate(new GovukHeader(), new GovukFooter(), new GovukSkipLink()),
+      new govukBackLink(),
+      new govukSummaryList(),
+      inject[AccessibilityStatementConfig],
+      new hmrcStandardFooter(new HmrcFooter(), new HmrcFooterItems(new uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig(Configuration(ConfigFactory.load))))
     )
   }
 
