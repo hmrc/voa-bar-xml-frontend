@@ -16,6 +16,8 @@
 
 package views
 
+import controllers.ReverseConfirmationController
+
 import javax.inject.Inject
 import models.ReportStatus
 import play.api.i18n.Messages
@@ -25,12 +27,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
 
-  val serviceUrl = serviceConfig.baseUrl("voa-bar-xml-frontend")
-  val baseSegment = "/voa-bar-xml-frontend/council-tax/jobs/refresh?submissionId="
-  val url = serviceUrl + baseSegment
-
-  def formatSummaryLink(reportStatus: ReportStatus)(implicit messages: Messages) = {
-    s"<a href='${url}${reportStatus.id}'>${formatStatuslink(reportStatus.status)}</a>"
+  def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(implicit messages: Messages) = {
+    s"<a href='${confirmationController.onPageRefresh(reportStatus.id)}'>${formatStatuslink(reportStatus.status)}</a>"
   }
 
   def formatStatuslink(value: Option[String])(implicit messages: Messages) : String = value match {
@@ -38,13 +36,13 @@ class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
     case _ => Messages("confirmation.heading.failed")
   }
 
-  def formatRows(reportStatuses: Seq[ReportStatus])(implicit messages: Messages) = {
+  def formatRows(reportStatuses: Seq[ReportStatus], confirmationController: ReverseConfirmationController)(implicit messages: Messages) = {
     reportStatuses.map ( reportStatus =>
       Seq (
         TableRow(Text(reportStatus.formattedCreated)),
         TableRow(Text(reportStatus.id.split("-").head)),
         TableRow(Text(reportStatus.filename.getOrElse("Unknown"))),
-        TableRow(HtmlContent(formatSummaryLink(reportStatus)))
+        TableRow(HtmlContent(formatSummaryLink(reportStatus, confirmationController)))
       )
     )
   }
