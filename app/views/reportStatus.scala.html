@@ -48,7 +48,7 @@
                     HeadCell(Text(messages("report.key.file"))),
                     HeadCell(Text(messages("report.key.status")))
                 )),
-                rows = formatter.formatRows(reportStatuses)
+                rows = formatter.formatRows(reportStatuses, routes.ConfirmationController)
             )
         )
 
