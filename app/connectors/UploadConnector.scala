@@ -86,7 +86,7 @@ class UploadConnector @Inject()(http: HttpClient,
   def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] = {
     http.POST[InitiateRequest, InitiateResponse](initiateUrl, request)
       .map{ initiateResponse =>
-        logger.info(s"Upscan initiate response : ${initiateResponse}")
+        logger.debug(s"Upscan initiate response : ${initiateResponse}")
         initiateResponse
       }.map(Right(_))
       .recover {
