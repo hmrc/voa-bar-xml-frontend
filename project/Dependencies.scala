@@ -5,21 +5,21 @@ object Dependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "3.15.0-play-26"
-  private val logbackJsonLoggerVersion = "4.8.0"
+  private val playHealthVersion = "3.16.0-play-26"
+  private val logbackJsonLoggerVersion = "5.1.0"
   private val govukTemplateVersion = "5.58.0-play-26"
   private val playUiVersion = "8.14.0-play-26"
   private val scalaTestPlusPlayVersion = "3.1.3"
   private val pegdownVersion = "1.6.0"
-  private val httpCachingClientVersion = "9.1.0-play-26"
-  private val simpleReactiveMongo = "7.30.0-play-26"
-  private val playConditionalFormMappingVersion = "1.3.0-play-26"
-  private val playLanguageVersion = "4.5.0-play-26"
-  private val bootstrapVersion = "2.0.0"
+  private val httpCachingClientVersion = "9.2.0-play-26"
+  private val simpleReactiveMongo = "7.31.0-play-26"
+  private val playConditionalFormMappingVersion = "1.6.0-play-26"
+  private val playLanguageVersion = "4.10.0-play-26"
+  private val bootstrapVersion = "2.3.0"
   private val scalacheckVersion = "1.14.1"
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
-  private val playPartialsVersion = "7.0.0-play-26"
+  private val playPartialsVersion = "7.1.0-play-26"
   private val playFrontendGovUkVersion = "0.53.0-play-26"
   private val playFrontendHmrcVersion  = "0.24.0-play-26"
   private val akkaVersion     = "2.5.26"
@@ -55,5 +55,5 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % scope
   )
 
-  val appDependencies = compileDependencies ++ testDependencies("test") ++ testDependencies("it")
+  val appDependencies = compileDependencies ++ testDependencies("test")
 }

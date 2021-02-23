@@ -27,7 +27,7 @@ class LanguageSwitchController @Inject() ( languageUtils: LanguageUtils,
                                            configuration: Configuration,
                                            appConfig: FrontendAppConfig,
                                            controllerComponents: MessagesControllerComponents
-                                         ) extends LanguageController(configuration, languageUtils, controllerComponents) {
+                                         ) extends LanguageController(languageUtils, controllerComponents) {
 
   override protected def fallbackURL: String = routes.WelcomeController.onPageLoad().url
 
