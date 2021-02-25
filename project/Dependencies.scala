@@ -20,8 +20,8 @@ object Dependencies {
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
   private val playPartialsVersion = "7.1.0-play-26"
-  private val playFrontendGovUkVersion = "0.53.0-play-26"
-  private val playFrontendHmrcVersion  = "0.24.0-play-26"
+  private val playFrontendGovUkVersion = "0.63.0-play-26"
+  private val playFrontendHmrcVersion  = "0.48.0-play-26"
   private val akkaVersion     = "2.5.26"
 
   val compileDependencies = Seq(
