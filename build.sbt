@@ -8,7 +8,7 @@ import com.typesafe.sbt.uglify.Import._
 import com.typesafe.sbt.digest.Import._
 import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.{SbtAutoBuildPlugin, _}
-import DefaultBuildSettings.{defaultSettings, scalaSettings, integrationTestSettings}
+import DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
 
@@ -40,11 +40,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
-    //dependencyOverrides := Dependencies.dependencyOverrides
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(integrationTestSettings(): _*)
   .settings(resolvers ++= Seq(
     Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo,
