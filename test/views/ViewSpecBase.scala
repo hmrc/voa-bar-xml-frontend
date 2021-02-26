@@ -30,7 +30,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
 import uk.gov.hmrc.govukfrontend.views.html.layouts.{govukLayout, govukTemplate}
 import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
-import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcFooterItems, hmrcStandardFooter}
+import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcFooterItems, HmrcTrackingConsentSnippet, hmrcStandardFooter}
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
@@ -199,7 +199,9 @@ trait ViewSpecBase extends SpecBase with Injecting {
   }
 
   def create_head(): head = {
-    new head()
+    val conf = new uk.gov.hmrc.hmrcfrontend.config.TrackingConsentConfig(Configuration())
+    val trackingConsentSnippet = new HmrcTrackingConsentSnippet(conf)
+    new head(trackingConsentSnippet)
   }
 
   def create_scripts(): scripts = {
