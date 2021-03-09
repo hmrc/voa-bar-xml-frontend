@@ -102,12 +102,12 @@ object UniformJourney {
 
 
   // $COVERAGE-OFF$
-  def addPropertyCommon[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05Common] = {
+  def addPropertyCommon[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], cr05Common: Option[Cr05Common]): F[Cr05Common] = {
     import interpreter._
     for {
-      baReport <- ask[String]("add-property-ba-report", validation = baReportValidation)
-      baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation)
-      effectiveDate <- ask[LocalDate]("add-property-effective-date")
+      baReport <- ask[String]("add-property-ba-report", validation = baReportValidation, default = cr05Common.map(_.baReport))
+      baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation, default = cr05Common.map(_.baRef))
+      effectiveDate <- ask[LocalDate]("add-property-effective-date", default = cr05Common.map(_.effectiveDate))
       ctForm = Cr05Common(baReport, baRef, effectiveDate)
       _ <- tell[Cr05Common]("add-property-check-answers-common", ctForm)
     } yield ctForm

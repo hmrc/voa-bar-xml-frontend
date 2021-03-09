@@ -24,7 +24,7 @@ import interpreters.playframework._
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
 import models.requests.OptionalDataRequest
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
 import services.Cr01Cr03Service
@@ -73,6 +73,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
 
     def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+      Logger.warn(s"externalID: ${externalId}, db: ${db}")
       dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
     }
 
@@ -101,18 +102,21 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-    val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)))
-    if(request.userAnswers.flatMap(_.login).isEmpty) {
-      implicit val messages = cc.messagesApi.preferred(request)
-      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
-    } else {
-      addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
-        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05SubmissionBuilder =>
-          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None, None)){ existingCr05SubmissionBuilder =>
-            existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
-          }
-          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
-            Redirect(routes.TaskListController.onPageLoad())
+    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey).flatMap { maybeData =>
+
+      val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection))
+      if (request.userAnswers.flatMap(_.login).isEmpty) {
+        implicit val messages = cc.messagesApi.preferred(request)
+        Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+      } else {
+        addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
+          dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
+            val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None, None)) { existingCr05SubmissionBuilder =>
+              existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
+            }
+            dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
+              Redirect(routes.TaskListController.onPageLoad())
+            }
           }
         }
       }
@@ -143,7 +147,11 @@ class UniformController @Inject()(messagesApi: MessagesApi,
               }
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
+            if(cr05Submission.splitProperties.map(_.isEmpty).getOrElse(true)) {
+              Redirect(routes.TaskListController.onPageLoad())
+            } else {
               Redirect(routes.AddToListController.onPageLoad())
+            }
           }
         }
       }
