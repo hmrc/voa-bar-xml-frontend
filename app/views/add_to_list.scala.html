@@ -43,10 +43,12 @@
 
         @cr05Submission.splitProperties.map { maybeSplitProperties =>
           <ul class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
-           @maybeSplitProperties.map { splitProperties =>
+           @maybeSplitProperties.zip(0 to maybeSplitProperties.size - 1).map { case (splitProperties, index) =>
                <li class="hmrc-add-to-a-list__contents">
                     <span class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
-                      @splitProperties.address.displayAddress
+                        <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.PROPOSED, index)">
+                            @splitProperties.address.displayAddress
+                        </a>
                     </span>
                    <span class="hmrc-add-to-a-list__remove">
                       <a class="govuk-link" href="#">

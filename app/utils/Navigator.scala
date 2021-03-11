@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.Call
 import controllers.routes
 import identifiers._
-import models.{CheckMode, Mode, NormalMode}
+import models.{CheckMode, Mode, NormalMode, PropertyType}
 
 @Singleton
 class Navigator @Inject()() {
@@ -31,7 +31,7 @@ class Navigator @Inject()() {
     CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
     TaskListId ->  (_ => routes.TaskListController.onPageLoad()),
     AddPropertyReportDetailsId -> (_ => routes.UniformController.addCommonSectionJourney("add-property-ba-report")),
-    AddPropertyId -> (_ => routes.UniformController.addPropertyJourney("add-property-UPRN")),
+    AddPropertyId -> (_ => routes.UniformController.propertyJourney("add-property-UPRN", PropertyType.PROPOSED)),
     AddCommentId -> (_ => routes.UniformController.addCommentJourney()),
     CheckYourAnswersId -> (_ => routes.UniformController.cr05CheckAnswerJourney())
   )
