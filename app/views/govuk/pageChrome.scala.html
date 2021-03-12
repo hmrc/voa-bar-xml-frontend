@@ -51,7 +51,7 @@
     backLinkUrl = Some(breadcrumbs.tail.headOption.getOrElse(controllers.routes.WelcomeController.onPageLoad().url))
 ) {
 
-    @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/")),
+    @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/") + "?" + request.rawQueryString),
         ('novalidate -> "novalidate"), ('autoComplete -> "off")
     ) {
         @if(errors.isNonEmpty) {

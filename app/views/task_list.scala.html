@@ -62,9 +62,15 @@
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
                     @if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
-                        <a href="@routes.TaskListController.goToAddPropertyPage().url" aria-describedby="add-property-status">
-                        Add a property
-                        </a>
+                        @cr05Submission.flatMap(_.propertyToBeSplit).map{propertyToSplit =>
+                            <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.EXISTING, 0)" aria-describedby="add-property-status">
+                                @(propertyToSplit.address.line1), @(propertyToSplit.address.line2), @propertyToSplit.address.postcode
+                            </a>
+                        }.getOrElse {
+                            <a href="@routes.UniformController.propertyJourney("add-property-UPRN", PropertyType.EXISTING)" aria-describedby="add-property-status">
+                                Add a property
+                            </a>
+                        }
                     } else {
                         Add a property
                     }

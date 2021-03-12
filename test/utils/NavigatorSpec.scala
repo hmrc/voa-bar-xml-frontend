@@ -62,7 +62,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
 
       "on selecting Add Property Journey link should redirect to Add Property Journey Page" in {
         AddPropertyId.toString mustBe "addproperty"
-        navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.addPropertyJourney("add-property-UPRN")
+        navigator.nextPage(AddPropertyId, NormalMode) (uploadUserAnswers) mustBe routes.UniformController.propertyJourney("add-property-UPRN", PropertyType.PROPOSED)
       }
 
       "on selecting Add Comments Journey link should redirect to Add Comment Journey Page" in {

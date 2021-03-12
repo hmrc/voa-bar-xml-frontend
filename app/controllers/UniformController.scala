@@ -21,8 +21,11 @@ import connectors.DataCacheConnector
 import controllers.actions.DataRetrievalAction
 import ltbs.uniform._
 import interpreters.playframework._
+
 import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
+import journey.UniformJourney.{AskTypes, Cr05AddProperty, Cr05SubmissionBuilder, TellTypes, addPropertyHelper}
+import models.PropertyType
 import models.requests.OptionalDataRequest
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Messages => _, _}
@@ -81,6 +84,15 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionConfirmation)
 
+  def myInterpreter(implicit request: Request[_]): AutobarsInterpreter = {
+    val results = new Results {
+      override def Redirect(url: String, queryString: Map[String, Seq[String]], status: Int): Result = {
+        super.Redirect(url, queryString ++ request.queryString, status)
+      }
+    }
+    new AutobarsInterpreter(results, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionConfirmation)
+  }
+
   def myJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
@@ -123,40 +135,62 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
   }
 
-  def addPropertyJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+
+  def editPropertyJourney(targetId: String, propertyType: PropertyType, index: Int): Action[AnyContent] = propertyJourney(
+    targetId, propertyType, Option(index))
+
+  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int])= getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+    getCr05Submission.flatMap { propertyBuilder =>
+
+      val property = propertyType match {
+        case PropertyType.EXISTING => propertyBuilder.propertyToBeSplit
+        case PropertyType.PROPOSED => propertyBuilder.splitProperties.flatMap(x => index.flatMap(index => x.lift(index)))
+      }
+      runPropertyJourney(targetId, propertyType, property, index)
+    }
+  }
+
+  def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])(implicit request: OptionalDataRequest[AnyContent]) = {
+    val interpreter = myInterpreter
     import interpreter._
     import UniformJourney._
-
-    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)))
-    if(request.userAnswers.flatMap(_.login).isEmpty) {
-      implicit val messages = cc.messagesApi.preferred(request)
-      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
-    } else {
-      addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
-        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
-          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, Some(cr05AddProperty), None, None)){ existingSubmission =>
-
-              if (existingSubmission.propertyToBeSplit.isEmpty){
-                existingSubmission.copy(propertyToBeSplit = Some(cr05AddProperty))
-              } else {
-                val splitProperties =
-                existingSubmission.splitProperties.fold(Some(List(cr05AddProperty))){ sp =>
-                  Some(sp :+ cr05AddProperty)
-                }
-                existingSubmission.copy(splitProperties = splitProperties)
-              }
-          }
-          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
-            if(cr05Submission.splitProperties.map(_.isEmpty).getOrElse(true)) {
-              Redirect(routes.TaskListController.onPageLoad())
-            } else {
-              Redirect(routes.AddToListController.onPageLoad())
-            }
-          }
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property)
+    addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
+      updateProperty(propertyType, cr05AddProperty, index).map { _ =>
+        propertyType match {
+          case PropertyType.EXISTING => Redirect(routes.TaskListController.onPageLoad())
+          case PropertyType.PROPOSED => Redirect(routes.AddToListController.onPageLoad())
         }
       }
     }
+
   }
+
+  def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: OptionalDataRequest[_] ) = {
+    Logger.warn(s"updating property : ${propertyType}, ${index}")
+    (propertyType, index) match {
+      case (PropertyType.EXISTING, _) => getCr05Submission.map(x => x.copy(propertyToBeSplit = Some(property))).flatMap(storeCr05Submission)
+      case (PropertyType.PROPOSED, None) => getCr05Submission.map(x => x.copy(splitProperties = x.splitProperties.map(z => z :+ property ).orElse(Some(List(property))))).flatMap(storeCr05Submission)
+      case (PropertyType.PROPOSED, Some(index)) => {
+        getCr05Submission.map { builder =>
+          val splitProperties = builder.splitProperties.map { properties =>
+            properties.updated(index, property)
+          }
+          builder.copy(splitProperties = splitProperties)
+        }.flatMap(storeCr05Submission)
+      }
+    }
+  }
+
+  def storeCr05Submission(submission: Cr05SubmissionBuilder)(implicit request: OptionalDataRequest[_]) = {
+    dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, submission).map(_ => ())
+  }
+
+  def getCr05Submission(implicit request: OptionalDataRequest[_]): Future[Cr05SubmissionBuilder] = {
+    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
+      .map(_.getOrElse(Cr05SubmissionBuilder(None, None, None, None)))
+  }
+
 
   def addCommentJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
     import interpreter._

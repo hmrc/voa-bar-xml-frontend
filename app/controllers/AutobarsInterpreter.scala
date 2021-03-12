@@ -68,6 +68,8 @@ class AutobarsInterpreter (
     }
   }
 
+
+
   override def pageChrome(
                            key: List[String],
                            errors: ErrorTree,

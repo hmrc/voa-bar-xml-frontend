@@ -17,14 +17,13 @@
 package journey
 
 import java.time.LocalDate
-
 import cats.data.Validated
 import ltbs.uniform._
 import cats.implicits._
+import journey.UniformJourney.Cr05AddProperty
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
 import play.api.libs.json._
-
 
 import scala.language.higherKinds
 
@@ -113,24 +112,31 @@ object UniformJourney {
     } yield ctForm
   }
 
-  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr05AddProperty] = {
+  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], property: Option[Cr05AddProperty]): F[Cr05AddProperty] = {
     import interpreter._
     for {
-      uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation)
-      address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"))
-      propertyContactDetails <- ask[ContactDetails]("add-property-property-contact-details", validation = propertyContactDetailValidator)
-      sameContactAddress <- ask[YesNoType]("add-property-same-contact-address")
-      contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address")) when (
-        sameContactAddress == No
-        )
-      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref")
-      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator) when (havePlanningRef == Yes)
-      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref") when (havePlanningRef == No)
+      uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation, default = property.map(_.uprn))
+      address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"), default = property.map(_.address))
+      propertyContactDetails <- ask[ContactDetails]("add-property-property-contact-details", validation = propertyContactDetailValidator, default = property.map(_.propertyContactDetails))
+      sameContactAddress <- ask[YesNoType]("add-property-same-contact-address", default = property.map(x => booleaToYesNo(x.sameContactAddress)))
+      contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address"),
+        default = property.flatMap(_.contactAddress)) when (sameContactAddress == No)
+      havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref", default = property.map(x => booleaToYesNo(x.havePlaningReference)))
+      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator, default = property.flatMap(_.planningRef)) when (havePlanningRef == Yes)
+      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref", default = property.flatMap(_.noPlanningReference)) when (havePlanningRef == No)
       ctForm = Cr05AddProperty(uprn, address, propertyContactDetails,
         sameContactAddress == Yes, contactAddress, havePlanningRef == Yes, planningRef, noPlanningReference)
 
       _ <- tell[Cr05AddProperty]("add-property-check-answers-property", ctForm)
     } yield ctForm
+  }
+
+  def booleaToYesNo(value: Boolean): YesNoType = {
+    if (value) {
+      Yes
+    }else {
+      No
+    }
   }
 
   def addComments[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Option[String]] = {
