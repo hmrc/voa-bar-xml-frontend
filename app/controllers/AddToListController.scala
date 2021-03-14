@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions._
 import identifiers.{AddPropertyId, VOAAuthorisedId}
+
 import javax.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
@@ -28,8 +29,10 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.Navigator
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import models.YesNoForm._
+
+import scala.util.Try
 
 class AddToListController @Inject()(appConfig: FrontendAppConfig,
                                     getData: DataRetrievalAction,
@@ -63,6 +66,30 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
           }
         }
       )
+  }
+
+  def removeProperty = (getData andThen requireData).async { implicit request =>
+
+    val propertyIndex = request.body.asFormUrlEncoded.getOrElse(Map()).get("delete-index").map(_.head).flatMap { i =>
+      Try {
+        i.toInt
+      }.toOption
+    }
+
+    propertyIndex.map { index =>
+      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
+        maybeCr05Submission.map { cr05Submission =>
+          val proposed = cr05Submission.splitProperties.map { properties =>
+            properties.take(index) ++ properties.drop(index + 1)
+          }
+          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission.copy(splitProperties = proposed))
+            .map(_ => Redirect(routes.AddToListController.onPageLoad()))
+
+        }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad())))
+      }
+    }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad())))
+
+
   }
 
 }

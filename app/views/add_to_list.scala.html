@@ -21,7 +21,8 @@
 
 @this(
     main_template: views.html.govuk.main_template,
-    formWithCSRF: FormWithCSRF
+    formWithCSRF: FormWithCSRF,
+    govukButton: GovukButton
 )
 
 
@@ -51,10 +52,12 @@
                         </a>
                     </span>
                    <span class="hmrc-add-to-a-list__remove">
-                      <a class="govuk-link" href="#">
-                        <span aria-hidden="true">Remove</span>
-                        <span class="govuk-visually-hidden">Remove @splitProperties.address.displayAddress</span>
-                      </a>
+                   @formWithCSRF(action = routes.AddToListController.removeProperty(),
+                       ('novalidate -> "novalidate"), ('autoComplete -> "off")
+                   ) {
+                       @govukButton(Button(value = Option(index.toString), content = Text("Remove"), classes = "govuk-button--warning",
+                           name = Option("delete-index")))
+                   }
                     </span>
                </li>
            }
