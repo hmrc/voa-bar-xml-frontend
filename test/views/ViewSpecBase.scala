@@ -135,7 +135,8 @@ trait ViewSpecBase extends SpecBase with Injecting {
   def createAddToListView(): add_to_list = {
     new add_to_list(
       createMain_template(),
-      new formWithCSRF()
+      new formWithCSRF(),
+      new GovukButton()
     )
   }
 

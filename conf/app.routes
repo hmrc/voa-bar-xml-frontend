@@ -49,6 +49,7 @@ GET         /start-add-comments                                 controllers.Task
 GET         /start-check-answers                                controllers.TaskListController.goToCheckYourAnswersPage()
 GET         /add-to-list                                        controllers.AddToListController.onPageLoad()
 POST        /confirm-add-property                               controllers.AddToListController.addProperty()
+POST        /delete-property                                    controllers.AddToListController.removeProperty()
 
 GET         /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
 POST        /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
