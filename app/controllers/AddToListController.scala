@@ -79,9 +79,8 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
     propertyIndex.map { index =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
         maybeCr05Submission.map { cr05Submission =>
-          val proposed = cr05Submission.splitProperties.map { properties =>
-            properties.take(index) ++ properties.drop(index + 1)
-          }
+          val proposed = cr05Submission.splitProperties.take(index) ++ cr05Submission.splitProperties.drop(index + 1)
+
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission.copy(splitProperties = proposed))
             .map(_ => Redirect(routes.AddToListController.onPageLoad()))
 

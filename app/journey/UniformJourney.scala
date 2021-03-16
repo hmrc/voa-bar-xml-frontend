@@ -66,7 +66,7 @@ object UniformJourney {
   case class Cr05SubmissionBuilder(
       cr05CommonSection: Option[Cr05Common],
       propertyToBeSplit: Option[Cr05AddProperty],
-      splitProperties: Option[List[Cr05AddProperty]],
+      splitProperties: List[Cr05AddProperty],
       comments: Option[String]
   )
 

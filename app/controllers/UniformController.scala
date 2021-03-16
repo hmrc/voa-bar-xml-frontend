@@ -123,7 +123,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       } else {
         addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
           dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
-            val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, None, None)) { existingCr05SubmissionBuilder =>
+            val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), None, List(), None)) { existingCr05SubmissionBuilder =>
               existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
             }
             dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
@@ -144,7 +144,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
       val property = propertyType match {
         case PropertyType.EXISTING => propertyBuilder.propertyToBeSplit
-        case PropertyType.PROPOSED => propertyBuilder.splitProperties.flatMap(x => index.flatMap(index => x.lift(index)))
+        case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.splitProperties.lift(x))
       }
       runPropertyJourney(targetId, propertyType, property, index)
     }
@@ -170,12 +170,10 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     Logger.warn(s"updating property : ${propertyType}, ${index}")
     (propertyType, index) match {
       case (PropertyType.EXISTING, _) => getCr05Submission.map(x => x.copy(propertyToBeSplit = Some(property))).flatMap(storeCr05Submission)
-      case (PropertyType.PROPOSED, None) => getCr05Submission.map(x => x.copy(splitProperties = x.splitProperties.map(z => z :+ property ).orElse(Some(List(property))))).flatMap(storeCr05Submission)
+      case (PropertyType.PROPOSED, None) => getCr05Submission.map(x => x.copy(splitProperties = x.splitProperties :+ property )).flatMap(storeCr05Submission)
       case (PropertyType.PROPOSED, Some(index)) => {
         getCr05Submission.map { builder =>
-          val splitProperties = builder.splitProperties.map { properties =>
-            properties.updated(index, property)
-          }
+          val splitProperties = builder.splitProperties.updated(index, property)
           builder.copy(splitProperties = splitProperties)
         }.flatMap(storeCr05Submission)
       }
@@ -188,7 +186,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   def getCr05Submission(implicit request: OptionalDataRequest[_]): Future[Cr05SubmissionBuilder] = {
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
-      .map(_.getOrElse(Cr05SubmissionBuilder(None, None, None, None)))
+      .map(_.getOrElse(Cr05SubmissionBuilder(None, None, List(), None)))
   }
 
 
@@ -203,7 +201,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     } else {
       addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
-          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, None, None, comments)){ existingSubmission =>
+          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, None, List(), comments)){ existingSubmission =>
             existingSubmission.copy(comments = comments)
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
