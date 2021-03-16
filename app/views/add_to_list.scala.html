@@ -33,8 +33,8 @@
     baCode = Some(baCode)
 ) {
 
-      @cr05Submission.splitProperties.map { splitPropertiesList =>
-            <h1 class="govuk-heading-l">You have created @{splitPropertiesList.length} properties </h1>
+      @cr05Submission.splitProperties.headOption.map { _ =>
+            <h1 class="govuk-heading-l">You have created @{cr05Submission.splitProperties.length} properties </h1>
       }.getOrElse{
             <h1 class="govuk-heading-l">Create a property</h1>
       }
@@ -42,9 +42,10 @@
       <span class="govuk-hint">The property must be split into at least two new properties.</span>
       <div class="govuk-form-group">
 
-        @cr05Submission.splitProperties.map { maybeSplitProperties =>
+
+        @if(cr05Submission.splitProperties.nonEmpty) {
           <ul class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
-           @maybeSplitProperties.zip(0 to maybeSplitProperties.size - 1).map { case (splitProperties, index) =>
+           @cr05Submission.splitProperties.zipWithIndex.map { case (splitProperties, index) =>
                <li class="hmrc-add-to-a-list__contents">
                     <span class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
                         <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.PROPOSED, index)">
@@ -55,7 +56,7 @@
                    @formWithCSRF(action = routes.AddToListController.removeProperty(),
                        ('novalidate -> "novalidate"), ('autoComplete -> "off")
                    ) {
-                       @govukButton(Button(value = Option(index.toString), content = Text("Remove"), classes = "govuk-button--warning",
+                       @govukButton(Button(value = Option(index.toString), content = Text("Remove"), classes = "govuk-button--warning govuk-!-margin-bottom-0",
                            name = Option("delete-index")))
                    }
                     </span>
@@ -70,7 +71,7 @@
         @formWithCSRF(action = routes.AddToListController.addProperty(),
         ('novalidate -> "novalidate"), ('autoComplete -> "off")
         ) {
-            @if(cr05Submission.splitProperties.exists(sp => sp.length > 1 && sp.length < 5)) {
+            @if(cr05Submission.splitProperties.length > 1 && cr05Submission.splitProperties.length < 5) {
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="add-another-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -99,7 +100,7 @@
             <button class="govuk-button" data-module="govuk-button">
                 continue
             </button>
-            } else if(cr05Submission.splitProperties.exists(_.length >= 5)) {
+            } else if(cr05Submission.splitProperties.length >= 5) {
                 <input type="hidden" value="false" id="add-another" name="add-another">
                 <button class="govuk-button" data-module="govuk-button">
                     Continue

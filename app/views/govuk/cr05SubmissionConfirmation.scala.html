@@ -42,15 +42,14 @@
        )
      }
 
-    @cr05Submission.splitProperties.map { spList =>
-        @spList.zipWithIndex.map { case (sp, index) =>
-            <h2 class="govuk-heading-m">New property @(index + 1)</h2>
+    @cr05Submission.splitProperties.zipWithIndex.map { case (sp, index) =>
+    <h2 class="govuk-heading-m">New property @(index + 1)</h2>
 
-            @summaryList(
-                (new Cr05AddPropertyWebTell(summaryList)).summaryList(cr05Submission.propertyToBeSplit.get, messages)
-            )
-        }
+        @summaryList(
+            (new Cr05AddPropertyWebTell(summaryList)).summaryList(cr05Submission.propertyToBeSplit.get, messages)
+        )
     }
+
 
     <h2 class="govuk-heading-m">Comments</h2>
 

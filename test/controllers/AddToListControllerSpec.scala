@@ -76,7 +76,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
         false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
         true, Option("1122"), None)
-      val propertyToSplitSubmission = Cr05SubmissionBuilder(None, None, Some(List(addProperty)), None)
+      val propertyToSplitSubmission = Cr05SubmissionBuilder(None, None, List(addProperty), None)
       val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
       status(result) mustBe OK
@@ -88,7 +88,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
         false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
         true, Option("1122"), None)
-      val propertyToSplitSubmission = Cr05SubmissionBuilder(None, None, Some(List(addProperty, addProperty)), None)
+      val propertyToSplitSubmission = Cr05SubmissionBuilder(None, None, List(addProperty, addProperty), None)
       val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
       status(result) mustBe OK
