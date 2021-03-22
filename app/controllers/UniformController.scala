@@ -18,7 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import controllers.actions.DataRetrievalAction
+import controllers.actions.{DataRequiredAction, DataRetrievalAction}
 import ltbs.uniform._
 import interpreters.playframework._
 
@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 import journey.UniformJourney
 import journey.UniformJourney.{AskTypes, Cr05AddProperty, Cr05SubmissionBuilder, TellTypes, addPropertyHelper}
 import models.PropertyType
-import models.requests.OptionalDataRequest
+import models.requests.{DataRequest, OptionalDataRequest}
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
@@ -46,6 +46,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   govukDateInput: govukDateInput,
                                   dataCacheConnector: DataCacheConnector,
                                   getData: DataRetrievalAction,
+                                  requireData: DataRequiredAction,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
                                   cr05SubmissionConfirmation: cr05SubmissionConfirmation,
@@ -60,6 +61,35 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import utils.Formats.uniformDBFormat
 
     override def apply(request: OptionalDataRequest[AnyContent])(
+      f: DB => Future[(_root_.ltbs.uniform.interpreters.playframework.DB, Result)]): Future[Result] = {
+
+      for {
+        db <- load(request.externalId)
+        (newdb, result) <- f(db)
+        _ <- save(request.externalId, newdb)
+      }yield {
+        result
+      }
+    }
+
+    def load(externalId: String): Future[_root_.ltbs.uniform.interpreters.playframework.DB] = {
+      dataCacheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
+    }
+
+    def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+      Logger.warn(s"externalID: ${externalId}, db: ${db}")
+      dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
+    }
+
+  }
+
+  implicit val mongoPersistance2: PersistenceEngine[DataRequest[AnyContent]] = new PersistenceEngine[DataRequest[AnyContent]]() {
+
+    val storageKey = "CR03"
+
+    import utils.Formats.uniformDBFormat
+
+    override def apply(request: DataRequest[AnyContent])(
       f: DB => Future[(_root_.ltbs.uniform.interpreters.playframework.DB, Result)]): Future[Result] = {
 
       for {
@@ -189,27 +219,26 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       .map(_.getOrElse(Cr05SubmissionBuilder(None, None, List(), None)))
   }
 
+  def getCr05Submission(request: DataRequest[_]): Future[Cr05SubmissionBuilder] = {
+    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
+      .map(_.getOrElse(Cr05SubmissionBuilder(None, None, List(), None)))
+  }
 
-  def addCommentJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>
+
+  def addCommentJourney(targetId: String) = (getData andThen requireData).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
-    val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)))
-    if(request.userAnswers.flatMap(_.login).isEmpty) {
-      implicit val messages = cc.messagesApi.preferred(request)
-      Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
-    } else {
+    getCr05Submission(request).flatMap { submission =>
+      val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments)
       addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
-        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { savedCr05Submission =>
-          val cr05Submission = savedCr05Submission.fold(Cr05SubmissionBuilder(None, None, List(), comments)){ existingSubmission =>
-            existingSubmission.copy(comments = comments)
-          }
-          dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
-              Redirect(routes.TaskListController.onPageLoad())
-          }
+        val cr05Submission = submission.copy(comments = comments)
+        dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
+          Redirect(routes.TaskListController.onPageLoad())
         }
       }
     }
+
   }
 
   def cr05CheckAnswerJourney(targetId: String) = getData.async { implicit request: OptionalDataRequest[AnyContent] =>

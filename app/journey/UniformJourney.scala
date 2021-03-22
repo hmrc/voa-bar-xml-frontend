@@ -139,10 +139,10 @@ object UniformJourney {
     }
   }
 
-  def addComments[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Option[String]] = {
+  def addComments[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], default: Option[String]): F[Option[String]] = {
     import interpreter._
     for {
-      comments <- ask[Option[String]]("add-comments", validation = commentsValidation)
+      comments <- ask[Option[String]]("add-comments", validation = commentsValidation, default = Some(default))
     } yield comments
   }
 
