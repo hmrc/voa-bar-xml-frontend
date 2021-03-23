@@ -65,7 +65,7 @@ object UniformJourney {
 
   case class Cr05SubmissionBuilder(
                                     cr05CommonSection: Option[Cr05Common],
-                                    existingProperties: Option[Cr05AddProperty],
+                                    existingProperties: List[Cr05AddProperty],
                                     proposedProperties: List[Cr05AddProperty],
                                     comments: Option[String]
   )

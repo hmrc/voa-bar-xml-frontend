@@ -62,7 +62,7 @@
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
                     @if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
-                        @cr05Submission.flatMap(_.existingProperties).map{propertyToSplit =>
+                        @cr05Submission.flatMap(_.existingProperties.lift(0)).map{propertyToSplit =>
                             <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.EXISTING, 0)" aria-describedby="add-property-status">
                                 @(propertyToSplit.address.line1), @(propertyToSplit.address.line2), @propertyToSplit.address.postcode
                             </a>
@@ -75,7 +75,7 @@
                         Add a property
                     }
                 </span>
-                    @if(cr05Submission.exists(_.existingProperties.isDefined)){
+                    @if(cr05Submission.exists(_.existingProperties.nonEmpty)){
                         <strong class="govuk-tag app-task-list__tag" id="add-property-status">Completed</strong>
                     } else if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
                         <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status">Not started</strong>
@@ -93,7 +93,7 @@
             <ul class="app-task-list__items">
                 <li class="app-task-list__item">
                     <span class="app-task-list__task-name">
-                        @if(cr05Submission.exists(_.existingProperties.isDefined)){
+                        @if(cr05Submission.exists(_.existingProperties.nonEmpty)){
                             <a href="@routes.AddToListController.onPageLoad().url" aria-describedby="add-property-status-2">
                             View, modify or add a property
                             </a>
@@ -101,7 +101,7 @@
                             View, modify or add a property
                         }
                     </span>
-                        @if(cr05Submission.exists(_.existingProperties.isDefined) && cr05Submission.exists(_.proposedProperties.length <= 1)){
+                        @if(cr05Submission.exists(_.existingProperties.nonEmpty) && cr05Submission.exists(_.proposedProperties.length <= 1)){
                         <strong class="govuk-tag govuk-tag--grey app-task-list__tag" id="add-property-status-2">Not started</strong>
                         } else if(cr05Submission.exists(_.proposedProperties.length > 1)){
                         <strong class="govuk-tag app-task-list__tag" id="add-property-status-2">Completed</strong>
