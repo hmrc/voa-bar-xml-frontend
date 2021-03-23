@@ -33,8 +33,8 @@
     baCode = Some(baCode)
 ) {
 
-      @cr05Submission.splitProperties.headOption.map { _ =>
-            <h1 class="govuk-heading-l">You have created @{cr05Submission.splitProperties.length} properties </h1>
+      @cr05Submission.proposedProperties.headOption.map { _ =>
+            <h1 class="govuk-heading-l">You have created @{cr05Submission.proposedProperties.length} properties </h1>
       }.getOrElse{
             <h1 class="govuk-heading-l">Create a property</h1>
       }
@@ -43,9 +43,9 @@
       <div class="govuk-form-group">
 
 
-        @if(cr05Submission.splitProperties.nonEmpty) {
+        @if(cr05Submission.proposedProperties.nonEmpty) {
           <ul class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
-           @cr05Submission.splitProperties.zipWithIndex.map { case (splitProperties, index) =>
+           @cr05Submission.proposedProperties.zipWithIndex.map { case (splitProperties, index) =>
                <li class="hmrc-add-to-a-list__contents">
                     <span class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
                         <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.PROPOSED, index)">
@@ -71,7 +71,7 @@
         @formWithCSRF(action = routes.AddToListController.addProperty(),
         ('novalidate -> "novalidate"), ('autoComplete -> "off")
         ) {
-            @if(cr05Submission.splitProperties.length > 1 && cr05Submission.splitProperties.length < 5) {
+            @if(cr05Submission.proposedProperties.length > 1 && cr05Submission.proposedProperties.length < 5) {
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="add-another-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -100,7 +100,7 @@
             <button class="govuk-button" data-module="govuk-button">
                 continue
             </button>
-            } else if(cr05Submission.splitProperties.length >= 5) {
+            } else if(cr05Submission.proposedProperties.length >= 5) {
                 <input type="hidden" value="false" id="add-another" name="add-another">
                 <button class="govuk-button" data-module="govuk-button">
                     Continue
