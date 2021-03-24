@@ -31,7 +31,7 @@ object UniformJourney {
 
   object Address { implicit val format = Json.format[Address] }
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String){
-    val displayAddress = {
+    def displayAddress = {
       val addressList = List(line1, line2) ++ List(line3, line4).flatten ++ List(postcode)
       addressList.mkString(", ")
     }
@@ -64,10 +64,10 @@ object UniformJourney {
   object Cr05AddProperty { implicit val format = Json.format[Cr05AddProperty] }
 
   case class Cr05SubmissionBuilder(
-      cr05CommonSection: Option[Cr05Common],
-      propertyToBeSplit: Option[Cr05AddProperty],
-      splitProperties: List[Cr05AddProperty],
-      comments: Option[String]
+                                    cr05CommonSection: Option[Cr05Common],
+                                    existingProperties: List[Cr05AddProperty],
+                                    proposedProperties: List[Cr05AddProperty],
+                                    comments: Option[String]
   )
 
   object Cr05SubmissionBuilder {
