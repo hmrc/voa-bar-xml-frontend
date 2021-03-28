@@ -153,10 +153,9 @@ object UniformJourney {
     } yield cr05Submission
   }
 
-  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes]): F[Cr01Cr03Submission] = {
+  def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes],reasonReport: ReasonReportType): F[Cr01Cr03Submission] = {
     import interpreter._
     for {
-      reasonReport <- ask[ReasonReportType]("what-is-the-reason-for-the-report")
       removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
       otherReason <- ask[OtherReasonWrapper]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
       baReport <- ask[String]("ba-report", validation = baReportValidation )

@@ -34,17 +34,12 @@
     <ul class="govuk-list">
         @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
             <li>
-                <a class="govuk-link" href="@controllers.routes.WelcomeController.goToStartWebFormPage().url" id="create">@messages("welcome.council_tax_webform")</a>
+                <a class="govuk-link" href="@controllers.routes.ReportReasonController.onPageLoad()" id="create">@messages("welcome.council_tax_webform")</a>
             </li>
         }
         <li>
             <a class="govuk-link" href="@routes.WelcomeController.goToCouncilTaxUploadPage().url" id="councilTaxLink">@messages("welcome.council_tax_upload")</a>
         </li>
-        @if(cr05FeatureFlag) {
-            <li>
-                <a class="govuk-link" href="@routes.WelcomeController.goToTaskListLoadPage().url" id="taskListLink">Split properties cr05</a>
-            </li>
-        }
         <li>
             <a class="govuk-link" href="@controllers.routes.ReportStatusController.onPageLoad().url" id="submissions">@messages("submission.view")</a>
         </li>

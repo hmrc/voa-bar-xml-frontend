@@ -71,11 +71,6 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-    "return a redirect when calling goToStartWebFormPage" in {
-      val result = loggedInController().goToStartWebFormPage()(fakeRequest)
-      status(result) mustBe SEE_OTHER
-    }
-
     "return a redirect when calling goToCouncilTaxUploadPage" in {
       val result = loggedInController().goToCouncilTaxUploadPage()(fakeRequest)
       status(result) mustBe SEE_OTHER

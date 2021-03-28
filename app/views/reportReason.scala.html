@@ -1,0 +1,69 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.FrontendAppConfig
+@import models.requests.DataRequest
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.helpers._
+
+@this(
+        main_template: views.html.govuk.main_template,
+        formWithCSRF: formWithCSRF,
+        govukButton: govukButton,
+        errorSummary: govukErrorSummary,
+        govukRadios: govukRadios,
+        appConfig: FrontendAppConfig
+)
+
+@(form: Form[_], cr05Enabled: Boolean)(implicit request: DataRequest[_], messages: Messages)
+
+@main_template(
+    pageTitle = if(form.errors.nonEmpty) {
+        Some(messages("error.title.prefix") + messages("service.title", messages("what-is-the-reason-for-the-report.pageLabel")))
+    } else {
+        Some(messages("service.title", messages("what-is-the-reason-for-the-report.pageLabel")))
+    },
+    backLinkUrl = Option(controllers.routes.WelcomeController.onPageLoad().url)
+
+) {
+    @formWithCSRF(
+        action = routes.ReportReasonController.onPageSubmit(),
+        'autoComplete -> "off"
+    ) {
+        @if(form.errors.nonEmpty) {
+            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        }
+
+        @govukRadios(Radios(
+            fieldset = Option(Fieldset(legend = Option(Legend(
+                content = Text(messages("what-is-the-reason-for-the-report.pageLabel")),
+                isPageHeading = true,
+                classes = "govuk-fieldset__legend--l")
+            ))),
+            items = journey.ReasonReportType.order.filter(x => cr05Enabled || (x != "SplitProperty")).map(x => RadioItem(id = Option(x),
+                    content = Text(messages(s"what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.${x}")), value = Option(x),
+                    checked = form("reportReason").value.exists(_ == x)
+                )
+            ), name = "reportReason", errorMessage = form.errors.asTextErrorMessageForField("reportReason")
+        ))
+
+
+        @govukButton(Button( attributes = Map("id" -> "submit"),
+            name = Some("submit"), content = Text(messages("site.continue"))
+        ))
+    }
+}

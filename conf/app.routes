@@ -8,8 +8,9 @@ GET         /                                     controllers.LoginController.on
 GET         /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
 
 
-GET         /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
-POST        /what-is-the-reason-for-the-report    controllers.UniformController.myJourney(id = "what-is-the-reason-for-the-report")
+GET         /what-is-the-reason-for-the-report    controllers.ReportReasonController.onPageLoad
+POST        /what-is-the-reason-for-the-report    controllers.ReportReasonController.onPageSubmit
+
 GET         /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
 POST        /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
 GET         /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
@@ -91,7 +92,6 @@ POST        /council-tax/upload/:reference        controllers.CouncilTaxUploadCo
 POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 
 GET         /online-or-upload                     controllers.WelcomeController.onPageLoad()
-GET         /goToStartWebForm                     controllers.WelcomeController.goToStartWebFormPage()
 GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage()
 GET         /goToTaskList                         controllers.WelcomeController.goToTaskListLoadPage()
 

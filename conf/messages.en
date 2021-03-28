@@ -272,6 +272,7 @@ what-is-the-reason-for-the-report.pageLabel=What is the reason for the report?
 what-is-the-reason-for-the-report.required=Select a reason for the report
 what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.AddProperty=Add a property to the Council Tax list (CR3)
 what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.RemoveProperty=Remove a property from the Council Tax list (CR1)
+what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.SplitProperty=Split property (CR5)
 
 why-should-it-be-removed.pageLabel=Why should it be removed?
 why-should-it-be-removed.required=Select why the property should be removed from the Council Tax list
