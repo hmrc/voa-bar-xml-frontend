@@ -45,7 +45,7 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: govukSummaryList) extends Gener
         value = Value(HtmlContent(messages("what-is-the-reason-for-the-report.what-is-the-reason-for-the-report." +
           in.reasonReport.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.myJourney("what-is-the-reason-for-the-report").url,
+          ActionItem(controllers.routes.ReportReasonController.onPageLoad().url,
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )

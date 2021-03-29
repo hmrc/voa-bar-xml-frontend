@@ -23,10 +23,10 @@ import ltbs.uniform._
 import interpreters.playframework._
 
 import javax.inject.{Inject, Singleton}
-import journey.UniformJourney
+import journey.{ReasonReportType, UniformJourney}
 import journey.UniformJourney.{AskTypes, Cr05AddProperty, Cr05SubmissionBuilder, TellTypes, addPropertyHelper}
 import models.PropertyType
-import models.requests.{DataRequest}
+import models.requests.DataRequest
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
@@ -90,13 +90,15 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-    val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)))
+    request.userAnswers.cacheMap.getEntry[ReasonReportType](ReportReasonController.STORAGE_KEY).map { reportReason =>
+      val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason)
 
-    playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission: Cr01Cr03Submission =>
-      cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.login.get).map { submissionId =>
-        Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
+      playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission: Cr01Cr03Submission =>
+        cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.login.get).map { submissionId =>
+          Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
+        }
       }
-    }
+    }.getOrElse(Future.successful(Redirect(routes.ReportReasonController.onPageLoad())))
 
   }
 

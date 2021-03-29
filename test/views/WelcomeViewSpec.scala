@@ -82,7 +82,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
     s"The webform link is visible for ${ba}" in {
       val href = formDoc.getElementById("create").attr("href")
-      assert(href == controllers.routes.WelcomeController.goToStartWebFormPage().url.toString)
+      assert(href == controllers.routes.ReportReasonController.onPageLoad().url.toString)
     }
 
     uploadLinkTest(ba, formDoc)

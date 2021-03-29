@@ -19,31 +19,32 @@ package connectors
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-object FakeDataCacheConnector extends DataCacheConnector {
-  var captures = Map[String, Any]()
+object FakeDataCacheConnector2 extends DataCacheConnector {
+  var captures = Map[String, JsValue]()
 
   override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = {
-    captures = captures + (key ->  value)
-    Future(CacheMap(cacheId, Map()))
+    captures = captures + (key ->  fmt.writes(value))
+    Future(CacheMap(cacheId, captures))
   }
 
   def getCapture(key: String):Option[Any] = captures.get(key)
 
-  def resetCaptures() = captures = Map[String, Any]()
+  def resetCaptures() = captures = Map[String, JsValue]()
 
   override def remove(cacheId: String, key: String): Future[Boolean] = {
     captures = captures - key
     Future.successful(true)
   }
 
-  override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, Map())))
+  override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, captures)))
+  def fetchMap(cacheId: String): CacheMap = CacheMap(cacheId, captures)
 
   override def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
     captures.get(key) match {
-      case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
+      case Some(x) => Future.successful(fmt.reads(x).asOpt)
       case None => Future.successful(None)
     }
 
