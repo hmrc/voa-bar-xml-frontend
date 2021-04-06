@@ -16,24 +16,29 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
+@import views.html.govuk.{cr05SubmissionConfirmation => cr05SubmissionConfirmationTemplate}
 @import views.html.components.confirmation_status_panel
-
+@import journey.UniformJourney.CrSubmission
+@import journey.UniformJourney.Cr05Submission
 @import journey.UniformJourney.Cr01Cr03Submission
+@import utils.UniformMessageUtil
 
 @this(
     mainTemplate: views.html.govuk.main_template,
     confirmationStatusPanel: confirmation_status_panel,
     govukBackLink: govukBackLink,
-    cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate
+    cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate,
+    cr05SubmissionConfirmation:cr05SubmissionConfirmationTemplate
 )
+
 
 @(
     baCode: String,
     report: ReportStatus,
-    cr03Submission: Option[Cr01Cr03Submission]
+    crSubmission: Option[CrSubmission],
 )(implicit request: Request[_], messages: Messages)
 
-@panelContent = {
+    @panelContent = {
 
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
     <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
@@ -65,9 +70,12 @@
         @confirmationStatusPanel(report.id, Some(report))
     </div>
 
-    @if(cr03Submission.isDefined) {
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Submission details</h2>
-        @cr03SubmissionConfirmation(cr03Submission.get)
+    @if(crSubmission.isDefined) {
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Submission details</h2>
+        @crSubmission.get match {
+            case x: Cr01Cr03Submission => {@cr03SubmissionConfirmation(x)}
+            case x: Cr05Submission => {@cr05SubmissionConfirmation(x.asBuilder, UniformMessageUtil.getViewUniformMessages) }
+        }
     }
 
     <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@{report.id}">@messages("feedback.email")</a></p>

@@ -22,7 +22,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*identifiers;.*models.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*FrontendAuditConnector.*;.*Routes.*;.*GuiceInjector;.*DataCacheConnector;.*AutobarsInterpreter;.*UniformController;" +
-      ".*ControllerConfiguration;.*LanguageSwitchController;.*FrontendAppConfig;.*Constraints;" +
+      ".*ControllerConfiguration;.*LanguageSwitchController;.*FrontendAppConfig;.*Constraints;.*UniformMessageUtil;" +
       ".*Formatters;.*CheckYourAnswersHelper;.*FormHelpers;.*error_template.template;.*main_template.template;.*pageChrome.template;.*feedbackError.template;" +
       ".*cr05SubmissionConfirmation.template;.*task_list.template",
     ScoverageKeys.coverageMinimum := 85,

@@ -44,13 +44,16 @@ object UniformJourney {
   }
   object ContactDetails {implicit val format = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
+
+  sealed trait CrSubmission
+
   object Cr01Cr03Submission { implicit val format = Json.format[Cr01Cr03Submission] }
   case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[OtherReasonWrapper],
                                 baReport: String, baRef: String, uprn: Option[String], address: Address,
                                 propertyContactDetails: ContactDetails,
                                 sameContactAddress: Boolean, contactAddress: Option[Address],
                                 effectiveDate: LocalDate, havePlaningReference: Boolean,
-                                planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String])
+                                planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String]) extends CrSubmission
 
 
   case class Cr05Common(baReport: String, baRef: String, effectiveDate: LocalDate)
@@ -68,7 +71,18 @@ object UniformJourney {
                                     existingProperties: List[Cr05AddProperty],
                                     proposedProperties: List[Cr05AddProperty],
                                     comments: Option[String]
-  )
+  ) {
+    def toCr05Submission : Cr05Submission = {
+      Cr05Submission(
+        cr05CommonSection.get.baReport,
+        cr05CommonSection.get.baRef,
+        cr05CommonSection.get.effectiveDate,
+        existingProperties,
+        proposedProperties,
+        comments
+      )
+    }
+  }
 
   object Cr05SubmissionBuilder {
     val storageKey = "ADD_PROPERTY"
@@ -79,13 +93,22 @@ object UniformJourney {
   object Cr05Submission {
     val storageKey = "CR05"
     implicit val format: Format[Cr05Submission] = Json.format[Cr05Submission]
-    val initial = Cr05Submission(Nil, Nil)
   }
 
-  case class Cr05Submission(
-    splitProperties: Seq[Cr01Cr03Submission],
-    mergeProperties: Seq[Cr01Cr03Submission]
-  )
+  case class Cr05Submission( baReport: String, baRef: String, effectiveDate: LocalDate,
+                             proposedProperties: Seq[Cr05AddProperty],
+                             existingPropertis: Seq[Cr05AddProperty],
+                             comments: Option[String]
+                           ) extends CrSubmission {
+    def asBuilder: Cr05SubmissionBuilder = {
+      Cr05SubmissionBuilder(
+        Option(Cr05Common(baReport, baRef, effectiveDate)),
+        proposedProperties.toList,
+        existingPropertis.toList,
+        comments
+      )
+    }
+  }
   // $COVERAGE-ON$
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::

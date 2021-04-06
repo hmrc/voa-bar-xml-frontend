@@ -28,7 +28,7 @@
 @(cr05Submission: Cr05SubmissionBuilder, messages: UniformMessages[Html])
 
      @cr05Submission.cr05CommonSection.map { cs =>
-        <h2 class="govuk-heading-m">The property to be split</h2>
+        <h2 class="govuk-heading-m">Report details</h2>
         @summaryList(
             (new Cr05CommonWebTell(summaryList)).summaryList(cs, messages)
         )
