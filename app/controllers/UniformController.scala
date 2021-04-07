@@ -33,7 +33,7 @@ import play.api.mvc._
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import views.html.govuk.{cr05SubmissionConfirmation, pageChrome}
+import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,7 +50,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   auth: AuthAction,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
-                                  cr05SubmissionConfirmation: cr05SubmissionConfirmation,
+                                  cr05SubmissionSummary: cr05SubmissionSummary,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
@@ -84,7 +84,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionConfirmation)
+  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
   def myJourney(targetId: String) = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
