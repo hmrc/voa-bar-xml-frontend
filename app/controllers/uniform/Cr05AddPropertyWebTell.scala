@@ -30,12 +30,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 // $COVERAGE-OFF$
 class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr05AddProperty, Html] {
 
-  def confirmationSummary(in: Cr05AddProperty, messages: Messages): SummaryList = {
-    val sum = summaryList(in, new UniformMessages[Html] {
-      override def get(key: String, args: Any*): Option[Html] = Option(Html(messages(key, args)))
-
-      override def list(key: String, args: Any*): List[Html] = Nil
-    })
+  def confirmationSummary(in: Cr05AddProperty, messagess: UniformMessages[Html]): SummaryList = {
+    val sum = summaryList(in, messagess)
     SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
   }
 

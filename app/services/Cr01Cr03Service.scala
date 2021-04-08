@@ -18,12 +18,12 @@ package services
 
 import java.time.ZonedDateTime
 import java.util.UUID
-
 import com.google.inject.ImplementedBy
 import connectors.ReportStatusConnector
+
 import javax.inject.{Inject, Singleton}
-import journey.UniformJourney.Cr01Cr03Submission
-import models.{Login, Pending, ReportStatus}
+import journey.UniformJourney.{Cr01Cr03Submission, Cr05Submission}
+import models.{Login, Pending, ReportStatus, Submitted}
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[DefaultCr01Cr03Service])
 trait Cr01Cr03Service {
   def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
+  def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
 }
 
 @Singleton
@@ -60,4 +61,27 @@ class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(i
     )
   }
 
+  def createReport(submission: Cr05Submission): JsObject = {
+    val jsObj = Cr05Submission.format.writes(submission)
+
+    Json.obj(
+      "type" -> "Cr05Submission",
+      "submission" -> jsObj
+    )
+  }
+
+  override def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
+    val submissionId = UUID.randomUUID()
+    val cr05Report = createReport(submission)
+    val report = ReportStatus(
+      id = submissionId.toString,
+      created = ZonedDateTime.now(),
+      baCode = Option(login.username),
+      status = Option(Submitted.value),
+      totalReports = Option(1),
+      report = Option(cr05Report)
+    )
+    reportConnector.save(report, login).map( _ => submissionId)
+
+  }
 }

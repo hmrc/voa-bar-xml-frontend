@@ -17,6 +17,7 @@
 package controllers
 
 import cats.data.EitherT
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -26,7 +27,7 @@ import connectors.{DataCacheConnector, ReportStatusConnector}
 import models.{ConfirmationPayload, Login, Pending, ReportStatus}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import cats.implicits._
-import journey.UniformJourney.Cr01Cr03Submission
+import journey.UniformJourney.{Cr01Cr03Submission, Cr05Submission, CrSubmission}
 import play.api.libs.json.JsString
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
@@ -53,9 +54,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        getCr01Cr03(reportStatus) match {
+        getCrSubmission(reportStatus) match {
           case None => Ok(confirmation(login.username, reference))
-          case cr01cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr01cr03))
+          case crSubmission@Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
         }
       }).valueOr(failPage => failPage)
   }
@@ -66,9 +67,9 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
       } yield {
-        getCr01Cr03(reportStatus) match {
+        getCrSubmission(reportStatus) match {
           case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
-          case cr01cr03@Some(_) => Ok(reportConfirmation(login.username, reportStatus, cr01cr03))
+          case crSubmission@Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
         }
       }).valueOr(failPage => failPage)
   }
@@ -101,14 +102,17 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     ))
   }
 
-  private def getCr01Cr03(reportStatus: ReportStatus): Option[Cr01Cr03Submission] = {
+  private def getCrSubmission(reportStatus: ReportStatus): Option[CrSubmission] = {
+
     reportStatus.report
-      .map(_.value)
-      .filter(x => x.get("type").exists {
-        case x: JsString => x.value == "Cr01Cr03Submission"
-        case _ => false
-      })
-      .flatMap(x => x.get("submission")).flatMap(x => Cr01Cr03Submission.format.reads(x).asOpt)
+      .filter(x => x.keys.contains("type"))
+      .flatMap { jsObject =>
+        jsObject("type") match {
+          case JsString("Cr01Cr03Submission") => jsObject.value.get("submission").flatMap(x => Cr01Cr03Submission.format.reads(x).asOpt)
+          case JsString("Cr05Submission") => jsObject.value.get("submission").flatMap(x => Cr05Submission.format.reads(x).asOpt)
+          case _ => None
+        }
+      }
   }
 
 

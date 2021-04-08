@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.LocalDate
-
 import cats.data.NonEmptyList
 import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
 import journey.UniformJourney.OtherReasonWrapper
@@ -36,7 +35,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
-import views.html.govuk.cr05SubmissionConfirmation
+import views.html.govuk.cr05SubmissionSummary
 
 import scala.concurrent.ExecutionContext
 
@@ -47,7 +46,7 @@ class AutobarsInterpreter (
                            govukInput: govukInput,
                            govukRadios: govukRadios,
                            govukDateInput: govukDateInput,
-                           cr05SubmissionConfirmation: cr05SubmissionConfirmation
+                           cr05SubmissionSummary: cr05SubmissionSummary
                          )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
@@ -86,7 +85,7 @@ class AutobarsInterpreter (
 
   implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
 
-  implicit val cr05SubmissionWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionConfirmation)
+  implicit val cr05SubmissionWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionSummary)
 
   implicit val cr05CommonWebTell = new Cr05CommonWebTell(new govukSummaryList())
 

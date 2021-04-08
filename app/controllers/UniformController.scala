@@ -33,7 +33,7 @@ import play.api.mvc._
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import views.html.govuk.{cr05SubmissionConfirmation, pageChrome}
+import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,7 +50,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   auth: AuthAction,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
-                                  cr05SubmissionConfirmation: cr05SubmissionConfirmation,
+                                  cr05SubmissionSummary: cr05SubmissionSummary,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
@@ -84,7 +84,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionConfirmation)
+  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
   def myJourney(targetId: String) = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
@@ -205,14 +205,18 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
       maybeCr05Submission match {
-        case None =>
-          // TODO Log / Return some kind of error
-          implicit val messages = cc.messagesApi.preferred(request)
-          Future.successful(Unauthorized(views.html.unauthorised(appConfig)))
+        case None => {
+          Logger.warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
+          Future.successful(Redirect(routes.TaskListController.onPageLoad()))
+        }
         case Some(cr05Submission) =>
           val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
           addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
-            Future.successful(Redirect(routes.WelcomeController.onPageLoad()))
+            cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get)flatMap { submissionId =>
+              dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>
+                Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
+              }
+            }
           }
 
       }

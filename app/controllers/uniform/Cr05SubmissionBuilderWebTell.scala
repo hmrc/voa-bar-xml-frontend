@@ -16,17 +16,23 @@
 
 package controllers.uniform
 
-import journey.UniformJourney.Cr05SubmissionBuilder
+import journey.UniformJourney.{Cr05Common, Cr05SubmissionBuilder}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
-import views.html.govuk.cr05SubmissionConfirmation
+import views.html.govuk.cr05SubmissionSummary
 
 // TODO test
 // $COVERAGE-OFF$
-class Cr05SubmissionBuilderWebTell(cr05SubmissionConfirmation: cr05SubmissionConfirmation) extends GenericWebTell[Cr05SubmissionBuilder, Html] {
+class Cr05SubmissionBuilderWebTell(cr05SubmissionSummary: cr05SubmissionSummary) extends GenericWebTell[Cr05SubmissionBuilder, Html] {
+
+  def confirmationSummary(in: Cr05SubmissionBuilder, messagess: UniformMessages[Html]): SummaryList = {
+    val sum = commentsSummaryList(in, messagess)
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+  }
+
 
   def commentsSummaryList(in: Cr05SubmissionBuilder, messages: UniformMessages[Html]): SummaryList =
     SummaryList(
@@ -44,6 +50,6 @@ class Cr05SubmissionBuilderWebTell(cr05SubmissionConfirmation: cr05SubmissionCon
 
 
   override def render(in: Cr05SubmissionBuilder, key: String, messages: UniformMessages[Html]): Html =
-    cr05SubmissionConfirmation(in, messages)
+    cr05SubmissionSummary(in, messages)
 }
 // $COVERAGE-ON$
