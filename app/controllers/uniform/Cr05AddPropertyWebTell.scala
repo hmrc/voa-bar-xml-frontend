@@ -28,19 +28,30 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 // TODO test
 // $COVERAGE-OFF$
-class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr05AddProperty, Html] {
+class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[(Cr05AddProperty, PropertyType, Option[Int]), Html] {
 
+  /**
+   * Not edit links.
+   */
   def confirmationSummary(in: Cr05AddProperty, messagess: UniformMessages[Html]): SummaryList = {
-    val sum = summaryList(in, messagess)
+    val sum = summaryList(in, PropertyType.EXISTING, None, messagess) //Not important, links are removed
     SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
   }
 
-  def summaryList(in: Cr05AddProperty, messages: UniformMessages[Html]): SummaryList = {
+  def formatUrl(journey: String, propertyType:PropertyType, index:Option[Int]) = {
+    index.map(x => {
+      controllers.routes.UniformController.editPropertyJourney(journey, propertyType, x).url
+    }).getOrElse(
+      controllers.routes.UniformController.propertyJourney(journey, propertyType).url
+    )
+  }
+
+  def summaryList(in: Cr05AddProperty, propertyType:PropertyType, index:Option[Int], messages: UniformMessages[Html]): SummaryList = {
     val uprn = SummaryListRow(
       key = Key(HtmlContent(messages("UPRN.pageLabel")), "govuk-!-width-one-half"),
       value = Value(in.uprn.map(Text).getOrElse(HtmlContent(messages("summary.uprn.notEntered")))),
       actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.propertyJourney("add-property-UPRN", PropertyType.EXISTING).url,
+        ActionItem(formatUrl("add-property-UPRN", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
@@ -62,7 +73,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
       key = Key(HtmlContent(messages("property-address.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(addressContent)),
       actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.propertyJourney("add-property-property-address", PropertyType.EXISTING).url,
+        ActionItem(formatUrl("add-property-property-address", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
@@ -82,7 +93,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
       key = Key(HtmlContent(messages("property-contact-details.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(contactDetailsContent)),
       actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.propertyJourney("add-property-property-contact-details", PropertyType.EXISTING).url,
+        ActionItem(formatUrl("add-property-property-contact-details", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
@@ -92,7 +103,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
         messages(if(in.sameContactAddress)"same-contact-address.same-contact-address.Yes" else "same-contact-address.same-contact-address.No")
       )),
       actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.propertyJourney("add-property-same-contact-address", PropertyType.EXISTING).url,
+        ActionItem(formatUrl("add-property-same-contact-address", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
@@ -114,7 +125,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
         key = Key(HtmlContent(messages("contact-address.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(addressContent)),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.propertyJourney("add-property-same-contact-address", PropertyType.EXISTING).url,
+          ActionItem(formatUrl("add-property-same-contact-address", propertyType, index),
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
@@ -124,7 +135,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
       key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(if(in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes") else messages("add-property-have-planning-ref.add-property-have-planning-ref.No"))),
       actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.propertyJourney("add-property-have-planning-ref", PropertyType.EXISTING).url,
+        ActionItem(formatUrl("add-property-have-planning-ref", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))
       ))
     )
@@ -134,7 +145,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
         key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(Text(planningRef)),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.propertyJourney("add-property-have-planning-ref", PropertyType.EXISTING).url,
+          ActionItem(formatUrl("add-property-have-planning-ref", propertyType, index),
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
@@ -145,7 +156,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
         key = Key(HtmlContent(messages("add-property-why-no-planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$","")))),
         actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.propertyJourney("add-property-why-no-planning-ref", PropertyType.EXISTING).url,
+          ActionItem(formatUrl("add-property-why-no-planning-ref", propertyType, index),
             HtmlContent(messages("check-answers.changeLabel"))))
         ))
       )
@@ -164,7 +175,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
         ).flatten)
   }
 
-  override def render(in: Cr05AddProperty, key: String, messages: UniformMessages[Html]): Html =
-    govUkSumaryList(summaryList(in, messages))
+  override def render(in: (Cr05AddProperty, PropertyType, Option[Int]), key: String, messages: UniformMessages[Html]): Html =
+    govUkSumaryList(summaryList(in._1, in._2, in._3, messages))
 }
 // $COVERAGE-ON$

@@ -55,6 +55,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
+  val log = Logger(this.getClass)
+
   implicit val mongoPersistance: PersistenceEngine[DataRequest[AnyContent]] = new PersistenceEngine[DataRequest[AnyContent]]() {
 
     val storageKey = "CR03"
@@ -141,7 +143,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])(implicit request: DataRequest[AnyContent]) = {
     import interpreter._
     import UniformJourney._
-    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property)
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index)
     addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
       updateProperty(propertyType, cr05AddProperty, index).map { _ =>
         propertyType match {
@@ -154,7 +156,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   }
 
   def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[_] ) = {
-    Logger.debug(s"updating property : ${propertyType}, ${index}")
+    log.debug(s"updating property : ${propertyType}, ${index}")
     (propertyType, index) match {
       case (PropertyType.EXISTING, None) => getCr05Submission.map(x => x.copy(existingProperties = x.existingProperties :+ property )).flatMap(storeCr05Submission)
       case (PropertyType.EXISTING, Some(index)) => {
@@ -166,8 +168,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       case (PropertyType.PROPOSED, None) => getCr05Submission.map(x => x.copy(proposedProperties = x.proposedProperties :+ property )).flatMap(storeCr05Submission)
       case (PropertyType.PROPOSED, Some(index)) => {
         getCr05Submission.map { builder =>
-          val splitProperties = builder.proposedProperties.updated(index, property)
-          builder.copy(proposedProperties = splitProperties)
+          val proposed = builder.proposedProperties.updated(index, property)
+          builder.copy(proposedProperties = proposed)
         }.flatMap(storeCr05Submission)
       }
     }
