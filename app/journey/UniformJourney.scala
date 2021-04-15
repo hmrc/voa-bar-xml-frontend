@@ -23,6 +23,7 @@ import cats.implicits._
 import journey.UniformJourney.Cr05AddProperty
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
+import models.PropertyType
 import play.api.libs.json._
 
 import scala.language.higherKinds
@@ -113,7 +114,7 @@ object UniformJourney {
   type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
-  type TellTypes = Cr05Common :: Cr05AddProperty :: Cr05SubmissionBuilder :: Cr01Cr03Submission :: NilTypes
+  type TellTypes = Cr05Common :: (Cr05AddProperty, PropertyType, Option[Int]) :: Cr05SubmissionBuilder :: Cr01Cr03Submission :: NilTypes
 
   //RestrictedStringType
   //[A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
@@ -135,7 +136,8 @@ object UniformJourney {
     } yield ctForm
   }
 
-  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], property: Option[Cr05AddProperty]): F[Cr05AddProperty] = {
+  def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], property: Option[Cr05AddProperty],
+                                           propertyType: PropertyType, index: Option[Int]): F[Cr05AddProperty] = {
     import interpreter._
     for {
       uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation, default = property.map(_.uprn))
@@ -150,7 +152,7 @@ object UniformJourney {
       ctForm = Cr05AddProperty(uprn, address, propertyContactDetails,
         sameContactAddress == Yes, contactAddress, havePlanningRef == Yes, planningRef, noPlanningReference)
 
-      _ <- tell[Cr05AddProperty]("add-property-check-answers-property", ctForm)
+      _ <- tell[(Cr05AddProperty, PropertyType, Option[Int])]("add-property-check-answers-property", ((ctForm, propertyType, index)))
     } yield ctForm
   }
 

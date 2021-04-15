@@ -44,7 +44,7 @@
     </logger>
 
     <logger name="com.google.inject" level="INFO"/>
-    <logger name="reactivemongo" level="INFO"/>
+    <logger name="reactivemongo" level="WARN"/>
     <logger name="org.asynchttpclient.netty.channel.DefaultChannelPool" level="INFO"/>
 
 
@@ -53,12 +53,15 @@
     <logger name="scala.Predef$" level="OFF" />
 
     <logger name="uk.gov" level="INFO"/>
+    <logger name="controllers.UniformController" level="DEBUG"/>
 
     <logger name="application" level="INFO"/>
 
     <logger name="connector" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
+
+
 
     <root level="INFO">
         <appender-ref ref="FILE"/>
