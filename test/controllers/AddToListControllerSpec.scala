@@ -20,7 +20,7 @@ import connectors.FakeDataCacheConnector
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import journey.UniformJourney.{Address, ContactDetails, Cr05AddProperty, Cr05SubmissionBuilder}
-import models.NormalMode
+import models.{AddAnother, NormalMode}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -61,7 +61,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
       new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createAddToListView())(ec)
   }
 
-  def viewAsString(submission: Cr05SubmissionBuilder) = createAddToListView()(username, submission)(fakeRequest, messages).toString
+  def viewAsString(submission: Cr05SubmissionBuilder) = createAddToListView()(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
 
   def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")

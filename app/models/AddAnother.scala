@@ -16,15 +16,30 @@
 
 package models
 
-import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, optional}
+import play.api.data.{Form, FormError}
+import play.api.data.Forms.{mapping, of}
+import play.api.data.format.Formatter
 
-case class AddAnother(value: Option[Boolean])
+
+case class AddAnother(value: Boolean)
 object YesNoForm {
 
   val yesNoForm = Form(
     mapping(
-      "add-another" -> optional(boolean)
+      "add-another" -> of[Boolean](new Formatter[Boolean] {
+        override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] = {
+            data.get(key).toRight(Seq(FormError(key, "error.add-property.option", Nil)))
+              .flatMap {
+                case "true" => Right(true)
+                case "false" => Right(false)
+                case _ => Left(Seq(FormError(key, "error.add-property.option", Nil)))
+              }
+        }
+
+        override def unbind(key: String, value: Boolean): Map[String, String] = {
+          Map(key -> value.toString)
+        }
+      })
     )(AddAnother.apply)(AddAnother.unapply)
   )
 

@@ -24,6 +24,7 @@ error.required = Please enter a value
 error.summary.title = There is a problem
 error.summary.text = Check the following
 error.select.option = Select what you want to do
+error.add-property.option = Select ‘Yes’ if you want to create another property
 error.invalid_username = Enter a valid username
 error.invalid_password = Enter a valid password
 error.internal_server_error.heading = Sorry, there is a problem with the service
