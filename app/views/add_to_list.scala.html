@@ -16,21 +16,25 @@
 
 @import journey.UniformJourney.Cr05SubmissionBuilder
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichFormErrors
 
 
 @this(
     main_template: views.html.govuk.main_template,
     formWithCSRF: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    errorSummary: GovukErrorSummary
 )
 
 
-@(baCode: String, cr05Submission: Cr05SubmissionBuilder)(implicit request: Request[_], messages: Messages)
+@(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: Request[_], messages: Messages)
 
 @main_template(
     pageTitle = Some(messages("service.title", messages("welcome.heading"))),
-    baCode = Some(baCode)
+    baCode = baCode,
+    beforeContentBlock = form.errors.headOption.map(_ => errorSummary(ErrorSummary( classes = "govuk-!-margin-top-3 govuk-!-margin-bottom-0 govuk-!-width-two-thirds",
+        errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title")))))
 ) {
 
       @cr05Submission.proposedProperties.headOption.map { _ =>
@@ -72,30 +76,15 @@
         ('novalidate -> "novalidate"), ('autoComplete -> "off")
         ) {
             @if(cr05Submission.proposedProperties.length > 1 && cr05Submission.proposedProperties.length < 5) {
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="add-another-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend govuk-fieldset__legend--m">
-                        Do you need to create another property?
-                    </legend>
-                    <span id="add-another-hint" class="govuk-hint">
-                     You can create up to five properties.
-                   </span>
-                    <div class="govuk-radios govuk-radios--inline">
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="add-another" name="add-another" type="radio" value="true">
-                            <label class="govuk-label govuk-radios__label" for="add-another">
-                                Yes
-                            </label>
-                        </div>
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="add-another-2" name="add-another" type="radio" value="false">
-                            <label class="govuk-label govuk-radios__label" for="add-another-2">
-                                No
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
+                @govukRadios(Radios(name = "add-another", idPrefix = Option("add-another"), errorMessage = form.errors.asTextErrorMessageForField("add-another"),
+                    fieldset = Option(Fieldset(
+                        legend = Option(Legend(content = Text("Do you need to create another property?"), classes = "govuk-fieldset__legend--m"))
+                    )), hint = Option(Hint(content = Text("You can create up to five properties. "))),
+                    items = Seq(
+                        RadioItem(content = Text("Yes"), value = Some("true")),
+                        RadioItem(content = Text("No"), value = Some("false"))
+                    ), classes = "govuk-radios--inline"
+                ))
 
             <button class="govuk-button" data-module="govuk-button">
                 continue
@@ -106,7 +95,6 @@
                     Continue
                 </button>
             } else {
-                <input type="hidden" value="true" id="add-another" name="add-another">
                 <button class="govuk-button" data-module="govuk-button">
                     Add a property
                 </button>

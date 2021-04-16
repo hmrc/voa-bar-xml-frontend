@@ -136,7 +136,9 @@ trait ViewSpecBase extends SpecBase with Injecting {
     new add_to_list(
       createMain_template(),
       new formWithCSRF(),
-      new GovukButton()
+      new GovukButton(),
+      GovukRadios,
+      new GovukErrorSummary()
     )
   }
 

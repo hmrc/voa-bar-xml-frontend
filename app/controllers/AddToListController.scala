@@ -48,21 +48,24 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
-          case Some(username) => Ok(addToList(username, maybeCr05Submission.get))
+          case Some(username) => Ok(addToList(Option(username), maybeCr05Submission.get, yesNoForm))
           case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }
       }
   }
 
-  def addProperty = (getData andThen requireData) {
-    implicit request =>
+  def addProperty = (getData andThen requireData).async { implicit request =>
       yesNoForm.bindFromRequest.fold(
-        formWithErrors => ???,
+        formWithErrors => {
+          dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
+            Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))
+          }
+        },
         success => {
-          if (success.value.contains(true)){
-            Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers))
+          if (success.value){
+            Future.successful(Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers)))
           } else {
-            Redirect(routes.TaskListController.onPageLoad())
+            Future.successful(Redirect(routes.TaskListController.onPageLoad()))
           }
         }
       )
