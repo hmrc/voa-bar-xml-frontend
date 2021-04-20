@@ -44,7 +44,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
       val service = new DefaultCr01Cr03Service(connector)
 
       val submission = Cr05Submission(BA_REF, "baRef", LocalDate.of(2020,2,2),
-        Seq(), Seq(), Some("comment")
+        Seq(), Seq(), Some("planningRef"), None, Some("comment")
       )
 
       service.storeSubmission(submission, Login(BA_REF, "xxx", None))(HeaderCarrier())

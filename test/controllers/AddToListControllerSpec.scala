@@ -74,8 +74,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     "return OK and the correct view for a GET for submission with 1 split property" in {
       val addProperty = Cr05AddProperty(None, Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
-        true, Option("1122"), None)
+        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")))
       val propertyToSplitSubmission = Cr05SubmissionBuilder(None, List(), List(addProperty), None)
       val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
@@ -86,8 +85,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     "return OK and the correct view for a GET for submission with 2 split property" in {
       val addProperty = Cr05AddProperty(None, Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
-        true, Option("1122"), None)
+        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")))
       val propertyToSplitSubmission = Cr05SubmissionBuilder(None, List(), List(addProperty, addProperty), None)
       val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
