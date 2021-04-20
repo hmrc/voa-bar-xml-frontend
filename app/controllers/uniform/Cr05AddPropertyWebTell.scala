@@ -131,47 +131,13 @@ class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericW
       )
     }
 
-    val havePlanningRef = SummaryListRow(
-      key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(HtmlContent(if(in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes") else messages("add-property-have-planning-ref.add-property-have-planning-ref.No"))),
-      actions = Some(Actions(items = Seq(
-        ActionItem(formatUrl("add-property-have-planning-ref", propertyType, index),
-          HtmlContent(messages("check-answers.changeLabel"))))
-      ))
-    )
-
-    val planningRef = in.planningRef.map { planningRef =>
-      SummaryListRow(
-        key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(Text(planningRef)),
-        actions = Some(Actions(items = Seq(
-          ActionItem(formatUrl("add-property-have-planning-ref", propertyType, index),
-            HtmlContent(messages("check-answers.changeLabel"))))
-        ))
-      )
-    }
-
-    val noPlanningRef = in.noPlanningReference.map { noPlanningRef =>
-      SummaryListRow(
-        key = Key(HtmlContent(messages("add-property-why-no-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(HtmlContent(messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$","")))),
-        actions = Some(Actions(items = Seq(
-          ActionItem(formatUrl("add-property-why-no-planning-ref", propertyType, index),
-            HtmlContent(messages("check-answers.changeLabel"))))
-        ))
-      )
-    }
-
     SummaryList(
         Seq(
           Option(uprn),
           Option(propertyAddress),
           Option(contactDetails),
           Option(sameAddressQuestion),
-          contactAddress,
-          Option(havePlanningRef),
-          planningRef,
-          noPlanningRef
+          contactAddress
         ).flatten)
   }
 
