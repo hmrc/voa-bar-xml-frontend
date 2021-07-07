@@ -7,21 +7,21 @@ object Dependencies {
 
   private val playHealthVersion = "3.16.0-play-26"
   private val logbackJsonLoggerVersion = "5.1.0"
-  private val govukTemplateVersion = "5.58.0-play-26"
-  private val playUiVersion = "8.14.0-play-26"
+  private val govukTemplateVersion = "5.69.0-play-26"
+  private val playUiVersion = "9.6.0-play-26"
   private val scalaTestPlusPlayVersion = "3.1.3"
   private val pegdownVersion = "1.6.0"
-  private val httpCachingClientVersion = "9.2.0-play-26"
-  private val simpleReactiveMongo = "7.31.0-play-26"
-  private val playConditionalFormMappingVersion = "1.6.0-play-26"
-  private val playLanguageVersion = "4.10.0-play-26"
-  private val bootstrapVersion = "2.3.0"
+  private val httpCachingClientVersion = "9.5.0-play-26"
+  private val simpleReactiveMongo = "8.0.0-play-26"
+  private val playConditionalFormMappingVersion = "1.9.0-play-26"
+  private val playLanguageVersion = "5.1.0-play-26"
+  private val bootstrapVersion = "4.0.0"
   private val scalacheckVersion = "1.14.1"
   private val guiceUtilsVersion = "4.2.2"
   private val pdfBoxVersion = "2.0.13"
-  private val playPartialsVersion = "7.1.0-play-26"
-  private val playFrontendGovUkVersion = "0.63.0-play-26"
-  private val playFrontendHmrcVersion  = "0.48.0-play-26"
+  private val playPartialsVersion = "8.1.0-play-26"
+  private val playFrontendGovUkVersion = "0.80.0-play-26"
+  private val playFrontendHmrcVersion  = "0.81.0-play-26"
   private val akkaVersion     = "2.5.26"
 
   val compileDependencies = Seq(
@@ -38,6 +38,7 @@ object Dependencies {
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
     "uk.gov.hmrc"       %% "play-frontend-govuk" % playFrontendGovUkVersion,
     "uk.gov.hmrc"       %% "play-frontend-hmrc" % playFrontendHmrcVersion,
+    "uk.gov.hmrc"       %% "http-verbs-play-26" % "13.7.0",
     "net.codingwell"    %% "scala-guice" % guiceUtilsVersion,
     "org.apache.pdfbox" %  "pdfbox" % pdfBoxVersion,
     "com.luketebbs.uniform" %% "core" % "4.10.0",

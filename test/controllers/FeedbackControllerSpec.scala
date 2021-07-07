@@ -19,7 +19,7 @@ package controllers
 import connectors.FakeDataCacheConnector
 import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{MessagesControllerComponents, RequestHeader}
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.partials.HtmlPartial
+import uk.gov.hmrc.play.partials.{FormPartialRetriever, HtmlPartial}
 import views.html.{inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,6 +39,8 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def servicesConfig = app.injector.instanceOf[ServicesConfig]
   def configuration = app.injector.instanceOf[Configuration]
+  val partialRetriever = mock[FormPartialRetriever]
+  when(partialRetriever.getPartialContent(any[String], any[Map[String, String]], any[Html])(any[ExecutionContext], any[RequestHeader])).thenReturn(Html(""))
 
   def notLoggedInController() = {
     FakeDataCacheConnector.resetCaptures()
@@ -48,7 +50,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     when(sessionCookieCrypto.crypto).thenReturn(encrypter)
     val http = mock[DefaultHttpClient](withSettings.lenient())
 
-    when(http.GET[HtmlPartial](any[String])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
+    when(http.GET[HtmlPartial](any[String], any[Seq[(String,String)]], any[Seq[(String,String)]])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future(HtmlPartial.Success(None, Html("<div/>"))))
 
     when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String,String)]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
@@ -61,7 +63,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       http,
       controllerComponents,
       servicesConfig,
-      configuration)
+      configuration)(ec, partialRetriever)
   }
   val url = "feedback.url"
 
@@ -70,7 +72,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = notLoggedInController.inPageFeedback()(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe inpagefeedback(Some(url), frontendAppConfig)(fakeRequest, messages, notLoggedInController.formPartialRetriever).toString
+      contentAsString(result) mustBe inpagefeedback(Some(url), frontendAppConfig)(fakeRequest, messages, partialRetriever, ec).toString
     }
     "be able to submit form" in {
       val result = notLoggedInController.sendBetaFeedbackToHmrc()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))
@@ -81,7 +83,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = notLoggedInController.inPageFeedbackNoLogin()(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe inpagefeedbackNoLogin(Some(url), frontendAppConfig)(fakeRequest, messages, notLoggedInController.formPartialRetriever).toString
+      contentAsString(result) mustBe inpagefeedbackNoLogin(Some(url), frontendAppConfig)(fakeRequest, messages, partialRetriever, ec).toString
     }
     "be able to submit form when not logged in" in {
       val result = notLoggedInController.sendBetaFeedbackToHmrcNoLogin()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))

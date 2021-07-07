@@ -28,7 +28,7 @@ import play.api.i18n.Lang
 import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
-import uk.gov.hmrc.govukfrontend.views.html.layouts.{govukLayout, govukTemplate}
+import uk.gov.hmrc.govukfrontend.views.html.layouts.{govukLayout, govukTemplate, twoThirdsMainContent}
 import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
 import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcFooterItems, HmrcTrackingConsentSnippet, hmrcStandardFooter}
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
@@ -216,7 +216,7 @@ trait ViewSpecBase extends SpecBase with Injecting {
   }
 
   def createGovukLayout(): govukLayout = {
-    new govukLayout(uk.gov.hmrc.govukfrontend.views.html.components.GovukTemplate, GovukHeader, GovukFooter, GovukBackLink)
+    new govukLayout(uk.gov.hmrc.govukfrontend.views.html.components.GovukTemplate, GovukHeader, GovukFooter, GovukBackLink, new twoThirdsMainContent)
   }
 
   def createSessionTimeoutView(): views.html.session_timeout =
