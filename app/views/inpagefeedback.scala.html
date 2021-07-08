@@ -15,8 +15,9 @@
  *@
 
 @import uk.gov.hmrc.play.partials.FormPartialRetriever
+@import scala.concurrent.ExecutionContext
 
-@(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages, formPartialRetriever: FormPartialRetriever)
+@(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages, formPartialRetriever: FormPartialRetriever, ec: ExecutionContext)
 
 @main_template(
 title = messages("heading.giveFeedback"),

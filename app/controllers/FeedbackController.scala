@@ -43,13 +43,9 @@ class FeedbackController @Inject()( getData: DataRetrievalAction,
                                     controllerComponents: MessagesControllerComponents,
                                     serviceConfig: ServicesConfig,
                                     configuration: Configuration
-                                  )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport {
+                                  )(implicit ec: ExecutionContext, formPartialRetriever: FormPartialRetriever) extends FrontendController(controllerComponents) with I18nSupport {
 
-  implicit val formPartialRetriever: FormPartialRetriever = new FormPartialRetriever {
-    override def httpGet: HttpGet = http
 
-    override def crypto: (String) => String = cookie => sessionCookieCrypto.crypto.encrypt(PlainText(cookie)).value
-  }
 
   val contactFrontendPartialBaseUrl = serviceConfig.baseUrl("contact-frontend")
   val serviceIdentifier = "VOA_BAR"
