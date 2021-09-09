@@ -171,7 +171,7 @@ confirmation.status.done.title = Submitted
 
 confirmation.submissionId = Submission ID
 confirmation.subheading = We are processing your reports
-confirmation.subheading.failed = We have received your reports, but were unable to process them due to errors.
+confirmation.subheading.failed = We cannot process any of your reports because one or more of them have errors.
 confirmation.subheading.done = We have successfully processed your reports
 confirmation.file.received = We have received your file and we are processing your reports.
 confirmation.file.success = We have received your file and have processed it successfully.

@@ -56,6 +56,16 @@
         @confirmationStatusPanel(submissionId, reportStatus)
     </div>
 
+    @if(reportStatus.flatMap(_.status) == Some(Failed.value)) {
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                You will need to resubmit all of your reports after you have fixed the errors.
+            </strong>
+        </div>
+    }
+
 
     @confirmationDetailPanel(submissionId, reportStatus)
 
