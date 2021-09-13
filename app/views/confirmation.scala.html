@@ -56,6 +56,16 @@
         @confirmationStatusPanel(submissionId, reportStatus)
     </div>
 
+    @if(reportStatus.flatMap(_.status) == Some(Failed.value)) {
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                @messages("confirmation.warning")
+            </strong>
+        </div>
+    }
+
 
     @confirmationDetailPanel(submissionId, reportStatus)
 
