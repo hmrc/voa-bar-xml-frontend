@@ -212,7 +212,7 @@ $(document).ready(function() {
                             if ($("#reportStatus").val() !== data.status) {
                                 console.debug("status changed, updating page", data.status);
 
-                                if (data.status === "Failed" || data.status === "Submitted" || data.status === "Done") {
+                                if (data.status === "Failed" || data.status === "Done") {
                                     console.debug("Reached final status, removing refresh", status)
                                     clearInterval(window.refreshIntervalId);
                                     window.location = $("#councilTaxUploadFormRedirect").val();
