@@ -31,16 +31,12 @@
                 SummaryListRow(
                     key = Key(Text(messages("report.key.type")), "govuk-!-width-one-half"),
                     value = Value(Text(messages("report.value.type")))
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("report.key.report.submitted")), "govuk-!-width-one-half"),
+                    value = Value(Text(reportStatus.totalReports.getOrElse(0).toString))
                 )
             )  ++
-            (if(!reportStatus.status.contains(Failed.value)) {
-                reportStatus.totalReports.map{ totalReports =>
-                    Seq(SummaryListRow(
-                        key = Key(Text(messages("report.key.report.submitted")), "govuk-!-width-one-half"),
-                        value = Value(Text(totalReports.toString))
-                    ))
-                }.getOrElse(Nil)
-            } else Nil) ++
             Seq(
                 SummaryListRow(
                     key = Key(Text(messages("report.key.file")), "govuk-!-width-one-half"),
