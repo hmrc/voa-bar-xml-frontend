@@ -22,9 +22,9 @@ import play.routing.Router.Tags.ROUTE_CONTROLLER
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.behaviours.ViewBehaviours
 
-import javax.inject.Inject
+class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
-class ReportStatusViewSpec @Inject()(reportStatus: views.html.reportStatus) extends ViewBehaviours with ViewSpecBase {
+  def reportStatus = app.injector.instanceOf[views.html.reportStatus]
 
   val username = "BA0350"
   val messageKeyPrefix = "reportStatus"

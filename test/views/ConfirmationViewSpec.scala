@@ -21,9 +21,9 @@ import models.{Done, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-import javax.inject.Inject
+class ConfirmationViewSpec extends ViewBehaviours {
 
-class ConfirmationViewSpec @Inject()(confirmation: views.html.confirmation) extends ViewBehaviours {
+  def confirmation = app.injector.instanceOf[views.html.confirmation]
 
   val username = "BA0116"
   val submissionId = "SId328473"

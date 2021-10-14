@@ -17,10 +17,10 @@
 package views
 
 import views.behaviours.ViewBehaviours
-import javax.inject.Inject
 
+class SessionTimeoutViewSpec extends ViewBehaviours with ViewSpecBase {
 
-class SessionTimeoutViewSpec @Inject()(sessionTimeout: views.html.session_timeout) extends ViewBehaviours with ViewSpecBase {
+  def sessionTimeout = app.injector.instanceOf[views.html.session_timeout]
 
   def view = () => sessionTimeout()(fakeRequest, messages)
 

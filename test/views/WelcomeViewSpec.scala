@@ -20,9 +20,9 @@ import org.jsoup.nodes.Document
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-import javax.inject.Inject
+class WelcomeViewSpec extends ViewBehaviours {
 
-class WelcomeViewSpec @Inject()(welcome: views.html.welcome) extends ViewBehaviours {
+  def welcome = app.injector.instanceOf[views.html.welcome]
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"

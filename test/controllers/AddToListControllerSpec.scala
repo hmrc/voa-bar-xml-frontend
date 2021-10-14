@@ -27,17 +27,17 @@ import play.api.test.Helpers._
 import play.filters.csrf.CSRF.{Token, TokenInfo}
 import utils.FakeNavigator
 import views.ViewSpecBase
-
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddToListControllerSpec @Inject()(addToList: views.html.add_to_list) extends ControllerSpecBase with ViewSpecBase  {
+class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
+  def addToList = app.injector.instanceOf[views.html.add_to_list]
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 

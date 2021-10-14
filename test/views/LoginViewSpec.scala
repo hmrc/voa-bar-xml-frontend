@@ -22,9 +22,9 @@ import forms.LoginFormProvider
 import models.{Login, NormalMode}
 import views.behaviours.govuk.QuestionViewBehaviours
 
-import javax.inject.Inject
+class LoginViewSpec extends QuestionViewBehaviours[Login] {
 
-class LoginViewSpec @Inject()(login: views.html.login) extends QuestionViewBehaviours[Login] {
+  def login = app.injector.instanceOf[views.html.login]
 
   val messageKeyPrefix = "login"
 

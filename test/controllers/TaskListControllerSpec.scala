@@ -25,12 +25,12 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.ViewSpecBase
-
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class TaskListControllerSpec @Inject()(taskList: views.html.task_list, welcome: views.html.welcome)
-  extends ControllerSpecBase with ViewSpecBase  {
+class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+
+  def taskList = app.injector.instanceOf[views.html.task_list]
+  def welcome = app.injector.instanceOf[views.html.welcome]
 
   val username = "AUser"
 

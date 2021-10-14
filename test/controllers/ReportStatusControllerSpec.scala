@@ -31,14 +31,14 @@ import services.ReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.{TableFormatter, ViewSpecBase}
-
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-class ReportStatusControllerSpec @Inject()(reportStatus: views.html.reportStatus, errorTemplate: views.html.error_template)
-  extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+
+  def reportStatus = app.injector.instanceOf[views.html.reportStatus]
+  def errorTemplate = app.injector.instanceOf[views.html.error_template]
 
   val configuration = injector.instanceOf[Configuration]
   val environment = injector.instanceOf[Environment]
