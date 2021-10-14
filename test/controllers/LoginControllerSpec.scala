@@ -31,12 +31,11 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class LoginControllerSpec @Inject()(login: views.html.login) extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
   var captures = Map[String, Any]()
 
@@ -48,6 +47,8 @@ class LoginControllerSpec @Inject()(login: views.html.login) extends ControllerS
 
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def ec = app.injector.instanceOf[ExecutionContext]
+
+  def login = app.injector.instanceOf[views.html.login]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 

@@ -34,19 +34,19 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FakeNavigator
 import views.ViewSpecBase
-
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
-class CouncilTaxUploadControllerSpec @Inject()(councilTaxUpload: views.html.councilTaxUpload, errorTemplate: views.html.error_template)
-  extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+
+  def councilTaxUpload = app.injector.instanceOf[views.html.councilTaxUpload]
+  def errorTemplate = app.injector.instanceOf[views.html.error_template]
 
   def configuration = app.injector.instanceOf[Configuration]
 

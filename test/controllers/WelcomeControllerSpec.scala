@@ -25,15 +25,15 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.ViewSpecBase
-
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class WelcomeControllerSpec @Inject()(welcome: views.html.welcome) extends ControllerSpecBase with ViewSpecBase  {
+class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
   val cr05FeatureFlag = false
+
+  def welcome = app.injector.instanceOf[views.html.welcome]
 
   def ec = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]

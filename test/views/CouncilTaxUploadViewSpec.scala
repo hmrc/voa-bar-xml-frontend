@@ -21,9 +21,9 @@ import models.UpScanRequests.{InitiateResponse, UploadRequest}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-import javax.inject.Inject
+class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
-class CouncilTaxUploadViewSpec @Inject()(councilTaxUpload: views.html.councilTaxUpload) extends ViewBehaviours with ViewSpecBase {
+  def councilTaxUpload = app.injector.instanceOf[views.html.councilTaxUpload]
 
   val username = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
