@@ -22,7 +22,9 @@ import play.routing.Router.Tags.ROUTE_CONTROLLER
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.behaviours.ViewBehaviours
 
-class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
+import javax.inject.Inject
+
+class ReportStatusViewSpec @Inject()(reportStatus: views.html.reportStatus) extends ViewBehaviours with ViewSpecBase {
 
   val username = "BA0350"
   val messageKeyPrefix = "reportStatus"
@@ -39,7 +41,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
   val reportStatusFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ReportStatusController"))
 
-  def createView(reportStatuses: Seq[ReportStatus] = Seq()) = () => createReportStatusView()(username, reportStatuses, None, fakeTableFormatter)(reportStatusFakeRequest, messages)
+  def createView(reportStatuses: Seq[ReportStatus] = Seq()) = () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(reportStatusFakeRequest, messages)
 
   def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
 

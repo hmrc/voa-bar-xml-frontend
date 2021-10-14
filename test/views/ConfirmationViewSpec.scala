@@ -17,12 +17,13 @@
 package views
 
 import java.time.ZonedDateTime
-
 import models.{Done, ReportStatus}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-class ConfirmationViewSpec extends ViewBehaviours {
+import javax.inject.Inject
+
+class ConfirmationViewSpec @Inject()(confirmation: views.html.confirmation) extends ViewBehaviours {
 
   val username = "BA0116"
   val submissionId = "SId328473"
@@ -35,9 +36,9 @@ class ConfirmationViewSpec extends ViewBehaviours {
   )
 
   def createView =
-    () => createConfirmationView()(username, submissionId)(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId)(confirmationFakeRequest, messages)
   def createViewWithStatus =
-    () => createConfirmationView()(username, submissionId, Some(reportStatus))(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId, Some(reportStatus))(confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 

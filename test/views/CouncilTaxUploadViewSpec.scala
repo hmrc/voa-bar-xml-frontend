@@ -21,7 +21,9 @@ import models.UpScanRequests.{InitiateResponse, UploadRequest}
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
+import javax.inject.Inject
+
+class CouncilTaxUploadViewSpec @Inject()(councilTaxUpload: views.html.councilTaxUpload) extends ViewBehaviours with ViewSpecBase {
 
   val username = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
@@ -52,9 +54,9 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
   )
   private def createView(displayInitiateResponse: Boolean = true) = {
     if (displayInitiateResponse) {
-      createUploadView()(username, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
+      councilTaxUpload(username, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
     } else {
-      createUploadView()(username, form)(councilTaxUploadFakeRequest, messages)
+      councilTaxUpload(username, form)(councilTaxUploadFakeRequest, messages)
     }
   }
 

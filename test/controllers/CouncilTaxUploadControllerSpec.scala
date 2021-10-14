@@ -35,11 +35,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.FakeNavigator
 import views.ViewSpecBase
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
-class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class CouncilTaxUploadControllerSpec @Inject()(councilTaxUpload: views.html.councilTaxUpload, errorTemplate: views.html.error_template)
+  extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -116,7 +118,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, createUploadView(), createErrorTemplateView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, councilTaxUpload, errorTemplate, userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
   def notLoggedInController(
@@ -126,10 +128,10 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(configuration, frontendAppConfig, messagesApi, getEmptyCacheMap,
       new DataRequiredActionImpl(ec), FakeDataCacheConnector, formProvider, new FakeNavigator(desiredRoute = onwardRoute),
-      connector, createUploadView(), createErrorTemplateView(), userReportUploadsConnector, reportStatusConnector, controllerComponents)
+      connector, councilTaxUpload, errorTemplate, userReportUploadsConnector, reportStatusConnector, controllerComponents)
   }
 
-  def viewAsString(form: Form[_] = form) = createUploadView()(username, form, Some(initiateResponse))(fakeRequest, messages).toString
+  def viewAsString(form: Form[_] = form) = councilTaxUpload(username, form, Some(initiateResponse))(fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 

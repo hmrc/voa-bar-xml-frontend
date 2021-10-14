@@ -19,18 +19,20 @@ package views
 import play.api.data.Form
 import controllers.routes
 import forms.LoginFormProvider
-import models.{NormalMode, Login}
+import models.{Login, NormalMode}
 import views.behaviours.govuk.QuestionViewBehaviours
 
-class LoginViewSpec extends QuestionViewBehaviours[Login] {
+import javax.inject.Inject
+
+class LoginViewSpec @Inject()(login: views.html.login) extends QuestionViewBehaviours[Login] {
 
   val messageKeyPrefix = "login"
 
   override val form = new LoginFormProvider()()
 
-  def createView = () => createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createView = () => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
 
-  def createViewUsingForm = (form: Form[Login]) => createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createViewUsingForm = (form: Form[Login]) => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
 
 
   "Login view" must {

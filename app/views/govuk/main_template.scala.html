@@ -14,17 +14,16 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.govuk.{head => headTemplate}
 @import views.html.govuk.{scripts => scriptsTemplate}
 @import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 
 @this(
-        govukLayout: govukLayout,
+        govukLayout: GovukLayout,
         head: headTemplate,
         scripts: scriptsTemplate,
-        govukPhaseBanner: govukPhaseBanner,
+        govukPhaseBanner: GovukPhaseBanner,
         siteHeader: components.siteHeader,
         siteFooter: components.siteFooter,
         govukBackLink: GovukBackLink,

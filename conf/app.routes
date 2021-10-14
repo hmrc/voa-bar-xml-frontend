@@ -1,7 +1,6 @@
 # microservice specific routes
 
-->          /govuk-frontend                       govuk.Routes
-->          /hmrc-frontend                      hmrcfrontend.Routes
+->          /hmrc-frontend                        hmrcfrontend.Routes
 
 GET         /                                     controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 

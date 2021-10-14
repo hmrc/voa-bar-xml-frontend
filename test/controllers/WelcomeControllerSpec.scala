@@ -26,9 +26,10 @@ import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.ViewSpecBase
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class WelcomeControllerSpec @Inject()(welcome: views.html.welcome) extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
@@ -44,16 +45,16 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new WelcomeController(frontendAppConfig, configuration, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new WelcomeController(frontendAppConfig, configuration,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
   }
 
-  def viewAsString() = createWelcomeView()(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString
+  def viewAsString() = welcome(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

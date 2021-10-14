@@ -28,7 +28,7 @@ import ltbs.uniform._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios, govukSummaryList}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, GovukRadios, GovukDateInput, GovukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Empty, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
@@ -43,9 +43,9 @@ class AutobarsInterpreter (
                            results: Results,
                            messagesApi: play.api.i18n.MessagesApi,
                            page_chrome: views.html.govuk.pageChrome,
-                           govukInput: govukInput,
-                           govukRadios: govukRadios,
-                           govukDateInput: govukDateInput,
+                           govukInput: GovukInput,
+                           govukRadios: GovukRadios,
+                           govukDateInput: GovukDateInput,
                            cr05SubmissionSummary: cr05SubmissionSummary
                          )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
@@ -83,13 +83,13 @@ class AutobarsInterpreter (
       key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
   }
 
-  implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new govukSummaryList())
+  implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
 
   implicit val cr05SubmissionWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionSummary)
 
-  implicit val cr05CommonWebTell = new Cr05CommonWebTell(new govukSummaryList())
+  implicit val cr05CommonWebTell = new Cr05CommonWebTell(new GovukSummaryList())
 
-  implicit val cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new govukSummaryList())
+  implicit val cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new GovukSummaryList())
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
