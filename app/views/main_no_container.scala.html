@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.layouts.govukLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.play.config.AccessibilityStatementConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
@@ -22,10 +21,10 @@
 @import views.html.govuk.head
 
 @this(
-        govukLayout: govukLayout,
+        govukLayout: GovukLayout,
         head: head,
         scripts: scriptsTemplate,
-        govukPhaseBanner: govukPhaseBanner,
+        govukPhaseBanner: GovukPhaseBanner,
         siteHeader: components.siteHeader,
         govukTemplate: GovukTemplate,
         govukBackLink: GovukBackLink,

@@ -24,14 +24,14 @@ import interpreters.playframework._
 
 import javax.inject.{Inject, Singleton}
 import journey.{ReasonReportType, UniformJourney}
-import journey.UniformJourney.{AskTypes, Cr05AddProperty, Cr05SubmissionBuilder, TellTypes, addPropertyHelper}
+import journey.UniformJourney.{Cr05AddProperty, Cr05SubmissionBuilder}
 import models.PropertyType
 import models.requests.DataRequest
 import play.api.{Configuration, Logger}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
 import services.Cr01Cr03Service
-import uk.gov.hmrc.govukfrontend.views.html.components.{govukDateInput, govukInput, govukRadios}
+import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
@@ -41,9 +41,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class UniformController @Inject()(messagesApi: MessagesApi,
                                   config: Configuration,
                                   pageChrome: pageChrome,
-                                  govukInput: govukInput,
-                                  govukRadios: govukRadios,
-                                  govukDateInput: govukDateInput,
+                                  govukInput: GovukInput,
+                                  govukRadios: GovukRadios,
+                                  govukDateInput: GovukDateInput,
                                   dataCacheConnector: DataCacheConnector,
                                   getData: DataRetrievalAction,
                                   requireData: DataRequiredAction,

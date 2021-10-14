@@ -20,15 +20,14 @@ import journey.UniformJourney.Cr05AddProperty
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
 import models.PropertyType
-import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.govukSummaryList
+import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 // TODO test
 // $COVERAGE-OFF$
-class Cr05AddPropertyWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[(Cr05AddProperty, PropertyType, Option[Int]), Html] {
+class Cr05AddPropertyWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTell[(Cr05AddProperty, PropertyType, Option[Int]), Html] {
 
   /**
    * Not edit links.

@@ -20,15 +20,14 @@ import java.time.format.DateTimeFormatter
 import journey.UniformJourney.Cr05Common
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
-import play.api.i18n.Messages
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.html.components.govukSummaryList
+import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 // TODO test
 // $COVERAGE-OFF$
-class Cr05CommonWebTell(govUkSumaryList: govukSummaryList) extends GenericWebTell[Cr05Common, Html] {
+class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTell[Cr05Common, Html] {
 
   def confirmationSummary(in: Cr05Common, messagess: UniformMessages[Html]): SummaryList = {
     val sum = summaryList(in, messagess)
