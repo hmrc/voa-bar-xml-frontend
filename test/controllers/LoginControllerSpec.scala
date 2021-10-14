@@ -17,10 +17,10 @@
 package controllers
 
 import play.api.data.Form
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.FakeNavigator
-import connectors.{DataCacheConnector, FakeDataCacheConnector, LoginConnector}
+import connectors.{FakeDataCacheConnector, LoginConnector}
 import controllers.actions._
 import play.api.test.Helpers._
 import forms.LoginFormProvider
@@ -30,15 +30,14 @@ import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
-import views.html.login
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
+class LoginControllerSpec @Inject()(login: views.html.login) extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
-
-class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
   var captures = Map[String, Any]()
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
@@ -61,10 +60,10 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents, createLoginView())
+      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents, login)
   }
 
-  def viewAsString(form: Form[Login] = form) = createLoginView()(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
+  def viewAsString(form: Form[Login] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
 
   "Login Controller" must {
 

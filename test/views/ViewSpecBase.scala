@@ -21,21 +21,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
 import base.SpecBase
-import com.typesafe.config.ConfigFactory
-import config.FrontendAppConfig
-import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.test.Injecting
-import uk.gov.hmrc.govukfrontend.views.html.components._
-import uk.gov.hmrc.govukfrontend.views.html.helpers.formWithCSRF
-import uk.gov.hmrc.govukfrontend.views.html.layouts.{govukLayout, govukTemplate, twoThirdsMainContent}
-import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
-import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcFooterItems, HmrcTrackingConsentSnippet, hmrcStandardFooter}
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import uk.gov.hmrc.play.config.AccessibilityStatementConfig
-import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
-import views.html.govuk.{head, scripts}
-import views.html.{add_to_list, confirmation, councilTaxUpload, error_template, login, main_no_container, reportStatus, task_list, welcome}
 
 trait ViewSpecBase extends SpecBase with Injecting {
 
@@ -109,121 +96,5 @@ trait ViewSpecBase extends SpecBase with Injecting {
       case _ => assert(!radio.hasAttr("checked") && radio.attr("checked") != "checked", s"\n\nElement $id is checked")
     }
   }
-
-  def createLoginView(): login = {
-    new login(
-      createMain_template(),
-      new formWithCSRF(),
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukInput,
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukButton,
-      uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-    )
-  }
-
-  def createWelcomeView(): welcome = {
-    new welcome(
-      createMain_template()
-    )
-  }
-
-  def createTaskListView(): task_list = {
-    new task_list(
-      createMain_template()
-    )
-  }
-
-  def createAddToListView(): add_to_list = {
-    new add_to_list(
-      createMain_template(),
-      new formWithCSRF(),
-      new GovukButton(),
-      GovukRadios,
-      new GovukErrorSummary()
-    )
-  }
-
-  def createUploadView(): councilTaxUpload = {
-    new councilTaxUpload(
-      createMain_template(),
-      new govukFileUpload(GovukErrorMessage, GovukHint, GovukLabel),
-      new govukErrorSummary()
-    )
-  }
-
-  def createReportStatusView(): reportStatus = {
-    new reportStatus(
-      createMain_no_container_template(),
-      new govukTable()
-    )
-  }
-
-  def createConfirmationView(): confirmation = {
-    new confirmation(
-      createMain_template(),
-      inject[confirmation_status_panel],
-      inject[confirmation_detail_panel],
-      new govukSummaryList()
-    )
-  }
-
-  def createErrorTemplateView(): error_template = {
-    new error_template(
-      createMain_template()
-    )
-  }
-
-  def createMain_template(): views.html.govuk.main_template = {
-    new views.html.govuk.main_template(
-      createGovukLayout(),
-      create_head(),
-      create_scripts(),
-      new govukPhaseBanner(new govukTag()),
-      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
-      new views.html.components.siteFooter(uk.gov.hmrc.govukfrontend.views.html.components.GovukFooter),
-      new govukBackLink(),
-      new govukSummaryList(),
-      inject[AccessibilityStatementConfig]
-    )
-  }
-
-  def createMain_no_container_template(): views.html.main_no_container = {
-    new main_no_container(
-      createGovukLayout(),
-      create_head(),
-      create_scripts(),
-      new govukPhaseBanner(new govukTag()),
-      new views.html.components.siteHeader(uk.gov.hmrc.govukfrontend.views.html.components.GovukHeader),
-      new govukTemplate(new GovukHeader(), new GovukFooter(), new GovukSkipLink()),
-      new govukBackLink(),
-      new govukSummaryList(),
-      inject[AccessibilityStatementConfig],
-      new hmrcStandardFooter(new HmrcFooter(), new HmrcFooterItems(new uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig(Configuration(ConfigFactory.load))))
-    )
-  }
-
-  def create_head(): head = {
-    val conf = new uk.gov.hmrc.hmrcfrontend.config.TrackingConsentConfig(Configuration())
-    val trackingConsentSnippet = new HmrcTrackingConsentSnippet(conf)
-    new head(trackingConsentSnippet)
-  }
-
-  def create_scripts(): scripts = {
-    val config = ConfigFactory.load
-    val configuration = Configuration(config)
-    val serviceConfig = new ServicesConfig(configuration, new RunMode(configuration, play.api.Mode.Test))
-    val appConfig = new FrontendAppConfig(configuration, serviceConfig)
-    new scripts(appConfig, configuration)
-  }
-
-  def createGovukLayout(): govukLayout = {
-    new govukLayout(uk.gov.hmrc.govukfrontend.views.html.components.GovukTemplate, GovukHeader, GovukFooter, GovukBackLink, new twoThirdsMainContent)
-  }
-
-  def createSessionTimeoutView(): views.html.session_timeout =
-    new views.html.session_timeout(
-      createMain_template()
-    )
-
-
 
 }

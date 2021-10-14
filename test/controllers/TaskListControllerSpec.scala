@@ -26,9 +26,11 @@ import play.api.test.Helpers._
 import utils.FakeNavigator
 import views.ViewSpecBase
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class TaskListControllerSpec @Inject()(taskList: views.html.task_list, welcome: views.html.welcome)
+  extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
@@ -44,20 +46,18 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new TaskListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createTaskListView()
-    )(ec)
-
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, taskList)(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new WelcomeController(frontendAppConfig, configuration,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createWelcomeView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
   }
 
 
 
-  def viewAsString() = createTaskListView()(username)(fakeRequest, messages).toString
+  def viewAsString() = taskList(username)(fakeRequest, messages).toString
 
   "Logging Controller" must {
 

@@ -20,7 +20,9 @@ import org.jsoup.nodes.Document
 import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
-class WelcomeViewSpec extends ViewBehaviours {
+import javax.inject.Inject
+
+class WelcomeViewSpec @Inject()(welcome: views.html.welcome) extends ViewBehaviours {
 
   val username = "BA0505"
   val messageKeyPrefix = "welcome"
@@ -28,7 +30,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
 
-  def createView = () => createWelcomeView()(frontendAppConfig, username, cr05FeatureFlag)(welcomeFakeRequest, messages)
+  def createView = () => welcome(frontendAppConfig, username, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -44,7 +46,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   // Welcome page containing form for navigation
 
-  def createFormView(formUser: String) = () => createWelcomeView()(frontendAppConfig, formUser, cr05FeatureFlag)(welcomeFakeRequest, messages)
+  def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
   def uploadLinkTest(ba: String, formDoc: Document) = {
     s"The upload link to the goToCouncilTaxUploadPage method for ${ba}" in {

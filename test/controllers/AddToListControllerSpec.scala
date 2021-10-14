@@ -20,7 +20,7 @@ import connectors.FakeDataCacheConnector
 import controllers.actions._
 import identifiers.VOAAuthorisedId
 import journey.UniformJourney.{Address, ContactDetails, Cr05AddProperty, Cr05SubmissionBuilder}
-import models.{AddAnother, NormalMode}
+import models.NormalMode
 import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -28,9 +28,10 @@ import play.filters.csrf.CSRF.{Token, TokenInfo}
 import utils.FakeNavigator
 import views.ViewSpecBase
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class AddToListControllerSpec @Inject()(addToList: views.html.add_to_list) extends ControllerSpecBase with ViewSpecBase  {
 
   val username = "AUser"
 
@@ -44,7 +45,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new AddToListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createAddToListView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
   }
 
   def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -52,16 +53,16 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Cr05SubmissionBuilder]("", Cr05SubmissionBuilder.storageKey, submission)
     new AddToListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createAddToListView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new AddToListController(frontendAppConfig,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, createAddToListView())(ec)
+      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
   }
 
-  def viewAsString(submission: Cr05SubmissionBuilder) = createAddToListView()(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
+  def viewAsString(submission: Cr05SubmissionBuilder) = addToList(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
 
   def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
