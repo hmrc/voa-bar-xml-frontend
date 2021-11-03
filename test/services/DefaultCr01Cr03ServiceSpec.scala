@@ -17,7 +17,7 @@
 package services
 
 import connectors.ReportStatusConnector
-import journey.{AddProperty, ReasonReportType, SplitProperty}
+import journey.AddProperty
 import journey.UniformJourney.{Address, ContactDetails, Cr01Cr03Submission, Cr05Submission}
 import models.{Login, ReportStatus}
 import org.mockito.captor.ArgCaptor

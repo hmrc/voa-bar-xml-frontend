@@ -31,7 +31,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import services.ReceiptService
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.TableFormatter
 
 import scala.concurrent.{ExecutionContext, Future}

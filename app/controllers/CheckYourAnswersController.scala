@@ -23,7 +23,7 @@ import viewmodels.AnswerSection
 import views.html.check_your_answers
 import config.FrontendAppConfig
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 class CheckYourAnswersController @Inject()(appConfig: FrontendAppConfig,
                                            override val messagesApi: MessagesApi,

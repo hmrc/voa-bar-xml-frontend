@@ -57,7 +57,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
   val username = "BA0114"
   val password = "pass"
-  lazy val login = Login(username, password).encrypt
+  lazy val login = Login(username, password).encrypt(configuration)
   lazy val pathForValidFile = getClass.getResource("/valid.xml")
 
   val submissionId = "SID38273"

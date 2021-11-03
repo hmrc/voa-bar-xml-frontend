@@ -20,10 +20,10 @@ import java.util.Locale
 
 import javax.inject.{Inject, Singleton}
 import models.UpScanRequests._
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Logging}
 import play.mvc.Http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import models.{Error, Login, VoaBarUpload}
 import play.api.i18n.{Lang, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -36,7 +36,7 @@ class UploadConnector @Inject()(http: HttpClient,
                                 val configuration: Configuration,
                                 val servicesConfig: ServicesConfig,
                                 messages: MessagesApi)
-                               (implicit ec: ExecutionContext) {
+                               (implicit ec: ExecutionContext) extends Logging {
 
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
   private[connectors] val upscanUrl = servicesConfig.baseUrl("upscan")
@@ -46,8 +46,6 @@ class UploadConnector @Inject()(http: HttpClient,
 
   private[connectors] val upScanConfig = configuration.get[Configuration]("microservice.services.upscan")
   private[connectors] val initiateUrl = s"${upscanUrl}${upScanConfig.get[String]("initiate.url")}"
-
-  val logger = Logger(this.getClass)
 
   def generateUsernameHeader(username: String) = ("BA-Code", username)
 
@@ -79,7 +77,7 @@ class UploadConnector @Inject()(http: HttpClient,
 
   private def handleSendXmlError(message: String) = {
     val errorMsg = s"Error when uploading am xml file\n$message"
-    Logger.warn(errorMsg)
+    logger.warn(errorMsg)
     Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
   }
 
@@ -92,7 +90,7 @@ class UploadConnector @Inject()(http: HttpClient,
       .recover {
         case ex: Throwable => {
           val errorMessage = "Failed to get UpScan file upload details"
-          Logger.error(errorMessage, ex)
+          logger.error(errorMessage, ex)
           Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
         }
       }

@@ -17,14 +17,14 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json._
 import models.Login
 
 import scala.util.{Failure, Success, Try}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Configuration
@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnector @Inject()(http: HttpClient,
                                val configuration: Configuration,
-                               val serviceConfig: ServicesConfig)(implicit ec: ExecutionContext) {
+                               val serviceConfig: ServicesConfig)(implicit ec: ExecutionContext) extends Logging {
 
   val serviceUrl = serviceConfig.baseUrl("voa-bar")
   val baseSegment = "/voa-bar/"
@@ -47,13 +47,13 @@ class LoginConnector @Inject()(http: HttpClient,
           response.status match {
             case 200 => Success(200)
             case status => {
-              Logger.warn("Received status of " + status + " from upstream service when logging in")
+              logger.warn("Received status of " + status + " from upstream service when logging in")
               Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
             }
           }
       } recover {
       case e =>
-        Logger.warn("Received exception " + e.getMessage + " from upstream service")
+        logger.warn("Received exception " + e.getMessage + " from upstream service")
         Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service"))
     }
   }

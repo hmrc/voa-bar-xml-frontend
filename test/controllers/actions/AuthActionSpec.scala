@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.UserAnswers
+import views.html.unauthorised
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,7 +41,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with I
   "AuthAction" should {
 
     "return unauthorised when user is not logged " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig])
+      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig], inject[unauthorised])
 
       val req = DataRequest(fakeRequest, sessionId, new UserAnswers(new CacheMap(sessionId, Map())))
 
@@ -51,7 +52,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with I
     }
 
     "return content of action when user is authorised " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig])
+      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig], inject[unauthorised])
 
       val cacheMap = new CacheMap(sessionId, Map(LoginId.toString -> Login.format.writes(Login("username", "password", None))))
 

@@ -25,7 +25,7 @@ lazy val microservice = Project(appName, file("."))
       ".*ControllerConfiguration;.*LanguageSwitchController;.*FrontendAppConfig;.*Constraints;.*UniformMessageUtil;" +
       ".*Formatters;.*CheckYourAnswersHelper;.*FormHelpers;.*error_template.template;.*main_template.template;.*pageChrome.template;.*feedbackError.template;" +
       ".*cr05SubmissionConfirmation.template;.*task_list.template;.*cr05SubmissionSummary.template;",
-    ScoverageKeys.coverageMinimum := 85,
+    ScoverageKeys.coverageMinimumStmtTotal := 85,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )

@@ -25,8 +25,7 @@ import scala.reflect.runtime.{universe => ru}
 
 class ReasonReportTypeSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
 
-  // TODO re-enabled when cr05 flow is integrated
-  "ReasonReportType" should "have all instance in Lister for to render radio buttons in order" ignore {
+  "ReasonReportType" should "have all instance in Lister for to render radio buttons in order" in {
     val traitType = ru.typeOf[ReasonReportType]
     val traitClazz = traitType.typeSymbol.asClass
 

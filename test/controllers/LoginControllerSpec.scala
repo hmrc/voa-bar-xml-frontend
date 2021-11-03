@@ -27,6 +27,7 @@ import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{Login, NormalMode}
 import org.mockito.scalatest.MockitoSugar
+import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
@@ -49,6 +50,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   def ec = app.injector.instanceOf[ExecutionContext]
 
   def login = app.injector.instanceOf[views.html.login]
+  val configuration = injector.instanceOf[Configuration]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
@@ -61,7 +63,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new LoginController(frontendAppConfig, messagesApi, FakeDataCacheConnector, new FakeNavigator(desiredRoute = onwardRoute),
-      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents, login)
+      dataRetrievalAction, new DataRequiredActionImpl(ec), formProvider, connector, controllerComponents, login, configuration)
   }
 
   def viewAsString(form: Form[Login] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString

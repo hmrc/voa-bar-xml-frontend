@@ -18,7 +18,6 @@ package controllers
 
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
-import views.html.session_expired
 
 class SignOutControllerSpec extends ControllerSpecBase {
 

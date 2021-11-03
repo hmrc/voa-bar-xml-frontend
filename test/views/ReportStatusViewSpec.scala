@@ -18,7 +18,6 @@ package views
 
 import java.time.ZonedDateTime
 import models.{Done, Failed, Pending, ReportStatus, Submitted, Verified}
-import play.routing.Router.Tags.ROUTE_CONTROLLER
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.behaviours.ViewBehaviours
 
@@ -39,7 +38,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
   def servicesConfig = injector.instanceOf[ServicesConfig]
   val fakeTableFormatter = new TableFormatter(servicesConfig)
 
-  val reportStatusFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ReportStatusController"))
+  val reportStatusFakeRequest = fakeRequest
 
   def createView(reportStatuses: Seq[ReportStatus] = Seq()) = () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(reportStatusFakeRequest, messages)
 

@@ -19,7 +19,6 @@ package connectors
 import java.io.{File, PrintWriter}
 
 import base.SpecBase
-import com.typesafe.config.ConfigException
 import models.UpScanRequests._
 import models._
 import org.mockito.ArgumentCaptor
@@ -33,7 +32,7 @@ import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -64,13 +63,13 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
   val xmlUrl = "http://localhost:59145"
   val username = "user"
   val password = "pass"
-  lazy val login = Login(username, password).encrypt
+  lazy val login = Login(username, password).encrypt(configuration)
 
   val submissionId = "SId3824832"
 
   def getHttpMock(returnedStatus: Int, returnedString: Option[String]) = {
     val httpMock = mock[HttpClient]
-    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[JsValue]], any[HttpReads[Any]],
       any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None, Map(), returnedString))
     httpMock
   }
