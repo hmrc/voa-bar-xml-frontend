@@ -20,7 +20,6 @@ import java.time.LocalDate
 import cats.data.Validated
 import ltbs.uniform._
 import cats.implicits._
-import journey.UniformJourney.Cr05AddProperty
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
 import models.PropertyType

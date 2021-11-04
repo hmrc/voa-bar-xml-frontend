@@ -40,7 +40,7 @@
 
 ) {
     @formWithCSRF(
-        action = routes.ReportReasonController.onPageSubmit(),
+        action = routes.ReportReasonController.onPageSubmit,
         'autoComplete -> "off"
     ) {
         @if(form.errors.nonEmpty) {

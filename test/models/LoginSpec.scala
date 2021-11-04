@@ -17,7 +17,7 @@
 package models
 
 import base.SpecBase
-import play.api.{Play, Configuration}
+import play.api.Configuration
 import uk.gov.hmrc.crypto.{ApplicationCrypto,Crypted}
 
 class LoginSpec extends SpecBase {
@@ -34,8 +34,8 @@ class LoginSpec extends SpecBase {
   }
 
   "Given an username and password, the encrypt method should return an encryted Login model" in {
-     lazy val crypto = new ApplicationCrypto(Play.current.configuration.underlying).JsonCrypto
-     val result = Login(username, password).encrypt
+     lazy val crypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
+     val result = Login(username, password).encrypt(configuration)
 
     result.username mustBe username
     password mustBe crypto.decrypt(Crypted(result.password)).value

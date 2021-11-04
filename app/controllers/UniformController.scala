@@ -27,12 +27,12 @@ import journey.{ReasonReportType, UniformJourney}
 import journey.UniformJourney.{Cr05AddProperty, Cr05SubmissionBuilder}
 import models.PropertyType
 import models.requests.DataRequest
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Logger, Logging}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components._
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,11 +51,9 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   appConfig: FrontendAppConfig,
                                   cr01cr03Service: Cr01Cr03Service,
                                   cr05SubmissionSummary: cr05SubmissionSummary,
-                                  cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
+                                  cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) with Logging {
 
   implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
-
-  val log = Logger(this.getClass)
 
   implicit val mongoPersistance: PersistenceEngine[DataRequest[AnyContent]] = new PersistenceEngine[DataRequest[AnyContent]]() {
 
@@ -80,7 +78,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
 
     def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
-      Logger.warn(s"externalID: ${externalId}, db: ${db}")
+      logger.warn(s"externalID: ${externalId}, db: ${db}")
       dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
     }
 
@@ -100,7 +98,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
           Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
         }
       }
-    }.getOrElse(Future.successful(Redirect(routes.ReportReasonController.onPageLoad())))
+    }.getOrElse(Future.successful(Redirect(routes.ReportReasonController.onPageLoad)))
 
   }
 
@@ -156,7 +154,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   }
 
   def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[_] ) = {
-    log.debug(s"updating property : ${propertyType}, ${index}")
+    logger.debug(s"updating property : ${propertyType}, ${index}")
     (propertyType, index) match {
       case (PropertyType.EXISTING, None) => getCr05Submission.map(x => x.copy(existingProperties = x.existingProperties :+ property )).flatMap(storeCr05Submission)
       case (PropertyType.EXISTING, Some(index)) => {
@@ -208,7 +206,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
       maybeCr05Submission match {
         case None => {
-          Logger.warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
+          Logger("CheckAnswerJourney").warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
           Future.successful(Redirect(routes.TaskListController.onPageLoad()))
         }
         case Some(cr05Submission) =>

@@ -18,7 +18,7 @@ package journey
 
 import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 
-sealed trait RemovalReasonType
+sealed trait RemovalReasonType extends Product with Serializable
 
 case object Demolition extends RemovalReasonType
 case object Disrepair extends RemovalReasonType

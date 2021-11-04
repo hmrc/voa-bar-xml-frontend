@@ -18,11 +18,11 @@ package controllers
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import identifiers.{CouncilTaxStartId, TaskListId, VOAAuthorisedId, WelcomeFormId}
+import identifiers.{CouncilTaxStartId, TaskListId, VOAAuthorisedId}
 import models.NormalMode
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents

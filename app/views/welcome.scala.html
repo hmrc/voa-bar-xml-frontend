@@ -34,7 +34,7 @@
     <ul class="govuk-list">
         @if(appConfig.baCodes.contains(baCode.toUpperCase)) {
             <li>
-                <a class="govuk-link" href="@controllers.routes.ReportReasonController.onPageLoad()" id="create">@messages("welcome.council_tax_webform")</a>
+                <a class="govuk-link" href="@controllers.routes.ReportReasonController.onPageLoad" id="create">@messages("welcome.council_tax_webform")</a>
             </li>
         }
         <li>

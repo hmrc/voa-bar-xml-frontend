@@ -34,7 +34,7 @@ import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.Navigator
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -153,7 +153,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                 uploadConfirmation: UploadConfirmation,
                                 login: Login,
                                 errors: Seq[Error] = Seq(),
-                                status: ReportStatusType = Verified
+                                status: ReportStatusType
                               )
                               (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
     val reportStatus = ReportStatus(

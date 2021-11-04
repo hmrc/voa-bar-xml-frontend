@@ -84,7 +84,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
     "in Check mode" must {
       "go to CheckYourAnswers from an identifier that doesn't exist in the edit route map" in {
         case object UnknownIdentifier extends Identifier
-        navigator.nextPage(UnknownIdentifier, CheckMode)(mock[UserAnswers]) mustBe routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(UnknownIdentifier, CheckMode)(mock[UserAnswers]) mustBe routes.CheckYourAnswersController.onPageLoad
       }
     }
   }

@@ -20,7 +20,7 @@ import play.api.data.FormError
 import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 import play.api.data.format.Formatter
 
-sealed trait ReasonReportType
+sealed trait ReasonReportType extends Product with Serializable
 
 case object AddProperty extends ReasonReportType
 case object SplitProperty extends ReasonReportType

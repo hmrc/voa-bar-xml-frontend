@@ -18,7 +18,6 @@ package views
 
 import java.time.ZonedDateTime
 import models.{Done, ReportStatus}
-import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
 class ConfirmationViewSpec extends ViewBehaviours {
@@ -28,7 +27,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
   val username = "BA0116"
   val submissionId = "SId328473"
   val messageKeyPrefix = "confirmation"
-  val confirmationFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.ConfirmationController"))
+  val confirmationFakeRequest = fakeRequest
   val reportStatus = ReportStatus(
     submissionId,
     ZonedDateTime.now,

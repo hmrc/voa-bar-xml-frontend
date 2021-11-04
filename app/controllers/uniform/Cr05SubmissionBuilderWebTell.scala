@@ -16,7 +16,7 @@
 
 package controllers.uniform
 
-import journey.UniformJourney.{Cr05Common, Cr05SubmissionBuilder}
+import journey.UniformJourney.Cr05SubmissionBuilder
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
 import play.twirl.api.Html

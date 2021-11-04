@@ -18,7 +18,7 @@ package journey
 
 import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 
-sealed trait NoPlanningReferenceType
+sealed trait NoPlanningReferenceType extends Product with Serializable
 
 case object WithoutPlanningPermission extends NoPlanningReferenceType
 case object NotApplicablePlanningPermission extends NoPlanningReferenceType

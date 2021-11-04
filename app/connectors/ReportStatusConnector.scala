@@ -17,17 +17,17 @@
 package connectors
 
 import java.time.ZonedDateTime
-
 import com.google.inject.ImplementedBy
+
 import javax.inject.{Inject, Singleton}
 import models.ReportStatus._
 import models.{Error, Login, ReportStatus}
 import play.api.mvc.Result
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Logging}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,10 +37,9 @@ class DefaultReportStatusConnector @Inject()(
                                       http: HttpClient,
                                       val serviceConfig: ServicesConfig)
                                      (implicit ec: ExecutionContext)
-  extends ReportStatusConnector with BaseConnector {
+  extends ReportStatusConnector with BaseConnector with Logging {
 
 
-  val logger = Logger(this.getClass)
   val serviceUrl = s"${serviceConfig.baseUrl("voa-bar")}/voa-bar"
 
   override def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] = {
@@ -50,7 +49,7 @@ class DefaultReportStatusConnector @Inject()(
       .map(Right(_))
       .recover{
         case ex: Throwable => {
-          Logger.error(ex.getMessage)
+          logger.error(ex.getMessage)
           Left(Error("", Seq("Couldn't get submissions")))
         }
       }
@@ -61,7 +60,7 @@ class DefaultReportStatusConnector @Inject()(
       .map(Right(_))
       .recover{
         case ex: Throwable => {
-          Logger.error(ex.getMessage)
+          logger.error(ex.getMessage)
           Left(Error("", Seq("Couldn't get submissions")))
         }
       }
@@ -72,7 +71,7 @@ class DefaultReportStatusConnector @Inject()(
       .map(Right(_))
       .recover{
         case ex: Throwable => {
-          Logger.error(ex.getMessage)
+          logger.error(ex.getMessage)
           Left(Error("", Seq("Couldn't get submissions")))
         }
       }
@@ -84,7 +83,7 @@ class DefaultReportStatusConnector @Inject()(
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
-          Logger.error(ex.getMessage)
+          logger.error(ex.getMessage)
           Left(Error("", Seq("Couldn't save submission")))
         }
       }
@@ -97,7 +96,7 @@ class DefaultReportStatusConnector @Inject()(
       .map(_ => Right(Unit))
       .recover {
         case ex: Throwable => {
-          Logger.error(ex.getMessage)
+          logger.error(ex.getMessage)
           Left(Error("", Seq("Couldn't save user info for the submission")))
         }
       }

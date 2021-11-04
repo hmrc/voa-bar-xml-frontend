@@ -22,14 +22,14 @@ import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import identifiers.LoginId
 import models.{Error, Login, NormalMode}
-import play.api.Logger
+import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseBarController extends FrontendBaseController {
+trait BaseBarController extends FrontendBaseController with Logging {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -70,7 +70,7 @@ trait BaseBarController extends FrontendBaseController {
         .recover{
           case ex: Throwable => {
             val errorMessage = "Error while saving login"
-            Logger.error(s"$errorMessage\n${ex.getMessage}")
+            logger.error(s"$errorMessage\n${ex.getMessage}")
             Left(InternalServerError)
           }
         }

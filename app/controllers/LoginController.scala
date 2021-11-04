@@ -19,14 +19,14 @@ package controllers
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import connectors.{DataCacheConnector, LoginConnector}
 import controllers.actions._
 import config.FrontendAppConfig
 import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{BillingAuthorities, Login, Mode}
-import play.api.Logger
+import play.api.{Configuration, Logging}
 import play.api.mvc.MessagesControllerComponents
 import utils.{Navigator, UserAnswers}
 
@@ -42,8 +42,9 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                                 formProvider: LoginFormProvider,
                                 loginConnector: LoginConnector,
                                 controllerComponents: MessagesControllerComponents,
-                                login: views.html.login
-                               )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport {
+                                login: views.html.login,
+                                configuration: Configuration
+                               )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport with Logging {
 
   val form = formProvider()
 
@@ -67,7 +68,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
         (formWithErrors: Form[Login]) =>
           Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
         value => {
-          val encryptedLogin = value.encrypt
+          val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) flatMap {
               case Success(status) => {
@@ -78,7 +79,7 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
                     }
                   }
                   case None => {
-                    Logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
+                    logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
                     val formWithLoginErrors =
                       form
                           .withError("username", Messages("error.invalid_username"))

@@ -17,6 +17,10 @@
 @import uk.gov.hmrc.play.partials.FormPartialRetriever
 @import scala.concurrent.ExecutionContext
 
+@this(
+		main_template: views.html.main_template
+)
+
 @(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages, formPartialRetriever: FormPartialRetriever, ec: ExecutionContext)
 
 @main_template(

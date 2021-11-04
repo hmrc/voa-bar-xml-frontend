@@ -17,17 +17,19 @@
 @import helper._
 @import controllers.ReportDeleteController
 
-@import play.api.Play
+@import play.api.Configuration
 @import scala.util.Try
+
+@this(configuration: Configuration)
+
 @(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
 
 @renderDelete = @{
 
     val delete = for {
-        application <- Play.maybeApplication
-        deleteFlag <- application.configuration.getOptional[String]("feature.delete.enabled").flatMap(x => Try(x.toBoolean).toOption)
-        deleteApproved <- application.configuration.getOptional[Seq[String]]("feature.delete.baCodes").map(_.contains(baCode.toUpperCase))
-    }yield (deleteFlag & deleteApproved)
+        deleteFlag <- configuration.getOptional[String]("feature.delete.enabled").flatMap(x => Try(x.toBoolean).toOption)
+        deleteApproved <- configuration.getOptional[Seq[String]]("feature.delete.baCodes").map(_.contains(baCode.toUpperCase))
+    } yield deleteFlag & deleteApproved
 
     delete.getOrElse(false)
 
@@ -41,5 +43,3 @@
     }
 
 }
-
-

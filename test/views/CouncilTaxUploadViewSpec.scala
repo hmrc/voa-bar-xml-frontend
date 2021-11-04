@@ -18,7 +18,6 @@ package views
 
 import forms.FileUploadDataFormProvider
 import models.UpScanRequests.{InitiateResponse, UploadRequest}
-import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
 class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
@@ -31,7 +30,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
   val form = new FileUploadDataFormProvider()()
 
-  val councilTaxUploadFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.CouncilTaxUploadController"))
+  val councilTaxUploadFakeRequest = fakeRequest
 
   val initiateResponse = InitiateResponse(
     reference = "foo",

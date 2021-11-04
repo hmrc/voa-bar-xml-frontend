@@ -22,15 +22,15 @@ import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import base.SpecBase
 import models._
-import org.scalatest.{Matchers, MustMatchers}
+import org.scalatest.MustMatchers
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.test.Helpers.{status, _}
+import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
@@ -42,13 +42,13 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
 
   val username = "user"
   val password = "pass"
-  lazy val login = Login(username, password).encrypt
+  lazy val login = Login(username, password).encrypt(configuration)
 
   implicit def hc: HeaderCarrier = HeaderCarrier()
 
   def getHttpMock(returnedStatus: Int) = {
     val httpMock = mock[HttpClient]
-    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[JsValue]], any[HttpReads[Any]],
       any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
 //    when(httpMock.GET(any[String])(any[HttpReads[Any]], any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
     httpMock
@@ -60,7 +60,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       "call the Microservice with the given JSON for username provided" in {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
-        implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])
+        implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[JsValue]])
         val urlCaptor = ArgumentCaptor.forClass(classOf[String])
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
@@ -99,7 +99,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
       "call the Microservice with the given JSON" in {
         implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
         implicit val httpReadsNapper = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
-        implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[Any]])
+        implicit val jsonWritesNapper = ArgumentCaptor.forClass(classOf[Writes[JsValue]])
         val urlCaptor = ArgumentCaptor.forClass(classOf[String])
         val bodyCaptor = ArgumentCaptor.forClass(classOf[JsValue])
         val headersCaptor = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
@@ -132,7 +132,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
 
       "return a failure if the data transfer call throws an exception" in {
         val httpMock = mock[HttpClient]
-        when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[Any]], any[HttpReads[Any]],
+        when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[JsValue]], any[HttpReads[Any]],
           any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(new RuntimeException)
         val connector = new LoginConnector(httpMock, configuration,servicesConfig)
         val result = await(connector.sendJson(minimalJson))

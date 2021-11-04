@@ -19,17 +19,16 @@ package controllers
 import java.util.UUID
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
-import controllers.actions.{DataRequiredActionImpl, DataRetrievalActionImpl}
+import controllers.actions.DataRetrievalActionImpl
 import identifiers.LoginId
 import models.Login
 import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
-import play.api.mvc.{AnyContent, BodyParser, BodyParsers, MessagesControllerComponents}
-import play.api.test.FakeRequest
+import play.api.mvc.{BodyParsers, MessagesControllerComponents}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, SessionKeys}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {

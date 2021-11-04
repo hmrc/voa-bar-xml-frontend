@@ -47,7 +47,7 @@
         if(errors.isEmpty) messages("service.title", messages(key.mkString("", ".", ".pageLabel"))) else "Error: " + messages("service.title", messages(key.mkString("", ".", ".pageLabel")))
         ),
     //second element from breadcrumbs, head is always current element.
-    backLinkUrl = Some(breadcrumbs.tail.headOption.getOrElse(controllers.routes.ReportReasonController.onPageLoad().url))
+    backLinkUrl = Some(breadcrumbs.tail.headOption.getOrElse(controllers.routes.ReportReasonController.onPageLoad.url))
 ) {
 
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/") + "?" + request.rawQueryString),

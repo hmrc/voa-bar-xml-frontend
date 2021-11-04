@@ -17,20 +17,20 @@
 package config
 
 import filters.VoaBarAuditFilter
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment, Logging}
 import play.api.inject.{Binding, Module}
-import uk.gov.hmrc.play.bootstrap.FrontendModule
+import uk.gov.hmrc.play.bootstrap.frontend.FrontendModule
 import uk.gov.hmrc.play.bootstrap.filters.AuditFilter
 
 /**
   * Custom frontend module. It bind everything from FrontendModule but change binding for FrontendAuditFilter.
   * We use custom implementation which prevent logging of sensitive fields.
   */
-class VoaBarFrontendModule extends Module {
+class VoaBarFrontendModule extends Module with Logging {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
 
-    Logger.warn("Binding audit filter")
+    logger.warn("Binding audit filter")
 
     new FrontendModule().bindings(environment, configuration)
     .map { binding =>

@@ -18,7 +18,7 @@ package filters
 
 import base.SpecBase
 import uk.gov.hmrc.play.bootstrap.filters.AuditFilter
-import uk.gov.hmrc.play.bootstrap.filters.frontend.{DefaultFrontendAuditFilter, FrontendAuditFilter}
+import uk.gov.hmrc.play.bootstrap.frontend.filters.FrontendAuditFilter
 
 class VoaBarAuditFilterSpec extends SpecBase {
 
@@ -33,12 +33,8 @@ class VoaBarAuditFilterSpec extends SpecBase {
       val auditFilter = app.injector.instanceOf[AuditFilter].asInstanceOf[FrontendAuditFilter]
 
       auditFilter.maskedFormFields must contain only("password")
-
-
     }
 
-
   }
-
 
 }

@@ -21,14 +21,14 @@ import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
 import play.api.mvc.{MessagesControllerComponents, RequestHeader}
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
-import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
-import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
+import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.partials.{FormPartialRetriever, HtmlPartial}
-import views.html.{inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
+import views.html.{feedbackError, inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,6 +39,10 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   def servicesConfig = app.injector.instanceOf[ServicesConfig]
   def configuration = app.injector.instanceOf[Configuration]
+  val feedbackError = injector.instanceOf[feedbackError]
+  val inpagefeedback = injector.instanceOf[inpagefeedback]
+  val inpagefeedbackNoLogin = injector.instanceOf[inpagefeedbackNoLogin]
+  val inPageFeedbackThankyou = injector.instanceOf[inPageFeedbackThankyou]
   val partialRetriever = mock[FormPartialRetriever]
   when(partialRetriever.getPartialContent(any[String], any[Map[String, String]], any[Html])(any[ExecutionContext], any[RequestHeader])).thenReturn(Html(""))
 
@@ -63,7 +67,11 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       http,
       controllerComponents,
       servicesConfig,
-      configuration)(ec, partialRetriever)
+      configuration,
+      feedbackError,
+      inpagefeedback,
+      inpagefeedbackNoLogin,
+      inPageFeedbackThankyou)(ec, partialRetriever)
   }
   val url = "feedback.url"
 

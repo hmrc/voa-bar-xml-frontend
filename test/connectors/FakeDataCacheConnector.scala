@@ -16,7 +16,7 @@
 
 package connectors
 
-import play.api.libs.json.{Format, JsValue}
+import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future

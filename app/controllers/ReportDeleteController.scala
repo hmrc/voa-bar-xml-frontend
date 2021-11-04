@@ -25,7 +25,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
 import scala.util.Try

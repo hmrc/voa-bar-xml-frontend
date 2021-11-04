@@ -17,7 +17,6 @@
 package views
 
 import org.jsoup.nodes.Document
-import play.routing.Router.Tags.ROUTE_CONTROLLER
 import views.behaviours.ViewBehaviours
 
 class WelcomeViewSpec extends ViewBehaviours {
@@ -28,7 +27,7 @@ class WelcomeViewSpec extends ViewBehaviours {
   val messageKeyPrefix = "welcome"
   val cr05FeatureFlag = false
 
-  val welcomeFakeRequest = fakeRequest.copyFakeRequest(tags = fakeRequest.tags + (ROUTE_CONTROLLER -> "controllers.WelcomeController"))
+  val welcomeFakeRequest = fakeRequest
 
   def createView = () => welcome(frontendAppConfig, username, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
@@ -41,7 +40,7 @@ class WelcomeViewSpec extends ViewBehaviours {
   "The Council Tax links to the goToCouncilTaxUploadPage method" in {
     val doc = asDocument(createView())
     val href = doc.getElementById("councilTaxLink").attr("href")
-    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url.toString)
+    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url)
   }
 
   // Welcome page containing form for navigation
@@ -51,14 +50,14 @@ class WelcomeViewSpec extends ViewBehaviours {
   def uploadLinkTest(ba: String, formDoc: Document) = {
     s"The upload link to the goToCouncilTaxUploadPage method for ${ba}" in {
       val href = formDoc.getElementById("councilTaxLink").attr("href")
-      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url.toString)
+      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url)
     }
   }
 
   def viewHistoryTest(ba: String, formDoc: Document) = {
     s"The view history link to the ReportStatusController.onPageLoad method for ${ba}" in {
       val href = formDoc.getElementById("submissions").attr("href")
-      assert(href == controllers.routes.ReportStatusController.onPageLoad().url.toString)
+      assert(href == controllers.routes.ReportStatusController.onPageLoad().url)
     }
   }
 
@@ -84,7 +83,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
     s"The webform link is visible for ${ba}" in {
       val href = formDoc.getElementById("create").attr("href")
-      assert(href == controllers.routes.ReportReasonController.onPageLoad().url.toString)
+      assert(href == controllers.routes.ReportReasonController.onPageLoad.url)
     }
 
     uploadLinkTest(ba, formDoc)
