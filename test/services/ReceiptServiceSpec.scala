@@ -19,20 +19,20 @@ package services
 import java.io.ByteArrayInputStream
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId, ZonedDateTime}
-
 import models._
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.{PDDocument, PDPage}
 import org.apache.pdfbox.text.PDFTextStripper
 import org.joda.time.DateTimeUtils
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatestplus.play.PlaySpec
 import play.api.i18n.MessagesApi
 
 /**
   * Created by rgallet on 08/03/16.
   */
-class ReceiptServiceSpec extends PlaySpec with OneAppPerSuite {
+class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   val messages = app.injector.instanceOf[MessagesApi]
   val service = new DefaultReceiptService(messages)

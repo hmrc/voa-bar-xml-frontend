@@ -17,13 +17,14 @@
 package journey
 
 import journey.RemovalReasonType._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.{JsString, Json}
 
 import scala.reflect.runtime.{universe => ru}
 
-class RemovalReasonTypeSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
+class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
 
   "RemovalReasonType" should "have all instance in Lister for to render radio buttons in order" in {
 
@@ -64,6 +65,5 @@ class RemovalReasonTypeSpec extends FlatSpec with Matchers with TableDrivenPrope
       Json.toJson(removalReasonType) shouldBe JsString(removalReasonType.toString)
     }
   }
-
 
 }

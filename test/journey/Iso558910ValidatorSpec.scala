@@ -17,10 +17,12 @@
 package journey
 
 import ltbs.uniform.{ErrorMsg, ErrorTree}
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
+import org.scalatest.EitherValues
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class Iso558910ValidatorSpec extends FlatSpec with Matchers with EitherValues with TableDrivenPropertyChecks {
+class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
 
   val invalidInputData = Table(
     ("Incorrect string"),

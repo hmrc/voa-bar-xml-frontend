@@ -21,10 +21,11 @@ object Dependencies {
   private val uniformVersion = "4.10.0"
 
   // Test dependencies
-  private val scalaTestPlusPlayVersion = "5.0.0"
-  private val jsoupVersion = "1.14.3"
-  private val mockitoScalatestVersion = "1.7.1"
-  private val scalacheckVersion = "1.14.1"
+  private val scalaTestPlusPlayVersion = "5.1.0"
+  private val scalatestPlusScalacheckVersion = "3.2.10.0"
+  private val scalatestVersion = "3.2.10"
+  private val mockitoScalatestVersion = "1.16.49"
+  private val flexmarkVersion = "0.62.2"
 
   val compileDependencies = Seq(
     ws,
@@ -45,14 +46,13 @@ object Dependencies {
   )
 
   val testDependencies = Seq(
-    //"org.scalatest" %% "scalatest" % "3.2.10" % Test, // TODO: Remove
     "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % Test,
-    "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test,
-    "com.vladsch.flexmark" % "flexmark-all" % "0.62.2" % Test,
+    "org.scalatest" %% "scalatest" % scalatestVersion % Test,
+    "org.scalatestplus" %% "scalacheck-1-15" % scalatestPlusScalacheckVersion % Test,
+    "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion % Test,
     "com.typesafe.play" %% "play-test" % PlayVersion.current % Test,
     "com.typesafe.akka" %% "akka-testkit" % PlayVersion.akkaVersion % Test,
-    "org.mockito" %% "mockito-scala-scalatest" % mockitoScalatestVersion % Test,
-    "org.jsoup" % "jsoup" % jsoupVersion % Test
+    "org.mockito" %% "mockito-scala-scalatest" % mockitoScalatestVersion % Test
   )
 
   val appDependencies: Seq[ModuleID] = compileDependencies ++ testDependencies

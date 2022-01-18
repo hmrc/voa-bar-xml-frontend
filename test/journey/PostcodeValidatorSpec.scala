@@ -17,9 +17,11 @@
 package journey
 
 import ltbs.uniform.ErrorTree
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
+import org.scalatest.EitherValues
 
-class PostcodeValidatorSpec extends FlatSpec with Matchers with EitherValues {
+class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues {
 
   val validator = new PostcodeValidator()
 
@@ -36,8 +38,6 @@ class PostcodeValidatorSpec extends FlatSpec with Matchers with EitherValues {
     //bn12 4axx and bbn12 4ax
   }
 
-
-
   it should "reject invalid postcode" in {
     validator("1112 4AX").toEither.left.value shouldBe a[ErrorTree]
   }
@@ -45,7 +45,5 @@ class PostcodeValidatorSpec extends FlatSpec with Matchers with EitherValues {
   it should "reject empty postcode" in {
     validator("").toEither.left.value shouldBe a[ErrorTree]
   }
-
-
 
 }
