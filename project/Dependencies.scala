@@ -49,7 +49,7 @@ object Dependencies {
     "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion % Test,
     "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     "org.scalatestplus" %% "scalacheck-1-15" % scalatestPlusScalacheckVersion % Test,
-    "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion % Test,
+    "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion % Test, // for scalatest 3.1+
     "com.typesafe.play" %% "play-test" % PlayVersion.current % Test,
     "com.typesafe.akka" %% "akka-testkit" % PlayVersion.akkaVersion % Test,
     "org.mockito" %% "mockito-scala-scalatest" % mockitoScalatestVersion % Test
