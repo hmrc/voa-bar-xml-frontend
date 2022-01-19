@@ -14,12 +14,20 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTimeoutDialogHelper
 
 @this(
-  hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
-@()(implicit messages: Messages)
-@hmrcTrackingConsentSnippet()
-<!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/application-ie-8.css")' rel="stylesheet" type="text/css" /><![endif]-->
-<!--[if gt IE 8]><!--><link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css" /><!--<![endif]-->
+
+@(enableTimeoutDialog: Boolean = true)(implicit request: RequestHeader, messages: Messages)
+
+<link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/voabarxmlfrontend-app.css")' />
+<link rel="stylesheet" media="print" href='@routes.Assets.versioned("stylesheets/voabarxmlfrontend-print.css")' />
+<link rel="stylesheet" media="all" type="text/css" href='@routes.Assets.versioned("stylesheets/application.css")' />
+
+@if(enableTimeoutDialog) {
+  @hmrcTimeoutDialogHelper(
+   signOutUrl = routes.TimeoutController.onPageLoad.url
+  )
+}

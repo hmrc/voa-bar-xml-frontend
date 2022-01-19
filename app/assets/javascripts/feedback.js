@@ -83,7 +83,7 @@
         $('.vacated-form [for="report-error"]').text(VoaMessages.textLabel('vacateFormGiveDetails'));
 
         $('.vacated-form [name="report-action"]').closest('div').show();
-        $('.vacated-form label[for="report-action"]').addClass('visuallyhidden');
+        $('.vacated-form label[for="report-action"]').addClass('govuk-visually-hidden');
         $('.vacated-form [name="report-action"]').val(VoaMessages.textLabel('labelWhatWereYouDoing')).attr('hidden', '');
 
 

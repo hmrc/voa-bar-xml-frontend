@@ -14,20 +14,12 @@
  * limitations under the License.
  *@
 
-@this(
-        main_template: views.html.govuk.main_template
-)
+@this()
 
-@(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages)
+@(contentBlock: Html)
 
-@main_template(
-    pageTitle = messages("heading.giveFeedback"),
-    showSignOut = false
-) {
-	 			<div class="help__wrapper">
-					<div class="help-content">
-						<h1>@messages("copy.feedback.thankyou")</h1>
-                        <a href="@routes.FeedbackController.inPageFeedback">@messages("copy.feedback.anotherForm")</a>
-					</div>
-				</div>
-}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @contentBlock
+    </div>
+</div>

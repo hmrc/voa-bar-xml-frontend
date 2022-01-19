@@ -15,45 +15,42 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import views.html.govuk.{head => headTemplate}
-@import views.html.govuk.{scripts => scriptsTemplate}
-@import uk.gov.hmrc.play.config.AccessibilityStatementConfig
+@import views.html.govuk.head
+@import views.html.govuk.scripts
+@import views.html.govuk.FullWidthMainContent
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 
 @this(
-        govukLayout: GovukLayout,
-        head: headTemplate,
-        scripts: scriptsTemplate,
-        govukPhaseBanner: GovukPhaseBanner,
-        siteHeader: components.siteHeader,
-        siteFooter: components.siteFooter,
+        hmrcLayout: HmrcLayout,
+        headTemplate: head,
+        scriptsTemplate: scripts,
         govukBackLink: GovukBackLink,
         govukSummaryList: GovukSummaryList,
-        accessibilityStatementConfig: AccessibilityStatementConfig
+        twoThirdsMainContent: TwoThirdsMainContent,
+        fullWidthMainContent: FullWidthMainContent
 )
 
-
-@(pageTitle: Option[String] = None,
+@(
+        pageTitle: String,
         beforeContentBlock: Option[Html] = None,
         backLinkUrl: Option[String] = None,
         baCode: Option[String] = None,
-        showSignOut: Boolean = true
+        showSignOut: Boolean = true,
+        fullWidth: Boolean = false
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
-@beforeBLock = {
-    @govukPhaseBanner(
-        PhaseBanner(
-            tag = Option(Tag(Text("BETA"))),
-            content = HtmlContent("This is a new service – your <a href=\"/voa-bar-xml-frontend/feedback/tell-us\" target=\"_blank\" id=\"betaFeedback\">feedback</a> will help us to improve it."),
-            classes = "govuk-!-display-none-print"
-        )
+@phaseBanner = @{
+    PhaseBanner(
+        tag = Option(Tag(Text(messages("label.beta")))),
+        content = HtmlContent(messages("label.phase", routes.FeedbackController.inPageFeedback.url)),
+        classes = "govuk-!-display-none-print"
     )
+}
+
+@beforeBlock = {
 
     @backLinkUrl.map{ url =>
-        <div>
-            @govukBackLink(
-                BackLink(href = url)
-            )
-        </div>
+        @govukBackLink(BackLink(href = url))
     }
 
     @baCode.map{ username =>
@@ -77,38 +74,15 @@
     @beforeContentBlock
 }
 
-
-@govukLayout(
-    pageTitle = pageTitle,
-    headBlock = Some(head()),
-    headerBlock = Some(siteHeader(showSignOut)),
-    beforeContentBlock = Option(beforeBLock),
-    footerBlock =
-        Some(
-            siteFooter(
-                Seq(
-                    FooterItem(
-                        href = Some("/help/cookies"),
-                        text = Some("Cookies")
-                    ),
-                    accessibilityStatementConfig.url
-                            .map(
-                        href => FooterItem(Some(messages("footer.accessibility.text")), Some(href))
-                    ).get,
-                    FooterItem(
-                        href = Some("/help/privacy"),
-                        text = Some("Privacy policy")
-                    ),
-                    FooterItem(
-                        href = Some("/help/terms-and-conditions"),
-                        text = Some("Terms and conditions")
-                    ),
-                    FooterItem(
-                        href = Some("https://www.gov.uk/help"),
-                        text = Some("Help using GOV.UK")
-                    )
-                )
-            )
-        ),
-    bodyEndBlock = Some(scripts(showSignOut))
+@hmrcLayout(
+    isWelshTranslationAvailable = false,
+    pageTitle = Some(messages("service.title", pageTitle)),
+    serviceName = Some(messages("service.name")),
+    serviceUrl = Some(routes.WelcomeController.onPageLoad.url),
+    signOutUrl = if (showSignOut) Some(routes.SignOutController.signOut.url) else None,
+    phaseBanner = Some(phaseBanner),
+    additionalHeadBlock = Some(headTemplate(showSignOut)),
+    additionalScriptsBlock = Some(scriptsTemplate()),
+    beforeContentBlock = Some(beforeBlock),
+    mainContentLayout = Some(if (fullWidth) fullWidthMainContent(_) else twoThirdsMainContent(_))
 )(contentBlock)

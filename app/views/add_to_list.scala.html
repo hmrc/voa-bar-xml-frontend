@@ -31,7 +31,7 @@
 @(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = Some(messages("service.title", messages("welcome.heading"))),
+    pageTitle = messages("welcome.heading"),
     baCode = baCode,
     beforeContentBlock = form.errors.headOption.map(_ => errorSummary(ErrorSummary( classes = "govuk-!-margin-top-3 govuk-!-margin-bottom-0 govuk-!-width-two-thirds",
         errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title")))))
@@ -101,6 +101,5 @@
                 </button>
             }
         }
-
 
 }

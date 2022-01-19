@@ -17,15 +17,15 @@
 @import config.FrontendAppConfig
 
 @this(
-        main_template: views.html.main_template
+        main_template: views.html.govuk.main_template
 )
 
 @(appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = messages("session_expired.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+    pageTitle = messages("session_expired.title"),
+    showSignOut = false
+) {
 
     <h1 class="heading-xlarge">@messages("session_expired.heading")</h1>
 

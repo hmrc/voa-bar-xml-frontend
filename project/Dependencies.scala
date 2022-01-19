@@ -5,8 +5,6 @@ object Dependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val govukTemplateVersion = "5.72.0-play-28"
-  private val playUiVersion = "9.7.0-play-28"
   private val bootstrapVersion = "5.19.0"
   private val playFrontendHmrcVersion = "2.0.0-play-28"
   private val playConditionalFormMappingVersion = "1.10.0-play-28"
@@ -29,8 +27,6 @@ object Dependencies {
 
   val compileDependencies = Seq(
     ws,
-    "uk.gov.hmrc"       %% "govuk-template" % govukTemplateVersion,
-    "uk.gov.hmrc"       %% "play-ui" % playUiVersion,
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc"       %% "play-frontend-hmrc" % playFrontendHmrcVersion,
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,

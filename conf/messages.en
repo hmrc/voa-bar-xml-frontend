@@ -223,7 +223,7 @@ header.links.confirmation = Submission
 header.links.status = History
 
 label.beta = BETA
-label.phase=This is a new service – your <a href="{0}" target="_blank" id="betaFeedback">feedback <span class="visuallyhidden"> (Opens in a new window)</span></a> will help us to improve it.
+label.phase=This is a new service – your <a href="{0}" class="govuk-link" target="_blank" id="betaFeedback">feedback</a> will help us to improve it.
 
 heading.giveFeedback = Give feedback
 

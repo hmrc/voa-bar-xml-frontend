@@ -18,18 +18,15 @@
 @import scala.concurrent.ExecutionContext
 
 @this(
-		main_template: views.html.main_template
+		main_template: views.html.govuk.main_template
 )
 
 @(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages, formPartialRetriever: FormPartialRetriever, ec: ExecutionContext)
 
 @main_template(
-title = messages("heading.giveFeedback"),
-appConfig = appConfig,
-bodyClasses = None) {
-	 <main id="content" tabindex="-1">
-	 	<div class="grid-row">
-    		<div class="column-two-thirds">
+	pageTitle = messages("heading.giveFeedback"),
+	showSignOut = false
+) {
 	 			<div class="help__wrapper">
 					<div class="help-content">
 						<div class="form-title heading-large">
@@ -46,7 +43,4 @@ bodyClasses = None) {
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</main>
 }

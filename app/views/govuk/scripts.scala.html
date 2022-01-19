@@ -17,41 +17,10 @@
 @import play.api.Configuration
 
 @this(
-   appConfig: config.FrontendAppConfig,
    configuration: Configuration
 )
 
-@(useTimeout: Boolean = true)
+@()
+
 <script src='@routes.Assets.versioned("javascripts/jquery-2.2.4.js")'></script>
-<script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
 <script src='@routes.Assets.versioned("javascripts/voabarxmlfrontend-app.min.js")'></script>
-@if(useTimeout) {
-<script>
-       // https://stackoverflow.com/a/52142007/5826349
-       (function() {
-
-           const idleDurationSecs = @configuration.get[Int]("signout.timeout");    // X number of seconds
-           const redirectUrl = '@routes.TimeoutController.onPageLoad()';  // Redirect idle users to this URL
-           let idleTimeout; // variable to hold the timeout, do not modify
-
-           const resetIdleTimeout = function() {
-
-               // Clears the existing timeout
-               if(idleTimeout) clearTimeout(idleTimeout);
-
-               // Set a new idle timeout to load the redirectUrl after idleDurationSecs
-               idleTimeout = setTimeout(() => location.href = redirectUrl, idleDurationSecs * 1000);
-           };
-
-           // Init on page load
-           resetIdleTimeout();
-
-           // Reset the idle timeout on any of the events listed below
-           ['click', 'touchstart', 'mousemove'].forEach(evt =>
-               document.addEventListener(evt, resetIdleTimeout, false)
-           );
-
-       })();
-</script>
-}
-<script>window.GOVUKFrontend.initAll();</script>
