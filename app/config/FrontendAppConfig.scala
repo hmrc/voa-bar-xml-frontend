@@ -30,9 +30,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   private lazy val contactHost = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "voabarxmlfrontend"
 
-  lazy val analyticsToken = loadConfig(s"google-analytics.token")
-  lazy val analyticsHost = loadConfig(s"google-analytics.host")
-  lazy val GTM = loadConfig(s"google-analytics.GTM")
   lazy val baCodes = loadConfig(s"baCodes").split(",").toSeq
   lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
