@@ -31,11 +31,7 @@
 @(appConfig: FrontendAppConfig, form: Form[Login], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = if(form.errors.nonEmpty) {
-        Some(messages("error.title.prefix") + messages("service.title", messages("login.heading")))
-    } else {
-        Some(messages("service.title", messages("login.heading")))
-    },
+    pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("login.heading"),
     showSignOut = false
 ) {
     @formWithCSRF(

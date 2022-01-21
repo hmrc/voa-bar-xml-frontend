@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package utils
+@this(
+        main_template: views.html.govuk.main_template
+)
 
-import org.scalatest.matchers.must
-import org.scalatest.wordspec.AnyWordSpec
+@()(implicit request: Request[_], messages: Messages)
 
-class WithNameSpec extends AnyWordSpec with must.Matchers {
+@main_template(
+    pageTitle = messages("heading.giveFeedback"),
+    showSignOut = false
+) {
+    <h1 class="govuk-heading-l">@messages("copy.feedback.thankyou")</h1>
 
-  object Foo extends WithName("bar")
-
-  ".toString" must {
-    "return the correct string" in {
-      Foo.toString mustEqual "bar"
-    }
-  }
+    <p class="govuk-body">
+        <a class="govuk-link" href="@routes.FeedbackController.onPageLoad">@messages("copy.feedback.anotherForm")</a>
+    </p>
 }

@@ -70,7 +70,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
     }
 
     "Include a signout link which redirects the users to the login page" in {
-      val href = doc.getElementById("signout-link").attr("href")
+      val href = doc.getElementsByClass("hmrc-sign-out-nav__link").first.attr("href")
       href mustBe controllers.routes.SignOutController.signOut().url
     }
 

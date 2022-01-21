@@ -55,7 +55,7 @@ report.status.submitted.title = Submitted (pending)
 report.status.cancelled.title = Submitted (pending)
 report.status.done.title = Submitted (completed)
 # Used for test only
-reportStatus.title = Submission history - Billing Authority Reports - GOV.UK
+reportStatus.title = Submission history
 
 report.filter.all = All Submissions
 report.filter.failed = Show only submissions with errors
@@ -151,7 +151,7 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 # Used only in tests
-confirmation.title = Report submitted - Billing Authority Reports - GOV.UK
+confirmation.title = Report submitted
 
 
 confirmation.heading.pending = Submission pending
@@ -184,7 +184,7 @@ confirmation.options.history = View your previous Council Tax submissions
 confirmation.submission.details = Submission details
 
 # User in test only
-councilTaxUpload.title = Upload a file - Billing Authority Reports - GOV.UK
+councilTaxUpload.title = Upload a file
 councilTaxUpload.heading = Upload a file
 councilTaxUpload.error.xml.required = XML File Required
 councilTaxUpload.error.xml.length = Maximum file size is 2 Mb
@@ -195,7 +195,7 @@ councilTaxUpload.error.transferXml = Error while uploading file
 councilTaxUpload.submit.button = Submit
 
 # Use only in test
-login.title = Sign in - Billing Authority Reports - GOV.UK
+login.title = Sign in
 login.heading = Sign in
 login.subheading = Billing Authority Reports
 login.username = Username
@@ -208,7 +208,7 @@ login.error.password.length = Password must be 100 characters or less
 login.error.auth = Needs to log in
 
 #Used only un tests
-welcome.title = Choose a task - Billing Authority Reports - GOV.UK
+welcome.title = Choose a task
 welcome.heading = Choose a task
 welcome.BA = Billing Authority Reports
 welcome.want.to = I want to
@@ -223,7 +223,7 @@ header.links.confirmation = Submission
 header.links.status = History
 
 label.beta = BETA
-label.phase=This is a new service – your <a href="{0}" target="_blank" id="betaFeedback">feedback <span class="visuallyhidden"> (Opens in a new window)</span></a> will help us to improve it.
+label.phase=This is a new service – your <a href="{0}" class="govuk-link" target="_blank" id="betaFeedback">feedback</a> will help us to improve it.
 
 heading.giveFeedback = Give feedback
 
@@ -232,7 +232,33 @@ copy.feedback=If you need help completing this form, please use the ‘Get help 
 copy.feedback.thankyou=Thank you for your feedback
 copy.feedback.anotherForm=Submit another form
 label.feedback.error=There was an error sending your feedback.
-copy.form.help.thankyouvacated=Thank you for submitting this feedback, there will be no need for you to continue with the on-line form and we will contact you if we need more information.
+
+feedback.heading=Give Feedback
+feedback.p1=We use your feedback to make our services better.
+feedback.satisfaction.label=How satisfied are you with this service?
+feedback.rating.5=Very satisfied
+feedback.rating.4=Satisfied
+feedback.rating.3=Neither satisfied or dissatisfied
+feedback.rating.2=Dissatisfied
+feedback.rating.1=Very dissatisfied
+feedback.rating.error.required=Select how satisfied you are with this service
+feedback.rating.error.invalid=Please select a valid satisfaction rating
+
+feedback.name.label=Full name (optional)
+feedback.name.error.required=Enter your full name
+feedback.name.error.length=Full name cannot be longer than 70 characters
+feedback.name.error.invalid=Full name must only include letters a to z, hyphens, full stops, commas, apostrophes and spaces
+
+feedback.email.label=Email address (optional)
+feedback.email.error.length=Email address must be 255 characters or fewer
+feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
+
+feedback.comments.label=How could we improve this service? (optional)
+feedback.comments.hint=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
+feedback.comments.error.required=Enter your comments
+feedback.comments.error.length=The comment cannot be longer than 2000 characters
+
+feedback.submit=Submit
 
 status.submissionId.title = Submission ID
 status.history.title = History
@@ -590,7 +616,7 @@ add-comments.error.invalidIsoString=Comments must only contain letters a to z, h
 
 #SESSION TIMEOUT
 ##############################
-sessionTimeout.title = You have been signed out due to inactivity - Billing Authority Reports - GOV.UK
+sessionTimeout.title = You have been signed out due to inactivity
 sessionTimeout.heading=You have been signed out due to inactivity
 sessionTimeout.copy=You will need to sign in again. If you have entered any details, these have not been saved
 sessionTimeout.link=Sign in

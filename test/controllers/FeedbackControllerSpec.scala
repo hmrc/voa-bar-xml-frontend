@@ -16,93 +16,78 @@
 
 package controllers
 
-import connectors.FakeDataCacheConnector
+import forms.FeedbackForm.feedbackForm
 import org.mockito.scalatest.MockitoSugar
-import play.api.Configuration
-import play.api.mvc.{MessagesControllerComponents, RequestHeader}
-import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
-import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
-import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
-import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.partials.{FormPartialRetriever, HtmlPartial}
-import views.html.{feedbackError, inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
+import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
+import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * @author Yuriy Tumakha
+ */
 class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  def ec = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  def servicesConfig = app.injector.instanceOf[ServicesConfig]
-  def configuration = app.injector.instanceOf[Configuration]
-  val feedbackError = injector.instanceOf[feedbackError]
-  val inpagefeedback = injector.instanceOf[inpagefeedback]
-  val inpagefeedbackNoLogin = injector.instanceOf[inpagefeedbackNoLogin]
-  val inPageFeedbackThankyou = injector.instanceOf[inPageFeedbackThankyou]
-  val partialRetriever = mock[FormPartialRetriever]
-  when(partialRetriever.getPartialContent(any[String], any[Map[String, String]], any[Html])(any[ExecutionContext], any[RequestHeader])).thenReturn(Html(""))
+  val ec = injector.instanceOf[ExecutionContext]
+  val controllerComponents = injector.instanceOf[MessagesControllerComponents]
+  val servicesConfig = injector.instanceOf[ServicesConfig]
+  val feedbackView = injector.instanceOf[feedback]
+  val feedbackThxView = injector.instanceOf[feedbackThx]
+  val feedbackErrorView = injector.instanceOf[feedbackError]
 
-  def notLoggedInController() = {
-    FakeDataCacheConnector.resetCaptures()
-    val encrypter = mock[Encrypter with Decrypter](withSettings.lenient())
-    when(encrypter.encrypt(any[PlainText])).thenReturn(Crypted("foo"))
-    val sessionCookieCrypto = mock[SessionCookieCrypto](withSettings.lenient())
-    when(sessionCookieCrypto.crypto).thenReturn(encrypter)
+  val feedbackController = {
     val http = mock[DefaultHttpClient](withSettings.lenient())
 
-    when(http.GET[HtmlPartial](any[String], any[Seq[(String,String)]], any[Seq[(String,String)]])(any[HttpReads[HtmlPartial]], any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future(HtmlPartial.Success(None, Html("<div/>"))))
-
-    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String,String)]])(any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future(HttpResponse(OK)))
+    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])
+      (any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
+      .thenReturn(Future(HttpResponse(OK, "OK")))
 
     new FeedbackController(
-      getEmptyCacheMap,
-      frontendAppConfig,
-      sessionCookieCrypto,
-      http,
-      controllerComponents,
       servicesConfig,
-      configuration,
-      feedbackError,
-      inpagefeedback,
-      inpagefeedbackNoLogin,
-      inPageFeedbackThankyou)(ec, partialRetriever)
+      http,
+      feedbackView,
+      feedbackThxView,
+      feedbackErrorView,
+      controllerComponents)(ec)
   }
-  val url = "feedback.url"
 
   "FeedbackController" should {
     "return feedback page when requested" in {
-      val result = notLoggedInController.inPageFeedback()(fakeRequest)
+      val result = feedbackController.onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe inpagefeedback(Some(url), frontendAppConfig)(fakeRequest, messages, partialRetriever, ec).toString
+      contentAsString(result) mustBe feedbackView(feedbackForm)(fakeRequest, messages).toString
     }
-    "be able to submit form" in {
-      val result = notLoggedInController.sendBetaFeedbackToHmrc()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))
+
+    "return 303 redirect for valid form data" in {
+      val result = feedbackController.onPageSubmit()(fakeRequest.withFormUrlEncodedBody("feedback-rating" -> "5"))
 
       status(result) mustBe SEE_OTHER
     }
-    "return feedback not logged in page when requested" in {
-      val result = notLoggedInController.inPageFeedbackNoLogin()(fakeRequest)
 
-      status(result) mustBe OK
-      contentAsString(result) mustBe inpagefeedbackNoLogin(Some(url), frontendAppConfig)(fakeRequest, messages, partialRetriever, ec).toString
-    }
-    "be able to submit form when not logged in" in {
-      val result = notLoggedInController.sendBetaFeedbackToHmrcNoLogin()(fakeRequest.withFormUrlEncodedBody(("foo" -> "bar")))
+    "return 400 Bad Request for invalid form data" in {
+      val result = feedbackController.onPageSubmit()(fakeRequest.withFormUrlEncodedBody("foo" -> "bar"))
 
-      status(result) mustBe SEE_OTHER
+      status(result) mustBe BAD_REQUEST
     }
+
     "be able to display thank you page" in {
-      val result = notLoggedInController.inPageFeedbackThankyou()(fakeRequest)
+      val result = feedbackController.feedbackThx(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe inPageFeedbackThankyou(Some(url), frontendAppConfig)(fakeRequest, messages).toString
+      contentAsString(result) mustBe feedbackThxView()(fakeRequest, messages).toString
+    }
+
+    "be able to display error page" in {
+      val result = feedbackController.feedbackError(fakeRequest)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe feedbackErrorView()(fakeRequest, messages).toString
     }
   }
 

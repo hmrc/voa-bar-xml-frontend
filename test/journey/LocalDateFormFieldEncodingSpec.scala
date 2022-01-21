@@ -17,13 +17,14 @@
 package journey
 
 import java.time.LocalDate
-
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.EitherValues
 import journey.LocalDateFormFieldEncoding.{day, month, year}
 import ltbs.uniform.ErrorTree
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class LocalDateFormFieldEncodingSpec extends FlatSpec with Matchers with EitherValues with TableDrivenPropertyChecks {
+class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
 
   val encoding = new LocalDateFormFieldEncoding()
   val tomorrow = LocalDate.now().plusDays(1)
@@ -96,8 +97,5 @@ class LocalDateFormFieldEncodingSpec extends FlatSpec with Matchers with EitherV
     ))
 
   }
-
-
-
 
 }

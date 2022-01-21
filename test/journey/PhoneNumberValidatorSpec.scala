@@ -17,9 +17,11 @@
 package journey
 
 import ltbs.uniform.ErrorTree
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
+import org.scalatest.EitherValues
 
-class PhoneNumberVarlidatorSpec extends FlatSpec with Matchers with EitherValues {
+class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues {
 
   val validator = new PhoneNumberValidator()
 
@@ -39,6 +41,5 @@ class PhoneNumberVarlidatorSpec extends FlatSpec with Matchers with EitherValues
     validator.apply("022333232333332211232").toEither.left.value shouldBe a[ErrorTree]
     validator.apply("").toEither.left.value shouldBe a[ErrorTree]
   }
-
 
 }

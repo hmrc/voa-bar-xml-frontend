@@ -23,7 +23,7 @@ import models.UpScanRequests._
 import models._
 import org.mockito.ArgumentCaptor
 import org.mockito.scalatest.MockitoSugar
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
@@ -37,7 +37,7 @@ import uk.gov.hmrc.http.HttpClient
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class UploadConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
+class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
 
   implicit def hc: HeaderCarrier = HeaderCarrier()
 

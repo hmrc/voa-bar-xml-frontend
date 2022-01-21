@@ -16,10 +16,11 @@
 
 package utils
 
-import org.scalatest.{FlatSpec, MustMatchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must
 import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
 
-class FormatsSpec extends FlatSpec with MustMatchers {
+class FormatsSpec extends AnyFlatSpec with must.Matchers {
 
 
   val uniformData: Map[List[String], String] = Map (
@@ -43,7 +44,5 @@ class FormatsSpec extends FlatSpec with MustMatchers {
     val data = JsString("value")
     Formats.uniformDBFormat.reads(data) mustBe a [JsError]
   }
-
-
 
 }

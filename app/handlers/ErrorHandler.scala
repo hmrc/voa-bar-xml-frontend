@@ -35,7 +35,7 @@ class ErrorHandler @Inject()(
     standardErrorTemplate(
       Messages("error.internal_server_error.title"),
       Messages("error.internal_server_error.heading"),
-      Messages("error.internal_server_error.message")
+      Messages("error.internal_server_error.description")
     )
 }
 

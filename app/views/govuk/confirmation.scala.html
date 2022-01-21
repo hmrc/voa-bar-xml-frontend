@@ -56,7 +56,7 @@
 }
 
 @mainTemplate(
-    pageTitle = Some(messages("service.title", report.title(messages))),
+    pageTitle = report.title(messages),
     baCode = Some(baCode)
 ) {
     <input type="hidden" id="reportStatus" value="@report.status.getOrElse(Pending.value)" />

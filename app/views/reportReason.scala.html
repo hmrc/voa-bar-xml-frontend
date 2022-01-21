@@ -31,13 +31,8 @@
 @(form: Form[_], cr05Enabled: Boolean)(implicit request: DataRequest[_], messages: Messages)
 
 @main_template(
-    pageTitle = if(form.errors.nonEmpty) {
-        Some(messages("error.title.prefix") + messages("service.title", messages("what-is-the-reason-for-the-report.pageLabel")))
-    } else {
-        Some(messages("service.title", messages("what-is-the-reason-for-the-report.pageLabel")))
-    },
-    backLinkUrl = Option(controllers.routes.WelcomeController.onPageLoad().url)
-
+    pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("what-is-the-reason-for-the-report.pageLabel"),
+    backLinkUrl = Some(controllers.routes.WelcomeController.onPageLoad().url)
 ) {
     @formWithCSRF(
         action = routes.ReportReasonController.onPageSubmit,
@@ -55,7 +50,7 @@
             ))),
             items = journey.ReasonReportType.order.filter(x => cr05Enabled || (x != "SplitProperty")).map(x => RadioItem(id = Option(x),
                     content = Text(messages(s"what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.${x}")), value = Option(x),
-                    checked = form("reportReason").value.exists(_ == x)
+                    checked = form("reportReason").value.contains(x)
                 )
             ), name = "reportReason", errorMessage = form.errors.asTextErrorMessageForField("reportReason")
         ))

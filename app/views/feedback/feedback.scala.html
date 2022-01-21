@@ -1,0 +1,128 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.FeedbackForm
+@import play.api.data._
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{Fieldset, Legend, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichCharacterCount
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcCharacterCount
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.charactercount.CharacterCount
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.{Cy, En}
+
+
+@this(
+        main_template: views.html.govuk.main_template,
+        govukInput: GovukInput,
+        govukRadios: GovukRadios,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        hmrcCharacterCount: HmrcCharacterCount,
+        formWithCSRF: FormWithCSRF
+)
+
+@(form: Form[FeedbackForm])(implicit request: Request[_], messages: Messages)
+
+@main_template(
+    pageTitle = messages("feedback.heading"),
+    showSignOut = false
+) {
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary(
+            errorList = form.errors.asTextErrorLinks,
+            title = Text(messages("error.summary.title"))
+        ))
+    }
+
+    <h1 class="govuk-heading-l">@messages("feedback.heading")</h1>
+
+    <p class="govuk-body">@messages("feedback.p1")</p>
+
+    @formWithCSRF(action = routes.FeedbackController.onPageSubmit, args = 'novalidate -> "novalidate") {
+
+        @govukRadios(
+            Radios(
+                items = Seq(
+                    "5" -> messages("feedback.rating.5"),
+                    "4" -> messages("feedback.rating.4"),
+                    "3" -> messages("feedback.rating.3"),
+                    "2" -> messages("feedback.rating.2"),
+                    "1" -> messages("feedback.rating.1")
+                ).map(radioItem => RadioItem(
+                    content = Text(radioItem._2),
+                    checked = radioItem._1.equals(form("feedback-rating").value.getOrElse("")),
+                    value = Option(radioItem._1)
+                )),
+                fieldset = Option(
+                    Fieldset(
+                        legend = Option(
+                            Legend(
+                                content = Text(messages("feedback.satisfaction.label")),
+                                classes = "govuk-fieldset__legend--s"
+                            )
+                        )
+                    )
+                )
+            ).withFormField(form("feedback-rating"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text(messages("feedback.name.label")), classes = "govuk-!-font-weight-bold"),
+                spellcheck = Some(false),
+                autocomplete = Some("name")
+            ).withFormField(form("feedback-name"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text(messages("feedback.email.label")), classes = "govuk-!-font-weight-bold"),
+                spellcheck = Some(false),
+                autocomplete = Some("email")
+            ).withFormField(form("feedback-email"))
+        )
+
+        @hmrcCharacterCount(
+            CharacterCount(
+                rows = 8,
+                maxLength = Some(2000),
+                label = Label(
+                    classes = "govuk-!-font-weight-bold",
+                    content = Text(messages("feedback.comments.label"))
+                ),
+                hint = Some(Hint(content = Text(messages("feedback.comments.hint")))),
+                language = if(messages.lang.language == "cy") Cy else En,
+                spellcheck = Some(true)
+            ).withFormField(form("feedback-comments"))
+        )
+
+        @govukButton(
+            Button(
+                attributes = Map("id" -> "send"),
+                content = Text(messages("feedback.submit")),
+                name = Some("send"),
+                value = Some("send"),
+                inputType = Some("submit")
+            )
+        )
+    }
+}

@@ -22,7 +22,7 @@ import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import base.SpecBase
 import models._
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -33,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class LoginConnectorSpec extends SpecBase with MockitoSugar with MustMatchers {
+class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
 
   def configuration = injector.instanceOf[Configuration]
   def environment = injector.instanceOf[Environment]

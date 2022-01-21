@@ -17,13 +17,14 @@
 package journey
 
 import journey.ReasonReportType._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.{JsString, Json}
 
 import scala.reflect.runtime.{universe => ru}
 
-class ReasonReportTypeSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
+class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
 
   "ReasonReportType" should "have all instance in Lister for to render radio buttons in order" in {
     val traitType = ru.typeOf[ReasonReportType]
@@ -50,6 +51,5 @@ class ReasonReportTypeSpec extends FlatSpec with Matchers with TableDrivenProper
       Json.toJson(reasonReportType) shouldBe JsString(reasonReportType.toString)
     }
   }
-
 
 }

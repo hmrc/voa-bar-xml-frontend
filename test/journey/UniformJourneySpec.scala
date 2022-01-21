@@ -18,9 +18,11 @@ package journey
 
 import cats.data.Validated.{Invalid, Valid}
 import ltbs.uniform.ErrorTree
-import org.scalatest.{EitherValues, FlatSpec, MustMatchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must
+import org.scalatest.EitherValues
 
-class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
+class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValues {
 
   import UniformJourney._
 
@@ -94,7 +96,5 @@ class UniformJourneySpec extends FlatSpec with MustMatchers with EitherValues{
     UniformJourney.commentsValidation(Option(string227Char)).toEither.left.value mustBe a[ErrorTree]
     UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.right.value mustBe(Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ"))
   }
-
-
 
 }
