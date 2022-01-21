@@ -232,7 +232,33 @@ copy.feedback=If you need help completing this form, please use the ‘Get help 
 copy.feedback.thankyou=Thank you for your feedback
 copy.feedback.anotherForm=Submit another form
 label.feedback.error=There was an error sending your feedback.
-copy.form.help.thankyouvacated=Thank you for submitting this feedback, there will be no need for you to continue with the on-line form and we will contact you if we need more information.
+
+feedback.heading=Give Feedback
+feedback.p1=We use your feedback to make our services better.
+feedback.satisfaction.label=How satisfied are you with this service?
+feedback.rating.5=Very satisfied
+feedback.rating.4=Satisfied
+feedback.rating.3=Neither satisfied or dissatisfied
+feedback.rating.2=Dissatisfied
+feedback.rating.1=Very dissatisfied
+feedback.rating.error.required=Select how satisfied you are with this service
+feedback.rating.error.invalid=Please select a valid satisfaction rating
+
+feedback.name.label=Full name (optional)
+feedback.name.error.required=Enter your full name
+feedback.name.error.length=Full name cannot be longer than 70 characters
+feedback.name.error.invalid=Full name must only include letters a to z, hyphens, full stops, commas, apostrophes and spaces
+
+feedback.email.label=Email address (optional)
+feedback.email.error.length=Email address must be 255 characters or fewer
+feedback.email.error.invalid=Enter an email address in the correct format, like name@example.com
+
+feedback.comments.label=How could we improve this service? (optional)
+feedback.comments.hint=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
+feedback.comments.error.required=Enter your comments
+feedback.comments.error.length=The comment cannot be longer than 2000 characters
+
+feedback.submit=Submit
 
 status.submissionId.title = Submission ID
 status.history.title = History

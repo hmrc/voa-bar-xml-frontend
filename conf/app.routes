@@ -120,8 +120,8 @@ GET         /council-tax/history/print            controllers.ReportStatusContro
 POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit()
 GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload()
 
-GET         /feedback/tell-us 		              controllers.FeedbackController.inPageFeedback
-POST 		/sendbetafeedbacktohmrc               controllers.FeedbackController.sendBetaFeedbackToHmrc
-POST 		/sendbetafeedbacktohmrcnologin        controllers.FeedbackController.sendBetaFeedbackToHmrcNoLogin
-GET         /inpagefeedbackThankyou               controllers.FeedbackController.inPageFeedbackThankyou
-GET 		/inpagefeedbackNoLogin	              controllers.FeedbackController.inPageFeedbackNoLogin
+GET         /feedback 		                      controllers.FeedbackController.onPageLoad
+POST 		/feedback                             controllers.FeedbackController.onPageSubmit
+GET         /feedback-error                       controllers.FeedbackController.feedbackError
+GET         /thankyou-for-your-feedback           controllers.FeedbackController.feedbackThx
+

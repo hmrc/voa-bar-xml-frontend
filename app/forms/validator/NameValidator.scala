@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-        main_template: views.html.govuk.main_template
-)
+package forms.validator
 
-@(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages)
+/**
+ * Copy of hmrc-deskpro NameValidator.
+ *
+ * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/NameValidator.scala
+ */
+case class NameValidator() {
 
-@main_template(
-    pageTitle = messages("heading.giveFeedback"),
-    showSignOut = false
-) {
-	 			<div class="help__wrapper">
-					<div class="help-content">
-						<h1>@messages("label.feedback.error")</h1>
-					</div>
-				</div>
+  val nameRegex: String = """^[A-Za-z\-.,()'"\s]+$"""
+
+  // Quick check that the string does not contain "http://" or "https://" before the full regex
+  def validate(name: String): Boolean =
+    !name.contains("http://") && !name.contains("https://") && name.matches(nameRegex)
+
 }

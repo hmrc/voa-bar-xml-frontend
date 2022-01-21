@@ -42,7 +42,7 @@
 @phaseBanner = @{
     PhaseBanner(
         tag = Option(Tag(Text(messages("label.beta")))),
-        content = HtmlContent(messages("label.phase", routes.FeedbackController.inPageFeedback.url)),
+        content = HtmlContent(messages("label.phase", routes.FeedbackController.onPageLoad.url)),
         classes = "govuk-!-display-none-print"
     )
 }

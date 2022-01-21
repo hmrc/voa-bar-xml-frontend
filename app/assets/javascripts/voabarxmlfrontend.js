@@ -265,9 +265,4 @@ $(document).ready(function() {
         console.log("intervalRefreshScheduled, id: ", window.refreshIntervalId);
     }
 
-
-      //feedback.js
-      window.VoaFeedback.feedbackOverrides();
-      window.VoaFeedback.toggleHelp();
-      window.VoaFeedback.helpForm();
   }

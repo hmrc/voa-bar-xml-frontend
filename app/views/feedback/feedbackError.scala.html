@@ -15,19 +15,15 @@
  *@
 
 @this(
-        main_template: views.html.govuk.main_template
+    main_template: views.html.govuk.main_template
 )
 
-@(contactPartialUrl: Option[String] = None, appConfig: config.FrontendAppConfig, error: Option[Html] = None)(implicit request: Request[_],  messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    pageTitle = messages("heading.giveFeedback"),
+    pageTitle = messages("error.title.prefix") + messages("heading.giveFeedback"),
+    backLinkUrl = Some(routes.FeedbackController.onPageLoad.url),
     showSignOut = false
 ) {
-	 			<div class="help__wrapper">
-					<div class="help-content">
-						<h1>@messages("copy.feedback.thankyou")</h1>
-                        <a href="@routes.FeedbackController.inPageFeedback">@messages("copy.feedback.anotherForm")</a>
-					</div>
-				</div>
+    <h1 class="govuk-heading-l">@messages("label.feedback.error")</h1>
 }

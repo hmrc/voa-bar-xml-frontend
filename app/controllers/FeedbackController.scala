@@ -16,91 +16,81 @@
 
 package controllers
 
-import java.net.URLEncoder
-import config.FrontendAppConfig
-import controllers.actions.DataRetrievalAction
-
-import javax.inject.Inject
-import play.api.Configuration
+import forms.FeedbackForm.feedbackForm
+import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc._
-import play.twirl.api.Html
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpResponse
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.http.{HttpClient, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.partials._
-import views.html.{feedbackError, inPageFeedbackThankyou, inpagefeedback, inpagefeedbackNoLogin}
+import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
-import scala.concurrent.ExecutionContext
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
-class FeedbackController @Inject()( getData: DataRetrievalAction,
-                                    appConfig: FrontendAppConfig,
-                                    sessionCookieCrypto: SessionCookieCrypto,
-                                    http: HttpClient,
-                                    controllerComponents: MessagesControllerComponents,
-                                    serviceConfig: ServicesConfig,
-                                    configuration: Configuration,
-                                    feedbackError: feedbackError,
-                                    inpagefeedback: inpagefeedback,
-                                    inpagefeedbackNoLogin: inpagefeedbackNoLogin,
-                                    inpageFeedbackThankyou: inPageFeedbackThankyou
-                                  )(implicit ec: ExecutionContext, formPartialRetriever: FormPartialRetriever) extends FrontendController(controllerComponents) with I18nSupport {
+/**
+ * @author Yuriy Tumakha
+ */
+@Singleton
+class FeedbackController @Inject()(servicesConfig: ServicesConfig,
+                                   http: HttpClient,
+                                   feedbackView: feedback,
+                                   feedbackThxView: feedbackThx,
+                                   feedbackErrorView: feedbackError,
+                                   cc: MessagesControllerComponents
+                                  )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport with Logging {
 
+  private val serviceIdentifier = "VOA_BAR"
+  private val contactFrontendBaseUrl = servicesConfig.baseUrl("contact-frontend")
+  private val contactFrontendPostFeedbackUrl = s"$contactFrontendBaseUrl/contact/beta-feedback"
 
+  // The default HTTPReads will wrap the response in an exception and make the body inaccessible
+  implicit val readPartialsForm: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 
-  val contactFrontendPartialBaseUrl = serviceConfig.baseUrl("contact-frontend")
-  val serviceIdentifier = "VOA_BAR"
-  val serviceName = configuration.get[String]("appName")
-
-  val betaFeedbackSubmitUrl = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrc.url}"
-  val betaFeedbackSubmitUrlNoLogin = s"/$serviceName${routes.FeedbackController.sendBetaFeedbackToHmrcNoLogin.url}"
-  val hmrcSubmitBetaFeedbackUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?resubmitUrl=${urlEncode(betaFeedbackSubmitUrl)}"
-  val hmrcSubmitBetaFeedbackNoLoginUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?resubmitUrl=${urlEncode(betaFeedbackSubmitUrlNoLogin)}"
-  val hmrcBetaFeedbackFormUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?service=$serviceIdentifier&submitUrl=${urlEncode(betaFeedbackSubmitUrl)}"
-  val hmrcBetaFeedbackFormNoLoginUrl = s"$contactFrontendPartialBaseUrl/contact/beta-feedback/form?service=$serviceIdentifier&submitUrl=${urlEncode(betaFeedbackSubmitUrlNoLogin)}"
-
-  val hmrcHelpWithPageFormUrl = s"$contactFrontendPartialBaseUrl/contact/problem_reports_ajax?service=$serviceIdentifier"
-
-  private def urlEncode(value: String) = URLEncoder.encode(value, "UTF-8")
-
-  def inPageFeedback = Action { implicit request =>
-    Ok(inpagefeedback(Some(hmrcBetaFeedbackFormUrl), appConfig, None))
+  def onPageLoad = Action { implicit request =>
+    Ok(feedbackView(feedbackForm))
   }
 
-  def sendBetaFeedbackToHmrc = getData.async { implicit request =>
-    request.body.asFormUrlEncoded.map { formData =>
-      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackUrl, formData, Seq("Csrf-Token" -> "nocheck")) map { res =>
-        res.status match {
-          case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
-          case 400 => BadRequest(inpagefeedback(None, appConfig, Some(Html(res.body))))
-          case _ => InternalServerError(feedbackError(appConfig = appConfig))
+  def onPageSubmit = Action.async { implicit request =>
+    feedbackForm.bindFromRequest().fold(
+      formWithErrors =>
+        Future.successful {
+          BadRequest(feedbackView(formWithErrors))
+        },
+      form => {
+        val data = Map(
+          "feedback-rating" -> form.rating.toString,
+          "feedback-name" -> form.name,
+          "feedback-email" -> form.email,
+          "feedback-comments" -> form.comments,
+          "service" -> serviceIdentifier,
+          "canOmitComments" -> "true",
+          "referrer" -> s"${request.host}${request.uri}",
+          "csrfToken" -> ""
+        ).mapValues(Seq(_))
+
+        val headers = Seq("Csrf-Token" -> "nocheck")
+
+        http.POSTForm[HttpResponse](contactFrontendPostFeedbackUrl, data, headers).map { res =>
+          res.status match {
+            case OK =>
+              logger.info(s"Feedback successful: ${res.status} response from $contactFrontendPostFeedbackUrl")
+              Redirect(routes.FeedbackController.feedbackThx)
+            case _ =>
+              logger.error(s"Feedback FAILED: ${res.status} response from $contactFrontendPostFeedbackUrl,\nparams: $data")
+              Redirect(routes.FeedbackController.feedbackError)
+          }
         }
       }
-    }.getOrElse(throw new Exception("Empty Feedback Form"))
+    )
   }
 
-  def sendBetaFeedbackToHmrcNoLogin = Action.async { implicit request =>
-    request.body.asFormUrlEncoded.map { formData =>
-      http.POSTForm[HttpResponse](hmrcSubmitBetaFeedbackNoLoginUrl, formData, Seq("Csrf-Token" -> "nocheck")) map { res =>
-        res.status match {
-          case 200 => Redirect(routes.FeedbackController.inPageFeedbackThankyou)
-          case 400 => BadRequest(inpagefeedbackNoLogin(None, appConfig, Some(Html(res.body))))
-          case _ => InternalServerError(feedbackError(appConfig = appConfig))
-        }
-      }
-    }.getOrElse(throw new Exception("Empty Feedback Form"))
+  def feedbackThx = Action { implicit request =>
+    Ok(feedbackThxView())
   }
 
-  def inPageFeedbackNoLogin = Action { implicit request =>
-    Ok(inpagefeedbackNoLogin(Some(hmrcBetaFeedbackFormNoLoginUrl), appConfig))
+  def feedbackError = Action { implicit request =>
+    Ok(feedbackErrorView())
   }
 
-  def inPageFeedbackThankyou = Action { implicit request =>
-    Ok(inpageFeedbackThankyou(appConfig = appConfig))
-  }
 }
-
-//scalastyle:off line.size.limit
