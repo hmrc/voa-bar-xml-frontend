@@ -5,9 +5,9 @@ object Dependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val bootstrapVersion = "5.19.0"
-  private val playFrontendHmrcVersion = "2.0.0-play-28"
-  private val playConditionalFormMappingVersion = "1.10.0-play-28"
+  private val bootstrapVersion = "5.20.0"
+  private val playFrontendHmrcVersion = "3.3.0-play-28"
+  private val playConditionalFormMappingVersion = "1.11.0-play-28"
   private val playLanguageVersion = "5.1.0-play-28"
   private val playPartialsVersion = "8.2.0-play-28"
   private val simpleReactiveMongo = "8.0.0-play-28"
@@ -20,9 +20,9 @@ object Dependencies {
 
   // Test dependencies
   private val scalaTestPlusPlayVersion = "5.1.0"
-  private val scalatestPlusScalacheckVersion = "3.2.10.0"
-  private val scalatestVersion = "3.2.10"
-  private val mockitoScalatestVersion = "1.16.49"
+  private val scalatestPlusScalacheckVersion = "3.2.11.0"
+  private val scalatestVersion = "3.2.11"
+  private val mockitoScalatestVersion = "1.17.0"
   private val flexmarkVersion = "0.62.2"
 
   val compileDependencies = Seq(
