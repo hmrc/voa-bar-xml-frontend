@@ -6,12 +6,12 @@ object Dependencies {
   import play.core.PlayVersion
 
   private val bootstrapVersion = "5.20.0"
-  private val playFrontendHmrcVersion = "3.3.0-play-28"
+  private val playFrontendHmrcVersion = "3.4.0-play-28"
   private val playConditionalFormMappingVersion = "1.11.0-play-28"
   private val playLanguageVersion = "5.1.0-play-28"
   private val playPartialsVersion = "8.2.0-play-28"
   private val simpleReactiveMongo = "8.0.0-play-28"
-  private val httpVerbsVersion = "13.10.0"
+  private val httpVerbsVersion = "13.13.0"
   private val httpCachingClientVersion = "9.5.0-play-28"
   private val logbackJsonLoggerVersion = "5.1.0"
   private val guiceUtilsVersion = "5.0.2"
