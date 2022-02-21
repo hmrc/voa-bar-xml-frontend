@@ -11,7 +11,7 @@ object Dependencies {
   private val playLanguageVersion = "5.1.0-play-28"
   private val playPartialsVersion = "8.2.0-play-28"
   private val simpleReactiveMongo = "8.0.0-play-28"
-  private val httpVerbsVersion = "13.13.0"
+  private val httpVerbsVersion = "13.12.0"
   private val httpCachingClientVersion = "9.5.0-play-28"
   private val logbackJsonLoggerVersion = "5.1.0"
   private val guiceUtilsVersion = "5.0.2"
