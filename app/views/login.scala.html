@@ -21,11 +21,11 @@
 @import models.Mode
 
 @this(
-    main_template: views.html.govuk.main_template,
-    formWithCSRF: FormWithCSRF,
-    govukInput: GovukInput,
-    govukButton: GovukButton,
-    errorSummary: GovukErrorSummary
+        main_template: views.html.govuk.main_template,
+        formWithCSRF: FormWithCSRF,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        errorSummary: GovukErrorSummary
 )
 
 @(appConfig: FrontendAppConfig, form: Form[Login], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -34,6 +34,9 @@
     pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("login.heading"),
     showSignOut = false
 ) {
+    <h1 class="govuk-heading-xl">@messages("login.heading")</h1>
+
+    <div class="block-js-enabled">
     @formWithCSRF(
         action = routes.LoginController.onSubmit(mode),
         'autoComplete -> "off"
@@ -42,13 +45,13 @@
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
         }
 
-        <h1 class="govuk-heading-xl">@messages("login.heading")</h1>
-
         @govukInput(Input(
             id = "username", name = "username", value = form("username").value,
             label = Label(content = Text(messages("login.username"))),
             errorMessage = form.errors.asTextErrorMessageForField("username"),
-            classes="govuk-input--width-20"
+            autocomplete = Some("off"),
+            attributes = Map("readonly" -> "readonly", "onfocus" -> "this.removeAttribute('readonly');"),
+            classes = "govuk-input--width-20"
         ))
 
         @govukInput(Input(
@@ -56,11 +59,46 @@
             inputType = "password",
             label = Label(content = Text(messages("login.password"))),
             errorMessage = form.errors.asTextErrorMessageForField("password"),
-            classes="govuk-input--width-20"
+            autocomplete = Some("off"),
+            attributes = Map("readonly" -> "readonly", "onfocus" -> "this.removeAttribute('readonly');"),
+            classes = "govuk-input--width-20"
         ))
 
-        @govukButton(Button( attributes = Map("id" -> "submit"),
+        @govukButton(Button(attributes = Map("id" -> "submit"),
             name = Some("submit"), content = Text(messages("site.login"))
         ))
     }
+    </div>
+
+    <noscript>
+    @formWithCSRF(
+        action = routes.LoginController.onSubmit(mode),
+        'autoComplete -> "off"
+    ) {
+        @if(form.errors.nonEmpty) {
+            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+        }
+
+        @govukInput(Input(
+            id = "username2", name = "username", value = form("username").value,
+            label = Label(content = Text(messages("login.username"))),
+            errorMessage = form.errors.asTextErrorMessageForField("username"),
+            autocomplete = Some("off"),
+            classes = "govuk-input--width-20"
+        ))
+
+        @govukInput(Input(
+            id = "password2", name = "password",
+            inputType = "password",
+            label = Label(content = Text(messages("login.password"))),
+            errorMessage = form.errors.asTextErrorMessageForField("password"),
+            autocomplete = Some("new-password"),
+            classes = "govuk-input--width-20"
+        ))
+
+        @govukButton(Button(attributes = Map("id" -> "submit2"),
+            name = Some("submit"), content = Text(messages("site.login"))
+        ))
+    }
+    </noscript>
 }
