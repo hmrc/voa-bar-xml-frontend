@@ -85,22 +85,6 @@
             ).withFormField(form("feedback-rating"))
         )
 
-        @govukInput(
-            Input(
-                label = Label(content = Text(messages("feedback.name.label")), classes = "govuk-!-font-weight-bold"),
-                spellcheck = Some(false),
-                autocomplete = Some("name")
-            ).withFormField(form("feedback-name"))
-        )
-
-        @govukInput(
-            Input(
-                label = Label(content = Text(messages("feedback.email.label")), classes = "govuk-!-font-weight-bold"),
-                spellcheck = Some(false),
-                autocomplete = Some("email")
-            ).withFormField(form("feedback-email"))
-        )
-
         @hmrcCharacterCount(
             CharacterCount(
                 rows = 8,

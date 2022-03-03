@@ -16,6 +16,7 @@
 
 package controllers
 
+import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
 import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
@@ -36,6 +37,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
   val ec = injector.instanceOf[ExecutionContext]
   val controllerComponents = injector.instanceOf[MessagesControllerComponents]
   val servicesConfig = injector.instanceOf[ServicesConfig]
+  val auditService = injector.instanceOf[AuditService]
   val feedbackView = injector.instanceOf[feedback]
   val feedbackThxView = injector.instanceOf[feedbackThx]
   val feedbackErrorView = injector.instanceOf[feedbackError]
@@ -49,6 +51,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
 
     new FeedbackController(
       servicesConfig,
+      auditService,
       http,
       feedbackView,
       feedbackThxView,
