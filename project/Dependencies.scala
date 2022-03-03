@@ -8,10 +8,9 @@ object Dependencies {
   private val playFrontendHmrcVersion = "3.5.0-play-28"
   private val playConditionalFormMappingVersion = "1.11.0-play-28"
   private val playLanguageVersion = "5.1.0-play-28"
-  private val playPartialsVersion = "8.2.0-play-28"
   private val simpleReactiveMongo = "8.0.0-play-28"
   private val httpVerbsVersion = "13.12.0"
-  private val httpCachingClientVersion = "9.5.0-play-28"
+  private val httpCachingClientVersion = "9.6.0-play-28"
   private val logbackJsonLoggerVersion = "5.2.0"
   private val guiceUtilsVersion = "5.0.2"
   private val pdfBoxVersion = "2.0.24"
@@ -30,7 +29,6 @@ object Dependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc" % playFrontendHmrcVersion,
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % playConditionalFormMappingVersion,
     "uk.gov.hmrc"       %% "play-language" % playLanguageVersion,
-    "uk.gov.hmrc"       %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc"       %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc"       %% "http-verbs-play-28" % httpVerbsVersion,
     "uk.gov.hmrc"       %% "simple-reactivemongo" % simpleReactiveMongo,

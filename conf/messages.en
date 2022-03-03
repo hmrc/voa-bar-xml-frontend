@@ -235,13 +235,13 @@ label.feedback.error=There was an error sending your feedback.
 
 feedback.heading=Give Feedback
 feedback.p1=We use your feedback to make our services better.
-feedback.satisfaction.label=How satisfied are you with this service?
+feedback.satisfaction.label=Overall, how did you feel about this service?
 feedback.rating.5=Very satisfied
 feedback.rating.4=Satisfied
 feedback.rating.3=Neither satisfied or dissatisfied
 feedback.rating.2=Dissatisfied
 feedback.rating.1=Very dissatisfied
-feedback.rating.error.required=Select how satisfied you are with this service
+feedback.rating.error.required=Select how you felt about the service
 feedback.rating.error.invalid=Please select a valid satisfaction rating
 
 feedback.name.label=Full name (optional)
@@ -255,8 +255,8 @@ feedback.email.error.invalid=Enter an email address in the correct format, like 
 
 feedback.comments.label=How could we improve this service? (optional)
 feedback.comments.hint=Do not include any personal or financial information. For example, your National Insurance or credit card numbers.
-feedback.comments.error.required=Enter your comments
-feedback.comments.error.length=The comment cannot be longer than 2000 characters
+feedback.comments.error.required=Enter your feedback
+feedback.comments.error.length=Feedback must be 2000 characters or fewer
 
 feedback.submit=Submit
 

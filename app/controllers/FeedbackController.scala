@@ -16,7 +16,9 @@
 
 package controllers
 
+import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
+import models.FeedbackAuditEvent
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
@@ -33,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 @Singleton
 class FeedbackController @Inject()(servicesConfig: ServicesConfig,
+                                   auditService: AuditService,
                                    http: HttpClient,
                                    feedbackView: feedback,
                                    feedbackThxView: feedbackThx,
@@ -58,6 +61,8 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
           BadRequest(feedbackView(formWithErrors))
         },
       form => {
+        auditService.sendFeedback(FeedbackAuditEvent(form.rating, form.comments))
+
         val data = Map(
           "feedback-rating" -> form.rating.toString,
           "feedback-name" -> form.name,
