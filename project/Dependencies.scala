@@ -4,23 +4,23 @@ import sbt._
 
 object Dependencies {
 
-  private val bootstrapVersion = "5.20.0"
-  private val playFrontendHmrcVersion = "3.5.0-play-28"
+  private val bootstrapVersion = "5.21.0"
+  private val playFrontendHmrcVersion = "3.8.0-play-28"
   private val playConditionalFormMappingVersion = "1.11.0-play-28"
-  private val playLanguageVersion = "5.1.0-play-28"
+  private val playLanguageVersion = "5.2.0-play-28"
   private val simpleReactiveMongo = "8.0.0-play-28"
   private val httpVerbsVersion = "13.12.0"
   private val httpCachingClientVersion = "9.6.0-play-28"
   private val logbackJsonLoggerVersion = "5.2.0"
   private val guiceUtilsVersion = "5.0.2"
-  private val pdfBoxVersion = "2.0.24"
+  private val pdfBoxVersion = "2.0.25"
   private val uniformVersion = "4.10.0"
 
   // Test dependencies
   private val scalaTestPlusPlayVersion = "5.1.0"
   private val scalatestPlusScalacheckVersion = "3.2.11.0"
   private val scalatestVersion = "3.2.11"
-  private val mockitoScalatestVersion = "1.17.0"
+  private val mockitoScalatestVersion = "1.17.5"
   private val flexmarkVersion = "0.62.2"
 
   val compileDependencies = Seq(
