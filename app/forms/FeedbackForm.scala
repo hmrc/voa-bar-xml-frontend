@@ -18,7 +18,7 @@ package forms
 
 import forms.validator.{DeskproEmailValidator, NameValidator}
 import play.api.data.Form
-import play.api.data.Forms.{default, mapping, number, text}
+import play.api.data.Forms.{boolean, default, mapping, number, optional, text}
 
 
 /**
@@ -28,7 +28,9 @@ case class FeedbackForm(
                          rating: Int,
                          name: String,
                          email: String,
-                         comments: String
+                         comments: String,
+                         afterSubmission: Boolean,
+                         submissionId: Option[String] = None
                        )
 
 object FeedbackForm {
@@ -49,8 +51,13 @@ object FeedbackForm {
         .verifying("feedback.email.error.length", _.length <= 255)
         .verifying("feedback.email.error.invalid", email => emailValidator.validate(email)),
       "feedback-comments" -> default(text, "")
-        .verifying("feedback.comments.error.length", _.length <= 2000)
+        .verifying("feedback.comments.error.length", _.length <= 2000),
+      "afterSubmission" -> default(boolean, false),
+      "submissionId" -> optional(text)
     )(FeedbackForm.apply)(FeedbackForm.unapply)
   )
+
+  def initFeedbackAfterSubmission(submissionId: String): Form[FeedbackForm] =
+    feedbackForm.fill(FeedbackForm(0,"Anonymous user","anonymous@anonymous.com","", true, Option(submissionId)))
 
 }
