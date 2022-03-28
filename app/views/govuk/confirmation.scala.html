@@ -88,9 +88,9 @@
 
     <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
 
-    <p class="govuk-!-display-none-print">
+    <div class="govuk-!-display-none-print">
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true"/>
         @feedbackFormTemplate(FeedbackForm.initFeedbackAfterSubmission(report.id.split("-").head))
-    </p>
+    </div>
 
 }
