@@ -18,7 +18,6 @@ package controllers
 
 import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
-import models.FeedbackAuditEvent
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
@@ -61,7 +60,7 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
           BadRequest(feedbackView(formWithErrors))
         },
       form => {
-        auditService.sendFeedback(FeedbackAuditEvent(form.rating, form.comments))
+        auditService.sendFeedback(form)
 
         val data = Map(
           "feedback-rating" -> form.rating.toString,

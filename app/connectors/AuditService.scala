@@ -16,6 +16,7 @@
 
 package connectors
 
+import forms.FeedbackForm
 import models.FeedbackAuditEvent
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
@@ -33,8 +34,11 @@ class AuditService @Inject()(val auditingConfig: AuditingConfig,
                              val datastreamMetrics: DatastreamMetrics
                             )(implicit val ec: ExecutionContext) extends AuditConnector {
 
-  def sendFeedback(event: FeedbackAuditEvent)(implicit hc: HeaderCarrier) {
-    sendExplicitAudit("SurveyFeedback", event)
+  def sendFeedback(form: FeedbackForm)(implicit hc: HeaderCarrier) {
+    val auditType = if (form.afterSubmission) "SurveySatisfaction" else "SurveyFeedback"
+    val event = FeedbackAuditEvent(form.rating, form.comments, form.afterSubmission, form.submissionId)
+
+    sendExplicitAudit(auditType, event)
   }
 
 }

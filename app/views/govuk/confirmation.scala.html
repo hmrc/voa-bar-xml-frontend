@@ -15,9 +15,11 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import forms.FeedbackForm
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
 @import views.html.govuk.{cr05SubmissionConfirmation => cr05SubmissionConfirmationTemplate}
 @import views.html.components.confirmation_status_panel
+@import views.html.feedback.feedbackForm
 @import journey.UniformJourney.CrSubmission
 @import journey.UniformJourney.Cr05Submission
 @import journey.UniformJourney.Cr01Cr03Submission
@@ -26,6 +28,7 @@
 @this(
     mainTemplate: views.html.govuk.main_template,
     confirmationStatusPanel: confirmation_status_panel,
+    feedbackFormTemplate: feedbackForm,
     govukBackLink: GovukBackLink,
     cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate,
     cr05SubmissionConfirmation:cr05SubmissionConfirmationTemplate
@@ -84,5 +87,10 @@
     <p class="govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
 
     <a href="@routes.WelcomeController.onPageLoad().url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
+
+    <div class="govuk-!-display-none-print">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true"/>
+        @feedbackFormTemplate(FeedbackForm.initFeedbackAfterSubmission(report.id.split("-").head))
+    </div>
 
 }
