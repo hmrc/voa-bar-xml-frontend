@@ -49,8 +49,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
   def getHttpMock(returnedStatus: Int) = {
     val httpMock = mock[HttpClient]
     when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[JsValue]], any[HttpReads[Any]],
-      any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
-//    when(httpMock.GET(any[String])(any[HttpReads[Any]], any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, None))
+      any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, ""))
     httpMock
   }
   "Login Connector" when {

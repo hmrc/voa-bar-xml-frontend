@@ -64,7 +64,7 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
         month -> List("3"),
         day -> List("30")
       )
-    encoding.decode(input).right.value shouldBe(LocalDate.of(2020, 3,30))
+    encoding.decode(input).value shouldBe LocalDate.of(2020, 3,30)
   }
 
   it should "Fail validation for all invalidInput" in {
@@ -85,7 +85,7 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
         month -> List(_month),
         day -> List(_day)
       )
-      encoding.decode(input).right.value shouldBe a[LocalDate]
+      encoding.decode(input).value shouldBe a[LocalDate]
     }
   }
 

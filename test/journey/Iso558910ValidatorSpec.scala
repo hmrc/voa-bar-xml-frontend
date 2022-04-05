@@ -40,14 +40,14 @@ class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with Eithe
   "Iso558910ValidatorSpec" should "Reject all non iso8859-15 characters" in {
     val validator = new Iso558910Validator()
     forAll(invalidInputData) { (badString) =>
-      validator(badString).toEither.left.value shouldBe(ErrorTree.oneErr(ErrorMsg("error.invalidIsoString")))
+      validator(badString).toEither.left.value shouldBe ErrorTree.oneErr(ErrorMsg("error.invalidIsoString"))
     }
   }
 
   it should "Allow all valid charactes in iso8859-15" in {
     val validator = new Iso558910Validator()
     forAll(validInputData) { (goodString) =>
-      validator(goodString).toEither.right.value shouldBe(goodString)
+      validator(goodString).toEither.value shouldBe goodString
     }
 
   }

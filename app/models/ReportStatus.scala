@@ -18,10 +18,9 @@ package models
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-
 import play.api.i18n.Messages
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 
 sealed trait ReportStatusType {
   val value: String = {
@@ -58,18 +57,19 @@ object ReportError {
 }
 
 
-object ReportStatus {import ReactiveMongoFormats.mongoEntity
+object ReportStatus {
 
-  implicit val format =  mongoEntity {
+  implicit val format: Format[ReportStatus] = mongoEntity {
     Json.format[ReportStatus]
   }
 }
+
 final case class ReportStatus(
                                id: String,
                                created: ZonedDateTime,
                                url: Option[String] = None,
                                checksum: Option[String] = None,
-                               errors: Option[Seq[Error]] = Some(Seq()),
+                               errors: Seq[Error] = Seq(),
                                reportErrors: Seq[ReportError] = Seq(),
                                baCode: Option[String] = None,
                                status: Option[String] = Some(Pending.value),

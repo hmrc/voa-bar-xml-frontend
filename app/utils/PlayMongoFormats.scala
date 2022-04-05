@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.Error
+package utils
 
-@(errorsSeq: Seq[Error])(implicit messages: Messages)
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.json._
 
-    @for(error <- errorsSeq) {
-        Error @error.code: @messages(s"error.${error.code}.message")
-        <ul class="list list-bullet ">
-            @error.values.map{v =>
-            <li>@v</li>
-            }
-        </ul>
+/**
+ * @author Yuriy Tumakha
+ */
+object PlayMongoFormats {
+
+  implicit val jodaDateTimeRead: Reads[DateTime] =
+    (__ \ "$date").read[Long].map { dateTime =>
+      new DateTime(dateTime, DateTimeZone.UTC)
     }
+
+  implicit val jodaDateTimeWrite: Writes[DateTime] =
+    dateTime => Json.obj("$date" -> dateTime.getMillis)
+
+  implicit val jodaDateTimeFormats: Format[DateTime] = Format(jodaDateTimeRead, jodaDateTimeWrite)
+
+}

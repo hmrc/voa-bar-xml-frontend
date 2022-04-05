@@ -18,67 +18,67 @@ package repositories
 
 import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.Configuration
-import play.api.libs.json.{JsValue, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import reactivemongo.play.json.ImplicitBSONHandlers._
+import play.api.{Configuration, Logging}
+import play.api.libs.json.{Format, JsValue, Json, OFormat}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model._
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import utils.PlayMongoFormats
+
+import java.util.concurrent.TimeUnit.SECONDS
 
 case class DatedCacheMap(id: String,
                          data: Map[String, JsValue],
-                         lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC))
+                         lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
+
+  def asCacheMap: CacheMap = CacheMap(id, data)
+}
 
 object DatedCacheMap {
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
-  implicit val formats = Json.format[DatedCacheMap]
+  implicit val dateFormat: Format[DateTime] = PlayMongoFormats.jodaDateTimeFormats
+  implicit val formats: OFormat[DatedCacheMap] = Json.format[DatedCacheMap]
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
 }
 
 @Singleton
-class SessionRepository @Inject() (config: Configuration, mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ReactiveRepository[DatedCacheMap, BSONObjectID](config.get[String]("appName"), mongo.mongoConnector.db, DatedCacheMap.formats) {
-
-  val fieldName = "lastUpdated"
-  val createdIndexName = "userAnswersExpiryIndex"
-  val expireAfterSeconds = "expireAfterSeconds"
-  val timeToLiveInSeconds = config.get[Int]("mongodb.timeToLiveInSeconds")
-
-  createIndex(fieldName, createdIndexName, timeToLiveInSeconds)
-
-  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-    collection.indexesManager.ensure(Index(Seq((field, IndexType.Ascending)), Some(indexName),
-      options = BSONDocument(expireAfterSeconds -> ttl))) map {
-      result => {
-        logger.debug(s"set [$indexName] with value $ttl -> result : $result")
-        result
-      }
-    } recover {
-      case e => logger.error("Failed to set TTL index", e)
-        false
-    }
-  }
+class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(implicit ec: ExecutionContext)
+  extends PlayMongoRepository[DatedCacheMap](
+    collectionName = config.get[String]("appName"),
+    mongoComponent = mongo,
+    domainFormat = DatedCacheMap.formats,
+    indexes = Seq(
+      IndexModel(
+        Indexes.ascending("lastUpdated"),
+        IndexOptions().name("userAnswersExpiryIndex").expireAfter(config.get[Long]("mongodb.timeToLiveInSeconds"), SECONDS)
+      )
+    ),
+    extraCodecs = Seq(
+      Codecs.playFormatCodec(DatedCacheMap.dateFormat)
+    )
+  ) with Logging {
 
   def upsert(cm: CacheMap): Future[Boolean] = {
-    val selector = BSONDocument("id" -> cm.id)
-    val cmDocument = Json.toJson(DatedCacheMap(cm))
-    val modifier = BSONDocument("$set" -> cmDocument)
+    val selector = equal("id", cm.id)
 
-    collection.update(false).one(selector, modifier, true, false).map {  lastError =>
-      lastError.ok
-    }
+    collection.findOneAndReplace(selector, DatedCacheMap(cm), FindOneAndReplaceOptions().upsert(true))
+      .toFutureOption()
+      .map(_ => true)
+      .recover {
+        case ex: Throwable =>
+          logger.error("Error on saving to cache", ex)
+          false
+      }
   }
 
   def get(id: String): Future[Option[CacheMap]] =
-    collection.find(Json.obj("id" -> id)).one[CacheMap]
+    collection.find(equal("id", id)).first().toFutureOption().map(_.map(_.asCacheMap))
 
-  def getByField[A](key: String, value: String): Future[Option[CacheMap]] = {
-    collection.find(Json.obj(key -> value)).one[CacheMap]
-  }
+  def getByField[A](key: String, value: String): Future[Option[CacheMap]] =
+    collection.find(equal(key, value)).first().toFutureOption().map(_.map(_.asCacheMap))
+
 }
