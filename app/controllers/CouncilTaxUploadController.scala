@@ -163,7 +163,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
       filename = Some(uploadConfirmation.uploadDetails.fileName),
-      errors = Some(errors)
+      errors = errors
     )
     reportStatusConnector.save(reportStatus, login)
       .map(_.fold(
@@ -183,7 +183,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
       reference,
       ZonedDateTime.now,
       status = Some(status.value),
-      errors = Some(errors)
+      errors = errors
     )
     reportStatusConnector.save(reportStatus, login)
   }

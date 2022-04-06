@@ -55,7 +55,7 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
 
   it should "validate Address" in {
     val address = Address("99  Fosse Way %+", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
-    UniformJourney.longAddressValidation("some-address")(address).toEither.right.value mustBe(address)
+    UniformJourney.longAddressValidation("some-address")(address).toEither.value mustBe(address)
   }
 
   it should "reject invalid address" in {
@@ -65,7 +65,7 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
 
   it should "validate short address with 35 characters" in {
     val address = Address("12345678901234567890123456789012345", "ARDNAGOINE", None, Some("Fiction house"), "IV26 4YY")
-    UniformJourney.shortAddressValidation("some-address")(address).toEither.right.value mustBe(address)
+    UniformJourney.shortAddressValidation("some-address")(address).toEither.value mustBe(address)
   }
 
   it should "reject short address with more that 35 characters" in {
@@ -75,7 +75,7 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
 
   it should "Validate correct contact details" in {
     val contactDetails = ContactDetails("First name", "lastName", None, None)
-    UniformJourney.propertyContactDetailValidator(contactDetails).toEither.right.value mustBe(contactDetails)
+    UniformJourney.propertyContactDetailValidator(contactDetails).toEither.value mustBe(contactDetails)
   }
 
   it should "reject invalid contact details" in {
@@ -88,13 +88,13 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
     UniformJourney.planningRefValidator("1234asdf½").toEither.left.value mustBe a[ErrorTree]
     UniformJourney.planningRefValidator("").toEither.left.value mustBe a[ErrorTree]
     UniformJourney.planningRefValidator("12345678901234567890123456").toEither.left.value mustBe a[ErrorTree]
-    UniformJourney.planningRefValidator("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ").toEither.right.value mustBe ("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
+    UniformJourney.planningRefValidator("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ").toEither.value mustBe ("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
   }
 
   it should "validate comments" in {
-    UniformJourney.commentsValidation(Option(string226Char)).toEither.right.value mustBe (Option(string226Char))
+    UniformJourney.commentsValidation(Option(string226Char)).toEither.value mustBe (Option(string226Char))
     UniformJourney.commentsValidation(Option(string227Char)).toEither.left.value mustBe a[ErrorTree]
-    UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.right.value mustBe(Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ"))
+    UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.value mustBe(Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ"))
   }
 
 }

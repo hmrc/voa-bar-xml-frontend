@@ -113,7 +113,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
   private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] = {
     val headerFields = Seq("Id", "Created", "BA Code", "Status", "File Name", "Total reports", "Error")
     def errors = (r: ReportStatus) =>
-      s"${r.errors.getOrElse(Seq()).map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
+      s"${r.errors.map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
     val lines = reportStatuses.map(r =>
       s"${r.id},${r.created},${r.baCode.getOrElse("")},${r.status.getOrElse(Pending.value)},${r.filename.getOrElse("none")},${r.totalReports.getOrElse(0)},${errors(r)}"
     )

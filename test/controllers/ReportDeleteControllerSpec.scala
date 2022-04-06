@@ -61,7 +61,8 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
-    when(reportStatusConnectorMock.deleteByReference(any[String], any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(HttpResponse(200))))
+    when(reportStatusConnectorMock.deleteByReference(any[String], any[Login])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Right(HttpResponse(OK, "OK"))))
 
     reportStatusConnectorMock
   }

@@ -16,9 +16,8 @@
 
 @import models.Error
 
-@(errors: Option[Seq[Error]])(implicit messages: Messages)
+@(errorsSeq: Seq[Error])(implicit messages: Messages)
 
-@errors.map { errorsSeq =>
     @for(error <- errorsSeq) {
         Error @error.code: @messages(s"error.${error.code}.message")
         <ul class="list list-bullet ">
@@ -27,4 +26,3 @@
             }
         </ul>
     }
-}

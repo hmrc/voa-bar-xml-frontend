@@ -26,15 +26,15 @@ class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with Either
   val validator = new PostcodeValidator()
 
   "Postcode validator" should "validate valid postcode" in {
-    validator("BN12 4AX").toEither.right.value shouldBe ("BN12 4AX")
+    validator("BN12 4AX").toEither.value shouldBe "BN12 4AX"
   }
 
   it should "strip not postcode characters and format postcode" in {
-    validator("-- B N1   2 4A  X  ").toEither.right.value shouldBe ("BN12 4AX")
-    validator("-(&^^%*$&%^#- BN12 4A x").toEither.right.value shouldBe ("BN12 4AX")
-    validator("bn124ax:").toEither.right.value shouldBe ("BN12 4AX")
-    validator("e2-6b J:").toEither.right.value shouldBe ("E2 6BJ")
-    validator("e2-6b,. J:").toEither.right.value shouldBe ("E2 6BJ")
+    validator("-- B N1   2 4A  X  ").toEither.value shouldBe "BN12 4AX"
+    validator("-(&^^%*$&%^#- BN12 4A x").toEither.value shouldBe "BN12 4AX"
+    validator("bn124ax:").toEither.value shouldBe "BN12 4AX"
+    validator("e2-6b J:").toEither.value shouldBe "E2 6BJ"
+    validator("e2-6b,. J:").toEither.value shouldBe "E2 6BJ"
     //bn12 4axx and bbn12 4ax
   }
 

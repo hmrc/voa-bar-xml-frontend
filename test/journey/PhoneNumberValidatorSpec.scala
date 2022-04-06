@@ -26,14 +26,14 @@ class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with Eit
   val validator = new PhoneNumberValidator()
 
   "validator" should "validate correct phone number" in {
-    validator.apply("01632960110").toEither.right.value shouldBe "01632960110"
-    validator.apply("02233323233333221123").toEither.right.value shouldBe "02233323233333221123"
+    validator.apply("01632960110").toEither.value shouldBe "01632960110"
+    validator.apply("02233323233333221123").toEither.value shouldBe "02233323233333221123"
   }
 
   it should "Validate and stript non allowed characters from phone number" in {
-    validator.apply("0##@$$1632 960110").toEither.right.value shouldBe "01632 960110"
-    validator.apply("0##@$$1632-960110").toEither.right.value shouldBe "01632-960110"
-    validator.apply("   0##@$$1632 960110").toEither.right.value shouldBe "   01632 960110"
+    validator.apply("0##@$$1632 960110").toEither.value shouldBe "01632 960110"
+    validator.apply("0##@$$1632-960110").toEither.value shouldBe "01632-960110"
+    validator.apply("   0##@$$1632 960110").toEither.value shouldBe "   01632 960110"
   }
 
   it should "Reject invalid phone number" in {
