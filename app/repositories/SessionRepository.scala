@@ -17,7 +17,6 @@
 package repositories
 
 import javax.inject.{Inject, Singleton}
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.{Configuration, Logging}
 import play.api.libs.json.{Format, JsValue, Json, OFormat}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -26,20 +25,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import utils.PlayMongoFormats
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit.SECONDS
 
 case class DatedCacheMap(id: String,
                          data: Map[String, JsValue],
-                         lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
+                         lastUpdated: LocalDateTime = LocalDateTime.now) {
 
   def asCacheMap: CacheMap = CacheMap(id, data)
 }
 
 object DatedCacheMap {
-  implicit val dateFormat: Format[DateTime] = PlayMongoFormats.jodaDateTimeFormats
+  implicit val dateFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
   implicit val formats: OFormat[DatedCacheMap] = Json.format[DatedCacheMap]
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
