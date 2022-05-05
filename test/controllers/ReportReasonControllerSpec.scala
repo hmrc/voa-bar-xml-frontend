@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{FakeDataCacheConnector2}
+import connectors.FakeDataCacheConnector2
 import controllers.actions.{AuthAction, DataRequiredAction, DataRetrievalActionImpl}
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.requests.DataRequest
@@ -72,7 +72,7 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "return redirect on successful form submission" in {
-      val req = fakeRequest.withSession(SessionKeys.sessionId -> sessionId)
+      val req = fakeRequest.withMethod("POST").withSession(SessionKeys.sessionId -> sessionId)
         .withFormUrlEncodedBody("reportReason" -> "AddProperty")
 
       val result = reportReasonController().onPageSubmit(req)
