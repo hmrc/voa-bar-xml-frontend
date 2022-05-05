@@ -87,7 +87,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     }
 
     "redirect to the next page when valid data is submitted" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
+      val postRequest = fakeRequest.withMethod("POST").withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
 
@@ -96,7 +96,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     }
 
     "logging in must cache an authorization token" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
+      val postRequest = fakeRequest.withMethod("POST").withFormUrlEncodedBody(("username", validBACode), ("password", "value 2"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
       status(result) mustBe SEE_OTHER
@@ -104,7 +104,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     }
 
     "return a Bad Request and errors when invalid data is submitted" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("value", "invalid value"))
+      val postRequest = fakeRequest.withMethod("POST").withFormUrlEncodedBody(("value", "invalid value"))
       val boundForm = form.bind(Map("value" -> "invalid value"))
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
@@ -114,7 +114,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     }
 
     "return a Bad Request and errors when valid bacode is submitted but no Council Name can be found related to the bacode" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "ba0000"), ("password", "value"))
+      val postRequest = fakeRequest.withMethod("POST").withFormUrlEncodedBody(("username", "ba0000"), ("password", "value"))
       val boundForm =
         form
           .withError("username", messages("error.invalid_username"))
@@ -127,7 +127,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     }
 
     "return a Bad Request and errors when the backend service call fails" in {
-      val postRequest = fakeRequest.withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
+      val postRequest = fakeRequest.withMethod("POST").withFormUrlEncodedBody(("username", "value 1"), ("password", "value 2"))
       val boundForm = form.bind(Map("username" -> "value 1", "password" -> "value2"))
 
       intercept[Exception] {

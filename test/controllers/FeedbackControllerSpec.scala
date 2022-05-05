@@ -68,13 +68,15 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "return 303 redirect for valid form data" in {
-      val result = feedbackController.onPageSubmit()(fakeRequest.withFormUrlEncodedBody("feedback-rating" -> "5"))
+      val result = feedbackController.onPageSubmit()(fakeRequest.withMethod("POST")
+        .withFormUrlEncodedBody("feedback-rating" -> "5"))
 
       status(result) mustBe SEE_OTHER
     }
 
     "return 400 Bad Request for invalid form data" in {
-      val result = feedbackController.onPageSubmit()(fakeRequest.withFormUrlEncodedBody("foo" -> "bar"))
+      val result = feedbackController.onPageSubmit()(fakeRequest.withMethod("POST")
+        .withFormUrlEncodedBody("foo" -> "bar"))
 
       status(result) mustBe BAD_REQUEST
     }
