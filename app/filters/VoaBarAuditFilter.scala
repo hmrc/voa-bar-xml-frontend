@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.config.{ControllerConfigs, HttpAuditEvent}
-import uk.gov.hmrc.play.bootstrap.frontend.filters.DefaultFrontendAuditFilter
+import uk.gov.hmrc.play.bootstrap.frontend.filters.{DefaultFrontendAuditFilter, RequestHeaderAuditing}
 
 import scala.concurrent.ExecutionContext
 
@@ -30,9 +30,10 @@ class VoaBarAuditFilter @Inject() (configuration: Configuration,
                          controllerConfigs: ControllerConfigs,
                          override val auditConnector: AuditConnector,
                          override val mat: Materializer,
-                                   httpAuditEvent: HttpAuditEvent
+                                   httpAuditEvent: HttpAuditEvent,
+                                   requestHeaderAuditing: RequestHeaderAuditing
                                   )(implicit ec: ExecutionContext)
-  extends DefaultFrontendAuditFilter(configuration, controllerConfigs, auditConnector, httpAuditEvent, mat) {
+  extends DefaultFrontendAuditFilter(configuration, controllerConfigs, auditConnector, httpAuditEvent, requestHeaderAuditing, mat) {
 
   override val maskedFormFields: Seq[String] = Seq("password")
 

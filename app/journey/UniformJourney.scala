@@ -25,8 +25,6 @@ import ltbs.uniform.validation.Rule.{maxLength, minLength}
 import models.PropertyType
 import play.api.libs.json._
 
-import scala.language.higherKinds
-
 object UniformJourney {
 
   object Address { implicit val format = Json.format[Address] }
@@ -53,7 +51,8 @@ object UniformJourney {
                                 propertyContactDetails: ContactDetails,
                                 sameContactAddress: Boolean, contactAddress: Option[Address],
                                 effectiveDate: LocalDate, havePlaningReference: Boolean,
-                                planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String]) extends CrSubmission
+                                planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType], comments: Option[String]
+                               ) extends CrSubmission
 
 
   case class Cr05Common(baReport: String, baRef: String, effectiveDate: LocalDate,

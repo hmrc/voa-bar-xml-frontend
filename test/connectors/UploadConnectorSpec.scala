@@ -159,7 +159,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
         val response = await(connector.initiate(initiateRequest))
 
         assert(response.isRight)
-        response.right.map(_.reference mustBe reference)
+        response.map(_.reference mustBe reference)
         verify(httpMock, times(1))
           .POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any[ExecutionContext])
       }

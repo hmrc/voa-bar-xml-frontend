@@ -105,7 +105,8 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
         date = DateTimeFormatter.ofPattern("yyyyMMddHHmm").format(reportStatus.created)
       } yield Ok(data).withHeaders(
           HeaderNames.CONTENT_TYPE -> withCharset("application/pdf"),
-          HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
+          HeaderNames.CONTENT_DISPOSITION ->
+            s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
         ))
         .valueOr(f => f)
   }

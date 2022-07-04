@@ -53,7 +53,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
 
         val result = await(userReportUploadsRepository.save(userReportUpload))
 
-        result mustBe Right(Unit)
+        result mustBe Right(())
       }
       "return a failed result when the repository fails" in {
         val httpMock = mock[HttpClient]

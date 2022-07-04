@@ -77,10 +77,10 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
+  override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] = {
 
     http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions?upsert=true", reportStatus, defaultHeaders(login.username, login.password))
-      .map(_ => Right(Unit))
+      .map(_ => Right(()))
       .recover {
         case ex: Throwable => {
           logger.error(ex.getMessage)
@@ -89,11 +89,11 @@ class DefaultReportStatusConnector @Inject()(
       }
   }
 
-  override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
+  override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] = {
     http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions/user-info",
       ReportStatus(reference, ZonedDateTime.now, baCode = Some(login.username)),
       defaultHeaders(login.username, login.password))
-      .map(_ => Right(Unit))
+      .map(_ => Right(()))
       .recover {
         case ex: Throwable => {
           logger.error(ex.getMessage)
@@ -114,8 +114,8 @@ class DefaultReportStatusConnector @Inject()(
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
 trait ReportStatusConnector {
-  def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
-  def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
+  def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
+  def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
   def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
   def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
   def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]]

@@ -18,7 +18,6 @@ package controllers
 
 import java.time.ZonedDateTime
 import java.util.Locale
-
 import javax.inject.Inject
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
@@ -155,7 +154,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                 errors: Seq[Error] = Seq(),
                                 status: ReportStatusType
                               )
-                              (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
+                              (implicit request: Request[_]): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       uploadConfirmation.reference,
       ZonedDateTime.now,
@@ -168,7 +167,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     reportStatusConnector.save(reportStatus, login)
       .map(_.fold(
         _ => Left(Error(s"Couldn't save report status for reference ${uploadConfirmation.reference}", Seq())),
-        _ => Right(Unit)
+        _ => Right(())
       ))
   }
 
@@ -178,7 +177,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                                 errors: Seq[Error],
                                 status: ReportStatusType
                               )
-                              (implicit request: Request[_]): Future[Either[Error, Unit.type]] = {
+                              (implicit request: Request[_]): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       reference,
       ZonedDateTime.now,
@@ -193,10 +192,10 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     login: Login,
     errors: Seq[Error],
     status: ReportStatusType
-  )(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+  )(implicit request: Request[_]): Future[Either[Result, Unit]] = {
       saveReportStatus(reference, login, errors, status).map(_.fold(
         _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
-        _ => Right(Unit)
+        _ => Right(())
       ))
   }
 
@@ -253,11 +252,11 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
         })
   }
 
-  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit.type]] = {
+  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit]] = {
     reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(
         _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
-        _ => Right(Unit)
+        _ => Right(())
       ))
   }
 

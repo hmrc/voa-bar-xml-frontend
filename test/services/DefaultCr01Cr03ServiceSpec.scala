@@ -38,7 +38,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
   "DefaultCr01Cr03ServiceSpec" should {
     "Create CR05 report and store in backend" in {
       val connector = mock[ReportStatusConnector]
-      when(connector.save(any[ReportStatus],any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(Unit)))
+      when(connector.save(any[ReportStatus],any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor = ArgCaptor[ReportStatus]
       val service = new DefaultCr01Cr03Service(connector)
@@ -59,7 +59,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
 
     "Create CR01 and CR03 report and store in backend" in {
       val connector = mock[ReportStatusConnector]
-      when(connector.save(any[ReportStatus],any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(Unit)))
+      when(connector.save(any[ReportStatus],any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor = ArgCaptor[ReportStatus]
       val service = new DefaultCr01Cr03Service(connector)

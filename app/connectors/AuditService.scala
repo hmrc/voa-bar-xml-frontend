@@ -34,7 +34,7 @@ class AuditService @Inject()(val auditingConfig: AuditingConfig,
                              val datastreamMetrics: DatastreamMetrics
                             )(implicit val ec: ExecutionContext) extends AuditConnector {
 
-  def sendFeedback(form: FeedbackForm)(implicit hc: HeaderCarrier) {
+  def sendFeedback(form: FeedbackForm)(implicit hc: HeaderCarrier): Unit = {
     val auditType = if (form.afterSubmission) "SurveySatisfaction" else "SurveyFeedback"
     val event = FeedbackAuditEvent(form.rating, form.comments, form.afterSubmission, form.submissionId)
 

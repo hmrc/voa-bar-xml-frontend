@@ -64,9 +64,9 @@ trait BaseBarController extends FrontendBaseController with Logging {
     ).value
   }
 
-  private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit.type]] = {
+  private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit]] = {
     dataCacheConnector.save[Login](externalId, LoginId.toString, login)
-        .map(_ => Right(Unit))
+        .map(_ => Right(()))
         .recover{
           case ex: Throwable => {
             val errorMessage = "Error while saving login"
