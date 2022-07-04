@@ -41,9 +41,12 @@ class DefaultUserReportUploadsConnector @Inject() (
   val serviceUrl = s"$protocol://$host:$port/voa-bar" //TODO - Refactor with services config
 
 
-  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]] = {
-    http.PUT[UserReportUpload, HttpResponse](s"$serviceUrl/user-report-upload", userReportUpload, defaultHeaders(userReportUpload.userId, userReportUpload.userPassword))
-      .map(_ => Right(Unit))
+  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] = {
+    http.PUT[UserReportUpload, HttpResponse](
+      s"$serviceUrl/user-report-upload",
+      userReportUpload,defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
+    )
+      .map(_ => Right(()))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
       }
@@ -62,6 +65,6 @@ class DefaultUserReportUploadsConnector @Inject() (
 
 @ImplementedBy(classOf[DefaultUserReportUploadsConnector])
 trait UserReportUploadsConnector {
-  def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit.type]]
+  def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
   def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]]
 }

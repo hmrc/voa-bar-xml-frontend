@@ -17,7 +17,6 @@
 >sm --start VOA_BAR
 
 Ensure that the following dependencies has been started with service manager:
-- ASSETS_FRONTEND
 - AUTH
 - CONTACT_FRONTEND (only needed for the feedback page)
 - DATASTREAM

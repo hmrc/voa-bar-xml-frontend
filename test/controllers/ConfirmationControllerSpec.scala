@@ -56,8 +56,8 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val login2 = Login(username, "bar")
   val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, status = Some(Submitted.value))
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(Unit))
-  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(()))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(()))
   when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn Future(Right(reportStatus))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)

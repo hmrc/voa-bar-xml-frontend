@@ -13,7 +13,6 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
 
 val appName = "voa-bar-xml-frontend"
-lazy val appDependencies : Seq[ModuleID] = Dependencies.appDependencies
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
@@ -33,13 +32,12 @@ lazy val microservice = Project(appName, file("."))
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
-    scalaVersion := "2.12.15",
-    scalacOptions += "-Ypartial-unification",
-    scalacOptions += "-J-Xss4M",
+    scalaVersion := "2.13.8",
+    DefaultBuildSettings.targetJvm := "jvm-11",
+    scalacOptions += "-J-Xss8M",
     PlayKeys.playDefaultPort := 8448,
-    libraryDependencies ++= appDependencies,
-    retrieveManaged := true,
-    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+    libraryDependencies ++= Dependencies.appDependencies,
+    retrieveManaged := true
   )
   .settings(resolvers ++= Seq(
     Resolver.bintrayRepo("hmrc", "releases"),

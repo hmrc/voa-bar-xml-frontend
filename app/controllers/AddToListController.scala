@@ -55,7 +55,7 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
   }
 
   def addProperty = (getData andThen requireData).async { implicit request =>
-      yesNoForm.bindFromRequest.fold(
+      yesNoForm.bindFromRequest().fold(
         formWithErrors => {
           dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
             Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))

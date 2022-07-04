@@ -44,6 +44,6 @@ class Navigator @Inject()() {
     case NormalMode =>
       routeMap.getOrElse(id, _ => routes.LoginController.onPageLoad(NormalMode))
     case CheckMode =>
-      editRouteMap.getOrElse(id, _ => routes.CheckYourAnswersController.onPageLoad)
+      editRouteMap.getOrElse(id, _ => routes.CheckYourAnswersController.onPageLoad())
   }
 }

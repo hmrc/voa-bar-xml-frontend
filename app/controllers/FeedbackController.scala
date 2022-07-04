@@ -62,7 +62,7 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
       form => {
         auditService.sendFeedback(form)
 
-        val data = Map(
+        val data: Map[String, Seq[String]] = Map(
           "feedback-rating" -> form.rating.toString,
           "feedback-name" -> form.name,
           "feedback-email" -> form.email,
@@ -71,7 +71,7 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
           "canOmitComments" -> "true",
           "referrer" -> s"${request.host}${request.uri}",
           "csrfToken" -> ""
-        ).mapValues(Seq(_))
+        ).mapValues(Seq(_)).toMap
 
         val headers = Seq("Csrf-Token" -> "nocheck")
 

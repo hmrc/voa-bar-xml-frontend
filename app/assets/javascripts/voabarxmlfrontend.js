@@ -138,8 +138,7 @@ $(document).ready(function() {
       // =====================================================
       $("#councilTaxUploadForm").submit(function(e){
         e.preventDefault();
-        const fileLength = $("#file")[0].files.length;
-        if(fileLength === 0){
+        if ($("#file")[0].files.length === 0) {
             window.location = $("#councilTaxUploadEmptyFileError").val();
         } else {
             var councilTaxUploadForm = this;

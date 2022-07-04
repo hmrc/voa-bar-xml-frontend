@@ -116,7 +116,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).verifyResponse(fakeMapAsJson)
 
       result.isRight mustBe true
-      result.right.get == fakeReports mustBe true
+      result.toOption.get == fakeReports mustBe true
     }
 
     "Give some wrong Json, the verify response method returns a Left representing the exception to be thrown at Runtime" in {
@@ -135,7 +135,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "Throw a runtime exception when  the Report Status returns an exception" in {
       val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
-      when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
+      when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(()))
 
       val controller =
         new ReportStatusController(frontendAppConfig, messagesApi, FakeDataCacheConnector, reportStatusConnectorMock,

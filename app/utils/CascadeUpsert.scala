@@ -37,5 +37,5 @@ class CascadeUpsert {
 
   private def store[A](key:String, value: A, cacheMap: CacheMap)(implicit fmt: Format[A]) =
     cacheMap copy (data = cacheMap.data + (key -> Json.toJson(value)))
-  
+
 }

@@ -94,7 +94,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
   when(uploadConnectorF.initiate(any[InitiateRequest])(any[HeaderCarrier])) thenReturn Future(Left(Error("INITIATE-ERROR", Seq("Received exception from upscan service"))))
 
   val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
-  when(userReportUploadsConnectorMock.save(any[UserReportUpload])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
+  when(userReportUploadsConnectorMock.save(any[UserReportUpload])(any[HeaderCarrier])) thenReturn Future(Right(()))
   when(userReportUploadsConnectorMock.getById(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Some(userReport)))
 
   val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
@@ -102,8 +102,8 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
   when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Left(error))
 
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(Unit))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(()))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(()))
 
   val reportStatusConnectorFailMock = mock[ReportStatusConnector]
   when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Left(error))
@@ -151,7 +151,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response on the upscan confirmation endpoint" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
@@ -162,7 +162,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response on the upscan confirmation endpoint even when the user upload information fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
@@ -173,7 +173,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response on the upscan confirmation endpoint even when the submission fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
@@ -196,7 +196,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response when saving upload error status" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/validError.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, s"/councilTaxUpload/error/$submissionId").withJsonBody(Json.parse(json))
 
@@ -207,7 +207,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return invalid response when saving upload error status fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/validError.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, s"/councilTaxUpload/error/$submissionId").withJsonBody(Json.parse(json))
 
@@ -222,7 +222,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response on the upscan failed confirmation endpoint" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 
@@ -233,7 +233,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
     "return valid response on the failed upscan confirmation endpoint even when the submission fails" in {
       val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
-        .getLines
+        .getLines()
         .mkString("\n")
       val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
 

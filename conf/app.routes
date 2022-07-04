@@ -81,11 +81,11 @@ POST        /cr05-check-answers                                controllers.Unifo
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad
+GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad()
 
-GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad()
 
 GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
 GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
@@ -124,4 +124,3 @@ GET         /feedback 		                      controllers.FeedbackController.onP
 POST 		/feedback                             controllers.FeedbackController.onPageSubmit
 GET         /feedback-error                       controllers.FeedbackController.feedbackError
 GET         /thankyou-for-your-feedback           controllers.FeedbackController.feedbackThx
-

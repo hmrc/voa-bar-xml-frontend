@@ -111,8 +111,9 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection))
       addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
-          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), List(), List(), None)) { existingCr05SubmissionBuilder =>
-            existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
+          val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), List(), List(), None)) {
+            existingCr05SubmissionBuilder =>
+              existingCr05SubmissionBuilder.copy(cr05CommonSection = Some(cr05CommonSection))
           }
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05SubmissionBuilder).map { _ =>
             Redirect(routes.TaskListController.onPageLoad())
@@ -126,8 +127,9 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   def editPropertyJourney(targetId: String, propertyType: PropertyType, index: Int): Action[AnyContent] = propertyJourney(
     targetId, propertyType, Option(index))
 
-  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int])= (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
-    getCr05Submission.flatMap { propertyBuilder =>
+  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int])= (getData andThen requireData andThen auth).async {
+    implicit request: DataRequest[AnyContent] =>
+      getCr05Submission.flatMap { propertyBuilder =>
 
       val property = propertyType match {
         case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
@@ -163,13 +165,13 @@ class UniformController @Inject()(messagesApi: MessagesApi,
           builder.copy(existingProperties = existingProperties)
         }.flatMap(storeCr05Submission)
       }
-      case (PropertyType.PROPOSED, None) => getCr05Submission.map(x => x.copy(proposedProperties = x.proposedProperties :+ property )).flatMap(storeCr05Submission)
-      case (PropertyType.PROPOSED, Some(index)) => {
+      case (PropertyType.PROPOSED, None) =>
+        getCr05Submission.map(x => x.copy(proposedProperties = x.proposedProperties :+ property )).flatMap(storeCr05Submission)
+      case (PropertyType.PROPOSED, Some(index)) =>
         getCr05Submission.map { builder =>
           val proposed = builder.proposedProperties.updated(index, property)
           builder.copy(proposedProperties = proposed)
         }.flatMap(storeCr05Submission)
-      }
     }
   }
 
@@ -203,23 +205,21 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import interpreter._
     import UniformJourney._
 
-    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
-      maybeCr05Submission match {
-        case None => {
-          Logger("CheckAnswerJourney").warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
-          Future.successful(Redirect(routes.TaskListController.onPageLoad()))
-        }
-        case Some(cr05Submission) =>
-          val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
-          addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
-            cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get)flatMap { submissionId =>
-              dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>
-                Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
-              }
+    dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap {
+      case None => {
+        Logger("CheckAnswerJourney").warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
+        Future.successful(Redirect(routes.TaskListController.onPageLoad()))
+      }
+      case Some(cr05Submission) =>
+        val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
+        addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
+          cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get) flatMap { submissionId =>
+            dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>
+              Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString))
             }
           }
+        }
 
-      }
     }
   }
 

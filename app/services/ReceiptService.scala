@@ -98,7 +98,7 @@ class DefaultReceiptService @Inject() (
     try {
       f()
     } finally {
-      obj.close
+      obj.close()
     }
   }
 
@@ -116,7 +116,9 @@ class DefaultReceiptService @Inject() (
   }
 
   def body(reportStatus: ReportStatus) = {
-    var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), dateFomatter.format(reportStatus.created))
+    var content = messages("report.pdf.details.summary.first.line",
+      reportStatus.filename.getOrElse("filename unavailable"), dateFomatter.format(reportStatus.created))
+
     content += " "
 
     reportStatus.status match {
