@@ -39,7 +39,7 @@
     <div class="block-js-enabled">
     @formWithCSRF(
         action = routes.LoginController.onSubmit(mode),
-        'autoComplete -> "off"
+        Symbol("autoComplete") -> "off"
     ) {
         @if(form.errors.nonEmpty) {
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
@@ -73,7 +73,7 @@
     <noscript>
     @formWithCSRF(
         action = routes.LoginController.onSubmit(mode),
-        'autoComplete -> "off"
+        Symbol("autoComplete") -> "off"
     ) {
         @if(form.errors.nonEmpty) {
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
