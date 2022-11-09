@@ -58,7 +58,7 @@
                     </span>
                    <span class="hmrc-add-to-a-list__remove">
                    @formWithCSRF(action = routes.AddToListController.removeProperty(),
-                       ('novalidate -> "novalidate"), ('autoComplete -> "off")
+                       Symbol("novalidate") -> "novalidate", Symbol("autoComplete") -> "off"
                    ) {
                        @govukButton(Button(value = Option(index.toString), content = Text("Remove"), classes = "govuk-button--warning govuk-!-margin-bottom-0",
                            name = Option("delete-index")))
@@ -73,7 +73,7 @@
       </div>
 
         @formWithCSRF(action = routes.AddToListController.addProperty(),
-        ('novalidate -> "novalidate"), ('autoComplete -> "off")
+        Symbol("novalidate") -> "novalidate", Symbol("autoComplete") -> "off"
         ) {
             @if(cr05Submission.proposedProperties.length > 1 && cr05Submission.proposedProperties.length < 5) {
                 @govukRadios(Radios(name = "add-another", idPrefix = Option("add-another"), errorMessage = form.errors.asTextErrorMessageForField("add-another"),

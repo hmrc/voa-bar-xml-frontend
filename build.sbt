@@ -15,7 +15,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning
 val appName = "voa-bar-xml-frontend"
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(majorVersion := 1)
   .settings(RoutesKeys.routesImport ++= Seq("models._"))
   .settings(
