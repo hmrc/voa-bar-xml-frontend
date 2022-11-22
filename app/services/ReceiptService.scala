@@ -17,7 +17,6 @@
 package services
 
 import java.io.ByteArrayOutputStream
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
@@ -43,8 +42,6 @@ class DefaultReceiptService @Inject() (
   val margin = 72
 
   implicit val lang: Lang = Lang(Locale.UK)
-
-  val dateFomatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
 
   def producePDF(reportStatus: ReportStatus) = {
 
@@ -117,7 +114,7 @@ class DefaultReceiptService @Inject() (
 
   def body(reportStatus: ReportStatus) = {
     var content = messages("report.pdf.details.summary.first.line",
-      reportStatus.filename.getOrElse("filename unavailable"), dateFomatter.format(reportStatus.created))
+      reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
 
     content += " "
 
@@ -167,9 +164,8 @@ class DefaultReceiptService @Inject() (
 
   def author = "Valuation Office Agency"
 
-  def title(reportStatus: ReportStatus) = {
-    s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${dateFomatter.format(reportStatus.created)}"
-  }
+  def title(reportStatus: ReportStatus) =
+    s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${reportStatus.formattedCreatedLong}"
 
   def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit = {
     val info = new PDDocumentInformation

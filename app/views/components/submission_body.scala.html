@@ -23,7 +23,7 @@
     @if(reportStatus.filename.isDefined) {
     <p><b class="bold">@messages("file")</b> @getAlternativeText(reportStatus.filename, "filename unavailable")</p>
     }
-    <p><i>@messages("status.created.para1") @reportStatus.created.toLocalDate @messages("status.created.para2")
-        @reportStatus.created.toLocalTime</i></p>
+    <p><i>@messages("status.created.para1") @reportStatus.createdAtZoned.toLocalDate @messages("status.created.para2")
+        @reportStatus.createdAtZoned.toLocalTime</i></p>
     @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.id).url, id = "print-button", className = "button print-hidden js-visible")
 </div>

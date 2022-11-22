@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.time.ZonedDateTime
+import java.time.Instant
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
@@ -31,11 +31,16 @@ import services.ReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.{TableFormatter, ViewSpecBase}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
 class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+
+  implicit class NormalizedInstant(instant: Instant) {
+    def normalize: Instant = Instant ofEpochMilli instant.toEpochMilli
+  }
 
   def reportStatus = app.injector.instanceOf[views.html.reportStatus]
   def errorTemplate = app.injector.instanceOf[views.html.error_template]
@@ -50,11 +55,10 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val submissionId1 = "1234-XX"
   val submissionId2 = "1235-XX"
   val submissionId3 = "1236-XX"
-  val date = () => ZonedDateTime.now
 
-  val rs1 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Submitted.value))
-  val rs2 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Verified.value))
-  val rs3 = ReportStatus(submissionId1, date(), baCode = Some(baCode), status = Some(Done.value))
+  val rs1 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Submitted.value), createdAt = Some(Instant.now.normalize))
+  val rs2 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Verified.value), createdAt = Some(Instant.now.normalize))
+  val rs3 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Done.value), createdAt = Some(Instant.now.normalize))
 
   val fakeReports = Seq(rs1, rs2, rs3)
   val fakeMapAsJson = Json.toJson(fakeReports)
@@ -64,7 +68,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
-  val sortedReports = fakeReports.sortWith{ case (r, r2) => r.created.compareTo(r2.created) >= 0 }
+  val sortedReports = fakeReports.sortBy(_.createdAt)
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
 
   val receiptServiceMock = mock[ReceiptService]

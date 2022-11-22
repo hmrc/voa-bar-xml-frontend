@@ -16,7 +16,6 @@
 
 package views
 
-import java.time.ZonedDateTime
 import models.{Done, ReportStatus}
 import views.behaviours.ViewBehaviours
 
@@ -30,7 +29,6 @@ class ConfirmationViewSpec extends ViewBehaviours {
   val confirmationFakeRequest = fakeRequest
   val reportStatus = ReportStatus(
     submissionId,
-    ZonedDateTime.now,
     status = Some(Done.value)
   )
 

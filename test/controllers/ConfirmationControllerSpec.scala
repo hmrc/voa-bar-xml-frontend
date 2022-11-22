@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.time.{LocalDate, ZonedDateTime}
+import java.time.LocalDate
 import java.util.UUID
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
@@ -54,7 +54,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val submissionId = "SID372463"
   val login = Login("foo", "bar")
   val login2 = Login(username, "bar")
-  val reportStatus = ReportStatus(submissionId, ZonedDateTime.now, status = Some(Submitted.value))
+  val reportStatus = ReportStatus(submissionId, status = Some(Submitted.value))
   val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(()))
   when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(()))
@@ -98,7 +98,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "return OK and the correct view for a GET - when status is verified" in {
       val verifiedSubmissionId = "VID372463"
-      val verifiedReportStatus = ReportStatus(verifiedSubmissionId, ZonedDateTime.now, status = Some(Verified.value))
+      val verifiedReportStatus = ReportStatus(verifiedSubmissionId, status = Some(Verified.value))
       when(reportStatusConnectorMock.getByReference(eqTo(verifiedSubmissionId), any[Login]))
         .thenReturn(Future(Right(verifiedReportStatus)))
 

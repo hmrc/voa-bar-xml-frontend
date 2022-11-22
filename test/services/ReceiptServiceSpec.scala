@@ -17,8 +17,7 @@
 package services
 
 import java.io.ByteArrayInputStream
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.Instant
 import models._
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType1Font
@@ -36,8 +35,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   val messages = app.injector.instanceOf[MessagesApi]
   val service = new DefaultReceiptService(messages)
-  val date = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault)
-  val dateFomatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
+  val date = Some(Instant.ofEpochMilli(0))
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
@@ -46,14 +44,14 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       val baCode = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Pending.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Pending.value))
 
       val data = service.producePDF(reportStatus)
 
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${dateFomatter.format(date)}.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()
@@ -65,7 +63,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       val baCode = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Failed.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Failed.value))
 
       val data = service.producePDF(reportStatus)
 
@@ -73,7 +71,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${dateFomatter.format(date)}.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()
@@ -85,14 +83,14 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       val baCode = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Done.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Done.value))
 
       val data = service.producePDF(reportStatus)
 
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${dateFomatter.format(date)}.")
+      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
       DateTimeUtils.setCurrentMillisSystem()
