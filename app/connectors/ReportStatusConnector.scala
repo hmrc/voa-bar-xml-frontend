@@ -16,7 +16,6 @@
 
 package connectors
 
-import java.time.ZonedDateTime
 import com.google.inject.ImplementedBy
 
 import javax.inject.{Inject, Singleton}
@@ -91,7 +90,7 @@ class DefaultReportStatusConnector @Inject()(
 
   override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] = {
     http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions/user-info",
-      ReportStatus(reference, ZonedDateTime.now, baCode = Some(login.username)),
+      ReportStatus(reference, baCode = Some(login.username)),
       defaultHeaders(login.username, login.password))
       .map(_ => Right(()))
       .recover {

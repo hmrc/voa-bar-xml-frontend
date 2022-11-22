@@ -16,7 +16,6 @@
 
 package controllers
 
-import java.time.format.DateTimeFormatter
 import cats.data.EitherT
 import cats.implicits._
 
@@ -50,6 +49,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
                                        formatter: TableFormatter
                                       )(implicit val ec: ExecutionContext)
   extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
     val reportStatuses = json.asOpt[Seq[ReportStatus]]
     reportStatuses match {
@@ -102,7 +102,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
         login <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(submissionId, login))
         data <- EitherT(getPDF(reportStatus))
-        date = DateTimeFormatter.ofPattern("yyyyMMddHHmm").format(reportStatus.created)
+        date = reportStatus.formattedCreatedShort
       } yield Ok(data).withHeaders(
           HeaderNames.CONTENT_TYPE -> withCharset("application/pdf"),
           HeaderNames.CONTENT_DISPOSITION ->
@@ -113,10 +113,12 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
 
   private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] = {
     val headerFields = Seq("Id", "Created", "BA Code", "Status", "File Name", "Total reports", "Error")
+
     def errors = (r: ReportStatus) =>
       s"${r.errors.map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
+
     val lines = reportStatuses.map(r =>
-      s"${r.id},${r.created},${r.baCode.getOrElse("")},${r.status.getOrElse(Pending.value)},${r.filename.getOrElse("none")},${r.totalReports.getOrElse(0)},${errors(r)}"
+      s"${r.id},${r.createdInCSV},${r.baCode.getOrElse("")},${r.status.getOrElse(Pending.value)},${r.filename.getOrElse("none")},${r.totalReports.getOrElse(0)},${errors(r)}"
     )
     val header = headerFields.mkString(",")
     s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")

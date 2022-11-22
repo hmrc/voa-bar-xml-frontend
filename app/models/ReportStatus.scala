@@ -16,7 +16,9 @@
 
 package models
 
-import java.time.ZonedDateTime
+import models.ReportStatus.{createdDateUIFormat, createdDateUILongFormat, dateShortFormat}
+
+import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import play.api.i18n.Messages
 import play.api.libs.json._
@@ -59,14 +61,24 @@ object ReportError {
 
 object ReportStatus {
 
+  import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits._
+
   implicit val format: Format[ReportStatus] = mongoEntity {
     Json.format[ReportStatus]
   }
+
+  val createdDateUIFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
+
+  val createdDateUILongFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
+
+  val dateShortFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
+
 }
 
 final case class ReportStatus(
                                id: String,
-                               created: ZonedDateTime,
+                               // TODO: After 1 April 2023 remove property 'created' as only 'createdAt' is used
+                               created: Option[ZonedDateTime] = None,
                                url: Option[String] = None,
                                checksum: Option[String] = None,
                                errors: Seq[Error] = Seq(),
@@ -75,12 +87,23 @@ final case class ReportStatus(
                                status: Option[String] = Some(Pending.value),
                                filename: Option[String] = None,
                                totalReports: Option[Int] = None,
-                               report: Option[JsObject] = None
+                               report: Option[JsObject] = None,
+                               // TODO: After 1 January 2023 define createdAt: Instant as all records in mongo must have this property
+                               createdAt: Option[Instant] = Some(Instant.now)
                              ){
-  val formattedCreated: String = {
-    val dtf = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
-    created.format(dtf)
-  }
+
+  def formattedCreated: String = createdAtFormatted(createdDateUIFormat)
+
+  def formattedCreatedLong: String = createdAtFormatted(createdDateUILongFormat)
+
+  def formattedCreatedShort: String = createdAtFormatted(dateShortFormat)
+
+  def createdInCSV: String = createdAtFormatted(DateTimeFormatter.ISO_DATE_TIME)
+
+  def createdAtZoned: ZonedDateTime = createdAt.fold(ZonedDateTime.now)(_.atZone(ZoneOffset.UTC))
+
+  private def createdAtFormatted(formatter: DateTimeFormatter): String =
+    createdAt.fold("")(_.atZone(ZoneOffset.UTC).format(formatter))
 
   def title(messages: Messages): String = {
     val defaultStatus = status.getOrElse(Pending.value).toLowerCase

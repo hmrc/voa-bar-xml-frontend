@@ -16,7 +16,6 @@
 
 package views.components
 
-import java.time.ZonedDateTime
 import models._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
@@ -27,8 +26,7 @@ class SubmissionPanelSpec extends ViewBehaviours  {
 
   val submissionId = "SId9324832"
   val baCode = "baCode"
-  val date = ZonedDateTime.now
-  val reportStatus1 = ReportStatus(submissionId, date, baCode = Some(baCode), status = Some(Submitted.value))
+  val reportStatus1 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
 
 

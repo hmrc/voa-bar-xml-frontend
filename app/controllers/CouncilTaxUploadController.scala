@@ -16,7 +16,6 @@
 
 package controllers
 
-import java.time.ZonedDateTime
 import java.util.Locale
 import javax.inject.Inject
 import config.FrontendAppConfig
@@ -157,7 +156,6 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                               (implicit request: Request[_]): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       uploadConfirmation.reference,
-      ZonedDateTime.now,
       url = Some(uploadConfirmation.downloadUrl),
       checksum = Some(uploadConfirmation.uploadDetails.checksum),
       status = Some(status.value),
@@ -180,7 +178,6 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
                               (implicit request: Request[_]): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       reference,
-      ZonedDateTime.now,
       status = Some(status.value),
       errors = errors
     )

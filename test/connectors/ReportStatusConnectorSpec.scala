@@ -16,8 +16,6 @@
 
 package connectors
 
-import java.time.ZonedDateTime
-
 import base.SpecBase
 import models._
 import org.mockito.scalatest.MockitoSugar
@@ -34,9 +32,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
   val userId = "ba1221"
-  val date = ZonedDateTime.now
   val submissionId = "1234-XX"
-  val rs = ReportStatus(submissionId, date, baCode = Some(userId), status = Some(Submitted.value))
+  val rs = ReportStatus(submissionId, baCode = Some(userId), status = Some(Submitted.value))
   val error = Error("Error", Seq())
 
   //implicit val hc = HeaderCarrier()

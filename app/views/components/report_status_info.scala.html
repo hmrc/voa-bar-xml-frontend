@@ -15,7 +15,6 @@
  *@
 
 @import models.ReportStatus
-@import utils.DateFormatter._
 @import utils.FormHelpers._
 
 @(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
@@ -42,7 +41,7 @@
                     @components.report_status_message(report)
             </p>
 
-            <p class="current-activity-info">@Messages("reports.active.timestamp", formatDate(report.created))</p>
+            <p class="current-activity-info">@Messages("reports.active.timestamp", report.formattedCreatedLong)</p>
         }
     }
 </div>

@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.ZonedDateTime
 import java.util.UUID
 import com.google.inject.ImplementedBy
 import connectors.ReportStatusConnector
@@ -43,7 +42,6 @@ class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(i
     val cr01cr03Report = createReport(submission)
     val report = ReportStatus(
       id = submissionId.toString,
-      created = ZonedDateTime.now(),
       baCode = Option(login.username),
       status = Option(Pending.value),
       totalReports = Option(1),
@@ -75,7 +73,6 @@ class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(i
     val cr05Report = createReport(submission)
     val report = ReportStatus(
       id = submissionId.toString,
-      created = ZonedDateTime.now(),
       baCode = Option(login.username),
       status = Option(Submitted.value),
       totalReports = Option(1),
