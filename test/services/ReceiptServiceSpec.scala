@@ -35,7 +35,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   val messages = app.injector.instanceOf[MessagesApi]
   val service = new DefaultReceiptService(messages)
-  val date = Some(Instant.ofEpochMilli(0))
+  val date = Instant.ofEpochMilli(0)
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {

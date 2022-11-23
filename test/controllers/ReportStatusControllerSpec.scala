@@ -56,9 +56,9 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val submissionId2 = "1235-XX"
   val submissionId3 = "1236-XX"
 
-  val rs1 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Submitted.value), createdAt = Some(Instant.now.normalize))
-  val rs2 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Verified.value), createdAt = Some(Instant.now.normalize))
-  val rs3 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Done.value), createdAt = Some(Instant.now.normalize))
+  val rs1 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Submitted.value), createdAt = Instant.now.normalize)
+  val rs2 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Verified.value), createdAt = Instant.now.normalize)
+  val rs3 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Done.value), createdAt = Instant.now.normalize)
 
   val fakeReports = Seq(rs1, rs2, rs3)
   val fakeMapAsJson = Json.toJson(fakeReports)

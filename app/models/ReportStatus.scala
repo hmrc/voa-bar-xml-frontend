@@ -88,8 +88,7 @@ final case class ReportStatus(
                                filename: Option[String] = None,
                                totalReports: Option[Int] = None,
                                report: Option[JsObject] = None,
-                               // TODO: After 1 January 2023 define createdAt: Instant as all records in mongo must have this property
-                               createdAt: Option[Instant] = Some(Instant.now)
+                               createdAt: Instant = Instant.now
                              ){
 
   def formattedCreated: String = createdAtFormatted(createdDateUIFormat)
@@ -100,10 +99,10 @@ final case class ReportStatus(
 
   def createdInCSV: String = createdAtFormatted(DateTimeFormatter.ISO_DATE_TIME)
 
-  def createdAtZoned: ZonedDateTime = createdAt.fold(ZonedDateTime.now)(_.atZone(ZoneOffset.UTC))
+  def createdAtZoned: ZonedDateTime = createdAt.atZone(ZoneOffset.UTC)
 
   private def createdAtFormatted(formatter: DateTimeFormatter): String =
-    createdAt.fold("")(_.atZone(ZoneOffset.UTC).format(formatter))
+    createdAt.atZone(ZoneOffset.UTC).format(formatter)
 
   def title(messages: Messages): String = {
     val defaultStatus = status.getOrElse(Pending.value).toLowerCase
