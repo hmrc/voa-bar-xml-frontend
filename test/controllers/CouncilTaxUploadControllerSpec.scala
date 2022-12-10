@@ -17,7 +17,6 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions._
 import forms.FileUploadDataFormProvider
@@ -34,6 +33,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FakeNavigator
 import views.ViewSpecBase
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
@@ -52,8 +52,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
   val formProvider = new FileUploadDataFormProvider()
   val form = formProvider()
-  implicit val actorSystem = ActorSystem()
-  implicit val materializer = ActorMaterializer()
+  implicit val actorSystem: ActorSystem = app.injector.instanceOf[ActorSystem]
 
   val username = "BA0114"
   val password = "pass"

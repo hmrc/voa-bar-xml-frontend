@@ -22,6 +22,7 @@ import controllers.actions._
 import identifiers.LoginId
 import models._
 import org.joda.time.DateTime
+import org.mockito.quality.Strictness
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.MessagesControllerComponents
@@ -78,7 +79,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   def fakeReportStatusConnector() = {
-    val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
+    val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
     when(reportStatusConnectorMock.get(any[Login], any[Option[String]])(any[HeaderCarrier])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
@@ -138,7 +139,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "Throw a runtime exception when  the Report Status returns an exception" in {
-      val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
+      val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
       when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])) thenReturn Future(Right(()))
 
       val controller =
