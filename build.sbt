@@ -40,7 +40,6 @@ lazy val microservice = Project(appName, file("."))
     retrieveManaged := true
   )
   .settings(resolvers ++= Seq(
-    Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo,
     Resolver.bintrayRepo("emueller", "maven")
   ))
