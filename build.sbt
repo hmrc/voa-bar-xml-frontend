@@ -14,6 +14,8 @@ import uk.gov.hmrc.versioning.SbtGitVersioning
 
 val appName = "voa-bar-xml-frontend"
 
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always // Resolves versions conflict
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(majorVersion := 1)
@@ -32,7 +34,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.10",
     DefaultBuildSettings.targetJvm := "jvm-11",
     scalacOptions += "-J-Xss8M",
     PlayKeys.playDefaultPort := 8448,
@@ -40,7 +42,6 @@ lazy val microservice = Project(appName, file("."))
     retrieveManaged := true
   )
   .settings(resolvers ++= Seq(
-    Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo,
     Resolver.bintrayRepo("emueller", "maven")
   ))

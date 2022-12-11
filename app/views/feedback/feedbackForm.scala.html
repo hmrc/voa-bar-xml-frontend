@@ -47,7 +47,7 @@
 
 <p class="govuk-body">@messages("feedback.p1")</p>
 
-@formWithCSRF(action = routes.FeedbackController.onPageSubmit, args = 'novalidate -> "novalidate") {
+@formWithCSRF(action = routes.FeedbackController.onPageSubmit, args = Symbol("novalidate") -> "novalidate") {
     <input type="hidden" name="afterSubmission" value="@{form("afterSubmission").value.getOrElse("false")}">
     @form("submissionId").value.map { submissionId =>
         <input type="hidden" name="submissionId" value="@submissionId">

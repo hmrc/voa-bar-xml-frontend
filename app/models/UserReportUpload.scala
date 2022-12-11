@@ -16,13 +16,12 @@
 
 package models
 
-import java.time.ZonedDateTime
+import play.api.libs.json.{Json, OFormat}
 
-import play.api.libs.json.Json
-
-final case class UserReportUpload(_id: String, userId: String, userPassword: String, lastUpdated: ZonedDateTime = ZonedDateTime.now)
+final case class UserReportUpload(id: String,
+                                  userId: String,
+                                  userPassword: String)
 
 object UserReportUpload {
-  implicit val format = Json.format[UserReportUpload]
-  final val name = classOf[UserReportUpload].getSimpleName.toLowerCase
+  implicit val format: OFormat[UserReportUpload] = Json.format[UserReportUpload]
 }

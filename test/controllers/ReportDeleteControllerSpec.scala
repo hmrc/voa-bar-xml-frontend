@@ -17,11 +17,11 @@
 package controllers
 
 import java.util.UUID
-
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions.DataRetrievalActionImpl
 import identifiers.LoginId
 import models.Login
+import org.mockito.quality.Strictness
 import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
 import play.api.mvc.{BodyParsers, MessagesControllerComponents}
@@ -60,7 +60,7 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
   }
 
   def fakeReportStatusConnector() = {
-    val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.lenient())
+    val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
     when(reportStatusConnectorMock.deleteByReference(any[String], any[Login])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(HttpResponse(OK, "OK"))))
 

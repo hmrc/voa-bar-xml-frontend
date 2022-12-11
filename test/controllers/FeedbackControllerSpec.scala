@@ -18,6 +18,7 @@ package controllers
 
 import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
+import org.mockito.quality.Strictness
 import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
@@ -43,7 +44,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
   val feedbackErrorView = injector.instanceOf[feedbackError]
 
   val feedbackController = {
-    val http = mock[DefaultHttpClient](withSettings.lenient())
+    val http = mock[DefaultHttpClient](withSettings.strictness(Strictness.LENIENT))
 
     when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])
       (any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))

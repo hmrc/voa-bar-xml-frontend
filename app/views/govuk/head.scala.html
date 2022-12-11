@@ -28,6 +28,6 @@
 
 @if(enableTimeoutDialog) {
   @hmrcTimeoutDialogHelper(
-   signOutUrl = routes.TimeoutController.onPageLoad.url
+   signOutUrl = routes.TimeoutController.onPageLoad().url
   )
 }
