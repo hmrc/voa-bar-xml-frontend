@@ -49,7 +49,7 @@
 ) {
 
     @formWithCSRF(action = Call("POST", breadcrumbs.headOption.getOrElse("/uniform/") + "?" + request.rawQueryString),
-        ('novalidate -> "novalidate"), ('autoComplete -> "off")
+        Symbol("novalidate") -> "novalidate", Symbol("autoComplete") -> "off"
     ) {
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
