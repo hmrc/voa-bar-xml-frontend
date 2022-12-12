@@ -86,9 +86,9 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
 
   def validateDateField(day: String, month: String, year: String): Either[ErrorTree, LocalDate] = {
     for {
-      day <- validateDay(day).right
-      month <- validateMont(month).right
-      year <- validateYear(year).right
+      day <- validateDay(day)
+      month <- validateMont(month)
+      year <- validateYear(year)
       finalDate <- {
         Try (
           LocalDate.of(year, month, day)
@@ -97,7 +97,7 @@ class LocalDateFormFieldEncoding extends FormFieldEncoding[LocalDate] {
             .append(ErrorMsg("day"))
             .append(ErrorMsg("month"))
             .append(ErrorMsg("year"))
-        )).right.flatMap { date =>
+        )).flatMap { date =>
           if(date.isBefore(earliestEffectiveDate) || date.isAfter(LocalDate.now())) {
             Left(ErrorTree.one(NonEmptyList.one(ErrorMsg("error.year.range"))
               .append(ErrorMsg("day")).append(ErrorMsg("month")).append(ErrorMsg("year"))))

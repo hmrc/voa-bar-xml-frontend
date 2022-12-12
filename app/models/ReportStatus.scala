@@ -24,6 +24,8 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 
+import scala.annotation.nowarn
+
 sealed trait ReportStatusType {
   val value: String = {
     val a: Class[_ <: ReportStatusType] = getClass.asSubclass(getClass)
@@ -63,6 +65,7 @@ object ReportStatus {
 
   import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits._
 
+  @nowarn
   implicit val format: Format[ReportStatus] = mongoEntity {
     Json.format[ReportStatus]
   }

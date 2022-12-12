@@ -17,7 +17,6 @@
 package views.components
 
 import models._
-import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_panel
@@ -30,7 +29,7 @@ class SubmissionPanelSpec extends ViewBehaviours  {
 
 
 
-  def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(messages, FakeRequest())
+  def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(messages)
 
 
   "Submission Panel" must {

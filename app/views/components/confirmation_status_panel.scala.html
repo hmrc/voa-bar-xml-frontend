@@ -22,7 +22,8 @@
         govukSummaryList: GovukSummaryList,
         govukPanel: GovukPanel
 )
-@(submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
+
+@(submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit messages: Messages)
 
 @panelTitle = {
     @reportStatus.map(_.title(messages)).getOrElse {@messages("confirmation.heading.pending")}

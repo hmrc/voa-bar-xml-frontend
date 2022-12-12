@@ -30,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderNames, SessionKeys}
 
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
 object SessionIdFilterSpec {
@@ -90,7 +91,7 @@ class SessionIdFilterSpec extends SpecBase  {
 
     "add a sessionId if one doesn't already exist" in {
 
-      val Some(result) = route(app, FakeRequest(GET, "/test"))
+      val Some(result) = route(app, FakeRequest(GET, "/test")): @nowarn
 
       val body = contentAsJson(result)
 
@@ -100,7 +101,7 @@ class SessionIdFilterSpec extends SpecBase  {
 
     "not override a sessionId if one doesn't already exist" in {
 
-      val Some(result) = route(app, FakeRequest(GET, "/test").withSession(SessionKeys.sessionId -> "foo"))
+      val Some(result) = route(app, FakeRequest(GET, "/test").withSession(SessionKeys.sessionId -> "foo")): @nowarn
 
       val body = contentAsJson(result)
 
@@ -110,14 +111,15 @@ class SessionIdFilterSpec extends SpecBase  {
 
     "not override other session values from the response" in {
 
-      val Some(result) = route(app, FakeRequest(GET, "/test2"))
+      val Some(result) = route(app, FakeRequest(GET, "/test2")): @nowarn
       session(result).data must contain("foo" -> "bar")
     }
 
     "not override other session values from the request" in {
 
-      val Some(result) = route(app, FakeRequest(GET, "/test").withSession("foo" -> "bar"))
+      val Some(result) = route(app, FakeRequest(GET, "/test").withSession("foo" -> "bar")): @nowarn
       session(result).data must contain("foo" -> "bar")
     }
   }
+
 }

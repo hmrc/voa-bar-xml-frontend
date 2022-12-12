@@ -41,23 +41,6 @@
     crSubmission: Option[CrSubmission],
 )(implicit request: Request[_], messages: Messages)
 
-    @panelContent = {
-
-    @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
-    <img src="/voa-bar-xml-frontend/assets/images/spinner-54px.gif" alt="Processing...">
-    }
-    <div>
-        @messages("confirmation.submissionId")<br/>
-        <strong>@report.id.substring(0, 8)</strong><br/>
-    </div>
-
-    @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
-    <p class="print-hide">@messages("confirmation.subheading")</p>
-    } else {
-    <span class="govuk-panel__body govuk-!-font-size-24">We have successfully processed your report</span>
-    }
-}
-
 @mainTemplate(
     pageTitle = report.title(messages),
     baCode = Some(baCode)

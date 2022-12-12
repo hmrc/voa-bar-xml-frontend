@@ -71,7 +71,7 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
           "canOmitComments" -> "true",
           "referrer" -> s"${request.host}${request.uri}",
           "csrfToken" -> ""
-        ).mapValues(Seq(_)).toMap
+        ).view.mapValues(Seq(_)).toMap
 
         val headers = Seq("Csrf-Token" -> "nocheck")
 

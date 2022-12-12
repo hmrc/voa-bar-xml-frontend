@@ -20,7 +20,7 @@
 @this(
         govukSummaryList: GovukSummaryList
 )
-@(submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
+@(submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit messages: Messages)
 
 @reportStatus.map{ rs =>
     <section class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
