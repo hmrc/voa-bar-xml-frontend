@@ -39,7 +39,7 @@
     @form(routes.ReportDeleteController.onPageSubmit()) {
         @CSRF.formField
         <input type="hidden" name="@ReportDeleteController.submissionId" value="@reportStatus.id">
-        <input type="submit" name="delete" value="Delete">
+        <input type="submit" name="delete" value="@messages("button.delete")">
     }
 
 }

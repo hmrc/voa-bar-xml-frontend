@@ -35,6 +35,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
+import scala.annotation.nowarn
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -91,7 +92,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import UniformJourney._
 
     request.userAnswers.cacheMap.getEntry[ReasonReportType](ReportReasonController.STORAGE_KEY).map { reportReason =>
-      val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason)
+      val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason): @nowarn
 
       playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission: Cr01Cr03Submission =>
         cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.login.get).map { submissionId =>
@@ -108,7 +109,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey).flatMap { maybeData =>
 
-      val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection))
+      val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection)): @nowarn
       addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
           val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), List(), List(), None)) {
@@ -143,7 +144,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])(implicit request: DataRequest[AnyContent]) = {
     import interpreter._
     import UniformJourney._
-    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index)
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index): @nowarn
     addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
       updateProperty(propertyType, cr05AddProperty, index).map { _ =>
         propertyType match {
@@ -190,7 +191,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     import UniformJourney._
 
     getCr05Submission(request).flatMap { submission =>
-      val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments)
+      val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments): @nowarn
       addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
         val cr05Submission = submission.copy(comments = comments)
         dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
@@ -211,7 +212,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
         Future.successful(Redirect(routes.TaskListController.onPageLoad()))
       }
       case Some(cr05Submission) =>
-        val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
+        val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission): @nowarn
         addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
           cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get) flatMap { submissionId =>
             dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>

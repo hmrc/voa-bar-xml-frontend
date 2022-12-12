@@ -132,6 +132,7 @@ site.delete = Remove
 site.edit = Change
 site.hidden-delete = Delete {0}
 site.hidden-edit = Change {0}
+button.delete = Delete
 site.no = No
 site.yes = Yes
 site.submit = Submit

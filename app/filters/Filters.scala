@@ -18,11 +18,13 @@ package filters
 
 import com.google.inject.Inject
 import play.api.http.DefaultHttpFilters
-import uk.gov.hmrc.play.bootstrap.filters.FrontendFilters
+import uk.gov.hmrc.play.bootstrap.frontend.filters.FrontendFilters
+
+import scala.annotation.nowarn
 
 class Filters @Inject() (
                           sessionIdFilter: SessionIdFilter,
-                          frontendFilters: FrontendFilters
+                          frontendFilters: FrontendFilters @nowarn
                         ) extends DefaultHttpFilters(frontendFilters.filters :+ sessionIdFilter: _*) {
 
 }
