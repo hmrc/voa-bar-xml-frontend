@@ -43,10 +43,6 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= Dependencies.appDependencies,
     retrieveManaged := true
   )
-  .settings(resolvers ++= Seq(
-    Resolver.jcenterRepo,
-    Resolver.bintrayRepo("emueller", "maven")
-  ))
   .settings(
     // concatenate js
     Concat.groups := Seq(
