@@ -5,7 +5,7 @@ object Dependencies {
 
   private val bootstrapVersion = "7.12.0"
   private val hmrcMongoVersion = "0.74.0"
-  private val playFrontendHmrcVersion = "4.0.0-play-28"
+  private val playFrontendHmrcVersion = "4.1.0-play-28"
   private val httpCachingClientVersion = "10.0.0-play-28"
   private val guiceUtilsVersion = "5.1.0"
   private val pdfBoxVersion = "2.0.27"
