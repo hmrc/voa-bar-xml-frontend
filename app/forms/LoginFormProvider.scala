@@ -25,12 +25,14 @@ import models.Login
 
 class LoginFormProvider @Inject() extends Mappings {
 
+  private val maxLen = 100
+
    def apply(): Form[Login] = Form(
      mapping(
       "username" -> text("login.error.username.required")
-        .verifying(maxLength(100, "login.error.username.length")),
+        .verifying(maxLength(maxLen, "login.error.username.length")),
      "password" -> text("login.error.password.required")
-       .verifying(maxLength(100, "login.error.password.length")),
+       .verifying(maxLength(maxLen, "login.error.password.length")),
      "reference" -> optional(text())
     )(Login.apply)(Login.unapply)
    )

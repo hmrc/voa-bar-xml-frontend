@@ -28,6 +28,7 @@ import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Configuration
+import play.api.http.Status.OK
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class LoginConnector @Inject()(http: HttpClient,
@@ -45,11 +46,10 @@ class LoginConnector @Inject()(http: HttpClient,
       .map {
         response =>
           response.status match {
-            case 200 => Success(200)
-            case status => {
+            case OK => Success(OK)
+            case status =>
               logger.warn("Received status of " + status + " from upstream service when logging in")
               Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
-            }
           }
       } recover {
       case e =>
