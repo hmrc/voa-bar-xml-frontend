@@ -117,8 +117,14 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     def errors = (r: ReportStatus) =>
       s"${r.errors.map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
 
+    def status(r: ReportStatus) = r.status.getOrElse(Pending.value)
+
+    def filename(r: ReportStatus) = r.filename.getOrElse("none")
+
+    def totalReports(r: ReportStatus) = r.totalReports.getOrElse(0)
+
     val lines = reportStatuses.map(r =>
-      s"${r.id},${r.createdInCSV},${r.baCode.getOrElse("")},${r.status.getOrElse(Pending.value)},${r.filename.getOrElse("none")},${r.totalReports.getOrElse(0)},${errors(r)}"
+      s"${r.id},${r.createdInCSV},${r.baCode.getOrElse("")},${status(r)},${filename(r)},${totalReports(r)},${errors(r)}"
     )
     val header = headerFields.mkString(",")
     s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")

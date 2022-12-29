@@ -99,16 +99,16 @@ class AutobarsInterpreter (
                           fieldKey: List[String],
                           breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                           data: Input, errors: ErrorTree,
-                          messages: UniformMessages[Html]): Html = _render(
+                          messages: UniformMessages[Html]): Html = doRender(
         pageKey, fieldKey, breadcrumbs, data, errors, false, messages)
 
 
-        def _render(pageKey: List[String],
-                            fieldKey: List[String],
-                            breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                            data: Input, errors: ErrorTree,
-                            optional: Boolean,
-                            messages: UniformMessages[Html]): Html =  {
+        def doRender(pageKey: List[String],
+                     fieldKey: List[String],
+                     breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                     data: Input, errors: ErrorTree,
+                     optional: Boolean,
+                     messages: UniformMessages[Html]): Html =  {
         import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
         val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
@@ -159,7 +159,7 @@ class AutobarsInterpreter (
                         fieldKey: List[String],
                         breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                         data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = {
-      stringField._render(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
+      stringField.doRender(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
     }
   }
 
@@ -171,15 +171,15 @@ class AutobarsInterpreter (
                         fieldKey: List[String],
                         breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
                         data: Input, errors: ErrorTree,
-                        messages: UniformMessages[Html]): Html = _render(
+                        messages: UniformMessages[Html]): Html = doRender(
       pageKey, fieldKey, breadcrumbs, data, errors, messages)
 
 
-    def _render(pageKey: List[String],
-                fieldKey: List[String],
-                breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                data: Input, errors: ErrorTree,
-                messages: UniformMessages[Html]): Html =  {
+    def doRender(pageKey: List[String],
+                 fieldKey: List[String],
+                 breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                 data: Input, errors: ErrorTree,
+                 messages: UniformMessages[Html]): Html =  {
       import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
       val errorMessage = errors.get(NonEmptyList.one(fieldKey))

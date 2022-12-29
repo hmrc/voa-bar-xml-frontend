@@ -132,9 +132,9 @@ object UniformJourney {
       baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation, default = cr05Common.map(_.baRef))
       effectiveDate <- ask[LocalDate]("add-property-effective-date", default = cr05Common.map(_.effectiveDate))
       havePlanningRef <- ask[YesNoType]("add-property-have-planning-ref", default = cr05Common.map(x => booleaToYesNo(x.havePlaningReference)))
-      planningRef <- ask[String]("add-property-planning-ref", validation = planningRefValidator, default = cr05Common.flatMap(_.planningRef)) when (havePlanningRef == Yes)
-      noPlanningReference <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref", default = cr05Common.flatMap(_.noPlanningReference)) when (havePlanningRef == No)
-      ctForm = Cr05Common(baReport, baRef, effectiveDate, havePlanningRef == Yes, planningRef, noPlanningReference)
+      planningRef <- ask[String]("add-property-planning-ref", cr05Common.flatMap(_.planningRef), planningRefValidator) when (havePlanningRef == Yes)
+      noPlanningRef <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref", cr05Common.flatMap(_.noPlanningReference)) when (havePlanningRef == No)
+      ctForm = Cr05Common(baReport, baRef, effectiveDate, havePlanningRef == Yes, planningRef, noPlanningRef)
       _ <- tell[Cr05Common]("add-property-check-answers-common", ctForm)
     } yield ctForm
   }
@@ -145,11 +145,11 @@ object UniformJourney {
     for {
       uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation, default = property.map(_.uprn))
       address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"), default = property.map(_.address))
-      propertyContactDetails <- ask[ContactDetails]("add-property-property-contact-details", validation = propertyContactDetailValidator, default = property.map(_.propertyContactDetails))
+      contactDetails <- ask[ContactDetails]("add-property-property-contact-details", property.map(_.propertyContactDetails), propertyContactDetailValidator)
       sameContactAddress <- ask[YesNoType]("add-property-same-contact-address", default = property.map(x => booleaToYesNo(x.sameContactAddress)))
       contactAddress <- ask[Address]("add-property-contact-address", validation = shortAddressValidation("contact-address"),
       default = property.flatMap(_.contactAddress)) when (sameContactAddress == No)
-      ctForm = Cr05AddProperty(uprn, address, propertyContactDetails, sameContactAddress == Yes, contactAddress)
+      ctForm = Cr05AddProperty(uprn, address, contactDetails, sameContactAddress == Yes, contactAddress)
       _ <- tell[(Cr05AddProperty, PropertyType, Option[Int])]("add-property-check-answers-property", ((ctForm, propertyType, index)))
     } yield ctForm
   }
