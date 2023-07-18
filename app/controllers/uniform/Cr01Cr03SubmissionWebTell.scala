@@ -35,7 +35,7 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: GovukSummaryList) extends Gener
 
       override def list(key: String, args: Any*): List[Html] = Nil
     })
-    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
   private def reasonSummaryList(in: Cr01Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {

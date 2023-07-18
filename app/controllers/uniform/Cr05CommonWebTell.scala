@@ -31,7 +31,7 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
 
   def confirmationSummary(in: Cr05Common, messagess: UniformMessages[Html]): SummaryList = {
     val sum = summaryList(in, messagess)
-    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
   def summaryList(in: Cr05Common, messages: UniformMessages[Html]): SummaryList = {

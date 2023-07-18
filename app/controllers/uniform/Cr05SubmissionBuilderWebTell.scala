@@ -30,7 +30,7 @@ class Cr05SubmissionBuilderWebTell(cr05SubmissionSummary: cr05SubmissionSummary)
 
   def confirmationSummary(in: Cr05SubmissionBuilder, messagess: UniformMessages[Html]): SummaryList = {
     val sum = commentsSummaryList(in, messagess)
-    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
 
