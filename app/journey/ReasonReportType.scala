@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ object ReasonReportType {
     }
   }
 
-  implicit val formFormat = new Formatter[ReasonReportType] {
+  implicit val formFormat: Formatter[ReasonReportType] = new Formatter[ReasonReportType] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], ReasonReportType] = {
       data.get(key).map {
         case "AddProperty" => AddProperty

@@ -13,10 +13,10 @@ object Dependencies {
 
   // Test dependencies
   private val scalaTestPlusPlayVersion = "5.1.0"
-  private val scalatestPlusScalacheckVersion = "3.2.14.0"
-  private val scalatestVersion = "3.2.14"
+  private val scalatestPlusScalacheckVersion = "3.2.16.0"
+  private val scalatestVersion = "3.2.16"
   private val mockitoScalatestVersion = "1.17.12"
-  private val flexMarkVersion = "0.64.0"
+  private val flexMarkVersion = "0.64.8"
 
   private val compileDependencies = Seq(
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % bootstrapVersion,

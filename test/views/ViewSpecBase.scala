@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import play.api.test.Injecting
 
 trait ViewSpecBase extends SpecBase with Injecting {
 
-  implicit def lang = Lang(Locale.UK)
+  implicit def lang: Lang = Lang(Locale.UK)
 
   def asDocument(html: Html): Document = Jsoup.parse(html.toString())
 

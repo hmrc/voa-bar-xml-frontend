@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import play.api.libs.json._
 
 object UniformJourney {
 
-  object Address { implicit val format = Json.format[Address] }
+  object Address { implicit val format: OFormat[Address] = Json.format[Address] }
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String){
     def displayAddress = {
       val addressList = List(line1, line2) ++ List(line3, line4).flatten ++ List(postcode)
@@ -40,12 +40,12 @@ object UniformJourney {
     implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
       implicitly[Format[String]].inmap(OtherReasonWrapper.apply, unlift(OtherReasonWrapper.unapply))
   }
-  object ContactDetails {implicit val format = Json.format[ContactDetails] }
+  object ContactDetails {implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
 
   sealed trait CrSubmission
 
-  object Cr01Cr03Submission { implicit val format = Json.format[Cr01Cr03Submission] }
+  object Cr01Cr03Submission { implicit val format: OFormat[Cr01Cr03Submission] = Json.format[Cr01Cr03Submission] }
   case class Cr01Cr03Submission(reasonReport: ReasonReportType, removalReason: Option[RemovalReasonType], otherReason: Option[OtherReasonWrapper],
                                 baReport: String, baRef: String, uprn: Option[String], address: Address,
                                 propertyContactDetails: ContactDetails,
@@ -58,12 +58,12 @@ object UniformJourney {
   case class Cr05Common(baReport: String, baRef: String, effectiveDate: LocalDate,
     havePlaningReference: Boolean, planningRef: Option[String], noPlanningReference: Option[NoPlanningReferenceType])
 
-  object Cr05Common { implicit val format = Json.format[Cr05Common] }
+  object Cr05Common { implicit val format: OFormat[Cr05Common] = Json.format[Cr05Common] }
   case class Cr05AddProperty(uprn: Option[String], address: Address,
                              propertyContactDetails: ContactDetails,
                              sameContactAddress: Boolean, contactAddress: Option[Address]
                              )
-  object Cr05AddProperty { implicit val format = Json.format[Cr05AddProperty] }
+  object Cr05AddProperty { implicit val format: OFormat[Cr05AddProperty] = Json.format[Cr05AddProperty] }
 
   case class Cr05SubmissionBuilder(
                                     cr05CommonSection: Option[Cr05Common],
@@ -169,7 +169,8 @@ object UniformJourney {
     } yield comments
   }
 
-  def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {
+  def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])
+                                             (cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {
     import interpreter._
     for {
       _ <- tell[Cr05SubmissionBuilder]("cr05-check-answers", cr05Submission)

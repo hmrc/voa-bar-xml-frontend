@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ case object Done extends ReportStatusType
 case class ReportErrorDetail(errorCode: String, values: Seq[String] = Seq.empty[String])
 
 object ReportErrorDetail {
-  implicit val format = Json.format[ReportErrorDetail]
+  implicit val format: OFormat[ReportErrorDetail] = Json.format[ReportErrorDetail]
 
 }
 
@@ -57,7 +57,7 @@ case class ReportError(reportNumber: Option[String],
                       )
 
 object ReportError {
-  implicit val format = Json.format[ReportError]
+  implicit val format: OFormat[ReportError] = Json.format[ReportError]
 }
 
 

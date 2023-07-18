@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,9 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
 
     val havePlanningRef = SummaryListRow(
       key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(HtmlContent(if(in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes") else messages("add-property-have-planning-ref.add-property-have-planning-ref.No"))),
+      value = Value(HtmlContent(
+        if(in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes") else messages("add-property-have-planning-ref.add-property-have-planning-ref.No")
+      )),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-have-planning-ref").url,
           HtmlContent(messages("check-answers.changeLabel"))))
@@ -88,7 +90,9 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
     val noPlanningRef = in.noPlanningReference.map { noPlanningRef =>
       SummaryListRow(
         key = Key(HtmlContent(messages("add-property-why-no-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-        value = Value(HtmlContent(messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$","")))),
+        value = Value(HtmlContent(
+          messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$",""))
+        )),
         actions = Some(Actions(items = Seq(
           ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-why-no-planning-ref").url,
             HtmlContent(messages("check-answers.changeLabel"))))

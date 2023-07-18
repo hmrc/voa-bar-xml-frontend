@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ object PropertyType {
   case object PROPOSED extends PropertyType
   case object EXISTING extends PropertyType
 
-  implicit val binder = new PathBindable[PropertyType] {
+  implicit val binder: PathBindable[PropertyType] = new PathBindable[PropertyType] {
     val log = Logger.apply(this.getClass)
 
     override def bind(key: String, value: String): Either[String, PropertyType] = value match {

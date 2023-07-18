@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
   private val httpResponse = mock[HttpResponse]
   private lazy val configuration = injector.instanceOf(classOf[Configuration])
   private val login = Login("foo", "bar")
-  implicit private val hc = HeaderCarrier()
+  implicit private val hc: HeaderCarrier = HeaderCarrier()
 
   "DefaultUserReportUploadsConnector" must {
     "have a method that save user and report information that" must {

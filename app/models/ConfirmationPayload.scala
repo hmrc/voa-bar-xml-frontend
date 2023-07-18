@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 
 case class ConfirmationPayload(status: String, statusPanel: String, detailPanel: String)
 
 case object ConfirmationPayload {
-  implicit val format = Json.format[ConfirmationPayload]
+  implicit val format: OFormat[ConfirmationPayload] = Json.format[ConfirmationPayload]
 }
