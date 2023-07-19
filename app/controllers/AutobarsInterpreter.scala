@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, C
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web.{CoproductFieldList, FormField, FormFieldStats, InferFormFieldCoProduct, InferFormFieldProduct, InferListingPages, ProductFieldList}
+import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
 import ltbs.uniform._
 import play.api.Logger
@@ -83,13 +83,13 @@ class AutobarsInterpreter (
       key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
   }
 
-  implicit val ctTaxFormWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
+  implicit val ctTaxFormWebTell: Cr01Cr03SubmissionWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
 
-  implicit val cr05SubmissionWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionSummary)
+  implicit val cr05SubmissionWebTell: Cr05SubmissionBuilderWebTell = new Cr05SubmissionBuilderWebTell(cr05SubmissionSummary)
 
-  implicit val cr05CommonWebTell = new Cr05CommonWebTell(new GovukSummaryList())
+  implicit val cr05CommonWebTell: Cr05CommonWebTell = new Cr05CommonWebTell(new GovukSummaryList())
 
-  implicit val cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new GovukSummaryList())
+  implicit val cr05AddPropertyWebTell: Cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new GovukSummaryList())
 
   implicit val stringField = new FormField[String, Html] {
       override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
@@ -147,7 +147,7 @@ class AutobarsInterpreter (
       }
   }
 
-  implicit val stringOption = new FormField[Option[String], Html] {
+  implicit val stringOption: FormField[Option[String], Html] = new FormField[Option[String], Html] {
 
     override def encode(in: Option[String]): Input = Input.one(List(in.getOrElse("")))
 
@@ -163,7 +163,7 @@ class AutobarsInterpreter (
     }
   }
 
-  implicit val otherReasonField = new FormField[OtherReasonWrapper, Html] {
+  implicit val otherReasonField: FormField[OtherReasonWrapper, Html] = new FormField[OtherReasonWrapper, Html] {
     override def decode(out: Input): Either[ErrorTree, OtherReasonWrapper] = out.toStringField().toEither.map(OtherReasonWrapper.apply)
     override def encode(in: OtherReasonWrapper): Input = Input.one(List(in.value))
 
@@ -217,7 +217,7 @@ class AutobarsInterpreter (
     }
   }
 
-  implicit val dateFormField = new FormField[LocalDate, Html] {
+  implicit val dateFormField: FormField[LocalDate, Html] = new FormField[LocalDate, Html] {
     import LocalDateFormFieldEncoding._
     val innerConverter = new LocalDateFormFieldEncoding()
 

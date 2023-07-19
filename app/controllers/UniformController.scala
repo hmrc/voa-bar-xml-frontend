@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
                                   cr05SubmissionSummary: cr05SubmissionSummary,
                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) with Logging {
 
-  implicit val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+  implicit val cr05FeatureEnabled: Boolean = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
   implicit val mongoPersistance: PersistenceEngine[DataRequest[AnyContent]] = new PersistenceEngine[DataRequest[AnyContent]]() {
 
@@ -141,7 +141,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
   }
 
-  def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])(implicit request: DataRequest[AnyContent]) = {
+  def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])
+                        (implicit request: DataRequest[AnyContent]) = {
     import interpreter._
     import UniformJourney._
     val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index): @nowarn
@@ -159,7 +160,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[_] ) = {
     logger.debug(s"updating property : ${propertyType}, ${index}")
     (propertyType, index) match {
-      case (PropertyType.EXISTING, None) => getCr05Submission.map(x => x.copy(existingProperties = x.existingProperties :+ property )).flatMap(storeCr05Submission)
+      case (PropertyType.EXISTING, None) =>
+        getCr05Submission.map(x => x.copy(existingProperties = x.existingProperties :+ property )).flatMap(storeCr05Submission)
       case (PropertyType.EXISTING, Some(index)) => {
         getCr05Submission.map { builder =>
           val existingProperties = builder.existingProperties.updated(index, property)
@@ -208,7 +210,8 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap {
       case None => {
-        Logger("CheckAnswerJourney").warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
+        Logger("CheckAnswerJourney")
+          .warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
         Future.successful(Redirect(routes.TaskListController.onPageLoad()))
       }
       case Some(cr05Submission) =>

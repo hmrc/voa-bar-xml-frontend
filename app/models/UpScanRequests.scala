@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,16 @@
 package models
 
 import java.time.OffsetDateTime
-
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 object UpScanRequests {
-  implicit val initiateRequest = Json.format[InitiateRequest]
-  implicit val uploadRequests = Json.format[UploadRequest]
-  implicit val initialResponse = Json.format[InitiateResponse]
-  implicit val uploadDetails = Json.format[UploadDetails]
-  implicit val uploadConfirmation = Json.format[UploadConfirmation]
-  implicit val failureDetails = Json.format[FailureDetails]
-  implicit val uploadConfirmationError = Json.format[UploadConfirmationError]
+  implicit val initiateRequest: OFormat[InitiateRequest] = Json.format[InitiateRequest]
+  implicit val uploadRequests: OFormat[UploadRequest] = Json.format[UploadRequest]
+  implicit val initialResponse: OFormat[InitiateResponse] = Json.format[InitiateResponse]
+  implicit val uploadDetails: OFormat[UploadDetails] = Json.format[UploadDetails]
+  implicit val uploadConfirmation: OFormat[UploadConfirmation] = Json.format[UploadConfirmation]
+  implicit val failureDetails: OFormat[FailureDetails] = Json.format[FailureDetails]
+  implicit val uploadConfirmationError: OFormat[UploadConfirmationError] = Json.format[UploadConfirmationError]
   case class InitiateRequest(
                               callbackUrl: String,
                               maxFileSize: Int

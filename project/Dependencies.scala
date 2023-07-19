@@ -1,22 +1,22 @@
 import play.core.PlayVersion
-import sbt._
+import sbt.*
 
 object Dependencies {
 
-  private val bootstrapVersion = "7.12.0"
-  private val hmrcMongoVersion = "0.74.0"
-  private val playFrontendHmrcVersion = "5.3.0-play-28"
+  private val bootstrapVersion = "7.19.0"
+  private val hmrcMongoVersion = "1.3.0"
+  private val playFrontendHmrcVersion = "7.14.0-play-28"
   private val httpCachingClientVersion = "10.0.0-play-28"
-  private val guiceUtilsVersion = "5.1.0"
+  private val guiceUtilsVersion = "5.1.1"
   private val pdfBoxVersion = "2.0.27"
   private val uniformVersion = "4.10.0"
 
   // Test dependencies
   private val scalaTestPlusPlayVersion = "5.1.0"
-  private val scalatestPlusScalacheckVersion = "3.2.14.0"
-  private val scalatestVersion = "3.2.14"
+  private val scalatestPlusScalacheckVersion = "3.2.16.0"
+  private val scalatestVersion = "3.2.16"
   private val mockitoScalatestVersion = "1.17.12"
-  private val flexMarkVersion = "0.64.0"
+  private val flexMarkVersion = "0.64.8"
 
   private val compileDependencies = Seq(
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % bootstrapVersion,

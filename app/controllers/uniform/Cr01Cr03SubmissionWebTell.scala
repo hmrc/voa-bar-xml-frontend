@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: GovukSummaryList) extends Gener
 
       override def list(key: String, args: Any*): List[Html] = Nil
     })
-    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
   private def reasonSummaryList(in: Cr01Cr03Submission, messages: UniformMessages[Html]): Seq[SummaryListRow] = {
@@ -192,7 +192,9 @@ class Cr01Cr03SubmissionWebTell(govUkSumaryList: GovukSummaryList) extends Gener
 
     val havePlanningRef = SummaryListRow(
       key = Key(HtmlContent(messages("have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(HtmlContent(if(in.havePlaningReference) messages("have-planning-ref.have-planning-ref.Yes") else messages("have-planning-ref.have-planning-ref.No"))),
+      value = Value(HtmlContent(
+        if(in.havePlaningReference) messages("have-planning-ref.have-planning-ref.Yes") else messages("have-planning-ref.have-planning-ref.No")
+      )),
       actions = Some(Actions(items = Seq(
         ActionItem(controllers.routes.UniformController.myJourney("have-planning-ref").url,
           HtmlContent(messages("check-answers.changeLabel"))))

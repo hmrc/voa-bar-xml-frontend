@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class Cr05SubmissionBuilderWebTell(cr05SubmissionSummary: cr05SubmissionSummary)
 
   def confirmationSummary(in: Cr05SubmissionBuilder, messagess: UniformMessages[Html]): SummaryList = {
     val sum = commentsSummaryList(in, messagess)
-    SummaryList(sum.rows.map(x => x.copy(actions = None)), "govuk-!-margin-bottom-9")
+    SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
 
