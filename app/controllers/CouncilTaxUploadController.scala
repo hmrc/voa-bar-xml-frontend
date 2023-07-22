@@ -66,7 +66,7 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
 
   private[controllers] def fileUploadDetails(username: String, password: String)
                                             (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
-    val initiateRequest = InitiateRequest(callBackUrl, maxFileSize)
+    val initiateRequest = InitiateRequest(s"$callBackUrl/$username", maxFileSize)
     val errorResult = Left(BadRequest(councilTaxUpload(username, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
     (for {
       uploadResponse <- EitherT(uploadConnector.initiate(initiateRequest))
