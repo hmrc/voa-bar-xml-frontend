@@ -1,12 +1,12 @@
-import sbt.Keys._
-import sbt._
+import sbt.Keys.*
+import sbt.*
 import scoverage.ScoverageKeys
-import com.typesafe.sbt.web.Import._
-import net.ground5hark.sbt.concat.Import._
-import com.typesafe.sbt.uglify.Import._
-import com.typesafe.sbt.digest.Import._
+import com.typesafe.sbt.web.Import.*
+import net.ground5hark.sbt.concat.Import.*
+import com.typesafe.sbt.uglify.Import.*
+import com.typesafe.sbt.digest.Import.*
 import play.sbt.routes.RoutesKeys
-import uk.gov.hmrc.{SbtAutoBuildPlugin, _}
+import uk.gov.hmrc.*
 import DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
@@ -30,8 +30,8 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
-  .settings(scalaSettings: _*)
-  .settings(defaultSettings(): _*)
+  .settings(scalaSettings *)
+  .settings(defaultSettings() *)
   .settings(
     scalaVersion := "2.13.11",
     DefaultBuildSettings.targetJvm := "jvm-11",
