@@ -92,10 +92,6 @@ GET         /council-tax/jobs/refresh             controllers.ConfirmationContro
 GET         /council-tax/jobs/checkStatus         controllers.ConfirmationController.onStatusCheck(submissionId: String)
 
 GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad(showEmptyError: Boolean ?= false)
-
-# Remove endpoint after VOA-3521 production deployment
-POST        /council-tax/upload/confirmation      controllers.CouncilTaxUploadController.onConfirmation()
-
 POST        /council-tax/upload/:reference        controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
 POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 

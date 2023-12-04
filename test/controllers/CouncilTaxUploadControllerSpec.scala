@@ -148,39 +148,6 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-    "return valid response on the upscan confirmation endpoint" in {
-      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines()
-        .mkString("\n")
-      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
-
-      val result = call(loggedInController(uploadConnector).onConfirmation, request)
-
-      status(result) mustBe NO_CONTENT
-    }
-
-    "return valid response on the upscan confirmation endpoint even when the user upload information fails" in {
-      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines()
-        .mkString("\n")
-      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
-
-      val result = call(loggedInController(uploadConnector, userReportUploadsConnector = userReportUploadsConnectorFailMock).onConfirmation, request)
-
-      status(result) mustBe NO_CONTENT
-    }
-
-    "return valid response on the upscan confirmation endpoint even when the submission fails" in {
-      val json = Source.fromInputStream(getClass.getResourceAsStream("/valid_upscan_confirmation.json"))
-        .getLines()
-        .mkString("\n")
-      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
-
-      val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
-
-      status(result) mustBe NO_CONTENT
-    }
-
     "return NoContent when preparing the file upload" in {
       val result = loggedInController(uploadConnector).onPrepareUpload(submissionId)(fakeRequest)
 
@@ -219,26 +186,5 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       status(result) mustBe INTERNAL_SERVER_ERROR
     }
 
-    "return valid response on the upscan failed confirmation endpoint" in {
-      val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
-        .getLines()
-        .mkString("\n")
-      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
-
-      val result = call(loggedInController(uploadConnector).onConfirmation, request)
-
-      status(result) mustBe NO_CONTENT
-    }
-
-    "return valid response on the failed upscan confirmation endpoint even when the submission fails" in {
-      val json = Source.fromInputStream(getClass.getResourceAsStream("/invalid_upscan_confirmation.json"))
-        .getLines()
-        .mkString("\n")
-      val request = FakeRequest(POST, "/council-tax/upload/confirmation").withJsonBody(Json.parse(json))
-
-      val result = call(loggedInController(uploadConnector, reportStatusConnector = reportStatusConnectorFailMock).onConfirmation, request)
-
-      status(result) mustBe NO_CONTENT
-    }
   }
 }
