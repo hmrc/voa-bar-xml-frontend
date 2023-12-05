@@ -13,10 +13,8 @@ addSbtPlugin("org.irundaia.sbt" % "sbt-sassify" % "1.4.13")
 
 addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.2.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-uglify" % "2.0.0")
-
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.4")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
+addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "1.0.0" exclude("org.scala-lang.modules", "scala-xml_2.12"))
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.8")
