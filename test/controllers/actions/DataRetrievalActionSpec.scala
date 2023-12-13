@@ -18,13 +18,13 @@ package controllers.actions
 
 import base.SpecBase
 import connectors.DataCacheConnector
+import models.CacheMap
 import models.requests.OptionalDataRequest
 import org.scalatest.RecoverMethods
 import org.scalatest.concurrent.ScalaFutures
 import org.mockito.scalatest.MockitoSugar
 import play.api.mvc.{BodyParsers, Request}
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

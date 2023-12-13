@@ -16,10 +16,11 @@
 
 package repositories
 
+import models.CacheMap
+
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logging}
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mongodb.scala.model.Filters.equal

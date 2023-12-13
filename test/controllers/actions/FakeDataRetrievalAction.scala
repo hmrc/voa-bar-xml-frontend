@@ -16,8 +16,8 @@
 
 package controllers.actions
 
+import models.CacheMap
 import play.api.mvc.{AnyContent, BodyParser, Request}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import models.requests.OptionalDataRequest
 import play.api.test.Helpers
 import utils.UserAnswers

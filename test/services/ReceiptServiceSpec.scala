@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.{PDDocument, PDPage}
 import org.apache.pdfbox.text.PDFTextStripper
-import org.joda.time.DateTimeUtils
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.MessagesApi
@@ -39,7 +38,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
-      DateTimeUtils.setCurrentMillisFixed(0)
+      //DateTimeUtils.setCurrentMillisFixed(0)
 
       val baCode = "ba1221"
       val submissionId = "1234-XX"
@@ -54,11 +53,11 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      DateTimeUtils.setCurrentMillisSystem()
+      //DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - FAILED" in {
-      DateTimeUtils.setCurrentMillisFixed(0)
+      //DateTimeUtils.setCurrentMillisFixed(0)
 
       val baCode = "ba1221"
       val submissionId = "1234-XX"
@@ -74,11 +73,11 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      DateTimeUtils.setCurrentMillisSystem()
+      //DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - DONE" in {
-      DateTimeUtils.setCurrentMillisFixed(0)
+      //DateTimeUtils.setCurrentMillisFixed(0)
 
       val baCode = "ba1221"
       val submissionId = "1234-XX"
@@ -93,7 +92,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      DateTimeUtils.setCurrentMillisSystem()
+      //DateTimeUtils.setCurrentMillisSystem()
     }
 
     "have correct font" in {

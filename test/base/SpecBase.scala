@@ -17,14 +17,13 @@
 package base
 
 import config.FrontendAppConfig
-import models.Login
+import models.{CacheMap, Login}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice._
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
 import play.api.test.FakeRequest
 import play.filters.csrf.CSRF.{Token, TokenInfo}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.UserAnswers
 
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {

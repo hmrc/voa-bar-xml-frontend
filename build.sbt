@@ -29,10 +29,10 @@ lazy val microservice = Project(appName, file("."))
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
-  .settings(scalaSettings *)
-  .settings(defaultSettings() *)
+  .settings(scalaSettings)
+  .settings(defaultSettings())
   .settings(
-    scalaVersion := "2.13.11",
+    scalaVersion := "2.13.12",
     DefaultBuildSettings.targetJvm := "jvm-11",
     scalacOptions += "-J-Xss8M",
     scalacOptions += "-Wconf:src=routes/.*:s",

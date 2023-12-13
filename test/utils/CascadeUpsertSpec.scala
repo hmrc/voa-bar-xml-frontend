@@ -18,7 +18,7 @@ package utils
 
 import play.api.libs.json._
 import base.SpecBase
-import uk.gov.hmrc.http.cache.client.CacheMap
+import models.CacheMap
 
 class CascadeUpsertSpec extends SpecBase {
 
