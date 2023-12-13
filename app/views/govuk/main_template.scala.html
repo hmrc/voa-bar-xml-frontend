@@ -78,7 +78,7 @@
         serviceName = Some(messages("service.name")),
         serviceURLs = ServiceURLs(
             serviceUrl = Some(routes.WelcomeController.onPageLoad().url),
-            signOutUrl = if (showSignOut) Some(routes.SignOutController.signOut().url) else None
+            signOutUrl = Option.when(showSignOut)(routes.SignOutController.signOut().url)
         ),
         banners = Banners(
             displayHmrcBanner = false,
