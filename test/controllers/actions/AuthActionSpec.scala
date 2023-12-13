@@ -19,14 +19,13 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import identifiers.LoginId
-import models.Login
+import models.{CacheMap, Login}
 import models.requests.DataRequest
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.{MessagesControllerComponents, Results}
 import play.api.test.Helpers._
 import play.api.test.Injecting
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.UserAnswers
 import views.html.unauthorised
 

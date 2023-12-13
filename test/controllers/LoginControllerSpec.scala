@@ -18,14 +18,13 @@ package controllers
 
 import play.api.data.Form
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.FakeNavigator
 import connectors.{FakeDataCacheConnector, LoginConnector}
 import controllers.actions._
 import play.api.test.Helpers._
 import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
-import models.{Login, NormalMode}
+import models.{CacheMap, Login, NormalMode}
 import org.mockito.scalatest.MockitoSugar
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents

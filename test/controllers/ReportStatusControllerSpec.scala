@@ -21,7 +21,6 @@ import connectors.{FakeDataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import identifiers.LoginId
 import models._
-import org.joda.time.DateTime
 import org.mockito.quality.Strictness
 import org.mockito.scalatest.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
@@ -67,7 +66,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   def servicesConfig = injector.instanceOf[ServicesConfig]
   val fakeTableFormatter = new TableFormatter(servicesConfig)
 
-  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
+  //implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
 
   val sortedReports = fakeReports.sortBy(_.createdAt)
   val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)

@@ -15,18 +15,23 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.Banners
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import views.html.govuk.head
 @import views.html.govuk.scripts
 @import views.html.govuk.FullWidthMainContent
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
 
 @this(
-        hmrcLayout: HmrcLayout,
+        hmrcStandardPage: HmrcStandardPage,
+        standardBetaBanner: StandardBetaBanner,
         headTemplate: head,
         scriptsTemplate: scripts,
         govukBackLink: GovukBackLink,
         govukSummaryList: GovukSummaryList,
-        twoThirdsMainContent: TwoThirdsMainContent,
         fullWidthMainContent: FullWidthMainContent
 )
 
@@ -38,14 +43,6 @@
         showSignOut: Boolean = true,
         fullWidth: Boolean = false
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
-
-@phaseBanner = @{
-    PhaseBanner(
-        tag = Option(Tag(Text(messages("label.beta")))),
-        content = HtmlContent(messages("label.phase", routes.FeedbackController.onPageLoad.url)),
-        classes = "govuk-!-display-none-print"
-    )
-}
 
 @beforeBlock = {
 
@@ -74,15 +71,24 @@
     @beforeContentBlock
 }
 
-@hmrcLayout(
-    isWelshTranslationAvailable = false,
-    pageTitle = Some(messages("service.title", pageTitle)),
-    serviceName = Some(messages("service.name")),
-    serviceUrl = Some(routes.WelcomeController.onPageLoad().url),
-    signOutUrl = if (showSignOut) Some(routes.SignOutController.signOut().url) else None,
-    phaseBanner = Some(phaseBanner),
-    additionalHeadBlock = Some(headTemplate(showSignOut)),
-    additionalScriptsBlock = Some(scriptsTemplate()),
-    beforeContentBlock = Some(beforeBlock),
-    mainContentLayout = Some(if (fullWidth) fullWidthMainContent(_) else twoThirdsMainContent(_))
+@hmrcStandardPage(
+    HmrcStandardPageParams(
+        pageTitle = Some(messages("service.title", pageTitle)),
+        isWelshTranslationAvailable = false,
+        serviceName = Some(messages("service.name")),
+        serviceURLs = ServiceURLs(
+            serviceUrl = Some(routes.WelcomeController.onPageLoad().url),
+            signOutUrl = Option.when(showSignOut)(routes.SignOutController.signOut().url)
+        ),
+        banners = Banners(
+            displayHmrcBanner = false,
+            phaseBanner = Some(standardBetaBanner(routes.FeedbackController.onPageLoad.url))
+        ),
+        templateOverrides = TemplateOverrides(
+            additionalHeadBlock = Some(headTemplate(showSignOut)),
+            additionalScriptsBlock = Some(scriptsTemplate()),
+            beforeContentBlock = Some(beforeBlock),
+            mainContentLayout = Option.when(fullWidth)(fullWidthMainContent(_))
+        )
+    )
 )(contentBlock)

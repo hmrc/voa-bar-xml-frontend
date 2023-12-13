@@ -16,10 +16,10 @@
 
 package utils
 
-import javax.inject.Singleton
+import models.CacheMap
 
+import javax.inject.Singleton
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 @Singleton
 class CascadeUpsert {

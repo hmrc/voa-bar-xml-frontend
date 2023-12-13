@@ -24,7 +24,6 @@ import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.actions._
 import models.{Login, Pending, ReportStatus}
-import org.joda.time.Instant
 import play.api.http.HeaderNames
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
@@ -33,6 +32,7 @@ import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.TableFormatter
 
+import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -137,7 +137,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
         reportStatuses <- EitherT(allReportStatuses(login))
       } yield Ok(createCsv(reportStatuses)).withHeaders(
         HeaderNames.CONTENT_TYPE -> withCharset("application/csv"),
-        HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=all-submission-status-${Instant.now().toString()}.csv"""
+        HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=all-submission-status-${Instant.now}.csv"""
       ))
         .valueOr(f => f)
   }
