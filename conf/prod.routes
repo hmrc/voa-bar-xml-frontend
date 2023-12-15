@@ -1,3 +1,5 @@
 # Add all the application routes to the app.routes file
 ->         /voa-bar-xml-frontend      app.Routes
 ->         /                          health.Routes
+
+GET        /                          controllers.RootRedirectController.rootRedirect
