@@ -16,16 +16,20 @@
 
 package controllers
 
+import models.NormalMode
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
+/**
+ * @author Yuriy Tumakha
+ */
 class RootRedirectController @Inject()(cc: MessagesControllerComponents) extends FrontendController(cc) {
 
   def rootRedirect: Action[AnyContent] = Action {
-    Redirect("/voa-bar-xml-frontend")
+    Redirect(routes.LoginController.onPageLoad(NormalMode))
   }
 
 }
