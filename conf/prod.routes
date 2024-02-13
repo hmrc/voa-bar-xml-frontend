@@ -2,4 +2,4 @@
 ->         /voa-bar-xml-frontend      app.Routes
 ->         /                          health.Routes
 
-GET        /                          controllers.RootRedirectController.rootRedirect
+GET        /                          controllers.localroot.RootRedirectController.rootRedirect

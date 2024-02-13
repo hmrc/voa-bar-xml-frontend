@@ -3,11 +3,11 @@ import sbt.*
 
 object Dependencies {
 
-  private val bootstrapVersion = "8.2.0"
-  private val hmrcMongoVersion = "1.6.0"
-  private val playFrontendHmrcVersion = "8.2.0"
+  private val bootstrapVersion = "8.4.0"
+  private val hmrcMongoVersion = "1.7.0"
+  private val playFrontendHmrcVersion = "8.5.0"
   private val guiceUtilsVersion = "6.0.0"
-  private val pdfBoxVersion = "2.0.27"
+  private val pdfBoxVersion = "2.0.30"
   private val uniformVersion = "4.10.0"
 
   // Test dependencies

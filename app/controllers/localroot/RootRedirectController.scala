@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.localroot
 
 import models.NormalMode
 import play.api.mvc._
@@ -22,14 +22,14 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 
-@Singleton
 /**
  * @author Yuriy Tumakha
  */
+@Singleton
 class RootRedirectController @Inject()(cc: MessagesControllerComponents) extends FrontendController(cc) {
 
   def rootRedirect: Action[AnyContent] = Action {
-    Redirect(routes.LoginController.onPageLoad(NormalMode))
+    Redirect(controllers.routes.LoginController.onPageLoad(NormalMode))
   }
 
 }
