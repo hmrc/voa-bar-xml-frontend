@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@
                         </a>
                     </span>
                    <span class="hmrc-add-to-a-list__remove">
-                   @formWithCSRF(action = routes.AddToListController.removeProperty(),
+                   @formWithCSRF(action = routes.AddToListController.removeProperty,
                        Symbol("novalidate") -> "novalidate", Symbol("autoComplete") -> "off"
                    ) {
                        @govukButton(Button(value = Option(index.toString), content = Text("Remove"), classes = "govuk-button--warning govuk-!-margin-bottom-0",
@@ -72,7 +72,7 @@
 
       </div>
 
-        @formWithCSRF(action = routes.AddToListController.addProperty(),
+        @formWithCSRF(action = routes.AddToListController.addProperty,
         Symbol("novalidate") -> "novalidate", Symbol("autoComplete") -> "off"
         ) {
             @if(cr05Submission.proposedProperties.length > 1 && cr05Submission.proposedProperties.length < 5) {

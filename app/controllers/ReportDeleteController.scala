@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package controllers
 
 import cats.data.EitherT
-import cats.implicits._
+import cats.implicits.*
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.ReportDeleteController.submissionId
 import controllers.actions.DataRetrievalAction
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
@@ -43,7 +43,7 @@ class ReportDeleteController @Inject() ( configuration: Configuration,
 
   val enabled = configuration.getOptional[String]("feature.delete.enabled").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)
 
-  def onPageSubmit() = getData.async { implicit request =>
+  def onPageSubmit: Action[AnyContent] = getData.async { implicit request =>
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
     (for {
       login <- EitherT(cachedLogin(request.externalId))

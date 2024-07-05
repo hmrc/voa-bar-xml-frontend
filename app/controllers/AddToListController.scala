@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,19 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import controllers.actions._
+import controllers.actions.*
 import identifiers.{AddPropertyId, VOAAuthorisedId}
 
 import javax.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
 import play.api.i18n.I18nSupport
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.Navigator
 
 import scala.concurrent.{ExecutionContext, Future}
-import models.YesNoForm._
+import models.YesNoForm.*
 
 import scala.util.Try
 
@@ -44,7 +44,7 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
                                   )(implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
 
-  def onPageLoad = getData.async {
+  def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
@@ -54,7 +54,7 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  def addProperty = (getData andThen requireData).async { implicit request =>
+  def addProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
       yesNoForm.bindFromRequest().fold(
         formWithErrors => {
           dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
@@ -65,13 +65,13 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
           if (success.value){
             Future.successful(Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers)))
           } else {
-            Future.successful(Redirect(routes.TaskListController.onPageLoad()))
+            Future.successful(Redirect(routes.TaskListController.onPageLoad))
           }
         }
       )
   }
 
-  def removeProperty = (getData andThen requireData).async { implicit request =>
+  def removeProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
 
     val propertyIndex = request.body.asFormUrlEncoded.getOrElse(Map()).get("delete-index").map(_.head).flatMap { i =>
       Try {
@@ -85,13 +85,11 @@ class AddToListController @Inject()(appConfig: FrontendAppConfig,
           val proposed = cr05Submission.proposedProperties.take(index) ++ cr05Submission.proposedProperties.drop(index + 1)
 
           dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission.copy(proposedProperties = proposed))
-            .map(_ => Redirect(routes.AddToListController.onPageLoad()))
+            .map(_ => Redirect(routes.AddToListController.onPageLoad))
 
-        }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad())))
+        }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad)))
       }
-    }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad())))
-
-
+    }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad)))
   }
 
 }

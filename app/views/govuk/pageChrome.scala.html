@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import scala.util.Try
-@import play.api.Configuration
-@import ltbs.uniform.ErrorTree
-@import ltbs.uniform.UniformMessages
 @import ltbs.uniform.common.web.FormFieldStats
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import ltbs.uniform.{ErrorTree, UniformMessages, toTreeLikeOps}
+@import play.api.Configuration
 @import uk.gov.hmrc.govukfrontend.views.Aliases.ErrorLink
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+
+@import scala.util.Try
 
 @this(
   mainTemplate: views.html.govuk.main_template,
@@ -54,7 +54,7 @@
         @if(errors.isNonEmpty) {
             @errorSummary(ErrorSummary(errorList = {
                 errors.map { error =>
-                        val errorLink = if (error._1.head.isEmpty)  key.mkString("#","_", "-error") else error._1.head.mkString("#","_", "")
+                    val errorLink = if(error._1.head.isEmpty) key.mkString("#", "_", "-error") else error._1.head.mkString("#", "_", "")
                     ErrorLink(Some(errorLink),
                         HtmlContent(error._2.head.prefixWith(key).render[Html](messages2)))
                 }.toList
@@ -70,7 +70,7 @@
 
     }
 
-    @if(configuration.getOptional[String]("feature.uniform-debug.enabled").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)) {
+    @if(configuration.getOptional[String]("feature.uniform-debug.enabled").exists(x => Try(x.toBoolean).getOrElse(false))) {
         <br />
         <br />
         <div style="border: solid 1px;

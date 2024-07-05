@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package controllers
 
-import javax.inject.Inject
-import play.api.i18n.I18nSupport
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import controllers.actions._
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
+import controllers.actions.*
 import identifiers.{CouncilTaxStartId, TaskListId, VOAAuthorisedId}
 import models.NormalMode
 import play.api.Configuration
-import play.api.mvc.MessagesControllerComponents
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.Navigator
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject()(appConfig: FrontendAppConfig,
@@ -40,10 +40,11 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
                                   welcome: views.html.welcome
                                  ) (implicit ec: ExecutionContext)
   extends FrontendController(controllerComponents) with I18nSupport {
-  val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+
+  private val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
 
-  def onPageLoad = getData.async {
+  def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
         case Some(username) => Ok(welcome(appConfig, username, cr05FeatureEnabled))
@@ -51,11 +52,11 @@ class WelcomeController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  def goToCouncilTaxUploadPage() = (getData andThen requireData) { implicit request =>
+  def goToCouncilTaxUploadPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(CouncilTaxStartId, NormalMode)(request.userAnswers))
   }
 
-  def goToTaskListLoadPage() = (getData andThen requireData) { implicit request =>
+  def goToTaskListLoadPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(TaskListId, NormalMode)(request.userAnswers))
   }
 }

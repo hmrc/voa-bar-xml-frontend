@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package journey
 
-import java.time.LocalDate
 import cats.data.Validated
-import ltbs.uniform._
-import cats.implicits._
-import ltbs.uniform.validation.Rule
+import cats.implicits.*
+import ltbs.uniform.*
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
+import ltbs.uniform.validation.{Rule, quantString}
 import models.PropertyType
-import play.api.libs.json._
+import play.api.libs.json.*
+
+import java.time.LocalDate
 
 object UniformJourney {
 
@@ -36,9 +37,9 @@ object UniformJourney {
   }
   case class OtherReasonWrapper(value : String)
   object OtherReasonWrapper {
-    import play.api.libs.functional.syntax._
+    import play.api.libs.functional.syntax.*
     implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
-      implicitly[Format[String]].inmap(OtherReasonWrapper.apply, unlift(OtherReasonWrapper.unapply))
+      implicitly[Format[String]].inmap(OtherReasonWrapper.apply, _.value)
   }
   object ContactDetails {implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
@@ -126,7 +127,7 @@ object UniformJourney {
 
   // $COVERAGE-OFF$
   def addPropertyCommon[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], cr05Common: Option[Cr05Common]): F[Cr05Common] = {
-    import interpreter._
+    import interpreter.*
     for {
       baReport <- ask[String]("add-property-ba-report", validation = baReportValidation, default = cr05Common.map(_.baReport))
       baRef <- ask[String]("add-property-ba-ref", validation = baReferenceValidation, default = cr05Common.map(_.baRef))
@@ -141,7 +142,7 @@ object UniformJourney {
 
   def addPropertyHelper[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], property: Option[Cr05AddProperty],
                                            propertyType: PropertyType, index: Option[Int]): F[Cr05AddProperty] = {
-    import interpreter._
+    import interpreter.*
     for {
       uprn <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation, default = property.map(_.uprn))
       address <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"), default = property.map(_.address))
@@ -163,7 +164,7 @@ object UniformJourney {
   }
 
   def addComments[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes], default: Option[String]): F[Option[String]] = {
-    import interpreter._
+    import interpreter.*
     for {
       comments <- ask[Option[String]]("add-comments", validation = commentsValidation, default = Some(default))
     } yield comments
@@ -171,14 +172,14 @@ object UniformJourney {
 
   def cr05CheckYourAnswers[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes])
                                              (cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {
-    import interpreter._
+    import interpreter.*
     for {
       _ <- tell[Cr05SubmissionBuilder]("cr05-check-answers", cr05Submission)
     } yield cr05Submission
   }
 
   def ctTaxJourney[F[_] : cats.Monad](interpreter: Language[F, TellTypes, AskTypes],reasonReport: ReasonReportType): F[Cr01Cr03Submission] = {
-    import interpreter._
+    import interpreter.*
     for {
       removalReason <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
       otherReason <- ask[OtherReasonWrapper]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
@@ -274,9 +275,7 @@ object UniformJourney {
 
     val phoneNumber = (contactDetails.phoneNumber match {
       case None => Validated.valid(None)
-      case Some(phone) => {
-        PhoneNumberValidator().apply(phone).map(Option(_))
-      }
+      case Some(phone) => PhoneNumberValidator()(phone).map(Option(_))
     }).leftMap(_.prefixWith("phoneNumber"))
 
 

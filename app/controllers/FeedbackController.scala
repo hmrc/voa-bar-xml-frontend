@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.{HttpClient, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -49,11 +49,11 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
   // The default HTTPReads will wrap the response in an exception and make the body inaccessible
   implicit val readPartialsForm: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 
-  def onPageLoad = Action { implicit request =>
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(feedbackView(feedbackForm))
   }
 
-  def onPageSubmit = Action.async { implicit request =>
+  def onPageSubmit: Action[AnyContent] = Action.async { implicit request =>
     feedbackForm.bindFromRequest().fold(
       formWithErrors =>
         Future.successful {
@@ -89,11 +89,11 @@ class FeedbackController @Inject()(servicesConfig: ServicesConfig,
     )
   }
 
-  def feedbackThx = Action { implicit request =>
+  def feedbackThx: Action[AnyContent] = Action { implicit request =>
     Ok(feedbackThxView())
   }
 
-  def feedbackError = Action { implicit request =>
+  def feedbackError: Action[AnyContent] = Action { implicit request =>
     Ok(feedbackErrorView())
   }
 

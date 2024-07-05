@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class Cr05SubmissionBuilderWebTell(cr05SubmissionSummary: cr05SubmissionSummary)
       List(
         SummaryListRow(
           key = Key(HtmlContent(messages("comments.pageLabel")), "govuk-!-width-one-half"),
-          value = Value(in.comments.map(Text).getOrElse(HtmlContent(messages("summary.comments.none")))),
+          value = Value(in.comments.map(Text.apply).getOrElse(HtmlContent(messages("summary.comments.none")))),
           actions = Some(Actions(items = Seq(
             ActionItem(controllers.routes.UniformController.addCommentJourney().url,
               HtmlContent(messages("check-answers.changeLabel"))))

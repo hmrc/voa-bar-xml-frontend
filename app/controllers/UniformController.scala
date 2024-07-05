@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,10 @@ import play.api.{Configuration, Logger, Logging}
 import play.api.i18n.{Messages => _, _}
 import play.api.mvc._
 import services.Cr01Cr03Service
-import uk.gov.hmrc.govukfrontend.views.html.components._
+import uk.gov.hmrc.govukfrontend.views.html.components.{Action => _, _}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
-import scala.annotation.nowarn
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -85,31 +84,31 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  lazy val interpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
+  val interpreter: AutobarsInterpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
-  def myJourney(targetId: String) = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def myJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
     request.userAnswers.cacheMap.getEntry[ReasonReportType](ReportReasonController.STORAGE_KEY).map { reportReason =>
-      val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason): @nowarn
+      val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason)
 
-      playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission: Cr01Cr03Submission =>
+      playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission =>
         cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.login.get).map { submissionId =>
-          Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString()))
+          Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString))
         }
       }
     }.getOrElse(Future.successful(Redirect(routes.ReportReasonController.onPageLoad)))
 
   }
 
-  def addCommonSectionJourney(targetId: String)= (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def addCommonSectionJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey).flatMap { maybeData =>
 
-      val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection)): @nowarn
+      val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection))
       addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
         dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
           val cr05SubmissionBuilder = savedCr05SubmissionBuilder.fold(Cr05SubmissionBuilder(Some(cr05CommonSection), List(), List(), None)) {
@@ -128,24 +127,25 @@ class UniformController @Inject()(messagesApi: MessagesApi,
   def editPropertyJourney(targetId: String, propertyType: PropertyType, index: Int): Action[AnyContent] = propertyJourney(
     targetId, propertyType, Option(index))
 
-  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int])= (getData andThen requireData andThen auth).async {
-    implicit request: DataRequest[AnyContent] =>
-      getCr05Submission.flatMap { propertyBuilder =>
+  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int]): Action[AnyContent] =
+    (getData andThen requireData andThen auth).async {
+      implicit request: DataRequest[AnyContent] =>
+        getCr05Submission.flatMap { propertyBuilder =>
 
-      val property = propertyType match {
-        case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
-        case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
-      }
+          val property = propertyType match {
+            case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
+            case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
+          }
 
-      runPropertyJourney(targetId, propertyType, property, index)
+          runPropertyJourney(targetId, propertyType, property, index)
+        }
     }
-  }
 
-  def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])
-                        (implicit request: DataRequest[AnyContent]) = {
+  private def runPropertyJourney(targetId: String, propertyType: PropertyType, property: Option[Cr05AddProperty], index: Option[Int])
+                                (implicit request: DataRequest[AnyContent]): Future[Result] = {
     import interpreter._
     import UniformJourney._
-    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index): @nowarn
+    val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index)
     addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
       updateProperty(propertyType, cr05AddProperty, index).map { _ =>
         propertyType match {
@@ -157,7 +157,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[_] ) = {
+  private def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[_] ): Future[Unit] = {
     logger.debug(s"updating property : ${propertyType}, ${index}")
     (propertyType, index) match {
       case (PropertyType.EXISTING, None) =>
@@ -178,22 +178,22 @@ class UniformController @Inject()(messagesApi: MessagesApi,
     }
   }
 
-  def storeCr05Submission(submission: Cr05SubmissionBuilder)(implicit request: DataRequest[_]) = {
+  private def storeCr05Submission(submission: Cr05SubmissionBuilder)(implicit request: DataRequest[_]): Future[Unit] = {
     dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, submission).map(_ => ())
   }
 
-  def getCr05Submission(implicit request: DataRequest[_]): Future[Cr05SubmissionBuilder] = {
+  private def getCr05Submission(implicit request: DataRequest[_]): Future[Cr05SubmissionBuilder] = {
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
       .map(_.getOrElse(Cr05SubmissionBuilder(None, List(), List(), None)))
   }
 
 
-  def addCommentJourney(targetId: String) = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def addCommentJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
     getCr05Submission(request).flatMap { submission =>
-      val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments): @nowarn
+      val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments)
       addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
         val cr05Submission = submission.copy(comments = comments)
         dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, cr05Submission).map { _ =>
@@ -204,7 +204,7 @@ class UniformController @Inject()(messagesApi: MessagesApi,
 
   }
 
-  def cr05CheckAnswerJourney(targetId: String) = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def cr05CheckAnswerJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import interpreter._
     import UniformJourney._
 
@@ -212,10 +212,10 @@ class UniformController @Inject()(messagesApi: MessagesApi,
       case None => {
         Logger("CheckAnswerJourney")
           .warn(s"Reach CR05 confirmation without finishing CR05, username: ${request.userAnswers.login.map(_.username).getOrElse("Unknown")}")
-        Future.successful(Redirect(routes.TaskListController.onPageLoad()))
+        Future.successful(Redirect(routes.TaskListController.onPageLoad))
       }
       case Some(cr05Submission) =>
-        val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission): @nowarn
+        val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
         addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
           cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get) flatMap { submissionId =>
             dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>

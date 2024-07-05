@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, C
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web._
+import ltbs.uniform.common.web.*
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
-import ltbs.uniform._
-import play.api.Logger
+import ltbs.uniform.*
+import play.api.{Logger, Logging}
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, GovukRadios, GovukDateInput, GovukSummaryList}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios, GovukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Empty, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
@@ -50,13 +50,12 @@ class AutobarsInterpreter (
                          )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
-  with InferListingPages[Html] {
-
-  val logger = Logger(this.getClass)
+  with InferListingPages[Html]
+  with Logging {
 
   override def blankTell: Html = Html("")
 
-  override def messages(request: Request[AnyContent]): UniformMessages[Html] = {
+  override def messages(request: Request[AnyContent]): UniformMessages[Html] =
     new UniformMessages[Html] {
 
       //Uniform can't handle when message doesn't exist.
@@ -65,9 +64,6 @@ class AutobarsInterpreter (
 
       override def list(key: String, args: Any*): List[Html] = Nil
     }
-  }
-
-
 
   override def pageChrome(
                            key: List[String],
@@ -77,11 +73,8 @@ class AutobarsInterpreter (
                            breadcrumbs: List[String],
                            request: Request[AnyContent],
                            messages: UniformMessages[Html],
-                           fieldStats: FormFieldStats): Html = {
-
-    page_chrome(
-      key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
-  }
+                           fieldStats: FormFieldStats): Html = 
+    page_chrome(key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
 
   implicit val ctTaxFormWebTell: Cr01Cr03SubmissionWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
 
@@ -91,60 +84,60 @@ class AutobarsInterpreter (
 
   implicit val cr05AddPropertyWebTell: Cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new GovukSummaryList())
 
-  implicit val stringField = new FormField[String, Html] {
-      override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
-      override def encode(in: String): Input = Input.one(List(in))
+  private def doRenderStringField(pageKey: List[String],
+                                  fieldKey: List[String],
+                                  breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                                  data: Input, errors: ErrorTree,
+                                  optional: Boolean,
+                                  messages: UniformMessages[Html]): Html = {
+    import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
 
-      override def render(pageKey: List[String],
-                          fieldKey: List[String],
-                          breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                          data: Input, errors: ErrorTree,
-                          messages: UniformMessages[Html]): Html = doRender(
-        pageKey, fieldKey, breadcrumbs, data, errors, false, messages)
+    val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
+    val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
 
-        def doRender(pageKey: List[String],
-                     fieldKey: List[String],
-                     breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                     data: Input, errors: ErrorTree,
-                     optional: Boolean,
-                     messages: UniformMessages[Html]): Html =  {
-        import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
+    logger.debug(
+      s"""
+         |pageKey : ${pageKey}
+         |fieldKey: ${fieldKey}
+         |Errors:
+         |  ${errors.mkString(" \n")}
+         |
+         |Value:
+         |  ${data.mkString(" \n")}
+         |
+         |""".stripMargin)
 
-        val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
+    val hint = if optional then
+      Option(Hint(content = Text("(optional)")))
+    else
+      Option.empty[Hint]
 
-        val fieldValue = data.get(fieldKey.tail).flatMap(_.headOption)
+    val messageKey = fieldKey :+ "label"
 
-        logger.debug(
-          s"""
-            |pageKey : ${pageKey}
-            |fieldKey: ${fieldKey}
-            |Errors:
-            |  ${errors.mkString(" \n")}
-            |
-            |Value:
-            |  ${data.mkString(" \n")}
-            |
-            |""".stripMargin)
+    govukInput(GovInput(
+      id = fieldKey.mkString("_"),
+      name = fieldKey.mkString("."),
+      label = Label(content = HtmlContent(messages(messageKey.mkString(".")))),
+      classes = "govuk-input--width-20",
+      value = fieldValue,
+      errorMessage = errorMessage,
+      hint = hint
+    ))
+  }
 
-        val hint = if(optional) {
-          Option(Hint(content = Text("(optional)")))
-        }else {
-          Option.empty[Hint]
-        }
+  implicit val stringField: FormField[String, Html] = new FormField[String, Html] {
 
-        val messageKey = fieldKey :+ "label"
+    override def decode(out: Input): Either[ErrorTree, String] = out.toStringField().toEither
 
-        govukInput(GovInput(
-          id = fieldKey.mkString("_"),
-          name = fieldKey.mkString("."),
-          label = Label(content = HtmlContent(messages(messageKey.mkString(".")))),
-          classes="govuk-input--width-20",
-          value = fieldValue,
-          errorMessage = errorMessage,
-          hint = hint
-        ))
-      }
+    override def encode(in: String): Input = Input.one(List(in))
+
+    override def render(pageKey: List[String],
+                        fieldKey: List[String],
+                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+                        data: Input, errors: ErrorTree,
+                        messages: UniformMessages[Html]): Html =
+      doRenderStringField(pageKey, fieldKey, breadcrumbs, data, errors, false, messages)
   }
 
   implicit val stringOption: FormField[Option[String], Html] = new FormField[Option[String], Html] {
@@ -158,9 +151,8 @@ class AutobarsInterpreter (
     override def render(pageKey: List[String],
                         fieldKey: List[String],
                         breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html = {
-      stringField.doRender(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
-    }
+                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html =
+      doRenderStringField(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
   }
 
   implicit val otherReasonField: FormField[OtherReasonWrapper, Html] = new FormField[OtherReasonWrapper, Html] {
@@ -248,7 +240,6 @@ class AutobarsInterpreter (
         errorMessage = rootError
       ))
     }
-
   }
 
   override def renderProduct[A](pageKey: List[String],
@@ -275,23 +266,22 @@ class AutobarsInterpreter (
 
     val value = values.valueAtRoot.map(_.mkString)
     val coproductValues = cfl.inner.map(_._1).toSet
-    val items = if(coproductValues == NoPlanningReferenceType.order.toSet) {
+    val items = if coproductValues == NoPlanningReferenceType.order.toSet then
       NoPlanningReferenceType.order
-    } else if (coproductValues == ReasonReportType.order.toSet){
+    else if coproductValues == ReasonReportType.order.toSet then
       ReasonReportType.order
-    } else if (coproductValues == RemovalReasonType.order.toSet) {
+    else if coproductValues == RemovalReasonType.order.toSet then
       RemovalReasonType.order
-    } else if (coproductValues == Set("Yes", "No")) {
+    else if coproductValues == Set("Yes", "No") then
       List("Yes", "No")
-    } else {
+    else
       cfl.inner.map(_._1)
-    }
 
-    val radiosItems = items.map { name:String =>
+    val radiosItems = items.map { name =>
       RadioItem(
-        id=Option(name),
-        value=Option(name),
-        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}${name}")),
+        id = Option(name),
+        value = Option(name),
+        content = HtmlContent(messages(s"${pageKey.mkString}${fieldKey.mkString(".", ".", ".")}$name")),
         checked = value.contains(name)
       )
     }
@@ -304,7 +294,7 @@ class AutobarsInterpreter (
         items = radiosItems,
         name = fieldKey.head,
         errorMessage = errorMessage,
-        classes = if (coproductValues.size == 2) "govuk-radios--inline" else ""
+        classes = if coproductValues.size == 2 then "govuk-radios--inline" else ""
       ))
   }
 
@@ -313,7 +303,7 @@ class AutobarsInterpreter (
      fieldKey: List[String],
      errors: ErrorTree,
      messages: UniformMessages[Html]
-  ): Option[ErrorMessage] = {
+  ): Option[ErrorMessage] =
     errors.get(NonEmptyList.one(fieldKey))
       .orElse {
         errors.valueAtRoot.filter(_ => pageKey == fieldKey)
@@ -322,5 +312,5 @@ class AutobarsInterpreter (
         val html = errorMsgNel.head.prefixWith(pageKey).render[Html](messages)
         ErrorMessage(content = HtmlContent(html))
       }
-  }
+
 }

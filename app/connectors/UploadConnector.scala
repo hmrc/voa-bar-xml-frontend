@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class UploadConnector @Inject()(http: HttpClient,
   }
 
   def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] = {
-    http.POST[InitiateRequest, InitiateResponse](initiateUrl, request)
+    http.POST[InitiateRequest, InitiateResponse](initiateUrl, request, Seq.empty)
       .map{ initiateResponse =>
         logger.debug(s"Upscan initiate response : ${initiateResponse}")
         initiateResponse

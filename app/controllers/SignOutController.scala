@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 class SignOutController @Inject()(controllerComponents: MessagesControllerComponents,
                                   appConfig: FrontendAppConfig) extends FrontendController(controllerComponents)  {
 
-  def signOut(): Action[AnyContent] = Action { _ =>
+  def signOut: Action[AnyContent] = Action {
      Redirect(routes.LoginController.onPageLoad(NormalMode)).withNewSession
   }
 

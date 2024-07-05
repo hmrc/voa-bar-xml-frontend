@@ -42,14 +42,14 @@ GET         /comments                             controllers.UniformController.
 POST        /comments                             controllers.UniformController.myJourney(id = "comments")
 # CR05
 
-GET         /task-list                                          controllers.TaskListController.onPageLoad()
-GET         /start-add-property                                 controllers.TaskListController.goToAddPropertyPage()
-GET         /start-add-property-report-details                  controllers.TaskListController.goToAddPropertyReportDetailPage()
-GET         /start-add-comments                                 controllers.TaskListController.goToAddComments()
-GET         /start-check-answers                                controllers.TaskListController.goToCheckYourAnswersPage()
-GET         /add-to-list                                        controllers.AddToListController.onPageLoad()
-POST        /confirm-add-property                               controllers.AddToListController.addProperty()
-POST        /delete-property                                    controllers.AddToListController.removeProperty()
+GET         /task-list                                          controllers.TaskListController.onPageLoad
+GET         /start-add-property                                 controllers.TaskListController.goToAddPropertyPage
+GET         /start-add-property-report-details                  controllers.TaskListController.goToAddPropertyReportDetailPage
+GET         /start-add-comments                                 controllers.TaskListController.goToAddComments
+GET         /start-check-answers                                controllers.TaskListController.goToCheckYourAnswersPage
+GET         /add-to-list                                        controllers.AddToListController.onPageLoad
+POST        /confirm-add-property                               controllers.AddToListController.addProperty
+POST        /delete-property                                    controllers.AddToListController.removeProperty
 
 GET         /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
 POST        /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
@@ -81,11 +81,11 @@ POST        /cr05-check-answers                                controllers.Unifo
 
 GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad()
+GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad
 
-GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad()
+GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad
 
-GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad()
+GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad
 
 GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
 GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
@@ -95,9 +95,9 @@ GET         /council-tax/upload                   controllers.CouncilTaxUploadCo
 POST        /council-tax/upload/:reference        controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
 POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
 
-GET         /online-or-upload                     controllers.WelcomeController.onPageLoad()
-GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage()
-GET         /goToTaskList                         controllers.WelcomeController.goToTaskListLoadPage()
+GET         /online-or-upload                     controllers.WelcomeController.onPageLoad
+GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage
+GET         /goToTaskList                         controllers.WelcomeController.goToTaskListLoadPage
 
 GET         /sign-in                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 POST        /sign-in                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)
@@ -106,18 +106,18 @@ POST        /changeLogin                          controllers.LoginController.on
 
 ### SignOut Expired
 ### -----------------------
-GET        /sign-out                              controllers.SignOutController.signOut()
+GET        /sign-out                              controllers.SignOutController.signOut
 
 ### Timeout
 ### -----------------------
-GET        /this-service-has-been-reset           controllers.TimeoutController.onPageLoad()
-GET        /this-service-has-been-reset/redirect  controllers.TimeoutController.timeout()
+GET        /this-service-has-been-reset           controllers.TimeoutController.onPageLoad
+GET        /this-service-has-been-reset/redirect  controllers.TimeoutController.timeout
 
 
 GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
 GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
-POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit()
-GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload()
+POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit
+GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload
 
 GET         /feedback 		                      controllers.FeedbackController.onPageLoad
 POST 		/feedback                             controllers.FeedbackController.onPageSubmit

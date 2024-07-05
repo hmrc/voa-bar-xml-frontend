@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,21 @@
 package controllers
 
 import cats.data.EitherT
-import cats.implicits._
-
-import javax.inject.Inject
+import cats.implicits.*
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
-import controllers.actions._
+import controllers.actions.*
 import models.{Login, Pending, ReportStatus}
 import play.api.http.HeaderNames
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
-import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import play.api.mvc.*
 import services.ReceiptService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.TableFormatter
 
 import java.time.Instant
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -79,7 +78,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     ))
   }
 
-  def onPageLoad(filter: Option[String] = None) = getData.async {
+  def onPageLoad(filter: Option[String] = None): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
@@ -96,7 +95,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     }
   }
 
-  def onReceiptDownload(submissionId: String) = getData.async {
+  def onReceiptDownload(submissionId: String): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
@@ -130,7 +129,7 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
     s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")
   }
 
-  def onAllReceiptsDownload() = getData.async {
+  def onAllReceiptsDownload: Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
@@ -141,4 +140,5 @@ class ReportStatusController @Inject()(appConfig: FrontendAppConfig,
       ))
         .valueOr(f => f)
   }
+
 }

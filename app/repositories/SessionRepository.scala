@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,18 @@
 package repositories
 
 import models.CacheMap
-
-import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Logging}
-import play.api.libs.json._
-
-import scala.concurrent.{ExecutionContext, Future}
+import org.mongodb.scala.SingleObservableFuture
+import org.mongodb.scala.model.*
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.model._
+import play.api.libs.json.*
+import play.api.{Configuration, Logging}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit.SECONDS
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 case class DatedCacheMap(id: String,
                          data: Map[String, JsValue],

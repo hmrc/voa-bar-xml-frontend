@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class Cr05AddPropertyWebTell(govUkSumaryList: GovukSummaryList) extends GenericW
   def summaryList(in: Cr05AddProperty, propertyType:PropertyType, index:Option[Int], messages: UniformMessages[Html]): SummaryList = {
     val uprn = SummaryListRow(
       key = Key(HtmlContent(messages("UPRN.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(in.uprn.map(Text).getOrElse(HtmlContent(messages("summary.uprn.notEntered")))),
+      value = Value(in.uprn.map(Text.apply).getOrElse(HtmlContent(messages("summary.uprn.notEntered")))),
       actions = Some(Actions(items = Seq(
         ActionItem(formatUrl("add-property-UPRN", propertyType, index),
           HtmlContent(messages("check-answers.changeLabel"))))

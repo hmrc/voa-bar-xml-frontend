@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ object FeedbackForm {
         .verifying("feedback.comments.error.length", _.length <= 2000),
       "afterSubmission" -> default(boolean, false),
       "submissionId" -> optional(text)
-    )(FeedbackForm.apply)(FeedbackForm.unapply)
+    )(FeedbackForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   def initFeedbackAfterSubmission(submissionId: String): Form[FeedbackForm] =

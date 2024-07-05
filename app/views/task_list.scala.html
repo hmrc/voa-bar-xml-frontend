@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@
             <ul class="app-task-list__items">
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
-                    <a href="@routes.TaskListController.goToAddPropertyReportDetailPage().url" aria-describedby="add-property-status">
+                    <a href="@routes.TaskListController.goToAddPropertyReportDetailPage.url" aria-describedby="add-property-status">
                         @cr05Submission.flatMap(_.cr05CommonSection) match {
                             case None => {Add property report details}
                             case Some(_) => {Edit property report details}
@@ -94,7 +94,7 @@
                 <li class="app-task-list__item">
                     <span class="app-task-list__task-name">
                         @if(cr05Submission.exists(_.existingProperties.nonEmpty)){
-                            <a href="@routes.AddToListController.onPageLoad().url" aria-describedby="add-property-status-2">
+                            <a href="@routes.AddToListController.onPageLoad.url" aria-describedby="add-property-status-2">
                             View, modify or add a property
                             </a>
                         } else {
@@ -120,7 +120,7 @@
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
                     @if(cr05Submission.exists(_.proposedProperties.length >= 2)){
-                        <a href="@routes.TaskListController.goToAddComments().url" aria-describedby="add-comments">
+                        <a href="@routes.TaskListController.goToAddComments.url" aria-describedby="add-comments">
                          Add comments
                         </a>
                     } else {
@@ -148,7 +148,7 @@
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
                     @if(cr05Submission.exists(_.proposedProperties.length >= 2)){
-                        <a href="@routes.TaskListController.goToCheckYourAnswersPage().url" aria-describedby="add-property-status">
+                        <a href="@routes.TaskListController.goToCheckYourAnswersPage.url" aria-describedby="add-property-status">
                         Submit your information
                         </a>
                     } else {

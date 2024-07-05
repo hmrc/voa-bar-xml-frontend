@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import models.{CheckMode, Mode, NormalMode, PropertyType}
 class Navigator @Inject()() {
 
   private val routeMap: Map[Identifier, UserAnswers => Call] = Map(
-    LoginId -> (_ => routes.WelcomeController.onPageLoad()),
+    LoginId -> (_ => routes.WelcomeController.onPageLoad),
     WelcomeFormId -> (_ => routes.UniformController.myJourney("ba-report")),
     CouncilTaxStartId -> (_ => routes.CouncilTaxUploadController.onPageLoad()),
-    TaskListId ->  (_ => routes.TaskListController.onPageLoad()),
+    TaskListId ->  (_ => routes.TaskListController.onPageLoad),
     AddPropertyReportDetailsId -> (_ => routes.UniformController.addCommonSectionJourney("add-property-ba-report")),
     AddPropertyId -> (_ => routes.UniformController.propertyJourney("add-property-UPRN", PropertyType.PROPOSED)),
     AddCommentId -> (_ => routes.UniformController.addCommentJourney()),
@@ -44,6 +44,6 @@ class Navigator @Inject()() {
     case NormalMode =>
       routeMap.getOrElse(id, _ => routes.LoginController.onPageLoad(NormalMode))
     case CheckMode =>
-      editRouteMap.getOrElse(id, _ => routes.CheckYourAnswersController.onPageLoad())
+      editRouteMap.getOrElse(id, _ => routes.CheckYourAnswersController.onPageLoad)
   }
 }

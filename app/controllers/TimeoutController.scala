@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package controllers
 
-import javax.inject.Inject
 import models.NormalMode
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.session_timeout
+
+import javax.inject.Inject
 
 
 class TimeoutController @Inject()(
@@ -31,7 +32,7 @@ class TimeoutController @Inject()(
     Ok(sessionTimeout())
   }
 
-  def timeout(): Action[AnyContent] = Action { _ =>
+  def timeout: Action[AnyContent] = Action { _ =>
      Redirect(routes.LoginController.onPageLoad(NormalMode)).withNewSession
   }
 
