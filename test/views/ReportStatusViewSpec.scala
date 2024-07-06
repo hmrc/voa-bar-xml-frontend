@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,16 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
   def reportStatus = app.injector.instanceOf[views.html.reportStatus]
 
-  val username = "BA0350"
-  val messageKeyPrefix = "reportStatus"
-  val submissionId = "SId9324832"
-  val baCode = "baCode"
-  val reportStatus1 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
-  val reportStatus2 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Verified.value))
-  val reportStatus3 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Failed.value))
-  val reportStatus4 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Done.value))
-  val reportStatus5 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Pending.value))
-  def servicesConfig = injector.instanceOf[ServicesConfig]
+  val username           = "BA0350"
+  val messageKeyPrefix   = "reportStatus"
+  val submissionId       = "SId9324832"
+  val baCode             = "baCode"
+  val reportStatus1      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
+  val reportStatus2      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Verified.value))
+  val reportStatus3      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Failed.value))
+  val reportStatus4      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Done.value))
+  val reportStatus5      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Pending.value))
+  def servicesConfig     = injector.instanceOf[ServicesConfig]
   val fakeTableFormatter = new TableFormatter(servicesConfig)
 
   val reportStatusFakeRequest = fakeRequest
@@ -53,9 +53,8 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
     "Include a signout link which redirects the users to the login page" in {
       val href = doc().getElementsByClass("hmrc-sign-out-nav__link").first.attr("href")
-      href mustBe controllers.routes.SignOutController.signOut().url
+      href mustBe controllers.routes.SignOutController.signOut.url
     }
-
 
   }
 }

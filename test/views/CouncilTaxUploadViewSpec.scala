@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
   def councilTaxUpload = app.injector.instanceOf[views.html.councilTaxUpload]
 
-  val username = "BA0345"
+  val username         = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"
-  val submissionId = "SId9324832"
+  val submissionId     = "SId9324832"
 
   val form = new FileUploadDataFormProvider()()
 
@@ -51,18 +51,18 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
       )
     )
   )
-  private def createView(displayInitiateResponse: Boolean = true) = {
+
+  private def createView(displayInitiateResponse: Boolean = true) =
     if (displayInitiateResponse) {
       councilTaxUpload(username, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
     } else {
       councilTaxUpload(username, form)(councilTaxUploadFakeRequest, messages)
     }
-  }
 
   lazy val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
-    behave like normalPage(() => createView(), messageKeyPrefix,  "title" ,"submit.button")
+    behave like normalPage(() => createView(), messageKeyPrefix, "title", "submit.button")
 
     "Include an username element displaying the BA name based on given BA Code" in {
       val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
@@ -71,17 +71,17 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
     "Include a signout link which redirects the users to the login page" in {
       val href = doc.getElementsByClass("hmrc-sign-out-nav__link").first.attr("href")
-      href mustBe controllers.routes.SignOutController.signOut().url
+      href mustBe controllers.routes.SignOutController.signOut.url
     }
 
     "contain Submit button with the value Upload" in {
-      val doc = asDocument(createView())
+      val doc          = asDocument(createView())
       val submitButton = doc.getElementById("submit").text()
       submitButton mustBe messages("councilTaxUpload.submit.button")
     }
 
     "contain Upscan expected hidden inputs" in {
-      val doc = asDocument(createView())
+      val doc          = asDocument(createView())
       val upscanInputs = doc.getElementById("councilTaxUploadForm").getElementsByAttributeValue("type", "hidden")
       Option(upscanInputs.select("[name='policy']")) mustBe defined
       upscanInputs.select("[name='policy']").`val` mustBe initiateResponse.uploadRequest.fields("policy")
@@ -104,7 +104,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
     }
 
     "do not contain Submit button when there is not initiate response" in {
-      val doc = asDocument(createView(false))
+      val doc          = asDocument(createView(false))
       val submitButton = Option(doc.getElementById("submit"))
       submitButton mustBe None
     }

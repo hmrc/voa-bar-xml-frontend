@@ -30,9 +30,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DatedCacheMap(id: String,
-                         data: Map[String, JsValue],
-                         lastUpdated: LocalDateTime = LocalDateTime.now) {
+case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now) {
 
   def asCacheMap: CacheMap = CacheMap(id, data)
 }
@@ -48,7 +46,7 @@ object DatedCacheMap {
       .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
 
   implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
-  implicit val formats: OFormat[DatedCacheMap] = Json.format[DatedCacheMap]
+  implicit val formats: OFormat[DatedCacheMap]   = Json.format[DatedCacheMap]
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
 }
@@ -68,7 +66,8 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
     extraCodecs = Seq(
       Codecs.playFormatCodec(DatedCacheMap.dateFormat)
     )
-  ) with Logging {
+  )
+  with Logging {
 
   def upsert(cm: CacheMap): Future[Boolean] = {
     val selector = equal("id", cm.id)

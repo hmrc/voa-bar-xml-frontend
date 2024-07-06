@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   val username = "BA1445"
 
-  def ec = app.injector.instanceOf[ExecutionContext]
+  def ec                   = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val configuration =  Configuration("feature.cr05.enabled" -> false)
+  val configuration        = Configuration("feature.cr05.enabled" -> false)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -53,8 +53,17 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     FakeDataCacheConnector2.save[String](sessionId, VOAAuthorisedId.toString, username)
     FakeDataCacheConnector2.save[Login](sessionId, LoginId.toString, Login(username = username, password = username, reference = None))
 
-    new ReportReasonController(inject[MessagesApi], FakeDataCacheConnector2, dataRetrievalAction, inject[DataRequiredAction],
-      inject[AuthAction], inject[error_template], inject[reportReason], inject[Configuration], inject[MessagesControllerComponents])(ec)
+    new ReportReasonController(
+      inject[MessagesApi],
+      FakeDataCacheConnector2,
+      dataRetrievalAction,
+      inject[DataRequiredAction],
+      inject[AuthAction],
+      inject[error_template],
+      inject[reportReason],
+      inject[Configuration],
+      inject[MessagesControllerComponents]
+    )(ec)
   }
 
   def viewAsString() = inject[reportReason]
@@ -68,7 +77,7 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       status(result) mustBe OK
 
       val dataRequest = new DataRequest[AnyContent](req, sessionId, new UserAnswers(FakeDataCacheConnector2.fetchMap(sessionId)))
-      contentAsString(result) mustBe (viewAsString()(ReportReasonController.form, true)(dataRequest, inject[MessagesApi].preferred(req))).toString()
+      contentAsString(result) mustBe viewAsString()(ReportReasonController.form, true)(dataRequest, inject[MessagesApi].preferred(req)).toString()
     }
 
     "return redirect on successful form submission" in {

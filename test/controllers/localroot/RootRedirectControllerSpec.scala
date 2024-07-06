@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import play.api.test.{FakeRequest, Injecting}
 class RootRedirectControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting {
 
   private val fakeRequest = FakeRequest("GET", "/")
-  private val controller = inject[RootRedirectController]
+  private val controller  = inject[RootRedirectController]
 
   "RootRedirectController" should {
     "return redirect to start page" in {
       val result = controller.rootRedirect(fakeRequest)
-      status(result) shouldBe SEE_OTHER
+      status(result)           shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(controllers.routes.LoginController.onPageLoad(NormalMode).url)
     }
   }

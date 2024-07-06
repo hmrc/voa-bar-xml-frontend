@@ -13,7 +13,6 @@ ThisBuild / majorVersion := 1
 ThisBuild / scalafmtFailOnErrors := true
 ThisBuild / semanticdbEnabled := true
 
-
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
@@ -35,3 +34,5 @@ lazy val microservice = Project(appName, file("."))
 excludeDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-parser-combinators_2.13"
 )
+
+addCommandAlias("scalastyle", ";scalafmtAll;scalafmtSbt;scalafixAll")

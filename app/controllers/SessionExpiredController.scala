@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.session_expired
 
-class SessionExpiredController @Inject()(val appConfig: FrontendAppConfig,
-                                         controllerComponents: MessagesControllerComponents,
-                                         session_expired: session_expired) extends FrontendController(controllerComponents) with I18nSupport {
+class SessionExpiredController @Inject() (
+  val appConfig: FrontendAppConfig,
+  controllerComponents: MessagesControllerComponents,
+  session_expired: session_expired
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(session_expired(appConfig))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,7 @@
 
 package services
 
-import java.io.ByteArrayOutputStream
-import java.util.Locale
-
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import javax.imageio.ImageIO
 import models.{BillingAuthorities, ReportStatus}
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDType1Font
@@ -28,30 +24,33 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory
 import org.apache.pdfbox.pdmodel.{PDDocument, PDDocumentInformation, PDPage, PDPageContentStream}
 import play.api.i18n.{Lang, MessagesApi}
 
-import scala.language.reflectiveCalls
+import java.io.{ByteArrayOutputStream, Closeable}
+import java.util.Locale
+import javax.imageio.ImageIO
 import scala.collection.mutable.ArrayBuffer
+import scala.language.reflectiveCalls
 import scala.util.Try
 
 @Singleton
 class DefaultReceiptService @Inject() (
-                                 messages: MessagesApi
-                               ) extends ReceiptService {
-  val font = PDType1Font.HELVETICA_BOLD
+  messages: MessagesApi
+) extends ReceiptService {
+  val font     = PDType1Font.HELVETICA_BOLD
   val fontSize = 12f
-  val leading = 1.5f * fontSize
-  val margin = 72
+  val leading  = 1.5f * fontSize
+  val margin   = 72
 
   implicit val lang: Lang = Lang(Locale.UK)
 
   def producePDF(reportStatus: ReportStatus) = {
 
     val document = new PDDocument
-    val page = new PDPage(PDRectangle.A4)
+    val page     = new PDPage(PDRectangle.A4)
     document.addPage(page)
 
     val mediaBox = page.getMediaBox
-    val startX = mediaBox.getLowerLeftX + margin
-    val startY = mediaBox.getUpperRightY - margin
+    val startX   = mediaBox.getLowerLeftX + margin
+    val startY   = mediaBox.getUpperRightY - margin
 
     setDocumentInformation(document, reportStatus)
 
@@ -60,52 +59,56 @@ class DefaultReceiptService @Inject() (
     val outputStream = new ByteArrayOutputStream
 
     Try {
-      forceClosing(document, () => {
-        forceClosing(contentStream, () => {
-          val height = addImage(document, page, contentStream)
+      forceClosing(
+        document,
+        () => {
+          forceClosing(
+            contentStream,
+            () => {
+              val height = addImage(document, page, contentStream)
 
-          contentStream.beginText
-          contentStream.newLineAtOffset(startX, startY - height - leading - 20)
+              contentStream.beginText
+              contentStream.newLineAtOffset(startX, startY - height - leading - 20)
 
-          contentStream.setFont(font, fontSize + 10)
-          BillingAuthorities.billingAuthorities
-            .find{ case (key,_) => key == reportStatus.baCode.getOrElse("")} match {
-            case Some((key, name)) =>
-              contentStream.showText(s"$name - $key".toUpperCase)
-              contentStream.newLineAtOffset(0f, -leading)
-            case _ =>
-          }
+              contentStream.setFont(font, fontSize + 10)
+              BillingAuthorities.billingAuthorities
+                .find { case (key, _) => key == reportStatus.baCode.getOrElse("") } match {
+                case Some((key, name)) =>
+                  contentStream.showText(s"$name - $key".toUpperCase)
+                  contentStream.newLineAtOffset(0f, -leading)
+                case _                 =>
+              }
 
-          contentStream.setFont(font, fontSize)
-          wrap(page, body(reportStatus)) foreach { line =>
-            contentStream.newLineAtOffset(0f, -leading)
-            contentStream.showText(line)
-          }
-          contentStream.endText
-        })
+              contentStream.setFont(font, fontSize)
+              wrap(page, body(reportStatus)) foreach { line =>
+                contentStream.newLineAtOffset(0f, -leading)
+                contentStream.showText(line)
+              }
+              contentStream.endText
+            }
+          )
 
-        document.save(outputStream)
-      })
+          document.save(outputStream)
+        }
+      )
     } map { _ =>
       outputStream.toByteArray
     }
   }
 
-  def forceClosing(obj: {def close(): Unit}, f: () => Unit) = {
-    try {
+  def forceClosing(obj: Closeable, f: () => Unit) =
+    try
       f()
-    } finally {
+    finally
       obj.close()
-    }
-  }
 
   def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream) = {
     val mediaBox = page.getMediaBox
-    val startX = mediaBox.getLowerLeftX + margin
-    val startY = mediaBox.getUpperRightY - margin
+    val startX   = mediaBox.getLowerLeftX + margin
+    val startY   = mediaBox.getUpperRightY - margin
 
     val awtImage = ImageIO.read(getClass.getResourceAsStream("/logo.png"))
-    val image = LosslessFactory.createFromImage(document, awtImage)
+    val image    = LosslessFactory.createFromImage(document, awtImage)
 
     contentStream.drawImage(image, startX, startY - image.getHeight)
 
@@ -113,14 +116,13 @@ class DefaultReceiptService @Inject() (
   }
 
   def body(reportStatus: ReportStatus) = {
-    var content = messages("report.pdf.details.summary.first.line",
-      reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
+    var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
 
     content += " "
 
     reportStatus.status match {
       case Some(s) => content += messages(s"report.pdf.details.summary.${s.toLowerCase}")
-      case _ =>
+      case _       =>
     }
 
     content
@@ -128,11 +130,11 @@ class DefaultReceiptService @Inject() (
 
   def wrap(page: PDPage, text: String) = {
     val mediaBox = page.getMediaBox
-    val width = mediaBox.getWidth - 2 * margin
+    val width    = mediaBox.getWidth - 2 * margin
 
     val lines = ArrayBuffer[String]()
 
-    var textLeft = text
+    var textLeft  = text
     var lastSpace = -1
 
     while (textLeft.nonEmpty) {

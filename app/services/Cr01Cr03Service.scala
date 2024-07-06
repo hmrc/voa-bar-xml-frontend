@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,26 +35,26 @@ trait Cr01Cr03Service {
 }
 
 @Singleton
-class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr01Cr03Service {
+class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr01Cr03Service {
 
   override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
-    val submissionId = UUID.randomUUID()
+    val submissionId   = UUID.randomUUID()
     val cr01cr03Report = createReport(submission)
-    val report = ReportStatus(
+    val report         = ReportStatus(
       id = submissionId.toString,
       baCode = Option(login.username),
       status = Option(Pending.value),
       totalReports = Option(1),
       report = Option(cr01cr03Report)
     )
-    reportConnector.save(report, login).map( _ => submissionId)
+    reportConnector.save(report, login).map(_ => submissionId)
   }
 
   def createReport(submission: Cr01Cr03Submission): JsObject = {
     val jsObj = Cr01Cr03Submission.format.writes(submission)
 
     Json.obj(
-      "type" -> "Cr01Cr03Submission",
+      "type"       -> "Cr01Cr03Submission",
       "submission" -> jsObj
     )
   }
@@ -63,22 +63,22 @@ class DefaultCr01Cr03Service @Inject()(reportConnector: ReportStatusConnector)(i
     val jsObj = Cr05Submission.format.writes(submission)
 
     Json.obj(
-      "type" -> "Cr05Submission",
+      "type"       -> "Cr05Submission",
       "submission" -> jsObj
     )
   }
 
   override def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
     val submissionId = UUID.randomUUID()
-    val cr05Report = createReport(submission)
-    val report = ReportStatus(
+    val cr05Report   = createReport(submission)
+    val report       = ReportStatus(
       id = submissionId.toString,
       baCode = Option(login.username),
       status = Option(Submitted.value),
       totalReports = Option(1),
       report = Option(cr05Report)
     )
-    reportConnector.save(report, login).map( _ => submissionId)
+    reportConnector.save(report, login).map(_ => submissionId)
 
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,11 @@ import play.api.data.{Form, FormError}
 
 class OptionFieldBehaviours extends FieldBehaviours {
 
-  def optionsField[T](form: Form[_],
-                      fieldName: String,
-                      validValues: Set[T],
-                      invalidError: FormError): Unit = {
-
+  def optionsField[T](form: Form[_], fieldName: String, validValues: Set[T], invalidError: FormError): Unit = {
 
     "bind all valid values" in {
 
-      for(value <- validValues) {
+      for (value <- validValues) {
 
         val result = form.bind(Map(fieldName -> value.toString)).apply(fieldName)
         result.value.value shouldEqual value.toString

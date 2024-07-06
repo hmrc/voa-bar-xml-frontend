@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,16 @@ import play.api.data.Form
 
 object FormHelpers {
 
-  def getErrorByKey[A](form: Form[_], errorKey: String) = {
+  def getErrorByKey[A](form: Form[_], errorKey: String) =
     form.error(errorKey) match {
-      case None => ""
+      case None        => ""
       case Some(error) => error.message
     }
-  }
 
-  def getAlternativeText(s: Option[String], text: String) = {
-    if(s.isEmpty || s.get.isEmpty) {
+  def getAlternativeText(s: Option[String], text: String) =
+    if (s.isEmpty || s.get.isEmpty) {
       text
     } else {
       s
     }
-  }
 }

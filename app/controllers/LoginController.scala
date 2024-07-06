@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,29 +33,32 @@ import utils.{Navigator, UserAnswers}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class LoginController @Inject()(appConfig: FrontendAppConfig,
-                                override val messagesApi: MessagesApi,
-                                dataCacheConnector: DataCacheConnector,
-                                navigator: Navigator,
-                                getData: DataRetrievalAction,
-                                requireData: DataRequiredAction,
-                                formProvider: LoginFormProvider,
-                                loginConnector: LoginConnector,
-                                controllerComponents: MessagesControllerComponents,
-                                login: views.html.login,
-                                configuration: Configuration
-                               )(implicit ec: ExecutionContext) extends FrontendController(controllerComponents) with I18nSupport with Logging {
+class LoginController @Inject() (
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  dataCacheConnector: DataCacheConnector,
+  navigator: Navigator,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: LoginFormProvider,
+  loginConnector: LoginConnector,
+  controllerComponents: MessagesControllerComponents,
+  login: views.html.login,
+  configuration: Configuration
+)(implicit ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with I18nSupport
+  with Logging {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode) = getData.async {
     implicit request =>
       val preparedForm = request.userAnswers.flatMap(_.login) match {
-        case None => form
-        case Some(value) => {
+        case None        => form
+        case Some(value) =>
           val loginWithBlankedPassword = Login(value.username, "")
           form.fill(loginWithBlankedPassword)
-        }
       }
       dataCacheConnector.remove(request.externalId, VOAAuthorisedId.toString) map {
         result => Ok(login(appConfig, preparedForm, mode))
@@ -71,30 +74,26 @@ class LoginController @Inject()(appConfig: FrontendAppConfig,
           val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.send(encryptedLogin) flatMap {
-              case Success(status) => {
+              case Success(status) =>
                 BillingAuthorities.find(value.username) match {
-                  case Some(councilName) => {
+                  case Some(councilName) =>
                     dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
                       cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
                     }
-                  }
-                  case None => {
+                  case None              =>
                     logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
                     val formWithLoginErrors =
                       form
-                          .withError("username", Messages("error.invalid_username"))
-                          .withError("password", Messages("error.invalid_password"))
+                        .withError("username", Messages("error.invalid_username"))
+                        .withError("password", Messages("error.invalid_password"))
                     Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
-                  }
                 }
-              }
-              case Failure(_) => {
+              case Failure(_)      =>
                 val formWithLoginErrors =
                   form
                     .withError("username", Messages("error.invalid_username"))
                     .withError("password", Messages("error.invalid_password"))
                 Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
-              }
             }
           }
         }

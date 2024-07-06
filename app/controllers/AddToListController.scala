@@ -34,41 +34,41 @@ import models.YesNoForm.*
 
 import scala.util.Try
 
-class AddToListController @Inject()(appConfig: FrontendAppConfig,
-                                    getData: DataRetrievalAction,
-                                    requireData: DataRequiredAction,
-                                    navigator: Navigator,
-                                    dataCacheConnector: DataCacheConnector,
-                                    controllerComponents: MessagesControllerComponents,
-                                    addToList: views.html.add_to_list
-                                  )(implicit ec: ExecutionContext)
-  extends FrontendController(controllerComponents) with I18nSupport {
+class AddToListController @Inject() (
+  appConfig: FrontendAppConfig,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  navigator: Navigator,
+  dataCacheConnector: DataCacheConnector,
+  controllerComponents: MessagesControllerComponents,
+  addToList: views.html.add_to_list
+)(implicit ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
+      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
           case Some(username) => Ok(addToList(Option(username), maybeCr05Submission.get, yesNoForm))
-          case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+          case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }
       }
   }
 
   def addProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
-      yesNoForm.bindFromRequest().fold(
-        formWithErrors => {
-          dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
-            Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))
-          }
+    yesNoForm.bindFromRequest().fold(
+      formWithErrors =>
+        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
+          Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))
         },
-        success => {
-          if (success.value){
-            Future.successful(Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers)))
-          } else {
-            Future.successful(Redirect(routes.TaskListController.onPageLoad))
-          }
+      success =>
+        if (success.value) {
+          Future.successful(Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers)))
+        } else {
+          Future.successful(Redirect(routes.TaskListController.onPageLoad))
         }
-      )
+    )
   }
 
   def removeProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>

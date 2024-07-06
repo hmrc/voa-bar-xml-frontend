@@ -33,21 +33,20 @@ class Cr05SubmissionBuilderWebTell(cr05SubmissionSummary: cr05SubmissionSummary)
     SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
   }
 
-
   def commentsSummaryList(in: Cr05SubmissionBuilder, messages: UniformMessages[Html]): SummaryList =
     SummaryList(
       List(
         SummaryListRow(
           key = Key(HtmlContent(messages("comments.pageLabel")), "govuk-!-width-one-half"),
           value = Value(in.comments.map(Text.apply).getOrElse(HtmlContent(messages("summary.comments.none")))),
-          actions = Some(Actions(items = Seq(
-            ActionItem(controllers.routes.UniformController.addCommentJourney().url,
-              HtmlContent(messages("check-answers.changeLabel"))))
+          actions = Some(Actions(items =
+            Seq(
+              ActionItem(controllers.routes.UniformController.addCommentJourney().url, HtmlContent(messages("check-answers.changeLabel")))
+            )
           ))
         )
       )
     )
-
 
   override def render(in: Cr05SubmissionBuilder, key: String, messages: UniformMessages[Html]): Html =
     cr05SubmissionSummary(in, messages)

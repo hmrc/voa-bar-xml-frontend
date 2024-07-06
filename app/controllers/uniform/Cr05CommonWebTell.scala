@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,22 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
     val baReport = SummaryListRow(
       key = Key(HtmlContent(messages("add-property-ba-report.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baReport)),
-      actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-ba-report").url,
-          HtmlContent(messages("check-answers.changeLabel"))))
+      actions = Some(Actions(items =
+        Seq(
+          ActionItem(
+            controllers.routes.UniformController.addCommonSectionJourney("add-property-ba-report").url,
+            HtmlContent(messages("check-answers.changeLabel"))
+          )
+        )
       ))
     )
-    val baRef = SummaryListRow(
+    val baRef    = SummaryListRow(
       key = Key(HtmlContent(messages("add-property-ba-ref.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baRef)),
-      actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-ba-ref").url,
-          HtmlContent(messages("check-answers.changeLabel"))))
+      actions = Some(Actions(items =
+        Seq(
+          ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-ba-ref").url, HtmlContent(messages("check-answers.changeLabel")))
+        )
       ))
     )
 
@@ -58,21 +63,29 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
     val effectiveDate = SummaryListRow(
       key = Key(HtmlContent(messages("effective-date.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(formatter.format(in.effectiveDate))),
-      actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-effective-date").url,
-          HtmlContent(messages("check-answers.changeLabel"))))
+      actions = Some(Actions(items =
+        Seq(
+          ActionItem(
+            controllers.routes.UniformController.addCommonSectionJourney("add-property-effective-date").url,
+            HtmlContent(messages("check-answers.changeLabel"))
+          )
+        )
       ))
     )
-
 
     val havePlanningRef = SummaryListRow(
       key = Key(HtmlContent(messages("add-property-have-planning-ref.pageLabel")), "govuk-!-width-one-half"),
       value = Value(HtmlContent(
-        if(in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes") else messages("add-property-have-planning-ref.add-property-have-planning-ref.No")
+        if (in.havePlaningReference) messages("add-property-have-planning-ref.add-property-have-planning-ref.Yes")
+        else messages("add-property-have-planning-ref.add-property-have-planning-ref.No")
       )),
-      actions = Some(Actions(items = Seq(
-        ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-have-planning-ref").url,
-          HtmlContent(messages("check-answers.changeLabel"))))
+      actions = Some(Actions(items =
+        Seq(
+          ActionItem(
+            controllers.routes.UniformController.addCommonSectionJourney("add-property-have-planning-ref").url,
+            HtmlContent(messages("check-answers.changeLabel"))
+          )
+        )
       ))
     )
 
@@ -80,9 +93,13 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
       SummaryListRow(
         key = Key(HtmlContent(messages("add-property-planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(Text(planningRef)),
-        actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-have-planning-ref").url,
-            HtmlContent(messages("check-answers.changeLabel"))))
+        actions = Some(Actions(items =
+          Seq(
+            ActionItem(
+              controllers.routes.UniformController.addCommonSectionJourney("add-property-have-planning-ref").url,
+              HtmlContent(messages("check-answers.changeLabel"))
+            )
+          )
         ))
       )
     }
@@ -91,25 +108,29 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
       SummaryListRow(
         key = Key(HtmlContent(messages("add-property-why-no-planning-ref.pageLabel")), "govuk-!-width-one-half"),
         value = Value(HtmlContent(
-          messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$",""))
+          messages("add-property-why-no-planning-ref.add-property-why-no-planning-ref." + noPlanningRef.getClass.getSimpleName.replace("$", ""))
         )),
-        actions = Some(Actions(items = Seq(
-          ActionItem(controllers.routes.UniformController.addCommonSectionJourney("add-property-why-no-planning-ref").url,
-            HtmlContent(messages("check-answers.changeLabel"))))
+        actions = Some(Actions(items =
+          Seq(
+            ActionItem(
+              controllers.routes.UniformController.addCommonSectionJourney("add-property-why-no-planning-ref").url,
+              HtmlContent(messages("check-answers.changeLabel"))
+            )
+          )
         ))
       )
     }
 
     SummaryList(
-        Seq(
-          Option(baReport),
-          Option(baRef),
-          Option(effectiveDate),
-          Option(havePlanningRef),
-          planningRef,
-          noPlanningRef
-
-        ).flatten)
+      Seq(
+        Option(baReport),
+        Option(baRef),
+        Option(effectiveDate),
+        Option(havePlanningRef),
+        planningRef,
+        noPlanningRef
+      ).flatten
+    )
   }
 
   override def render(in: Cr05Common, key: String, messages: UniformMessages[Html]): Html =

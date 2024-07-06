@@ -30,32 +30,33 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-
 @Singleton
-class ReportDeleteController @Inject() ( configuration: Configuration,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         reportStatusConnector: ReportStatusConnector,
-                                         controllerComponents: MessagesControllerComponents,
-                                         val errorTemplate: views.html.error_template,
-                                         getData: DataRetrievalAction
-  )(implicit val ec: ExecutionContext)
-    extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+class ReportDeleteController @Inject() (
+  configuration: Configuration,
+  val dataCacheConnector: DataCacheConnector,
+  reportStatusConnector: ReportStatusConnector,
+  controllerComponents: MessagesControllerComponents,
+  val errorTemplate: views.html.error_template,
+  getData: DataRetrievalAction
+)(implicit val ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with BaseBarController
+  with I18nSupport {
 
   val enabled = configuration.getOptional[String]("feature.delete.enabled").map(x => Try(x.toBoolean).getOrElse(false)).getOrElse(false)
 
   def onPageSubmit: Action[AnyContent] = getData.async { implicit request =>
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
     (for {
-      login <- EitherT(cachedLogin(request.externalId))
+      login        <- EitherT(cachedLogin(request.externalId))
       deleteStatus <- EitherT(reportStatusConnector.deleteByReference(reference, login)(hc))
-    }yield {
-      Ok(
-        s"""Response\n\n
-           |Status code ${deleteStatus.status} \n
-           |body: ${deleteStatus.body}\n
-           |headers: ${deleteStatus.headers.mkString("\n  ", "\n  ", "")}
-           | """.stripMargin)
-    }).valueOr(f => f)
+    } yield Ok(
+      s"""Response\n\n
+         |Status code ${deleteStatus.status} \n
+         |body: ${deleteStatus.body}\n
+         |headers: ${deleteStatus.headers.mkString("\n  ", "\n  ", "")}
+         | """.stripMargin
+    )).valueOr(f => f)
 
   }
 }

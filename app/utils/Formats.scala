@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,29 @@ package utils
 object Formats {
 
   import play.api.libs.json._
-  implicit val uniformDBFormat: Format[Map[List[String],String]] = new Format[Map[List[String],String]] {
+
+  implicit val uniformDBFormat: Format[Map[List[String], String]] = new Format[Map[List[String], String]] {
+
     override def writes(o: Map[List[String], String]): JsValue = {
       val data = o.map { case (key, value) =>
-        (key.mkString("."), JsString(value)) //Todo, maybe better delimiter
+        (key.mkString("."), JsString(value)) // Todo, maybe better delimiter
       }
       JsObject(data)
     }
 
     override def reads(json: JsValue): JsResult[Map[List[String], String]] = json match {
-      case JsObject(data ) => {
+      case JsObject(data) =>
         val dataMap = data.map { case (key, value) =>
           value match {
-            case JsString(stringValue) => {
+            case JsString(stringValue) =>
               (key.split('.').toList, stringValue)
-            }
-            case _ =>  {
-              throw new RuntimeException(s"Unable to deserialize ${value}")
-            }
+            case _                     =>
+              throw new RuntimeException(s"Unable to deserialize $value")
           }
         }.toMap
         JsSuccess(dataMap)
-      }
-      case x => JsError(s"unable to parse : ${x}")
+      case x              => JsError(s"unable to parse : $x")
     }
   }
-
 
 }

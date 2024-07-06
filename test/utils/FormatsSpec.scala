@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,12 @@ import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
 
 class FormatsSpec extends AnyFlatSpec with must.Matchers {
 
-
-  val uniformData: Map[List[String], String] = Map (
+  val uniformData: Map[List[String], String] = Map(
     List("simple", "path") -> "value in simple path",
     List("OneElementPath") -> "value in oneElementPath"
   )
 
-  val jsonData = Json.obj("simple.path" -> "value in simple path",
-    "OneElementPath" -> "value in oneElementPath"
-  )
+  val jsonData = Json.obj("simple.path" -> "value in simple path", "OneElementPath" -> "value in oneElementPath")
 
   "uniformDBFormat" should "write uniform DB data to Json" in {
     Formats.uniformDBFormat.writes(uniformData) mustBe jsonData
@@ -42,7 +39,7 @@ class FormatsSpec extends AnyFlatSpec with must.Matchers {
 
   it should "not read data from json for unsuported format" in {
     val data = JsString("value")
-    Formats.uniformDBFormat.reads(data) mustBe a [JsError]
+    Formats.uniformDBFormat.reads(data) mustBe a[JsError]
   }
 
 }

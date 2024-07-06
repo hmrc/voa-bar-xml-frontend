@@ -27,13 +27,13 @@ class LoginFormProvider @Inject() extends Mappings {
 
   private val maxLen = 100
 
-   def apply(): Form[Login] = Form(
-     mapping(
-      "username" -> text("login.error.username.required")
+  def apply(): Form[Login] = Form(
+    mapping(
+      "username"  -> text("login.error.username.required")
         .verifying(maxLength(maxLen, "login.error.username.length")),
-     "password" -> text("login.error.password.required")
-       .verifying(maxLength(maxLen, "login.error.password.length")),
-     "reference" -> optional(text())
+      "password"  -> text("login.error.password.required")
+        .verifying(maxLength(maxLen, "login.error.password.length")),
+      "reference" -> optional(text())
     )(Login.apply)(o => Some(Tuple.fromProductTyped(o)))
-   )
- }
+  )
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,12 @@ object CacheMap {
 }
 
 class KeyStoreEntryValidationException(
-                                        val key: String,
-                                        val invalidJson: JsValue,
-                                        val readingAs: Class[_],
-                                        val errors: scala.collection.Seq[(JsPath, scala.collection.Seq[JsonValidationError])]
-                                      ) extends Exception {
+  val key: String,
+  val invalidJson: JsValue,
+  val readingAs: Class[_],
+  val errors: scala.collection.Seq[(JsPath, scala.collection.Seq[JsonValidationError])]
+) extends Exception {
+
   override def getMessage: String =
     s"KeyStore entry for key '$key' was '${Json.stringify(invalidJson)}'. Attempt to convert to ${readingAs.getName} gave errors: $errors"
 }

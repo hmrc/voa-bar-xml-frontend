@@ -16,16 +16,14 @@
 
 package controllers
 
-import java.time.LocalDate
 import cats.data.NonEmptyList
 import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
 import journey.UniformJourney.OtherReasonWrapper
 import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
-import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web.*
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
 import ltbs.uniform.*
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios, GovukSummaryList}
@@ -37,17 +35,19 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import views.html.govuk.cr05SubmissionSummary
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext
 
-class AutobarsInterpreter (
-                           results: Results,
-                           messagesApi: play.api.i18n.MessagesApi,
-                           page_chrome: views.html.govuk.pageChrome,
-                           govukInput: GovukInput,
-                           govukRadios: GovukRadios,
-                           govukDateInput: GovukDateInput,
-                           cr05SubmissionSummary: cr05SubmissionSummary
-                         )(implicit ec: ExecutionContext) extends PlayInterpreter[Html](results)
+class AutobarsInterpreter(
+  results: Results,
+  messagesApi: play.api.i18n.MessagesApi,
+  page_chrome: views.html.govuk.pageChrome,
+  govukInput: GovukInput,
+  govukRadios: GovukRadios,
+  govukDateInput: GovukDateInput,
+  cr05SubmissionSummary: cr05SubmissionSummary
+)(implicit ec: ExecutionContext
+) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
   with InferListingPages[Html]
@@ -58,7 +58,7 @@ class AutobarsInterpreter (
   override def messages(request: Request[AnyContent]): UniformMessages[Html] =
     new UniformMessages[Html] {
 
-      //Uniform can't handle when message doesn't exist.
+      // Uniform can't handle when message doesn't exist.
       override def get(key: String, args: Any*): Option[Html] = Option(Html(messagesApi
         .preferred(request)(key, args)))
 
@@ -66,14 +66,15 @@ class AutobarsInterpreter (
     }
 
   override def pageChrome(
-                           key: List[String],
-                           errors: ErrorTree,
-                           tell: Html,
-                           ask: Html,
-                           breadcrumbs: List[String],
-                           request: Request[AnyContent],
-                           messages: UniformMessages[Html],
-                           fieldStats: FormFieldStats): Html = 
+    key: List[String],
+    errors: ErrorTree,
+    tell: Html,
+    ask: Html,
+    breadcrumbs: List[String],
+    request: Request[AnyContent],
+    messages: UniformMessages[Html],
+    fieldStats: FormFieldStats
+  ): Html =
     page_chrome(key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
 
   implicit val ctTaxFormWebTell: Cr01Cr03SubmissionWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
@@ -84,13 +85,16 @@ class AutobarsInterpreter (
 
   implicit val cr05AddPropertyWebTell: Cr05AddPropertyWebTell = new Cr05AddPropertyWebTell(new GovukSummaryList())
 
-  private def doRenderStringField(pageKey: List[String],
-                                  fieldKey: List[String],
-                                  breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                                  data: Input, errors: ErrorTree,
-                                  optional: Boolean,
-                                  messages: UniformMessages[Html]): Html = {
-    import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
+  private def doRenderStringField(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    optional: Boolean,
+    messages: UniformMessages[Html]
+  ): Html = {
+    import uk.gov.hmrc.govukfrontend.views.html.components.Input as GovInput
 
     val errorMessage = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
@@ -98,15 +102,16 @@ class AutobarsInterpreter (
 
     logger.debug(
       s"""
-         |pageKey : ${pageKey}
-         |fieldKey: ${fieldKey}
+         |pageKey : $pageKey
+         |fieldKey: $fieldKey
          |Errors:
          |  ${errors.mkString(" \n")}
          |
          |Value:
          |  ${data.mkString(" \n")}
          |
-         |""".stripMargin)
+         |""".stripMargin
+    )
 
     val hint = if optional then
       Option(Hint(content = Text("(optional)")))
@@ -132,11 +137,14 @@ class AutobarsInterpreter (
 
     override def encode(in: String): Input = Input.one(List(in))
 
-    override def render(pageKey: List[String],
-                        fieldKey: List[String],
-                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree,
-                        messages: UniformMessages[Html]): Html =
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Html =
       doRenderStringField(pageKey, fieldKey, breadcrumbs, data, errors, false, messages)
   }
 
@@ -144,35 +152,49 @@ class AutobarsInterpreter (
 
     override def encode(in: Option[String]): Input = Input.one(List(in.getOrElse("")))
 
-    override def decode(out: Input): Either[ErrorTree, Option[String]] = {
-      out.toStringField().toEither.map(value => if(value == "") None else Option(value))
-    }
+    override def decode(out: Input): Either[ErrorTree, Option[String]] =
+      out.toStringField().toEither.map(value => if (value == "") None else Option(value))
 
-    override def render(pageKey: List[String],
-                        fieldKey: List[String],
-                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree, messages: UniformMessages[Html]): Html =
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Html =
       doRenderStringField(pageKey, fieldKey, breadcrumbs, data, errors, pageKey == fieldKey, messages)
   }
 
   implicit val otherReasonField: FormField[OtherReasonWrapper, Html] = new FormField[OtherReasonWrapper, Html] {
     override def decode(out: Input): Either[ErrorTree, OtherReasonWrapper] = out.toStringField().toEither.map(OtherReasonWrapper.apply)
-    override def encode(in: OtherReasonWrapper): Input = Input.one(List(in.value))
+    override def encode(in: OtherReasonWrapper): Input                     = Input.one(List(in.value))
 
-    override def render(pageKey: List[String],
-                        fieldKey: List[String],
-                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree,
-                        messages: UniformMessages[Html]): Html = doRender(
-      pageKey, fieldKey, breadcrumbs, data, errors, messages)
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Html = doRender(
+      pageKey,
+      fieldKey,
+      breadcrumbs,
+      data,
+      errors,
+      messages
+    )
 
-
-    def doRender(pageKey: List[String],
-                 fieldKey: List[String],
-                 breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                 data: Input, errors: ErrorTree,
-                 messages: UniformMessages[Html]): Html =  {
-      import uk.gov.hmrc.govukfrontend.views.html.components.{Input => GovInput}
+    def doRender(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Html = {
+      import uk.gov.hmrc.govukfrontend.views.html.components.Input as GovInput
 
       val errorMessage = errors.get(NonEmptyList.one(fieldKey))
         .orElse {
@@ -185,15 +207,16 @@ class AutobarsInterpreter (
 
       logger.debug(
         s"""
-           |pageKey : ${pageKey}
-           |fieldKey: ${fieldKey}
+           |pageKey : $pageKey
+           |fieldKey: $fieldKey
            |Errors:
            |  ${errors.mkString(" \n")}
            |
            |Value:
            |  ${data.mkString(" \n")}
            |
-           |""".stripMargin)
+           |""".stripMargin
+      )
 
       val hint = Option(Hint(content = HtmlContent(messages("other-reason.hint"))))
 
@@ -201,7 +224,7 @@ class AutobarsInterpreter (
         id = fieldKey.mkString("_"),
         name = fieldKey.mkString("."),
         label = Label(content = Empty),
-        classes="govuk-input",
+        classes = "govuk-input",
         value = fieldValue,
         errorMessage = errorMessage,
         hint = hint
@@ -210,24 +233,27 @@ class AutobarsInterpreter (
   }
 
   implicit val dateFormField: FormField[LocalDate, Html] = new FormField[LocalDate, Html] {
-    import LocalDateFormFieldEncoding._
+    import LocalDateFormFieldEncoding.*
     val innerConverter = new LocalDateFormFieldEncoding()
 
     override def encode(in: LocalDate): Input = innerConverter.encode(in)
 
     override def decode(out: Input): Either[ErrorTree, LocalDate] = innerConverter.decode(out)
 
-
-    override def render(pageKey: List[String], fieldKey: List[String],
-                        breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                        data: Input, errors: ErrorTree,
-                        messages: UniformMessages[Html]): Html = {
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Html = {
 
       val rootError = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
-      val dayClass = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "day").map(_ => " govuk-input--error")).getOrElse(""))
+      val dayClass   = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "day").map(_ => " govuk-input--error")).getOrElse(""))
       val monthClass = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "month").map(_ => " govuk-input--error")).getOrElse(""))
-      val yearClass = "govuk-input--width-4" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "year").map(_ => " govuk-input--error")).getOrElse(""))
+      val yearClass  = "govuk-input--width-4" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "year").map(_ => " govuk-input--error")).getOrElse(""))
 
       govukDateInput(DateInput(
         id = (pageKey ++ fieldKey).mkString("."),
@@ -242,13 +268,15 @@ class AutobarsInterpreter (
     }
   }
 
-  override def renderProduct[A](pageKey: List[String],
-                                fieldKey: List[String],
-                                path: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                                values: Input,
-                                errors: ErrorTree,
-                                messages: UniformMessages[Html],
-                                pfl: ProductFieldList[A, Html]): Html = {
+  override def renderProduct[A](
+    pageKey: List[String],
+    fieldKey: List[String],
+    path: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    values: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    pfl: ProductFieldList[A, Html]
+  ): Html = {
 
     val htmlList = pfl.inner.map { case (subFieldId, f) =>
       f(pageKey, fieldKey :+ subFieldId, path, values, errors, messages)
@@ -256,17 +284,19 @@ class AutobarsInterpreter (
     HtmlFormat.fill(htmlList)
   }
 
-  override def renderCoproduct[A](pageKey: List[String],
-                                  fieldKey: List[String],
-                                  path: _root_.ltbs.uniform.common.web.Breadcrumbs,
-                                  values: Input,
-                                  errors: ErrorTree,
-                                  messages: UniformMessages[Html],
-                                  cfl: CoproductFieldList[A, Html]): Html = {
+  override def renderCoproduct[A](
+    pageKey: List[String],
+    fieldKey: List[String],
+    path: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    values: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    cfl: CoproductFieldList[A, Html]
+  ): Html = {
 
-    val value = values.valueAtRoot.map(_.mkString)
+    val value           = values.valueAtRoot.map(_.mkString)
     val coproductValues = cfl.inner.map(_._1).toSet
-    val items = if coproductValues == NoPlanningReferenceType.order.toSet then
+    val items           = if coproductValues == NoPlanningReferenceType.order.toSet then
       NoPlanningReferenceType.order
     else if coproductValues == ReasonReportType.order.toSet then
       ReasonReportType.order
@@ -295,14 +325,15 @@ class AutobarsInterpreter (
         name = fieldKey.head,
         errorMessage = errorMessage,
         classes = if coproductValues.size == 2 then "govuk-radios--inline" else ""
-      ))
+      )
+    )
   }
 
   private def renderErrorMessage[A](
-     pageKey: List[String],
-     fieldKey: List[String],
-     errors: ErrorTree,
-     messages: UniformMessages[Html]
+    pageKey: List[String],
+    fieldKey: List[String],
+    errors: ErrorTree,
+    messages: UniformMessages[Html]
   ): Option[ErrorMessage] =
     errors.get(NonEmptyList.one(fieldKey))
       .orElse {

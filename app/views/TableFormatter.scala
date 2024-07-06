@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,26 +25,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class TableFormatter @Inject()(serviceConfig: ServicesConfig) {
+class TableFormatter @Inject() (serviceConfig: ServicesConfig) {
 
-  def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(implicit messages: Messages) = {
+  def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(implicit messages: Messages) =
     s"<a href='${confirmationController.onPageRefresh(reportStatus.id)}'>${formatStatuslink(reportStatus.status)}</a>"
-  }
 
-  def formatStatuslink(value: Option[String])(implicit messages: Messages) : String = value match {
-    case Some("Done") => Messages("confirmation.heading.submitted")
+  def formatStatuslink(value: Option[String])(implicit messages: Messages): String = value match {
+    case Some("Done")      => Messages("confirmation.heading.submitted")
     case Some("Submitted") => Messages("confirmation.heading.submitted")
-    case _ => Messages("confirmation.heading.failed")
+    case _                 => Messages("confirmation.heading.failed")
   }
 
-  def formatRows(reportStatuses: Seq[ReportStatus], confirmationController: ReverseConfirmationController)(implicit messages: Messages) = {
-    reportStatuses.map ( reportStatus =>
-      Seq (
+  def formatRows(reportStatuses: Seq[ReportStatus], confirmationController: ReverseConfirmationController)(implicit messages: Messages) =
+    reportStatuses.map(reportStatus =>
+      Seq(
         TableRow(Text(reportStatus.formattedCreated)),
         TableRow(Text(reportStatus.id.split("-").head)),
         TableRow(Text(reportStatus.filename.getOrElse("Unknown"))),
         TableRow(HtmlContent(formatSummaryLink(reportStatus, confirmationController)))
       )
     )
-  }
 }

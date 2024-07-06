@@ -32,29 +32,31 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UploadConnector @Inject()(http: HttpClient,
-                                val configuration: Configuration,
-                                val servicesConfig: ServicesConfig,
-                                messages: MessagesApi)
-                               (implicit ec: ExecutionContext) extends Logging {
+class UploadConnector @Inject() (
+  http: HttpClient,
+  val configuration: Configuration,
+  val servicesConfig: ServicesConfig,
+  messages: MessagesApi
+)(implicit ec: ExecutionContext
+) extends Logging {
 
   private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
-  private[connectors] val upscanUrl = servicesConfig.baseUrl("upscan")
+  private[connectors] val upscanUrl  = servicesConfig.baseUrl("upscan")
 
-  private[connectors] val baseSegment = "/voa-bar/"
+  private[connectors] val baseSegment          = "/voa-bar/"
   private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
 
   private[connectors] val upScanConfig = configuration.get[Configuration]("microservice.services.upscan")
-  private[connectors] val initiateUrl = s"${upscanUrl}${upScanConfig.get[String]("initiate.url")}"
+  private[connectors] val initiateUrl  = s"$upscanUrl${upScanConfig.get[String]("initiate.url")}"
 
   def generateUsernameHeader(username: String) = ("BA-Code", username)
 
   def generatePasswordHeader(password: String) = ("password", password)
 
   def sendXml(xmlUrl: String, loginDetails: Login, id: String)(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
-    val baCode = loginDetails.username
+    val baCode   = loginDetails.username
     val password = loginDetails.password
-    val headers = Seq(generateUsernameHeader(baCode), generatePasswordHeader(password))
+    val headers  = Seq(generateUsernameHeader(baCode), generatePasswordHeader(password))
 
     val uploadData = VoaBarUpload(id, xmlUrl)
 
@@ -63,9 +65,8 @@ class UploadConnector @Inject()(http: HttpClient,
         response =>
           response.status match {
             case Status.OK => Right(response.body)
-            case status => {
+            case status    =>
               handleSendXmlError(response.body)
-            }
           }
       } recover {
       case e =>
@@ -81,19 +82,17 @@ class UploadConnector @Inject()(http: HttpClient,
     Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
   }
 
-  def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] = {
+  def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] =
     http.POST[InitiateRequest, InitiateResponse](initiateUrl, request, Seq.empty)
-      .map{ initiateResponse =>
-        logger.debug(s"Upscan initiate response : ${initiateResponse}")
+      .map { initiateResponse =>
+        logger.debug(s"Upscan initiate response : $initiateResponse")
         initiateResponse
       }.map(Right(_))
       .recover {
-        case ex: Throwable => {
+        case ex: Throwable =>
           val errorMessage = "Failed to get UpScan file upload details"
           logger.error(errorMessage, ex)
           Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
-        }
       }
-  }
 
 }

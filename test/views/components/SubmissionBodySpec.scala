@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import views.html.components.submission_body
 class SubmissionBodySpec extends ViewBehaviours {
 
   val submissionId = "SId9324832"
-  val baCode = "baCode"
+  val baCode       = "baCode"
   val reportStatus = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
   def submission = () => submission_body(reportStatus)(messages)

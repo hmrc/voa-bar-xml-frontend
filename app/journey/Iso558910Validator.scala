@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,10 @@ class Iso558910Validator extends Rule[String] {
 
   override def apply(v1: String): Validated[ErrorTree, String] = {
     val encoder = Iso558910Validator.isoCharser.newEncoder()
-    if(v1.toCharArray.find(x => !encoder.canEncode(x)).isEmpty) {
+    if (v1.toCharArray.find(x => !encoder.canEncode(x)).isEmpty) {
       Validated.valid(v1)
     } else {
       Validated.invalid(ErrorTree.oneErr(ErrorMsg("error.invalidIsoString")))
     }
   }
 }
-
-

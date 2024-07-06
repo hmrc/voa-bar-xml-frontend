@@ -23,17 +23,17 @@ import views.html.session_timeout
 
 import javax.inject.Inject
 
-
-class TimeoutController @Inject()(
-    controllerComponents: MessagesControllerComponents,
-    sessionTimeout: session_timeout) extends FrontendController(controllerComponents)  {
+class TimeoutController @Inject() (
+  controllerComponents: MessagesControllerComponents,
+  sessionTimeout: session_timeout
+) extends FrontendController(controllerComponents) {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(sessionTimeout())
   }
 
   def timeout: Action[AnyContent] = Action { _ =>
-     Redirect(routes.LoginController.onPageLoad(NormalMode)).withNewSession
+    Redirect(routes.LoginController.onPageLoad(NormalMode)).withNewSession
   }
 
 }

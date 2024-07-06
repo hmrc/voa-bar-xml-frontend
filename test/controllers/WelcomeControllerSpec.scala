@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import utils.FakeNavigator
 import views.ViewSpecBase
 import scala.concurrent.ExecutionContext
 
-class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   val username = "AUser"
 
@@ -35,23 +35,39 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase  {
 
   def welcome = app.injector.instanceOf[views.html.welcome]
 
-  def ec = app.injector.instanceOf[ExecutionContext]
+  def ec                   = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val configuration =  Configuration("feature.cr05.enabled" -> cr05FeatureFlag)
+  val configuration        = Configuration("feature.cr05.enabled" -> cr05FeatureFlag)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new WelcomeController(frontendAppConfig, configuration, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
+    new WelcomeController(
+      frontendAppConfig,
+      configuration,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      welcome
+    )(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new WelcomeController(frontendAppConfig, configuration,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
+    new WelcomeController(
+      frontendAppConfig,
+      configuration,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      welcome
+    )(ec)
   }
 
   def viewAsString() = welcome(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString

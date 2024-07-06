@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,16 @@ import scala.concurrent.ExecutionContext
  * @author Yuriy Tumakha
  */
 @Singleton
-class AuditService @Inject()(val auditingConfig: AuditingConfig,
-                             val auditChannel: AuditChannel,
-                             val datastreamMetrics: DatastreamMetrics
-                            )(implicit val ec: ExecutionContext) extends AuditConnector {
+class AuditService @Inject() (
+  val auditingConfig: AuditingConfig,
+  val auditChannel: AuditChannel,
+  val datastreamMetrics: DatastreamMetrics
+)(implicit val ec: ExecutionContext
+) extends AuditConnector {
 
   def sendFeedback(form: FeedbackForm)(implicit hc: HeaderCarrier): Unit = {
     val auditType = if (form.afterSubmission) "SurveySatisfaction" else "SurveyFeedback"
-    val event = FeedbackAuditEvent(form.rating, form.comments, form.afterSubmission, form.submissionId)
+    val event     = FeedbackAuditEvent(form.rating, form.comments, form.afterSubmission, form.submissionId)
 
     sendExplicitAudit(auditType, event)
   }

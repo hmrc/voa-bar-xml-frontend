@@ -30,25 +30,26 @@ import utils.Navigator
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class WelcomeController @Inject()(appConfig: FrontendAppConfig,
-                                  config: Configuration,
-                                  getData: DataRetrievalAction,
-                                  requireData: DataRequiredAction,
-                                  navigator: Navigator,
-                                  dataCacheConnector: DataCacheConnector,
-                                  controllerComponents: MessagesControllerComponents,
-                                  welcome: views.html.welcome
-                                 ) (implicit ec: ExecutionContext)
-  extends FrontendController(controllerComponents) with I18nSupport {
+class WelcomeController @Inject() (
+  appConfig: FrontendAppConfig,
+  config: Configuration,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  navigator: Navigator,
+  dataCacheConnector: DataCacheConnector,
+  controllerComponents: MessagesControllerComponents,
+  welcome: views.html.welcome
+)(implicit ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
   private val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
-
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
         case Some(username) => Ok(welcome(appConfig, username, cr05FeatureEnabled))
-        case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+        case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
 

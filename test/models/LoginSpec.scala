@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package models
 
 import base.SpecBase
 import play.api.Configuration
-import uk.gov.hmrc.crypto.{ApplicationCrypto,Crypted}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted}
 
 class LoginSpec extends SpecBase {
 
   val configuration = injector.instanceOf[Configuration]
-  val username = "user"
-  val password = "pass"
+  val username      = "user"
+  val password      = "pass"
 
   "Given an username and password produce a login model containing plain text password" in {
     val result = Login(username, password)
@@ -34,8 +34,8 @@ class LoginSpec extends SpecBase {
   }
 
   "Given an username and password, the encrypt method should return an encryted Login model" in {
-     lazy val crypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
-     val result = Login(username, password).encrypt(configuration)
+    lazy val crypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
+    val result      = Login(username, password).encrypt(configuration)
 
     result.username mustBe username
     password mustBe crypto.decrypt(Crypted(result.password)).value

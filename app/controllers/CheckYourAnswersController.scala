@@ -25,17 +25,19 @@ import config.FrontendAppConfig
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-class CheckYourAnswersController @Inject()(appConfig: FrontendAppConfig,
-                                           override val messagesApi: MessagesApi,
-                                           getData: DataRetrievalAction,
-                                           requireData: DataRequiredAction,
-                                           checkYourAnswer: check_your_answers,
-                                           controllerComponents: MessagesControllerComponents
-                                          ) extends FrontendController(controllerComponents) with I18nSupport {
+class CheckYourAnswersController @Inject() (
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  checkYourAnswer: check_your_answers,
+  controllerComponents: MessagesControllerComponents
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (getData andThen requireData) { implicit request =>
-      val sections = Seq(AnswerSection(None, Seq()))
-      Ok(checkYourAnswer(appConfig, sections))
+    val sections = Seq(AnswerSection(None, Seq()))
+    Ok(checkYourAnswer(appConfig, sections))
   }
 
 }

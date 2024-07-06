@@ -20,5 +20,3 @@ sealed trait YesNoType
 
 case object Yes extends YesNoType
 case object No extends YesNoType
-
-

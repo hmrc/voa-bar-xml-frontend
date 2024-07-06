@@ -24,11 +24,11 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 
-
 sealed trait ReportStatusType {
+
   val value: String = {
     val a: Class[_ <: ReportStatusType] = getClass.asSubclass(getClass)
-    val u: String = a.getSimpleName.replace("$", "")
+    val u: String                       = a.getSimpleName.replace("$", "")
     u
   }
 }
@@ -41,7 +41,6 @@ case object Submitted extends ReportStatusType
 case object Cancelled extends ReportStatusType
 case object Done extends ReportStatusType
 
-
 case class ReportErrorDetail(errorCode: String, values: Seq[String] = Seq.empty[String])
 
 object ReportErrorDetail {
@@ -49,16 +48,11 @@ object ReportErrorDetail {
 
 }
 
-case class ReportError(reportNumber: Option[String],
-                       baTransaction: Option[String],
-                       uprn: Seq[Long],
-                       errors: Seq[ReportErrorDetail]
-                      )
+case class ReportError(reportNumber: Option[String], baTransaction: Option[String], uprn: Seq[Long], errors: Seq[ReportErrorDetail])
 
 object ReportError {
   implicit val format: OFormat[ReportError] = Json.format[ReportError]
 }
-
 
 object ReportStatus {
 
@@ -77,20 +71,20 @@ object ReportStatus {
 }
 
 final case class ReportStatus(
-                               id: String,
-                               // TODO: After 1 April 2023 remove property 'created' as only 'createdAt' is used
-                               created: Option[ZonedDateTime] = None,
-                               url: Option[String] = None,
-                               checksum: Option[String] = None,
-                               errors: Seq[Error] = Seq(),
-                               reportErrors: Seq[ReportError] = Seq(),
-                               baCode: Option[String] = None,
-                               status: Option[String] = Some(Pending.value),
-                               filename: Option[String] = None,
-                               totalReports: Option[Int] = None,
-                               report: Option[JsObject] = None,
-                               createdAt: Instant = Instant.now
-                             ){
+  id: String,
+  // TODO: After 1 April 2023 remove property 'created' as only 'createdAt' is used
+  created: Option[ZonedDateTime] = None,
+  url: Option[String] = None,
+  checksum: Option[String] = None,
+  errors: Seq[Error] = Seq(),
+  reportErrors: Seq[ReportError] = Seq(),
+  baCode: Option[String] = None,
+  status: Option[String] = Some(Pending.value),
+  filename: Option[String] = None,
+  totalReports: Option[Int] = None,
+  report: Option[JsObject] = None,
+  createdAt: Instant = Instant.now
+) {
 
   def formattedCreated: String = createdAtFormatted(createdDateUIFormat)
 

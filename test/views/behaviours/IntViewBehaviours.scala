@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,7 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
 
   val number = 123
 
-  def intPage(createView: (Form[Int]) => HtmlFormat.Appendable,
-              messageKeyPrefix: String,
-              expectedFormAction: String) = {
-
+  def intPage(createView: (Form[Int]) => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String) =
     "behave like a page with an integer value field" when {
       "rendered" must {
 
@@ -56,11 +53,10 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
         }
 
         "show an error in the value field's label" in {
-          val doc = asDocument(createView(form.withError(error)))
+          val doc       = asDocument(createView(form.withError(error)))
           val errorSpan = doc.getElementsByClass("error-notification").first
           errorSpan.text mustBe messages(errorMessage)
         }
       }
     }
-  }
 }

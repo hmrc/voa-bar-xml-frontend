@@ -12,6 +12,3 @@ addSbtPlugin("ch.epfl.scala"       % "sbt-scalafix"       % "0.12.1")
 addSbtPlugin("io.github.irundaia"  % "sbt-sassify"        % "1.5.2")
 addSbtPlugin("net.ground5hark.sbt" % "sbt-concat"         % "0.2.0")
 addSbtPlugin("com.typesafe.sbt"    % "sbt-digest"         % "1.1.4")
-
-// TODO: Remove scalastyle
-addSbtPlugin("org.scalastyle" % "scalastyle-sbt-plugin" % "1.0.0" exclude("org.scala-lang.modules", "scala-xml_2.12"))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@ import cats.data.Validated
 import ltbs.uniform.ErrorTree
 import ltbs.uniform.validation.Rule
 
-class PhoneNumberValidator extends Rule[String]{
+class PhoneNumberValidator extends Rule[String] {
   import PhoneNumberValidator._
-
 
   val validationRegex = """[0-9 \-]{1,20}"""
 

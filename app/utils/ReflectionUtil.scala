@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package models.requests
+package utils
 
-import play.api.mvc.{Request, WrappedRequest}
-import utils.UserAnswers
+import scala.compiletime.summonAll
+import scala.deriving.Mirror
 
-case class OptionalDataRequest[A](request: Request[A], externalId: String, userAnswers: Option[UserAnswers]) extends WrappedRequest[A](request)
+/**
+ * @author Yuriy Tumakha
+ */
+object ReflectionUtil {
 
-case class DataRequest[A](request: Request[A], externalId: String, userAnswers: UserAnswers) extends WrappedRequest[A](request)
+  inline def findAllSubTypeNames[A](using m: Mirror.SumOf[A]): Seq[String] =
+    findAllSubTypes.map(_.getClass.getSimpleName.stripSuffix("$"))
+
+  inline def findAllSubTypes[A](using m: Mirror.SumOf[A]): Seq[A] =
+    summonAll[Tuple.Map[m.MirroredElemTypes, ValueOf]]
+      .productIterator
+      .map {
+        case v: ValueOf[A @unchecked] => v.value
+      }.toSeq
+
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,24 @@
 
 package connectors
 
-import java.io.{File, PrintWriter}
 import base.SpecBase
-import models.UpScanRequests._
-import models._
-import org.mockito.captor.ArgCaptor
-import org.mockito.scalatest.MockitoSugar
+import models.*
+import models.UpScanRequests.*
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.matchers.must
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
-import play.api.libs.json._
-import play.api.test.Helpers._
+import play.api.libs.json.*
+import play.api.test.Helpers.*
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
 
+import java.io.{File, PrintWriter}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,7 +42,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
   implicit def hc: HeaderCarrier = HeaderCarrier()
 
   def configuration = injector.instanceOf[Configuration]
-  def environment = injector.instanceOf[Environment]
+  def environment   = injector.instanceOf[Environment]
 
   def file = File.createTempFile("foo", "bar")
   def path = new PrintWriter(file) { write("<xml />"); close }
@@ -50,26 +51,30 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
 
   def tempFile: TemporaryFile = tempCreator.create(file.toPath)
 
-  val upScanConfigPath = "microservice.services.upscan"
-  val upScanConfig = configuration.get[Configuration](upScanConfigPath)
+  val upScanConfigPath      = "microservice.services.upscan"
+  val upScanConfig          = configuration.get[Configuration](upScanConfigPath)
   val upScanCallBackUrlPath = "callback-url"
-  val upScanCallBackUrl = upScanConfig.get[String](upScanCallBackUrlPath)
-  val maximumFileSizePath = "max-file-size"
-  val maximumFileSize = upScanConfig.get[Int](maximumFileSizePath)
+  val upScanCallBackUrl     = upScanConfig.get[String](upScanCallBackUrlPath)
+  val maximumFileSizePath   = "max-file-size"
+  val maximumFileSize       = upScanConfig.get[Int](maximumFileSizePath)
 
   def servicesConfig = injector.instanceOf[ServicesConfig]
 
-  val xmlUrl = "http://localhost:59145"
-  val username = "user"
-  val password = "pass"
+  val xmlUrl     = "http://localhost:59145"
+  val username   = "user"
+  val password   = "pass"
   lazy val login = Login(username, password).encrypt(configuration)
 
   val submissionId = "SId3824832"
 
   def getHttpMock(returnedStatus: Int, returnedString: Option[String]) = {
     val httpMock = mock[HttpClient]
-    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(any[Writes[JsValue]], any[HttpReads[Any]],
-      any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(HttpResponse(returnedStatus, returnedString.getOrElse("")))
+    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
+      any[Writes[JsValue]],
+      any[HttpReads[Any]],
+      any[HeaderCarrier],
+      any[ExecutionContext]
+    )) thenReturn Future.successful(HttpResponse(returnedStatus, returnedString.getOrElse("")))
     httpMock
   }
 
@@ -78,61 +83,69 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
     "provided with an encrypted Login Input and some xml content" must {
 
       "call the Microservice with the given xml and login details" in {
-        implicit val headerCarrierNapper = ArgCaptor[HeaderCarrier]
-        implicit val httpReadsNapper = ArgCaptor[HttpReads[Any]]
-        val messagesApi = injector.instanceOf[MessagesApi]
-        val urlCaptor = ArgCaptor[String]
-        val bodyCaptor = ArgCaptor[VoaBarUpload]
-        val headersCaptor = ArgCaptor[Seq[(String, String)]]
-        val httpMock = getHttpMock(Status.OK, Some(submissionId))
+        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+        implicit val httpReadsNapper     = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
+        val messagesApi                  = injector.instanceOf[MessagesApi]
+        val urlCaptor                    = ArgumentCaptor.forClass(classOf[String])
+        val bodyCaptor                   = ArgumentCaptor.forClass(classOf[VoaBarUpload])
+        val headersCaptor                = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
+        val httpMock                     = getHttpMock(Status.OK, Some(submissionId))
 
-        val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
+        val connector  = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
         val userHeader = connector.generateUsernameHeader(username)
         val passHeader = connector.generatePasswordHeader(login.password)
 
         await(connector.sendXml(xmlUrl, login, submissionId))
         verify(httpMock)
-          .POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(any[Writes[VoaBarUpload]], httpReadsNapper.capture,  headerCarrierNapper.capture,
-            any[ExecutionContext])
-        urlCaptor.value must endWith(s"${connector.baseSegment}upload")
-        bodyCaptor.value mustBe VoaBarUpload(submissionId, xmlUrl)
-        headersCaptor.value mustBe Seq(userHeader, passHeader)
+          .POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
+            any[Writes[VoaBarUpload]],
+            httpReadsNapper.capture,
+            headerCarrierNapper.capture,
+            any[ExecutionContext]
+          )
+        urlCaptor.getValue must endWith(s"${connector.baseSegment}upload")
+        bodyCaptor.getValue mustBe VoaBarUpload(submissionId, xmlUrl)
+        headersCaptor.getValue mustBe Seq(userHeader, passHeader)
       }
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val connector = new UploadConnector(getHttpMock(Status.OK, Some(submissionId)), configuration, servicesConfig, messagesApi)
-        val result = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
         result match {
           case Right(submissionValue) => submissionValue mustBe submissionId
-          case Left(e) => assert(false)
+          case Left(e)                => assert(false)
         }
       }
 
       "return a failure representing the error when send method fails" in {
         val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR, None), configuration, servicesConfig, messagesApi)
-        val result = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
         assert(result.isLeft)
       }
 
       "return a failure if the upload call throws an exception" in {
-        val httpMock = mock[HttpClient]
-        when(httpMock.POST(any[String], any[VoaBarUpload], any[Seq[(String, String)]])(any[Writes[VoaBarUpload]], any[HttpReads[Any]],
-          any[HeaderCarrier], any[ExecutionContext])) thenReturn Future.successful(new RuntimeException)
+        val httpMock  = mock[HttpClient]
+        when(httpMock.POST(any[String], any[VoaBarUpload], any[Seq[(String, String)]])(
+          any[Writes[VoaBarUpload]],
+          any[HttpReads[Any]],
+          any[HeaderCarrier],
+          any[ExecutionContext]
+        )) thenReturn Future.successful(new RuntimeException)
         val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
-        val result = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
         assert(result.isLeft)
       }
     }
 
     "provided with the proper file restrictions" must {
       "call UpScan initiate endpoint" in {
-        implicit val headerCarrierNapper = ArgCaptor[HeaderCarrier]
-        implicit val httpReadsNapper = ArgCaptor[HttpReads[InitiateResponse]]
-        implicit val jsonWritesNapper = ArgCaptor[Writes[InitiateRequest]]
-        val reference = "11370e18-6e24-453e-b45a-76d3e32ea33d"
-        val initiateRequest = InitiateRequest(upScanCallBackUrl, maximumFileSize)
-        val uploadUrl = "http://upload.url"
-        val initiateResponse = InitiateResponse(
+        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+        implicit val httpReadsNapper     = ArgumentCaptor.forClass(classOf[HttpReads[InitiateResponse]])
+        implicit val jsonWritesNapper    = ArgumentCaptor.forClass(classOf[Writes[InitiateRequest]])
+        val reference                    = "11370e18-6e24-453e-b45a-76d3e32ea33d"
+        val initiateRequest              = InitiateRequest(upScanCallBackUrl, maximumFileSize)
+        val uploadUrl                    = "http://upload.url"
+        val initiateResponse             = InitiateResponse(
           reference = reference,
           uploadRequest = UploadRequest(
             href = uploadUrl,
@@ -151,17 +164,26 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
             )
           )
         )
-        val httpMock = mock[HttpClient]
-        when(httpMock.POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])
-          (jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any[ExecutionContext])) thenReturn Future.successful(initiateResponse)
-        val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
+        val httpMock                     = mock[HttpClient]
+        when(httpMock.POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(
+          jsonWritesNapper.capture,
+          httpReadsNapper.capture,
+          headerCarrierNapper.capture,
+          any[ExecutionContext]
+        )) thenReturn Future.successful(initiateResponse)
+        val connector                    = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
 
         val response = await(connector.initiate(initiateRequest))
 
         assert(response.isRight)
         response.map(_.reference mustBe reference)
         verify(httpMock, times(1))
-          .POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(jsonWritesNapper.capture, httpReadsNapper.capture, headerCarrierNapper.capture, any[ExecutionContext])
+          .POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(
+            jsonWritesNapper.capture,
+            httpReadsNapper.capture,
+            headerCarrierNapper.capture,
+            any[ExecutionContext]
+          )
       }
     }
   }

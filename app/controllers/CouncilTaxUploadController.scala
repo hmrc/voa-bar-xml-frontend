@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,106 +16,106 @@
 
 package controllers
 
-import java.util.Locale
-import javax.inject.Inject
+import cats.data.EitherT
+import cats.implicits.*
 import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
-import controllers.actions._
+import controllers.actions.*
 import forms.FileUploadDataFormProvider
-import models.{Error, Failed, Login, ReportStatus, ReportStatusType, UserReportUpload}
-import cats.data.EitherT
-import cats.implicits._
-import models.UpScanRequests._
+import models.UpScanRequests.*
 import models.requests.OptionalDataRequest
-import play.api.{Configuration, Logger}
+import models.{Error, Failed, Login, ReportStatus, ReportStatusType, UserReportUpload}
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.libs.json.{JsSuccess, JsValue}
-import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import play.api.mvc.*
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.Navigator
 
+import java.util.Locale
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CouncilTaxUploadController @Inject()(configuration: Configuration,
-                                            appConfig: FrontendAppConfig,
-                                           override val messagesApi: MessagesApi,
-                                           getData: DataRetrievalAction,
-                                           requireData: DataRequiredAction,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           formProvider: FileUploadDataFormProvider,
-                                           navigator: Navigator,
-                                           uploadConnector: UploadConnector,
-                                           councilTaxUpload: views.html.councilTaxUpload,
-                                           val errorTemplate: views.html.error_template,
-                                           userReportUploadsConnector: UserReportUploadsConnector,
-                                           reportStatusConnector: ReportStatusConnector,
-                                           controllerComponents: MessagesControllerComponents)
-                                          (implicit val ec: ExecutionContext)
-  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+class CouncilTaxUploadController @Inject() (
+  configuration: Configuration,
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val dataCacheConnector: DataCacheConnector,
+  formProvider: FileUploadDataFormProvider,
+  navigator: Navigator,
+  uploadConnector: UploadConnector,
+  councilTaxUpload: views.html.councilTaxUpload,
+  val errorTemplate: views.html.error_template,
+  userReportUploadsConnector: UserReportUploadsConnector,
+  reportStatusConnector: ReportStatusConnector,
+  controllerComponents: MessagesControllerComponents
+)(implicit val ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with BaseBarController
+  with I18nSupport {
 
   val log = Logger(this.getClass)
 
   implicit val lang: Lang = Lang(Locale.UK)
 
   private[controllers] val form = formProvider()
+
   private[controllers] val maxFileSize = configuration
     .get[Int]("microservice.services.upscan.max-file-size")
+
   private[controllers] val callBackUrl = configuration
     .get[String]("microservice.services.upscan.callback-url")
 
-  private[controllers] def fileUploadDetails(username: String, password: String)
-                                            (implicit request: OptionalDataRequest[_]): Future[Either[Result, InitiateResponse]] = {
+  private[controllers] def fileUploadDetails(username: String, password: String)(implicit request: OptionalDataRequest[_])
+    : Future[Either[Result, InitiateResponse]] = {
     val initiateRequest = InitiateRequest(s"$callBackUrl/$username", maxFileSize)
-    val errorResult = Left(BadRequest(councilTaxUpload(username, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
+    val errorResult     = Left(BadRequest(councilTaxUpload(username, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
     (for {
       uploadResponse <- EitherT(uploadConnector.initiate(initiateRequest))
-      _ <- EitherT(userReportUploadsConnector.save(UserReportUpload(uploadResponse.reference, username, password)))
+      _              <- EitherT(userReportUploadsConnector.save(UserReportUpload(uploadResponse.reference, username, password)))
     } yield Right(uploadResponse))
       .valueOr(_ => errorResult)
   }
 
-  private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)
-                                   (implicit request: OptionalDataRequest[_]): Future[Result] = {
+  private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)(implicit request: OptionalDataRequest[_]): Future[Result] =
     (for {
-      login <- EitherT(cachedLogin(request.externalId))
+      login            <- EitherT(cachedLogin(request.externalId))
       initiateResponse <- EitherT(fileUploadDetails(login.username, login.password))
     } yield expectedPage(login.username, initiateResponse))
       .valueOr(fallBackPage => fallBackPage)
-  }
 
-  private[controllers] def parseError(request: Request[JsValue]): Either[Result, Error] = {
+  private[controllers] def parseError(request: Request[JsValue]): Either[Result, Error] =
     request.body.validate[Error] match {
-      case error: JsSuccess[Error] => Right(error.get)
-      case _ => {
+      case JsSuccess(error, _) => Right(error)
+      case _                   =>
         val errorMsg = s"Couldn't parse: \n${request.body}"
         log.warn(errorMsg)
         Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[_]])))
-      }
     }
-  }
 
-  def onPageLoad(showEmptyError: Boolean) = getData.async {
-    implicit request => {
-      val formWithError =
-       if (showEmptyError) {
-         form
-           .withError("file", messagesApi("error.file.empty"))
-       } else {
-         form
-       }
+  def onPageLoad(showEmptyError: Boolean): Action[AnyContent] = getData.async {
+    implicit request =>
+      val formWithError                                                  =
+        if (showEmptyError) {
+          form
+            .withError("file", messagesApi("error.file.empty"))
+        } else {
+          form
+        }
       def okResult(username: String, initiateResponse: InitiateResponse) =
         Ok(councilTaxUpload(username, formWithError, Some(initiateResponse)))
       loadPage(okResult)
-    }
   }
 
   private def saveReportStatus(
-                                reference: String,
-                                login: Login,
-                                errors: Seq[Error],
-                                status: ReportStatusType
-                              )
-                              (implicit request: Request[_]): Future[Either[Error, Unit]] = {
+    reference: String,
+    login: Login,
+    errors: Seq[Error],
+    status: ReportStatusType
+  )(implicit request: Request[_]
+  ): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       reference,
       status = Some(status.value),
@@ -129,40 +129,39 @@ class CouncilTaxUploadController @Inject()(configuration: Configuration,
     login: Login,
     errors: Seq[Error],
     status: ReportStatusType
-  )(implicit request: Request[_]): Future[Either[Result, Unit]] = {
-      saveReportStatus(reference, login, errors, status).map(_.fold(
-        _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
-        _ => Right(())
-      ))
-  }
+  )(implicit request: Request[_]
+  ): Future[Either[Result, Unit]] =
+    saveReportStatus(reference, login, errors, status).map(_.fold(
+      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
+      _ => Right(())
+    ))
 
-  def onError(reference: String) = getData.async(parse.tolerantJson) {
+  def onError(reference: String): Action[JsValue] = getData.async(parse.tolerantJson) {
     implicit request =>
       log.warn(s"Unable to upload XML, error detail: ${request.body}")
       (for {
         error <- EitherT(Future.successful(parseError(request)))
         login <- EitherT(cachedLogin(request.externalId))
-        _ <- EitherT(saveReportStatusResult(reference, login, Seq(error), Failed))
+        _     <- EitherT(saveReportStatusResult(reference, login, Seq(error), Failed))
       } yield NoContent)
-        .valueOr(_ => {
+        .valueOr { _ =>
           InternalServerError
-        })
+        }
   }
 
-  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit]] = {
+  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit]] =
     reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(
         _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
         _ => Right(())
       ))
-  }
 
-  def onPrepareUpload(reference: String) = getData.async {
+  def onPrepareUpload(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login <- EitherT(cachedLogin(request.externalId))
-        _ <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
-        _ <- EitherT(saveReportStatus(login, reference))
+        _     <- EitherT(saveLogin(request.externalId, login.copy(reference = Some(reference))))
+        _     <- EitherT(saveReportStatus(login, reference))
       } yield NoContent)
         .valueOr(failPage => failPage)
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
 
   def createViewUsingForm = (form: Form[Login]) => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
 
-
   "Login view" must {
 
     behave like normalPage(createView, messageKeyPrefix)
@@ -42,7 +41,7 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
     behave like pageWithTextFields(createViewUsingForm, messageKeyPrefix, routes.LoginController.onSubmit(NormalMode).url, "username", "password")
 
     "contain Login button with the value Login" in {
-      val doc = asDocument(createViewUsingForm(form))
+      val doc         = asDocument(createViewUsingForm(form))
       val loginButton = doc.getElementById("submit").text()
       assert(loginButton == messages("site.login"))
     }

@@ -23,11 +23,12 @@ import play.api.i18n.Lang
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
-class LanguageSwitchController @Inject() ( languageUtils: LanguageUtils,
-                                           configuration: Configuration,
-                                           appConfig: FrontendAppConfig,
-                                           controllerComponents: MessagesControllerComponents
-                                         ) extends LanguageController(languageUtils, controllerComponents) {
+class LanguageSwitchController @Inject() (
+  languageUtils: LanguageUtils,
+  configuration: Configuration,
+  appConfig: FrontendAppConfig,
+  controllerComponents: MessagesControllerComponents
+) extends LanguageController(languageUtils, controllerComponents) {
 
   override protected def fallbackURL: String = routes.WelcomeController.onPageLoad.url
 
