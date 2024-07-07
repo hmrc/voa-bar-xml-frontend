@@ -24,7 +24,7 @@ import play.api.libs.json._
 @Singleton
 class CascadeUpsert {
 
-  val funcMap: Map[String, (JsValue, CacheMap) => CacheMap] =
+  private val funcMap: Map[String, (JsValue, CacheMap) => CacheMap] =
     Map()
 
   def apply[A](key: String, value: A, originalCacheMap: CacheMap)(implicit fmt: Format[A]): CacheMap =
@@ -32,10 +32,10 @@ class CascadeUpsert {
 
   def addRepeatedValue[A](key: String, value: A, originalCacheMap: CacheMap)(implicit fmt: Format[A]): CacheMap = {
     val values = originalCacheMap.getEntry[Seq[A]](key).getOrElse(Seq()) :+ value
-    originalCacheMap copy (data = originalCacheMap.data + (key -> Json.toJson(values)))
+    originalCacheMap.copy(data = originalCacheMap.data + (key -> Json.toJson(values)))
   }
 
   private def store[A](key: String, value: A, cacheMap: CacheMap)(implicit fmt: Format[A]) =
-    cacheMap copy (data = cacheMap.data + (key -> Json.toJson(value)))
+    cacheMap.copy(data = cacheMap.data + (key -> Json.toJson(value)))
 
 }

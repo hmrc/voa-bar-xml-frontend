@@ -27,7 +27,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 sealed trait ReportStatusType {
 
   val value: String = {
-    val a: Class[_ <: ReportStatusType] = getClass.asSubclass(getClass)
+    val a: Class[? <: ReportStatusType] = getClass.asSubclass(getClass)
     val u: String                       = a.getSimpleName.replace("$", "")
     u
   }

@@ -39,7 +39,7 @@
     baCode: String,
     report: ReportStatus,
     crSubmission: Option[CrSubmission],
-)(implicit request: Request[_], messages: Messages)
+)(implicit request: Request[?], messages: Messages)
 
 @mainTemplate(
     pageTitle = report.title(messages),

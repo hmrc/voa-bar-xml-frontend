@@ -68,7 +68,7 @@ class CouncilTaxUploadController @Inject() (
   private[controllers] val callBackUrl = configuration
     .get[String]("microservice.services.upscan.callback-url")
 
-  private[controllers] def fileUploadDetails(username: String, password: String)(implicit request: OptionalDataRequest[_])
+  private[controllers] def fileUploadDetails(username: String, password: String)(implicit request: OptionalDataRequest[?])
     : Future[Either[Result, InitiateResponse]] = {
     val initiateRequest = InitiateRequest(s"$callBackUrl/$username", maxFileSize)
     val errorResult     = Left(BadRequest(councilTaxUpload(username, form.withGlobalError(messagesApi("councilTaxUpload.error.fileUploadService")))))
@@ -79,7 +79,7 @@ class CouncilTaxUploadController @Inject() (
       .valueOr(_ => errorResult)
   }
 
-  private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)(implicit request: OptionalDataRequest[_]): Future[Result] =
+  private[controllers] def loadPage(expectedPage: (String, InitiateResponse) => Result)(implicit request: OptionalDataRequest[?]): Future[Result] =
     (for {
       login            <- EitherT(cachedLogin(request.externalId))
       initiateResponse <- EitherT(fileUploadDetails(login.username, login.password))
@@ -92,7 +92,7 @@ class CouncilTaxUploadController @Inject() (
       case _                   =>
         val errorMsg = s"Couldn't parse: \n${request.body}"
         log.warn(errorMsg)
-        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[_]])))
+        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[?]])))
     }
 
   def onPageLoad(showEmptyError: Boolean): Action[AnyContent] = getData.async {
@@ -114,7 +114,7 @@ class CouncilTaxUploadController @Inject() (
     login: Login,
     errors: Seq[Error],
     status: ReportStatusType
-  )(implicit request: Request[_]
+  )(implicit request: Request[?]
   ): Future[Either[Error, Unit]] = {
     val reportStatus = ReportStatus(
       reference,
@@ -129,7 +129,7 @@ class CouncilTaxUploadController @Inject() (
     login: Login,
     errors: Seq[Error],
     status: ReportStatusType
-  )(implicit request: Request[_]
+  )(implicit request: Request[?]
   ): Future[Either[Result, Unit]] =
     saveReportStatus(reference, login, errors, status).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
@@ -149,7 +149,7 @@ class CouncilTaxUploadController @Inject() (
         }
   }
 
-  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[_]): Future[Either[Result, Unit]] =
+  private def saveReportStatus(login: Login, reference: String)(implicit request: Request[?]): Future[Either[Result, Unit]] =
     reportStatusConnector.saveUserInfo(reference, login)
       .map(_.fold(
         _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),

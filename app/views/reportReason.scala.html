@@ -28,7 +28,7 @@
         appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], cr05Enabled: Boolean)(implicit request: DataRequest[_], messages: Messages)
+@(form: Form[?], cr05Enabled: Boolean)(implicit request: DataRequest[?], messages: Messages)
 
 @main_template(
     pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("what-is-the-reason-for-the-report.pageLabel"),

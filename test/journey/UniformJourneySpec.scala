@@ -33,24 +33,24 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
     baReportValidation("1234") mustBe Valid("1234")
     baReportValidation("1") mustBe Valid("1")
     baReportValidation("123456789012") mustBe Valid("123456789012")
-    baReportValidation("") mustBe a[Invalid[_]]
-    baReportValidation("asdasd") mustBe a[Valid[_]]
-    baReportValidation("|") mustBe a[Invalid[_]]
+    baReportValidation("") mustBe a[Invalid[?]]
+    baReportValidation("asdasd") mustBe a[Valid[?]]
+    baReportValidation("|") mustBe a[Invalid[?]]
   }
 
   it should "validate BA-ref" in {
     baReferenceValidation("1234") mustBe Valid("1234")
     baReferenceValidation("adasd#$^&*()") mustBe Valid("adasd#$^&*()")
-    baReferenceValidation("adasd#$^&*(%)") mustBe a[Valid[_]]
-    baReferenceValidation("|") mustBe a[Invalid[_]]
+    baReferenceValidation("adasd#$^&*(%)") mustBe a[Valid[?]]
+    baReferenceValidation("|") mustBe a[Invalid[?]]
   }
 
   it should "validate UPRN" in {
     uprnValidation(None) mustBe Valid(None)
     uprnValidation(Some("1123")) mustBe Valid(Some("1123"))
     uprnValidation(Some("123456789011")) mustBe Valid(Some("123456789011"))
-    uprnValidation(Some("1234567890013")) mustBe a[Invalid[_]]
-    uprnValidation(Some("")) mustBe a[Invalid[_]]
+    uprnValidation(Some("1234567890013")) mustBe a[Invalid[?]]
+    uprnValidation(Some("")) mustBe a[Invalid[?]]
   }
 
   it should "validate Address" in {

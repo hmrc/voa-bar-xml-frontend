@@ -41,7 +41,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
       }
 
       "on a valid submit from Login page go to Welcome page" in {
-        when(mockUserAnswers.login) thenReturn Some(Login("username", "pass"))
+        when(mockUserAnswers.login).thenReturn(Some(Login("username", "pass")))
         navigator.nextPage(LoginId, NormalMode)(mockUserAnswers) mustBe routes.WelcomeController.onPageLoad
       }
 

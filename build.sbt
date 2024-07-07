@@ -17,7 +17,6 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
-    scalacOptions += "-J-Xss16M",
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
     RoutesKeys.routesImport ++= Seq("models._"),

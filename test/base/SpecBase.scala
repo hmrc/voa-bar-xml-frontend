@@ -37,7 +37,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
   def fakeRequest = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
     val req       = FakeRequest("", "")
-    req.withAttrs(req.attrs + (Token.InfoAttr -> TokenInfo(csfrToken)))
+    req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))
   }
 
   def messages: Messages = messagesApi.preferred(fakeRequest)

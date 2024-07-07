@@ -60,19 +60,19 @@ class ReportStatusController @Inject() (
     }
   }
 
-  private def reportStatuses(login: Login, filter: Option[String])(implicit request: Request[_]): Future[Either[Result, Seq[ReportStatus]]] =
+  private def reportStatuses(login: Login, filter: Option[String])(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.get(login, filter).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatuses => Right(reportStatuses)
     ))
 
-  private def allReportStatuses(login: Login)(implicit request: Request[_]): Future[Either[Result, Seq[ReportStatus]]] =
+  private def allReportStatuses(login: Login)(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.getAll(login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatuses => Right(reportStatuses)
     ))
 
-  private def getReportStatus(submissionId: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] =
+  private def getReportStatus(submissionId: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(submissionId, login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatus => Right(reportStatus)
@@ -87,7 +87,7 @@ class ReportStatusController @Inject() (
         .valueOr(f => f)
   }
 
-  private def getPDF(reportStatus: ReportStatus)(implicit request: Request[_]): Future[Either[Result, Array[Byte]]] =
+  private def getPDF(reportStatus: ReportStatus)(implicit request: Request[?]): Future[Either[Result, Array[Byte]]] =
     Future {
       receiptService.producePDF(reportStatus) match {
         case Success(content) => Right(content)

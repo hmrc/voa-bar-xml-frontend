@@ -56,10 +56,10 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
   val loginConnector = mock[LoginConnector]
-  when(loginConnector.send(any[Login])) thenReturn Future.successful(Success(200))
+  when(loginConnector.send(any[Login])).thenReturn(Future.successful(Success(OK)))
 
   val loginConnectorF = mock[LoginConnector]
-  when(loginConnectorF.send(any[Login])) thenReturn Future.successful(Failure(new RuntimeException("Received exception from upstream service")))
+  when(loginConnectorF.send(any[Login])).thenReturn(Future.successful(Failure(new RuntimeException("Received exception from upstream service"))))
 
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()

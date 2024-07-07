@@ -39,7 +39,7 @@
         breadcrumbs: List[String],
         messages2: UniformMessages[Html],
         fieldStats: FormFieldStats
-)(implicit request: Request[_], messages: Messages)
+)(implicit request: Request[?], messages: Messages)
 
 
 @mainTemplate(

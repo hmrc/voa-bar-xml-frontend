@@ -88,7 +88,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
   def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
     val req       = FakeRequest("POST", "").withFormUrlEncodedBody("add-another" -> formResponse)
-    req.withAttrs(req.attrs + (Token.InfoAttr -> TokenInfo(csfrToken)))
+    req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))
   }
 
   "AddToListController" must {

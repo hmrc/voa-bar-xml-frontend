@@ -29,7 +29,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[_], messages: Messages)
+@(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = reportStatus.fold(messages("confirmation.heading.pending"))(_.title(messages)),

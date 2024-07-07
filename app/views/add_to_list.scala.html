@@ -28,7 +28,7 @@
 )
 
 
-@(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: Request[_], messages: Messages)
+@(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = messages("welcome.heading"),

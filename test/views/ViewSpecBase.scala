@@ -45,7 +45,7 @@ trait ViewSpecBase extends SpecBase with Injecting {
   def assertPageTitleEqualsMessage(doc: Document, expectedMessageKey: String, args: Any*) = {
     val headers = doc.getElementsByTag("h1")
     headers.size mustBe 1
-    headers.first.text.replaceAll("\u00a0", " ") contains messages(expectedMessageKey, args: _*).replaceAll("&nbsp;", " ")
+    headers.first.text.replaceAll("\u00a0", " ").contains(messages(expectedMessageKey, args*).replaceAll("&nbsp;", " "))
   }
 
   def assertContainsText(doc: Document, text: String) = assert(doc.toString.contains(text), "\n\ntext " + text + " was not rendered on the page.\n")

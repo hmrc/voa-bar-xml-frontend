@@ -45,7 +45,7 @@ object CacheMap {
 class KeyStoreEntryValidationException(
   val key: String,
   val invalidJson: JsValue,
-  val readingAs: Class[_],
+  val readingAs: Class[?],
   val errors: scala.collection.Seq[(JsPath, scala.collection.Seq[JsonValidationError])]
 ) extends Exception {
 

@@ -37,7 +37,7 @@ trait BaseBarController extends FrontendBaseController with Logging {
 
   val errorTemplate: views.html.error_template
 
-  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
+  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[?]) =
     errorTemplate(
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")

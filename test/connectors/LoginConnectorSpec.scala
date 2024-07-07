@@ -53,7 +53,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
       any[HttpReads[Any]],
       any[HeaderCarrier],
       any[ExecutionContext]
-    )) thenReturn Future.successful(HttpResponse(returnedStatus, ""))
+    )).thenReturn(Future.successful(HttpResponse(returnedStatus, "")))
     httpMock
   }
   "Login Connector" when {
@@ -148,7 +148,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
           any[HttpReads[Any]],
           any[HeaderCarrier],
           any[ExecutionContext]
-        )) thenReturn Future.successful(new RuntimeException)
+        )).thenReturn(Future.successful(new RuntimeException))
         val connector = new LoginConnector(httpMock, configuration, servicesConfig)
         val result    = await(connector.sendJson(minimalJson))
         assert(result.isFailure)

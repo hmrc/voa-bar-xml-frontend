@@ -36,7 +36,7 @@ class DataCacheConnectorImpl @Inject() (val sessionRepository: SessionRepository
   def remove(cacheId: String, key: String): Future[Boolean] =
     sessionRepository.get(cacheId).flatMap { optionalCacheMap =>
       optionalCacheMap.fold(Future(false)) { cacheMap =>
-        val newCacheMap = cacheMap copy (data = cacheMap.data - key)
+        val newCacheMap = cacheMap.copy(data = cacheMap.data - key)
         sessionRepository.upsert(newCacheMap)
       }
     }
@@ -65,9 +65,9 @@ class DataCacheConnectorImpl @Inject() (val sessionRepository: SessionRepository
       optionalCacheMap.fold(throw new Exception(s"Couldn't find document with key $cacheId")) { cacheMap =>
         val newSeq      = cacheMap.data(collectionKey).as[Seq[A]].filterNot(x => x == item)
         val newCacheMap = if (newSeq.isEmpty) {
-          cacheMap copy (data = cacheMap.data - collectionKey)
+          cacheMap.copy(data = cacheMap.data - collectionKey)
         } else {
-          cacheMap copy (data = cacheMap.data + (collectionKey -> Json.toJson(newSeq)))
+          cacheMap.copy(data = cacheMap.data + (collectionKey -> Json.toJson(newSeq)))
         }
 
         sessionRepository.upsert(newCacheMap).map(_ => newCacheMap)
@@ -78,7 +78,7 @@ class DataCacheConnectorImpl @Inject() (val sessionRepository: SessionRepository
     sessionRepository.get(cacheId).flatMap { optionalCacheMap =>
       optionalCacheMap.fold(throw new Exception(s"Couldn't find document with key $cacheId")) { cacheMap =>
         val newSeq          = cacheMap.data(collectionKey).as[Seq[A]].updated(index, item)
-        val updatedCacheMap = cacheMap copy (data = cacheMap.data + (collectionKey -> Json.toJson(newSeq)))
+        val updatedCacheMap = cacheMap.copy(data = cacheMap.data + (collectionKey -> Json.toJson(newSeq)))
         sessionRepository.upsert(updatedCacheMap).map(_ => updatedCacheMap)
       }
     }

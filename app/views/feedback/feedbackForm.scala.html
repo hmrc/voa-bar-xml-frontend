@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(form: Form[FeedbackForm])(implicit request: Request[_], messages: Messages)
+@(form: Form[FeedbackForm])(implicit request: Request[?], messages: Messages)
 
 @if(form("afterSubmission").value.contains("true")) {
     <h2 class="govuk-heading-m">@messages("feedback.heading")</h2>

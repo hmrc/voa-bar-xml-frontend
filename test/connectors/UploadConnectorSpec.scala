@@ -74,7 +74,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
       any[HttpReads[Any]],
       any[HeaderCarrier],
       any[ExecutionContext]
-    )) thenReturn Future.successful(HttpResponse(returnedStatus, returnedString.getOrElse("")))
+    )).thenReturn(Future.successful(HttpResponse(returnedStatus, returnedString.getOrElse(""))))
     httpMock
   }
 
@@ -130,7 +130,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
           any[HttpReads[Any]],
           any[HeaderCarrier],
           any[ExecutionContext]
-        )) thenReturn Future.successful(new RuntimeException)
+        )).thenReturn(Future.successful(new RuntimeException))
         val connector = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
         val result    = await(connector.sendXml(xmlUrl, login, submissionId))
         assert(result.isLeft)
@@ -170,7 +170,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
           httpReadsNapper.capture,
           headerCarrierNapper.capture,
           any[ExecutionContext]
-        )) thenReturn Future.successful(initiateResponse)
+        )).thenReturn(Future.successful(initiateResponse))
         val connector                    = new UploadConnector(httpMock, configuration, servicesConfig, messagesApi)
 
         val response = await(connector.initiate(initiateRequest))

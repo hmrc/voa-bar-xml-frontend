@@ -42,7 +42,7 @@
         baCode: Option[String] = None,
         showSignOut: Boolean = true,
         fullWidth: Boolean = false
-)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+)(contentBlock: Html)(implicit request: Request[?], messages: Messages)
 
 @beforeBlock = {
 

@@ -93,7 +93,7 @@ class ConfirmationController @Inject() (
     }).valueOr(failPage => failPage)
   }
 
-  private def getReportStatus(reference: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] =
+  private def getReportStatus(reference: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(reference, login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatus => Right(reportStatus)
