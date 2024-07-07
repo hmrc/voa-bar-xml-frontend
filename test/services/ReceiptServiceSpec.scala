@@ -27,7 +27,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.MessagesApi
 
-
 class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   val messages = app.injector.instanceOf[MessagesApi]

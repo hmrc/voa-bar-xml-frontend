@@ -97,10 +97,8 @@ class DefaultReceiptService @Inject() (
   }
 
   def forceClosing(obj: Closeable, f: () => Unit) =
-    try
-      f()
-    finally
-      obj.close()
+    try f()
+    finally obj.close()
 
   def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream) = {
     val mediaBox = page.getMediaBox

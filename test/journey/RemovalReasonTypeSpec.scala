@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,18 @@
 
 package journey
 
-import journey.RemovalReasonType._
+import journey.RemovalReasonType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.libs.json.{JsString, Json}
-
-import scala.reflect.runtime.{universe => ru}
+import utils.ReflectionUtil
 
 class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
 
   "RemovalReasonType" should "have all instance in Lister for to render radio buttons in order" in {
 
-    val traitType = ru.typeOf[RemovalReasonType]
-    val traitClazz = traitType.typeSymbol.asClass
-
-    traitClazz.knownDirectSubclasses.map(_.name.toString) should contain theSameElementsAs RemovalReasonType.order
-
+    ReflectionUtil.findAllSubTypeNames[RemovalReasonType] should contain theSameElementsAs RemovalReasonType.order
   }
 
   it should "deserialize" in {
@@ -45,9 +40,12 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
       "CaravanRemoved",
       "Duplicate",
       "OtherReason"
-    ).foreach{ removalReasonTypeString =>
-      val json = JsString(removalReasonTypeString)
-      Json.fromJson(json).isSuccess shouldBe true
+    ).foreach { removalReasonTypeString =>
+      val json     = JsString(removalReasonTypeString)
+      val jsResult = Json.fromJson(json)
+      jsResult.isSuccess shouldBe true
+      val noPlanningReferenceType = jsResult.get
+      noPlanningReferenceType.toString shouldBe removalReasonTypeString
     }
   }
 
@@ -62,7 +60,7 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
       Duplicate,
       OtherReason
     ).foreach { removalReasonType =>
-      Json.toJson(removalReasonType) shouldBe JsString(removalReasonType.toString)
+      Json.toJson(removalReasonType)(RemovalReasonType.format) shouldBe JsString(removalReasonType.toString)
     }
   }
 

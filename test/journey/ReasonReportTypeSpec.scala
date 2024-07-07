@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,31 @@
 
 package journey
 
-import journey.ReasonReportType._
+import journey.ReasonReportType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.libs.json.{JsString, Json}
-
-import scala.reflect.runtime.{universe => ru}
+import utils.ReflectionUtil
 
 class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
 
   "ReasonReportType" should "have all instance in Lister for to render radio buttons in order" in {
-    val traitType = ru.typeOf[ReasonReportType]
-    val traitClazz = traitType.typeSymbol.asClass
 
-    traitClazz.knownDirectSubclasses.map(_.name.toString) should contain theSameElementsAs ReasonReportType.order
+    ReflectionUtil.findAllSubTypeNames[ReasonReportType] should contain theSameElementsAs ReasonReportType.order
   }
 
   it should "deserialize" in {
     List(
       "AddProperty",
       "RemoveProperty"
-    ).foreach{ reasonTypeString =>
-      val json = JsString(reasonTypeString)
-      Json.fromJson(json).isSuccess shouldBe true
+    ).foreach { reasonTypeString =>
+      val json     = JsString(reasonTypeString)
+      val jsResult = Json.fromJson(json)
+      jsResult.isSuccess shouldBe true
+      val noPlanningReferenceType = jsResult.get
+      noPlanningReferenceType.toString shouldBe reasonTypeString
+
     }
   }
 
@@ -48,7 +49,7 @@ class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDr
       AddProperty,
       RemoveProperty
     ).foreach { reasonReportType =>
-      Json.toJson(reasonReportType) shouldBe JsString(reasonReportType.toString)
+      Json.toJson(reasonReportType)(ReasonReportType.format) shouldBe JsString(reasonReportType.toString)
     }
   }
 
