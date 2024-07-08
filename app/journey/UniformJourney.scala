@@ -37,6 +37,7 @@ object UniformJourney {
       addressList.mkString(", ")
     }
   }
+
   case class OtherReasonWrapper(value: String)
 
   object OtherReasonWrapper {
@@ -45,6 +46,7 @@ object UniformJourney {
     implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
       implicitly[Format[String]].inmap(OtherReasonWrapper.apply, _.value)
   }
+
   object ContactDetails { implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails] }
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
 

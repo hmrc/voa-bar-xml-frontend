@@ -18,12 +18,13 @@ package controllers
 
 import cats.data.NonEmptyList
 import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
-import journey.UniformJourney.OtherReasonWrapper
-import journey.{LocalDateFormFieldEncoding, NoPlanningReferenceType, ReasonReportType, RemovalReasonType}
+import journey.UniformJourney.{Address, ContactDetails, OtherReasonWrapper}
+import journey.*
+import ltbs.uniform.*
 import ltbs.uniform.common.web.*
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
-import ltbs.uniform.*
 import play.api.Logging
+import play.api.libs.json.*
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios, GovukSummaryList}
@@ -50,10 +51,10 @@ class AutobarsInterpreter(
 ) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
-  with InferListingPages[Html]
+  // with InferListingPages[Html]
   with Logging {
 
-  override def blankTell: Html = Html("")
+  // override def blankTell: Html = Html("")
 
   override def messages(request: Request[AnyContent]): UniformMessages[Html] =
     new UniformMessages[Html] {
@@ -343,5 +344,100 @@ class AutobarsInterpreter(
         val html = errorMsgNel.head.prefixWith(pageKey).render[Html](messages)
         ErrorMessage(content = HtmlContent(html))
       }
+
+  private def genericCoproductFieldList[A](
+    values: List[String]
+  )(implicit rds: Reads[A],
+    tjs: Writes[A]
+  ): CoproductFieldList[A, Html] = new CoproductFieldList[A, Html] {
+
+    override def decode(in: Input): Either[ErrorTree, A] =
+      in.toStringField().toEither.flatMap(str =>
+        JsString(str).validate[A].asEither.left.map {
+          e => ErrorMsg(e.toString).toTree
+        }
+      )
+
+    override def encode(a: A): Input = Input.one(
+      List(Json.stringify(Json.toJson[A](a)))
+    )
+
+    override val inner = values.map(_ -> stringField.render)
+
+    def stats = FormFieldStats()
+  }
+
+  private def readStringOrOptionString(jsValue: JsValue): String =
+    jsValue match {
+      case JsString(str) => java.net.URLEncoder.encode(str, "UTF-8")
+      case _             => ""
+    }
+
+  private def createProductFieldList[A](
+    innerParams: List[(String, (List[String], List[String], Breadcrumbs, Input, ErrorTree, UniformMessages[Html]) => Html)]
+  )(implicit rds: Reads[A],
+    tjs: Writes[A]
+  ): ProductFieldList[A, Html] =
+    new ProductFieldList[A, Html] {
+
+      override def decode(in: Input): Either[ErrorTree, A] = {
+        val jsObject = JsObject(
+          in.map((key, value) => value.headOption.filter(_.trim.nonEmpty).fold(None)(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
+        )
+        jsObject.validate[A].asEither.left.map {
+          e => ErrorMsg(e.toString).toTree
+        }
+      }
+
+      override def encode(a: A): Input =
+        Json.toJson[A](a) match {
+          case jsObject: JsObject =>
+            val encodedString = jsObject.fields.map((key, json) => s"$key=${readStringOrOptionString(json)}").mkString("&")
+            Input.fromUrlEncodedString(encodedString).getOrElse(Input.empty)
+          case _                  => Input.empty
+        }
+
+      override val inner = innerParams
+
+      def stats = FormFieldStats()
+    }
+
+  implicit def cflReasonReportType: CoproductFieldList[ReasonReportType, Html]               = genericCoproductFieldList(ReasonReportType.order)
+  implicit def cflRemovalReasonType: CoproductFieldList[RemovalReasonType, Html]             = genericCoproductFieldList(RemovalReasonType.order)
+  implicit def cflNoPlanningReferenceType: CoproductFieldList[NoPlanningReferenceType, Html] = genericCoproductFieldList(NoPlanningReferenceType.order)
+  implicit def cflYesNoType: CoproductFieldList[YesNoType, Html]                             = genericCoproductFieldList(List("Yes", "No"))
+
+  implicit def pflContactDetails: ProductFieldList[ContactDetails, Html] = createProductFieldList(
+    List(
+      "firstName"   -> stringField.render,
+      "lastName"    -> stringField.render,
+      "email"       -> stringOption.render,
+      "phoneNumber" -> stringOption.render
+    )
+  )
+
+  implicit def pflAddress: ProductFieldList[Address, Html] = createProductFieldList(
+    List(
+      "line1"    -> stringField.render,
+      "line2"    -> stringField.render,
+      "line3"    -> stringOption.render,
+      "line4"    -> stringOption.render,
+      "postcode" -> stringField.render
+    )
+  )
+
+  // implicit val wmcReasonReportType: WMC[ReasonReportType]   = new SimplePostAndGetPage[ReasonReportType, Html](coproductField[ReasonReportType])
+  // implicit val wmcRemovalReasonType: WMC[RemovalReasonType] = new SimplePostAndGetPage[RemovalReasonType, Html](coproductField[RemovalReasonType])
+
+  // implicit val wmcNoPlanningReferenceType: WMC[NoPlanningReferenceType] = new SimplePostAndGetPage[NoPlanningReferenceType, Html](coproductField[NoPlanningReferenceType])
+  // implicit val wmcLocalDate: WMC[LocalDate]                             = new SimplePostAndGetPage[LocalDate, Html](dateFormField)
+  // implicit val wmcYesNoType: WMC[YesNoType]                             = new SimplePostAndGetPage[YesNoType, Html](coproductField[YesNoType])
+
+//   implicit val wmcContactDetails: WMC[ContactDetails] = new SimplePostAndGetPage[ContactDetails, Html](productField[ContactDetails])
+//   implicit val wmcAddress: WMC[Address] = new SimplePostAndGetPage[Address, Html](productField[Address])
+
+  // implicit val wmcOtherReasonWrapper: WMC[OtherReasonWrapper]           = new SimplePostAndGetPage[OtherReasonWrapper, Html](otherReasonField)
+  // implicit val wmcOptionString: WMC[Option[String]]                     = new SimplePostAndGetPage[Option[String], Html](stringOption)
+  // implicit val wmcString: WMC[String]                                   = new SimplePostAndGetPage[String, Html](stringField)
 
 }
