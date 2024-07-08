@@ -379,9 +379,18 @@ class AutobarsInterpreter(
   ): ProductFieldList[A, Html] =
     new ProductFieldList[A, Html] {
 
+      val optionalFields = Set("email", "phoneNumber", "line3", "line4")
+
+      def isOptional(fullPath: String): Boolean = optionalFields.exists(fullPath.contains)
+
       override def decode(in: Input): Either[ErrorTree, A] = {
         val jsObject = JsObject(
-          in.map((key, value) => value.headOption.flatMap(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
+          in.map { (key, value) =>
+            val path = key.mkString(".")
+            value.headOption
+              .filter(v => !isOptional(path) || v.trim.nonEmpty)
+              .flatMap(v => Some(path -> JsString(v)))
+          }.flatten.toSeq
         )
 
         jsObject.validate[A].asEither.left.map {
