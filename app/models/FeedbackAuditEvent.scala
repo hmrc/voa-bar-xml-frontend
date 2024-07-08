@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,7 @@ import play.api.libs.json.{Json, Writes}
 /**
  * @author Yuriy Tumakha
  */
-case class FeedbackAuditEvent(rating: Int,
-                              comments: String,
-                              afterSubmission: Boolean,
-                              submissionId: Option[String])
+case class FeedbackAuditEvent(rating: Int, comments: String, afterSubmission: Boolean, submissionId: Option[String])
 
 object FeedbackAuditEvent {
   implicit val jsonWrites: Writes[FeedbackAuditEvent] = Json.writes[FeedbackAuditEvent]

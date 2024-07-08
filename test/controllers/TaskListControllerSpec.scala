@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,35 +27,48 @@ import utils.FakeNavigator
 import views.ViewSpecBase
 import scala.concurrent.ExecutionContext
 
-class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   def taskList = app.injector.instanceOf[views.html.task_list]
-  def welcome = app.injector.instanceOf[views.html.welcome]
+  def welcome  = app.injector.instanceOf[views.html.welcome]
 
   val username = "AUser"
 
   val cr05FeatureFlag = false
 
-  def ec = app.injector.instanceOf[ExecutionContext]
+  def ec                   = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val configuration =  Configuration("feature.cr05.enabled" -> false)
+  val configuration        = Configuration("feature.cr05.enabled" -> false)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new TaskListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, taskList)(ec)
+    new TaskListController(
+      frontendAppConfig,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      taskList
+    )(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new WelcomeController(frontendAppConfig, configuration,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, welcome)(ec)
+    new WelcomeController(
+      frontendAppConfig,
+      configuration,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      welcome
+    )(ec)
   }
-
-
 
   def viewAsString() = taskList(username)(fakeRequest, messages).toString
 

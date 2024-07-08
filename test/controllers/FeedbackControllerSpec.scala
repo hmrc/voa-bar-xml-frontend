@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package controllers
 
 import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{when, withSettings}
 import org.mockito.quality.Strictness
-import org.mockito.scalatest.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
@@ -35,19 +37,22 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  val ec = injector.instanceOf[ExecutionContext]
+  val ec                   = injector.instanceOf[ExecutionContext]
   val controllerComponents = injector.instanceOf[MessagesControllerComponents]
-  val servicesConfig = injector.instanceOf[ServicesConfig]
-  val auditService = injector.instanceOf[AuditService]
-  val feedbackView = injector.instanceOf[feedback]
-  val feedbackThxView = injector.instanceOf[feedbackThx]
-  val feedbackErrorView = injector.instanceOf[feedbackError]
+  val servicesConfig       = injector.instanceOf[ServicesConfig]
+  val auditService         = injector.instanceOf[AuditService]
+  val feedbackView         = injector.instanceOf[feedback]
+  val feedbackThxView      = injector.instanceOf[feedbackThx]
+  val feedbackErrorView    = injector.instanceOf[feedbackError]
 
   val feedbackController = {
     val http = mock[DefaultHttpClient](withSettings.strictness(Strictness.LENIENT))
 
-    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])
-      (any[HttpReads[HttpResponse]], any[HeaderCarrier], any[ExecutionContext]))
+    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])(
+      any[HttpReads[HttpResponse]],
+      any[HeaderCarrier],
+      any[ExecutionContext]
+    ))
       .thenReturn(Future(HttpResponse(OK, "OK")))
 
     new FeedbackController(
@@ -57,7 +62,8 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       feedbackView,
       feedbackThxView,
       feedbackErrorView,
-      controllerComponents)(ec)
+      controllerComponents
+    )(ec)
   }
 
   "FeedbackController" should {

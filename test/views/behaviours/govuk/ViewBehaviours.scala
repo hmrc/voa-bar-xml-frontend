@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,12 @@ import views.ViewSpecBase
 
 trait ViewBehaviours extends ViewSpecBase {
 
-  def normalPage(view: () => HtmlFormat.Appendable,
-                 messageKeyPrefix: String,
-                 expectedGuidanceKeys: String*) = {
-
+  def normalPage(view: () => HtmlFormat.Appendable, messageKeyPrefix: String, expectedGuidanceKeys: String*) =
     "behave like a normal page" when {
       "rendered" must {
         "have the correct banner title" in {
-          val doc = asDocument(view())
-          val nav = doc.getElementsByClass("govuk-header__content").get(0)
+          val doc  = asDocument(view())
+          val nav  = doc.getElementsByClass("govuk-header__content").get(0)
           val span = nav.children.first
           span.text mustBe messagesApi("site.service_name")
         }
@@ -55,15 +52,12 @@ trait ViewBehaviours extends ViewSpecBase {
         }
       }
     }
-  }
 
-  def pageWithBackLink(view: () => HtmlFormat.Appendable) = {
-
+  def pageWithBackLink(view: () => HtmlFormat.Appendable) =
     "behave like a page with a back link" must {
       "have a back link" in {
         val doc = asDocument(view())
         assertRenderedById(doc, "back-link")
       }
     }
-  }
 }

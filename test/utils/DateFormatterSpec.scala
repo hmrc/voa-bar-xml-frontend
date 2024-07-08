@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,15 @@ class DateFormatterSpec extends AnyFlatSpec with must.Matchers {
 
   "DateFormatter" should "format date" in {
     val dateTime = ZonedDateTime.of(
-      2020,10,1, 10,0,0,
-      0, ZoneId.of("Europe/London"))
+      2020,
+      10,
+      1,
+      10,
+      0,
+      0,
+      0,
+      ZoneId.of("Europe/London")
+    )
     DateFormatter.formatDate(dateTime) mustBe "01 October 2020 at 10:00"
   }
 

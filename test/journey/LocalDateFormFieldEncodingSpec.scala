@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
 
   val encoding = new LocalDateFormFieldEncoding()
   val tomorrow = LocalDate.now().plusDays(1)
-  val today = LocalDate.now()
-
+  val today    = LocalDate.now()
 
   val invalidInputDate = Table(
     ("day", "month", "year"),
@@ -57,43 +56,42 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
     (today.getDayOfMonth.toString, today.getMonthValue.toString, today.getYear.toString)
   )
 
-
   "LocalDateformFieldEncoding" should "decode and validate correct date" in {
-      val input =  Map(
-        year -> List("2020"),
-        month -> List("3"),
-        day -> List("30")
-      )
-    encoding.decode(input).value shouldBe LocalDate.of(2020, 3,30)
+    val input = Map(
+      year  -> List("2020"),
+      month -> List("3"),
+      day   -> List("30")
+    )
+    encoding.decode(input).value shouldBe LocalDate.of(2020, 3, 30)
   }
 
   it should "Fail validation for all invalidInput" in {
-    forAll(invalidInputDate) { (_day:String, _month:String, _year:String ) =>
-      val input =  Map(
-        year -> List(_year),
+    forAll(invalidInputDate) { (_day: String, _month: String, _year: String) =>
+      val input = Map(
+        year  -> List(_year),
         month -> List(_month),
-        day -> List(_day)
+        day   -> List(_day)
       )
       encoding.decode(input).left.value shouldBe a[ErrorTree]
     }
   }
 
   it should "Validate input for all valid input dates" in {
-    forAll(validInputDate) { (_day:String, _month:String, _year:String ) =>
-      val input =  Map(
-        year -> List(_year),
+    forAll(validInputDate) { (_day: String, _month: String, _year: String) =>
+      val input = Map(
+        year  -> List(_year),
         month -> List(_month),
-        day -> List(_day)
+        day   -> List(_day)
       )
       encoding.decode(input).value shouldBe a[LocalDate]
     }
   }
 
   it should "convert LocalDate to Input" in {
-    encoding.encode(LocalDate.of(1900,1,1)) shouldBe (Map(
-      year -> List("1900"),
+    encoding.encode(LocalDate.of(1900, 1, 1)) shouldBe (Map(
+      year  -> List("1900"),
       month -> List("1"),
-      day -> List("1")
+      day   -> List("1")
     ))
 
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ object FakeDataCacheConnector extends DataCacheConnector {
   var captures = Map[String, Any]()
 
   override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = {
-    captures = captures + (key ->  value)
+    captures = captures + (key -> value)
     Future(CacheMap(cacheId, Map()))
   }
 
-  def getCapture(key: String):Option[Any] = captures.get(key)
+  def getCapture(key: String): Option[Any] = captures.get(key)
 
   def resetCaptures() = captures = Map[String, Any]()
 
@@ -44,19 +44,20 @@ object FakeDataCacheConnector extends DataCacheConnector {
   override def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
     captures.get(key) match {
       case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
-      case None => Future.successful(None)
+      case None    => Future.successful(None)
     }
 
   override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
 
-  override def removeFromCollection[A](cacheId: String, collectionKey: String, item: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
+  override def removeFromCollection[A](cacheId: String, collectionKey: String, item: A)(implicit fmt: Format[A]): Future[CacheMap] =
+    Future(CacheMap(cacheId, Map()))
 
-  override def replaceInCollection[A](cacheId: String, collectionKey: String, index: Int, item: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
+  override def replaceInCollection[A](cacheId: String, collectionKey: String, index: Int, item: A)(implicit fmt: Format[A]): Future[CacheMap] =
+    Future(CacheMap(cacheId, Map()))
 
-  override def getEntryByField[A](field: String, value: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] = {
+  override def getEntryByField[A](field: String, value: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
     captures.get(key) match {
       case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
-      case None => Future.successful(None)
+      case None    => Future.successful(None)
     }
-  }
 }

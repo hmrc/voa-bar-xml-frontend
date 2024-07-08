@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ class LoginFormProviderSpec extends StringFieldBehaviours {
 
   ".username" must {
 
-    val fieldName = "username"
+    val fieldName   = "username"
     val requiredKey = "login.error.username.required"
-    val lengthKey = "login.error.username.length"
-    val maxLength = 100
+    val lengthKey   = "login.error.username.length"
+    val maxLength   = 100
 
     behave like fieldThatBindsValidData(
       form,
@@ -52,10 +52,10 @@ class LoginFormProviderSpec extends StringFieldBehaviours {
 
   ".password" must {
 
-    val fieldName = "password"
+    val fieldName   = "password"
     val requiredKey = "login.error.password.required"
-    val lengthKey = "login.error.password.length"
-    val maxLength = 100
+    val lengthKey   = "login.error.password.length"
+    val maxLength   = 100
 
     behave like fieldThatBindsValidData(
       form,

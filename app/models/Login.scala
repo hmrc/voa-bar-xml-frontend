@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ import play.api.Configuration
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
-case class Login (username: String, password: String, reference: Option[String] = None) {
-  def encrypt(configuration: Configuration):Login = {
+case class Login(username: String, password: String, reference: Option[String] = None) {
+
+  def encrypt(configuration: Configuration): Login = {
     val crypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
-    Login (username, crypto.encrypt (PlainText (password) ).value)
+    Login(username, crypto.encrypt(PlainText(password)).value)
   }
 }
 

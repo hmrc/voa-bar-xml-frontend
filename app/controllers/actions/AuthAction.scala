@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,19 @@ import views.html.unauthorised
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthAction @Inject() (cc: MessagesControllerComponents,
-                            appConfig: FrontendAppConfig,
-                            unauthorised: unauthorised)(implicit val executionContext: ExecutionContext)
-  extends ActionFilter[DataRequest]{
+class AuthAction @Inject() (
+  cc: MessagesControllerComponents,
+  appConfig: FrontendAppConfig,
+  unauthorised: unauthorised
+)(implicit val executionContext: ExecutionContext
+) extends ActionFilter[DataRequest] {
 
-  override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] = {
-    if(request.userAnswers.login.isEmpty) {
+  override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] =
+    if (request.userAnswers.login.isEmpty) {
       val messages = cc.messagesApi.preferred(request)
       Future.successful(Some(Unauthorized(unauthorised(appConfig)(request, messages))))
     } else {
       Future.successful(None)
     }
-  }
 
 }

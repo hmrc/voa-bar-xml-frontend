@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 )
 
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = messages("sessionTimeout.heading"),
@@ -31,5 +31,5 @@
 
     <p class="govuk-body">@Messages("sessionTimeout.copy")</p>
 
-    <p><a class="govuk-link" href="@routes.TimeoutController.timeout()">@Messages("sessionTimeout.link")</a></p>
+    <p><a class="govuk-link" href="@routes.TimeoutController.timeout">@Messages("sessionTimeout.link")</a></p>
 }

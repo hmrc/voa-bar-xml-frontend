@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,19 @@ import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersControllerSpec extends ControllerSpecBase {
 
-  def ec = app.injector.instanceOf[ExecutionContext]
+  def ec                   = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  def checkYourAnswerView = app.injector.instanceOf[views.html.check_your_answers]
+  def checkYourAnswerView  = app.injector.instanceOf[views.html.check_your_answers]
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CheckYourAnswersController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), checkYourAnswerView, controllerComponents)
+    new CheckYourAnswersController(
+      frontendAppConfig,
+      messagesApi,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      checkYourAnswerView,
+      controllerComponents
+    )
 
   "Check Your Answers Controller" must {
     "return 200 and the correct view for a GET" in {
@@ -44,7 +50,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase {
       val result = controller(dontGetAnyData).onPageLoad()(fakeRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SessionExpiredController.onPageLoad().url)
+      redirectLocation(result) mustBe Some(routes.SessionExpiredController.onPageLoad.url)
     }
   }
 }

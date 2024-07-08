@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,35 @@
 
 package handlers
 
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.Request
+import play.api.mvc.{Request, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
 @Singleton
-class ErrorHandler @Inject()(
-                              errorTemplate: views.html.error_template,
-                              val messagesApi: MessagesApi
-                            ) extends FrontendErrorHandler with I18nSupport {
+class ErrorHandler @Inject() (
+  errorTemplate: views.html.error_template,
+  val messagesApi: MessagesApi
+)(implicit val ec: ExecutionContext
+) extends FrontendErrorHandler
+  with I18nSupport {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
-    errorTemplate(heading, message)
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[Html] =
+    render { implicit request =>
+      errorTemplate(heading, message)
+    }
 
-  override def internalServerErrorTemplate(implicit request: Request[_]): Html =
+  override def internalServerErrorTemplate(implicit request: RequestHeader): Future[Html] =
     standardErrorTemplate(
       Messages("error.internal_server_error.title"),
       Messages("error.internal_server_error.heading"),
       Messages("error.internal_server_error.description")
     )
-}
 
+  private def render(template: Request[?] => Html)(implicit rh: RequestHeader): Future[Html] =
+    Future.successful(template(Request(rh, "")))
+
+}

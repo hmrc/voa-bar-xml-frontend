@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,11 @@ import utils.FakeNavigator
 import views.ViewSpecBase
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
+class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   val username = "AUser"
 
-
-  def ec = app.injector.instanceOf[ExecutionContext]
+  def ec                   = app.injector.instanceOf[ExecutionContext]
   def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   def addToList = app.injector.instanceOf[views.html.add_to_list]
@@ -44,56 +43,85 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase  {
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
-    new AddToListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
+    new AddToListController(
+      frontendAppConfig,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      addToList
+    )(ec)
   }
 
   def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Cr05SubmissionBuilder]("", Cr05SubmissionBuilder.storageKey, submission)
-    new AddToListController(frontendAppConfig, dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
+    new AddToListController(
+      frontendAppConfig,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      addToList
+    )(ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new AddToListController(frontendAppConfig,  dataRetrievalAction, new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute), FakeDataCacheConnector, controllerComponents, addToList)(ec)
+    new AddToListController(
+      frontendAppConfig,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeDataCacheConnector,
+      controllerComponents,
+      addToList
+    )(ec)
   }
 
-  def viewAsString(submission: Cr05SubmissionBuilder) = addToList(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
+  def viewAsString(submission: Cr05SubmissionBuilder): String =
+    addToList(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
 
   def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
-    val req = FakeRequest("POST", "").withFormUrlEncodedBody("add-another" -> formResponse)
-    req.withAttrs(req.attrs + (Token.InfoAttr -> TokenInfo(csfrToken)))
+    val req       = FakeRequest("POST", "").withFormUrlEncodedBody("add-another" -> formResponse)
+    req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))
   }
 
   "AddToListController" must {
 
     "return OK and the correct view for a GET for submission with 1 split property" in {
-      val addProperty = Cr05AddProperty(None, Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
+      val addProperty               = Cr05AddProperty(
+        None,
+        Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")))
+        false,
+        Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"))
+      )
       val propertyToSplitSubmission = Cr05SubmissionBuilder(None, List(), List(addProperty), None)
-      val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
+      val result: Future[Result]    = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString(propertyToSplitSubmission)
     }
 
     "return OK and the correct view for a GET for submission with 2 split property" in {
-      val addProperty = Cr05AddProperty(None, Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
+      val addProperty               = Cr05AddProperty(
+        None,
+        Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
         ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-        false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")))
+        false,
+        Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"))
+      )
       val propertyToSplitSubmission = Cr05SubmissionBuilder(None, List(), List(addProperty, addProperty), None)
-      val result: Future[Result] = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
+      val result: Future[Result]    = loggedInControllerWithSubmission(propertyToSplitSubmission).onPageLoad(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString(propertyToSplitSubmission)
     }
-
 
     "go to Add Property Page on POST with yes " in {
       val result: Future[Result] = loggedInController().addProperty(formfakeRequest("true"))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,67 +16,88 @@
 
 package controllers
 
-import java.time.LocalDate
-import java.util.UUID
-
 import connectors.{FakeDataCacheConnector, ReportStatusConnector}
-import controllers.actions._
+import controllers.actions.*
 import identifiers.LoginId
-import journey.{AddProperty, Demolition, RemoveProperty}
 import journey.UniformJourney.{Address, ContactDetails, Cr01Cr03Submission}
-import models.{Login, NormalMode, ReportStatus, Submitted, Verified}
-import play.api.test.Helpers._
-import org.mockito.scalatest.MockitoSugar
+import journey.{AddProperty, Demolition, RemoveProperty}
+import models.*
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.MessagesControllerComponents
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
 import views.ViewSpecBase
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.time.LocalDate
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
 
-  def ec = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                     = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents   = app.injector.instanceOf[MessagesControllerComponents]
   def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
-  def confirmationView = app.injector.instanceOf[views.html.confirmation]
-  def errorTemplateView = app.injector.instanceOf[views.html.error_template]
+  def confirmationView       = app.injector.instanceOf[views.html.confirmation]
+  def errorTemplateView      = app.injector.instanceOf[views.html.error_template]
 
   def confirmationStatusPanel = inject[confirmation_status_panel]
   def confirmationDetailPanel = inject[confirmation_detail_panel]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
-  val username = "AUser"
-  val submissionId = "SID372463"
-  val login = Login("foo", "bar")
-  val login2 = Login(username, "bar")
-  val reportStatus = ReportStatus(submissionId, status = Some(Submitted.value))
+  val username                  = "AUser"
+  val submissionId              = "SID372463"
+  val login                     = Login("foo", "bar")
+  val login2                    = Login(username, "bar")
+  val reportStatus              = ReportStatus(submissionId, status = Some(Submitted.value))
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])) thenReturn Future(Right(()))
-  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])) thenReturn Future(Right(()))
-  when(reportStatusConnectorMock.getByReference(any[String], any[Login])) thenReturn Future(Right(reportStatus))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])).thenReturn(Future(Right(())))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])).thenReturn(Future(Right(())))
+  when(reportStatusConnectorMock.getByReference(any[String], any[Login])).thenReturn(Future(Right(reportStatus)))
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
-    new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock, reportConfirmationView,
-      confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
+    new ConfirmationController(
+      frontendAppConfig,
+      messagesApi,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      FakeDataCacheConnector,
+      reportStatusConnectorMock,
+      reportConfirmationView,
+      confirmationView,
+      confirmationStatusPanel,
+      confirmationDetailPanel,
+      errorTemplateView,
+      controllerComponents
+    )
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    new ConfirmationController(frontendAppConfig, messagesApi, dataRetrievalAction,
-      new DataRequiredActionImpl(ec), FakeDataCacheConnector, reportStatusConnectorMock,reportConfirmationView,
-
-
-      confirmationView, confirmationStatusPanel, confirmationDetailPanel, errorTemplateView, controllerComponents)
+    new ConfirmationController(
+      frontendAppConfig,
+      messagesApi,
+      dataRetrievalAction,
+      new DataRequiredActionImpl(ec),
+      FakeDataCacheConnector,
+      reportStatusConnectorMock,
+      reportConfirmationView,
+      confirmationView,
+      confirmationStatusPanel,
+      confirmationDetailPanel,
+      errorTemplateView,
+      controllerComponents
+    )
   }
 
   def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
@@ -84,6 +105,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
     confirmationView(username, submissionId)(fakeRequest, messages).toString
+
   def refreshViewAsString() =
     confirmationView(username, submissionId, Some(reportStatus))(fakeRequest, messages).toString
 
@@ -145,10 +167,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "if CR03 report is present, it should render confirmation page with all details" in {
-      val submissionId = UUID.randomUUID().toString
-      val cr03Report = aCr03Report
-      val cr03Json = Json.obj(
-        "type" -> "Cr01Cr03Submission",
+      val submissionId     = UUID.randomUUID().toString
+      val cr03Report       = aCr03Report
+      val cr03Json         = Json.obj(
+        "type"       -> "Cr01Cr03Submission",
         "submission" -> Cr01Cr03Submission.format.writes(cr03Report)
       )
       val cr03ReportStatus = reportStatus.copy(report = Option(cr03Json), id = submissionId)
@@ -162,20 +184,30 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
   }
 
-  def aCr03Report: Cr01Cr03Submission = {
-    Cr01Cr03Submission(AddProperty,None, None, "baRepro", "baRer", None,
+  def aCr03Report: Cr01Cr03Submission =
+    Cr01Cr03Submission(
+      AddProperty,
+      None,
+      None,
+      "baRepro",
+      "baRer",
+      None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-      false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
-      LocalDate.now(), true, Option("1122"), None, Some("comment")
+      false,
+      Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
+      LocalDate.now(),
+      true,
+      Option("1122"),
+      None,
+      Some("comment")
     )
-  }
 
   "if CR01 report is present, it should render confirmation page with all details" in {
-    val submissionId = UUID.randomUUID().toString
-    val cr01Report = aCr01Report
-    val cr01Json = Json.obj(
-      "type" -> "Cr01Cr03Submission",
+    val submissionId     = UUID.randomUUID().toString
+    val cr01Report       = aCr01Report
+    val cr01Json         = Json.obj(
+      "type"       -> "Cr01Cr03Submission",
       "submission" -> Cr01Cr03Submission.format.writes(cr01Report)
     )
     val cr01ReportStatus = reportStatus.copy(report = Option(cr01Json), id = submissionId)
@@ -188,14 +220,23 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     contentAsString(result) mustBe cr01cr03ViewAsString(cr01ReportStatus, Some(cr01Report))
   }
 
-
-  def aCr01Report: Cr01Cr03Submission = {
-    Cr01Cr03Submission(RemoveProperty,Some(Demolition), None, "baRepro", "baRer", None,
+  def aCr01Report: Cr01Cr03Submission =
+    Cr01Cr03Submission(
+      RemoveProperty,
+      Some(Demolition),
+      None,
+      "baRepro",
+      "baRer",
+      None,
       Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX"),
       ContactDetails("firstName", "lastName", Option("user@example.com"), Option("01122554442")),
-      false, Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
-      LocalDate.now(), true, Option("1122"), None, Some("comment")
+      false,
+      Option(Address("line1", "line2", Option("line3"), Option("line 4"), "BN12 4AX")),
+      LocalDate.now(),
+      true,
+      Option("1122"),
+      None,
+      Some("comment")
     )
-  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,22 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction}
 import viewmodels.AnswerSection
 import views.html.check_your_answers
 import config.FrontendAppConfig
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-class CheckYourAnswersController @Inject()(appConfig: FrontendAppConfig,
-                                           override val messagesApi: MessagesApi,
-                                           getData: DataRetrievalAction,
-                                           requireData: DataRequiredAction,
-                                           checkYourAnswer: check_your_answers,
-                                           controllerComponents: MessagesControllerComponents
-                                          ) extends FrontendController(controllerComponents) with I18nSupport {
+class CheckYourAnswersController @Inject() (
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  checkYourAnswer: check_your_answers,
+  controllerComponents: MessagesControllerComponents
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
-  def onPageLoad() = (getData andThen requireData) { implicit request =>
-
-      val sections = Seq(AnswerSection(None, Seq()))
-      Ok(checkYourAnswer(appConfig, sections))
+  def onPageLoad: Action[AnyContent] = (getData andThen requireData) { implicit request =>
+    val sections = Seq(AnswerSection(None, Seq()))
+    Ok(checkYourAnswer(appConfig, sections))
   }
+
 }

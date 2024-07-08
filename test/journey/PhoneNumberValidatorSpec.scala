@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,20 +26,20 @@ class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with Eit
   val validator = new PhoneNumberValidator()
 
   "validator" should "validate correct phone number" in {
-    validator.apply("01632960110").toEither.value shouldBe "01632960110"
+    validator.apply("01632960110").toEither.value          shouldBe "01632960110"
     validator.apply("02233323233333221123").toEither.value shouldBe "02233323233333221123"
   }
 
   it should "Validate and stript non allowed characters from phone number" in {
-    validator.apply("0##@$$1632 960110").toEither.value shouldBe "01632 960110"
-    validator.apply("0##@$$1632-960110").toEither.value shouldBe "01632-960110"
+    validator.apply("0##@$$1632 960110").toEither.value    shouldBe "01632 960110"
+    validator.apply("0##@$$1632-960110").toEither.value    shouldBe "01632-960110"
     validator.apply("   0##@$$1632 960110").toEither.value shouldBe "   01632 960110"
   }
 
   it should "Reject invalid phone number" in {
-    validator.apply("asdasdad").toEither.left.value shouldBe a[ErrorTree]
+    validator.apply("asdasdad").toEither.left.value              shouldBe a[ErrorTree]
     validator.apply("022333232333332211232").toEither.left.value shouldBe a[ErrorTree]
-    validator.apply("").toEither.left.value shouldBe a[ErrorTree]
+    validator.apply("").toEither.left.value                      shouldBe a[ErrorTree]
   }
 
 }

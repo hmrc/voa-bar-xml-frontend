@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +21,20 @@ import play.twirl.api.HtmlFormat
 
 trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
-  val errorKey = "value"
+  val errorKey     = "value"
   val errorMessage = "error.number"
-  val error = FormError(errorKey, errorMessage)
+  val error        = FormError(errorKey, errorMessage)
 
   val form: Form[A]
 
-  def pageWithTextFields(createView: (Form[A]) => HtmlFormat.Appendable,
-                         messageKeyPrefix: String,
-                         expectedFormAction: String,
-                         fields: String*) = {
-
+  def pageWithTextFields(createView: (Form[A]) => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String, fields: String*) =
     "behave like a question page" when {
       "rendered" must {
-        for(field <- fields) {
+        for (field <- fields)
           s"contain an input for $field" in {
             val doc = asDocument(createView(form))
             assertRenderedById(doc, field)
           }
-        }
 
         "not render an error summary" in {
           val doc = asDocument(createView(form))
@@ -47,7 +42,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
         }
       }
 
-      for(field <- fields) {
+      for (field <- fields)
         s"rendered with an error with field '$field'" must {
           "show an error summary" in {
             val doc = asDocument(createView(form.withError(FormError(field, "error"))))
@@ -55,12 +50,10 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
           }
 
           s"show an error in the label for field '$field'" in {
-            val doc = asDocument(createView(form.withError(FormError(field, "error"))))
+            val doc       = asDocument(createView(form.withError(FormError(field, "error"))))
             val errorSpan = doc.getElementsByClass("error-notification").first
             errorSpan.parent.attr("for") mustBe field
           }
         }
-      }
     }
-  }
 }

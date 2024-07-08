@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,14 @@ import play.api.data.{Form, FormError}
 
 trait FormSpec extends AnyWordSpec with OptionValues with should.Matchers {
 
-  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]) = {
-
+  def checkForError(form: Form[?], data: Map[String, String], expectedErrors: Seq[FormError]) =
     form.bind(data).fold(
       formWithErrors => {
         for (error <- expectedErrors) formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
         formWithErrors.errors.size shouldBe expectedErrors.size
       },
-      form => {
-        fail("Expected a validation error when binding the form, but it was bound successfully.")
-      }
+      form => fail(s"Expected a validation error when binding the form, but it was bound successfully. $form")
     )
-  }
 
   def error(key: String, value: String, args: Any*) = Seq(FormError(key, value, args))
 

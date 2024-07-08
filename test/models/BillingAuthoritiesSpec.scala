@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import base.SpecBase
 
 class BillingAuthoritiesSpec extends SpecBase {
 
-  val existingBaCode = "BA0230"
+  val existingBaCode    = "BA0230"
   val nonExistingBaCode = "ba9999"
-  val ForestHeath = "ba3510"
-  val StEdmundsbury = "ba3525"
-  val SuffolkCoastal = "ba3530"
-  val Waveney = "ba3535"
-  val BAMapSize = 350
+  val ForestHeath       = "ba3510"
+  val StEdmundsbury     = "ba3525"
+  val SuffolkCoastal    = "ba3530"
+  val Waveney           = "ba3535"
+  val BAMapSize         = 350
 
   "BillingAuthorities" must {
 

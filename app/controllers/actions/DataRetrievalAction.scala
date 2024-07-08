@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,20 @@ import utils.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRetrievalActionImpl @Inject()(val dataCacheConnector: DataCacheConnector,
-                                        bodyParsers: BodyParsers.Default)(
-  implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
+class DataRetrievalActionImpl @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  bodyParsers: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext
+) extends DataRetrievalAction {
 
   override protected def transform[A](request: Request[A]): Future[OptionalDataRequest[A]] = {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     hc.sessionId match {
-      case None => Future.failed(new IllegalStateException())
+      case None            => Future.failed(new IllegalStateException())
       case Some(sessionId) =>
         dataCacheConnector.fetch(sessionId.toString).map {
-          case None => OptionalDataRequest(request, sessionId.toString, None)
+          case None       => OptionalDataRequest(request, sessionId.toString, None)
           case Some(data) => OptionalDataRequest(request, sessionId.toString, Some(new UserAnswers(data)))
         }
     }

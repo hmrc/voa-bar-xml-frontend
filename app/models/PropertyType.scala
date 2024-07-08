@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,9 @@ object PropertyType {
     override def bind(key: String, value: String): Either[String, PropertyType] = value match {
       case "proposed" => Right(PROPOSED)
       case "existing" => Right(EXISTING)
-      case x => {
-        log.warn(s"Unable to bind type or property : ${x}")
+      case x          =>
+        log.warn(s"Unable to bind type or property : $x")
         Left("Invalid request, Unable to bind type or property")
-      }
     }
 
     override def unbind(key: String, value: PropertyType): String = value match {

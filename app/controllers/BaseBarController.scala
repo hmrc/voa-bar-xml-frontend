@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,42 +37,37 @@ trait BaseBarController extends FrontendBaseController with Logging {
 
   val errorTemplate: views.html.error_template
 
-  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[_]) =
+  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[?]) =
     errorTemplate(
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")
     )(request, messages)
 
-  private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] = {
+  private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] =
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
       Redirect(routes.LoginController.onPageLoad(NormalMode))
     ).value
-  }
 
-  private[controllers] def cachedLoginError(externalId: String): Future[Either[Error, Login]] = {
+  private[controllers] def cachedLoginError(externalId: String): Future[Either[Error, Login]] =
     EitherT.fromOptionF(
       dataCacheConnector.getEntry[Login](externalId, LoginId.toString),
-      Error("Couldn't get user session", Seq(s"ExternalId: ${externalId}"))
+      Error("Couldn't get user session", Seq(s"ExternalId: $externalId"))
     ).value
-  }
 
-  private[controllers] def cachedLoginByReference(reference: String): Future[Either[Error, Login]] = {
+  private[controllers] def cachedLoginByReference(reference: String): Future[Either[Error, Login]] =
     EitherT.fromOptionF(
       dataCacheConnector.getEntryByField[Login]("data.login.reference", reference, LoginId.toString),
-      Error("Couldn't get user session", Seq(s"Reference : ${reference}"))
+      Error("Couldn't get user session", Seq(s"Reference : $reference"))
     ).value
-  }
 
-  private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit]] = {
+  private[controllers] def saveLogin(externalId: String, login: Login): Future[Either[Result, Unit]] =
     dataCacheConnector.save[Login](externalId, LoginId.toString, login)
-        .map(_ => Right(()))
-        .recover{
-          case ex: Throwable => {
-            val errorMessage = "Error while saving login"
-            logger.error(s"$errorMessage\n${ex.getMessage}")
-            Left(InternalServerError)
-          }
-        }
-  }
+      .map(_ => Right(()))
+      .recover {
+        case ex: Throwable =>
+          val errorMessage = "Error while saving login"
+          logger.error(s"$errorMessage\n${ex.getMessage}")
+          Left(InternalServerError)
+      }
 }

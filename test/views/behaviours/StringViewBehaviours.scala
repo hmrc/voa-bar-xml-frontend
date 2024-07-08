@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,18 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
 
   val answer = "answer"
 
-  def stringPage(createView: (Form[String]) => HtmlFormat.Appendable,
-                 messageKeyPrefix: String,
-                 expectedFormAction: String,
-                 expectedHintKey: Option[String] = None) = {
-
+  def stringPage(
+    createView: (Form[String]) => HtmlFormat.Appendable,
+    messageKeyPrefix: String,
+    expectedFormAction: String,
+    expectedHintKey: Option[String] = None
+  ) =
     "behave like a page with a string value field" when {
       "rendered" must {
 
         "contain a label for the value" in {
-          val doc = asDocument(createView(form))
-          val expectedHintText = expectedHintKey map(k => messages(k))
+          val doc              = asDocument(createView(form))
+          val expectedHintText = expectedHintKey map (k => messages(k))
           assertContainsLabel(doc, "value", messages(s"$messageKeyPrefix.heading"), expectedHintText)
         }
 
@@ -58,11 +59,10 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
         }
 
         "show an error in the value field's label" in {
-          val doc = asDocument(createView(form.withError(error)))
+          val doc       = asDocument(createView(form.withError(error)))
           val errorSpan = doc.getElementsByClass("error-notification").first
           errorSpan.text mustBe messages(errorMessage)
         }
       }
     }
-  }
 }

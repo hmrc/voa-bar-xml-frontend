@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,11 @@ import play.twirl.api.Html
 
 object UniformMessageUtil {
 
-
-  def getViewUniformMessages(implicit messages: Messages): UniformMessages[Html] = {
+  def getViewUniformMessages(implicit messages: Messages): UniformMessages[Html] =
     new UniformMessages[Html] {
       override def get(key: String, args: Any*): Option[Html] = Option(Html(messages(key, args)))
 
       override def list(key: String, args: Any*): List[Html] = Nil
     }
-  }
 
 }

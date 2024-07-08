@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,20 +27,17 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.MessagesApi
 
-/**
-  * Created by rgallet on 08/03/16.
-  */
 class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   val messages = app.injector.instanceOf[MessagesApi]
-  val service = new DefaultReceiptService(messages)
-  val date = Instant.ofEpochMilli(0)
+  val service  = new DefaultReceiptService(messages)
+  val date     = Instant.ofEpochMilli(0)
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
-      //DateTimeUtils.setCurrentMillisFixed(0)
+      // DateTimeUtils.setCurrentMillisFixed(0)
 
-      val baCode = "ba1221"
+      val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
       val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Pending.value))
@@ -50,16 +47,16 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      //DateTimeUtils.setCurrentMillisSystem()
+      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - FAILED" in {
-      //DateTimeUtils.setCurrentMillisFixed(0)
+      // DateTimeUtils.setCurrentMillisFixed(0)
 
-      val baCode = "ba1221"
+      val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
       val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Failed.value))
@@ -70,16 +67,16 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      //DateTimeUtils.setCurrentMillisSystem()
+      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - DONE" in {
-      //DateTimeUtils.setCurrentMillisFixed(0)
+      // DateTimeUtils.setCurrentMillisFixed(0)
 
-      val baCode = "ba1221"
+      val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
       val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Done.value))
@@ -89,10 +86,10 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
-      new PDFTextStripper().getText(pdf) must include (s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close
-      //DateTimeUtils.setCurrentMillisSystem()
+      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "have correct font" in {
@@ -101,19 +98,19 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
     "have correct margin, font size and leading" in {
       service.fontSize must be(12f)
-      service.leading must be(18f)
-      service.margin must be(72)
+      service.leading  must be(18f)
+      service.margin   must be(72)
     }
 
     "wrap text" in {
       val page = new PDPage(PDRectangle.A4)
 
       val mediaBox = page.getMediaBox
-      val width = mediaBox.getWidth - 2 * service.margin
+      val width    = mediaBox.getWidth - 2 * service.margin
 
       val lines = service.wrap(page, "My text" * 1000)
 
-      lines must have size (100)
+      lines must have size 100
       lines foreach {
         service.font.getStringWidth(_) must be <= (width * 1000)
       }

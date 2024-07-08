@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,15 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
 
   def fakeRequest = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
-    val req = FakeRequest("", "")
-    req.withAttrs(req.attrs + (Token.InfoAttr -> TokenInfo(csfrToken)))
+    val req       = FakeRequest("", "")
+    req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))
   }
 
   def messages: Messages = messagesApi.preferred(fakeRequest)
 
-  class FakeUserAnswers(login: Login,
-                        cacheMap: CacheMap = new CacheMap("", Map())) extends UserAnswers(cacheMap) {
+  class FakeUserAnswers(loginValue: Login, cacheMap: CacheMap = new CacheMap("", Map())) extends UserAnswers(cacheMap) {
 
-    override def login: Option[Login] = Some(login)
+    override def login: Option[Login] = Some(loginValue)
   }
 
 }

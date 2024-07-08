@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 @this(configuration: Configuration)
 
-@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[_])
+@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[?])
 
 @renderDelete = @{
 
@@ -36,7 +36,7 @@
 }
 @if(renderDelete) {
 
-    @form(routes.ReportDeleteController.onPageSubmit()) {
+    @form(routes.ReportDeleteController.onPageSubmit) {
         @CSRF.formField
         <input type="hidden" name="@ReportDeleteController.submissionId" value="@reportStatus.id">
         <input type="submit" name="delete" value="@messages("button.delete")">

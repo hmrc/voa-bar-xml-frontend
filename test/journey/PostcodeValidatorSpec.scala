@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with Either
   }
 
   it should "strip not postcode characters and format postcode" in {
-    validator("-- B N1   2 4A  X  ").toEither.value shouldBe "BN12 4AX"
+    validator("-- B N1   2 4A  X  ").toEither.value     shouldBe "BN12 4AX"
     validator("-(&^^%*$&%^#- BN12 4A x").toEither.value shouldBe "BN12 4AX"
-    validator("bn124ax:").toEither.value shouldBe "BN12 4AX"
-    validator("e2-6b J:").toEither.value shouldBe "E2 6BJ"
-    validator("e2-6b,. J:").toEither.value shouldBe "E2 6BJ"
-    //bn12 4axx and bbn12 4ax
+    validator("bn124ax:").toEither.value                shouldBe "BN12 4AX"
+    validator("e2-6b J:").toEither.value                shouldBe "E2 6BJ"
+    validator("e2-6b,. J:").toEither.value              shouldBe "E2 6BJ"
+    // bn12 4axx and bbn12 4ax
   }
 
   it should "reject invalid postcode" in {

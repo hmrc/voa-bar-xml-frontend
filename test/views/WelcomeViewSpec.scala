@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   def welcome = app.injector.instanceOf[views.html.welcome]
 
-  val username = "BA0505"
+  val username         = "BA0505"
   val messageKeyPrefix = "welcome"
-  val cr05FeatureFlag = false
+  val cr05FeatureFlag  = false
 
   val welcomeFakeRequest = fakeRequest
 
@@ -38,34 +38,32 @@ class WelcomeViewSpec extends ViewBehaviours {
   }
 
   "The Council Tax links to the goToCouncilTaxUploadPage method" in {
-    val doc = asDocument(createView())
+    val doc  = asDocument(createView())
     val href = doc.getElementById("councilTaxLink").attr("href")
-    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url)
+    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url)
   }
 
   // Welcome page containing form for navigation
 
   def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser, cr05FeatureFlag)(welcomeFakeRequest, messages)
 
-  def uploadLinkTest(ba: String, formDoc: Document) = {
-    s"The upload link to the goToCouncilTaxUploadPage method for ${ba}" in {
+  def uploadLinkTest(ba: String, formDoc: Document) =
+    s"The upload link to the goToCouncilTaxUploadPage method for $ba" in {
       val href = formDoc.getElementById("councilTaxLink").attr("href")
-      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage().url)
+      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url)
     }
-  }
 
-  def viewHistoryTest(ba: String, formDoc: Document) = {
-    s"The view history link to the ReportStatusController.onPageLoad method for ${ba}" in {
+  def viewHistoryTest(ba: String, formDoc: Document) =
+    s"The view history link to the ReportStatusController.onPageLoad method for $ba" in {
       val href = formDoc.getElementById("submissions").attr("href")
       assert(href == controllers.routes.ReportStatusController.onPageLoad().url)
     }
-  }
 
   def runFormNavigationTests(ba: String) = {
     lazy val formDoc = asDocument(createFormView(ba)())
 
-    s"The webform link is not visible for ${ba}" in {
-      assertThrows[NullPointerException] {formDoc.getElementById("create").attr("href")}
+    s"The webform link is not visible for $ba" in {
+      assertThrows[NullPointerException](formDoc.getElementById("create").attr("href"))
     }
 
     uploadLinkTest(ba, formDoc)
@@ -81,7 +79,7 @@ class WelcomeViewSpec extends ViewBehaviours {
   def runPilotBATests(ba: String) = {
     lazy val formDoc = asDocument(createFormView(ba)())
 
-    s"The webform link is visible for ${ba}" in {
+    s"The webform link is visible for $ba" in {
       val href = formDoc.getElementById("create").attr("href")
       assert(href == controllers.routes.ReportReasonController.onPageLoad.url)
     }

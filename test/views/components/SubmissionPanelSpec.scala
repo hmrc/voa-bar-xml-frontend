@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,19 @@ import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_panel
 
-class SubmissionPanelSpec extends ViewBehaviours  {
+class SubmissionPanelSpec extends ViewBehaviours {
 
-  val submissionId = "SId9324832"
-  val baCode = "baCode"
+  val submissionId  = "SId9324832"
+  val baCode        = "baCode"
   val reportStatus1 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
-
-
   def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(messages)
-
 
   "Submission Panel" must {
 
     "Contain a submission ID equal to 'submissionId'" in {
       lazy val doc = asDocument(submission1())
-      val status = doc.select(s"#summary-list-${reportStatus1.id.split("-").head} > div:nth-child(1) > dd").text
+      val status   = doc.select(s"#summary-list-${reportStatus1.id.split("-").head} > div:nth-child(1) > dd").text
       status mustBe submissionId
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,51 +18,53 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
-import controllers.actions._
-import identifiers._
-import javax.inject.Inject
+import controllers.actions.*
+import identifiers.*
 import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
 import play.api.i18n.I18nSupport
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.Navigator
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class TaskListController @Inject()(appConfig: FrontendAppConfig,
-                                   getData: DataRetrievalAction,
-                                   requireData: DataRequiredAction,
-                                   navigator: Navigator,
-                                   dataCacheConnector: DataCacheConnector,
-                                   controllerComponents: MessagesControllerComponents,
-                                   taskList: views.html.task_list
-                                  )(implicit ec: ExecutionContext)
-  extends FrontendController(controllerComponents) with I18nSupport {
+class TaskListController @Inject() (
+  appConfig: FrontendAppConfig,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  navigator: Navigator,
+  dataCacheConnector: DataCacheConnector,
+  controllerComponents: MessagesControllerComponents,
+  taskList: views.html.task_list
+)(implicit ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with I18nSupport {
 
-  def onPageLoad() = getData.async {
+  def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap  { maybeCr05Submission =>
+      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
           case Some(username) => Ok(taskList(username, maybeCr05Submission))
-          case None => Redirect(routes.LoginController.onPageLoad(NormalMode))
+          case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }
       }
   }
 
-  def goToAddPropertyReportDetailPage() =  (getData andThen requireData) { implicit request =>
+  def goToAddPropertyReportDetailPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(AddPropertyReportDetailsId, NormalMode)(request.userAnswers))
   }
 
-  def goToAddPropertyPage() =  (getData andThen requireData) { implicit request =>
+  def goToAddPropertyPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers))
   }
 
-  def goToAddComments()= (getData andThen requireData) { implicit request =>
+  def goToAddComments: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(AddCommentId, NormalMode)(request.userAnswers))
   }
 
-  def goToCheckYourAnswersPage() =  (getData andThen requireData) { implicit request =>
+  def goToCheckYourAnswersPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(CheckYourAnswersId, NormalMode)(request.userAnswers))
   }
 

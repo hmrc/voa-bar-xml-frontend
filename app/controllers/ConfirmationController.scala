@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,44 +33,43 @@ import views.html.components.{confirmation_detail_panel, confirmation_status_pan
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
-                                       override val messagesApi: MessagesApi,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val dataCacheConnector: DataCacheConnector,
-                                       reportStatusConnector: ReportStatusConnector,
-                                       reportConfirmation: views.html.govuk.confirmation,
-                                       confirmation: views.html.confirmation,
-                                       confirmationStatusPanel: confirmation_status_panel,
-                                       confirmationDetailPanel: confirmation_detail_panel,
-                                       val errorTemplate: views.html.error_template,
-                                       controllerComponents: MessagesControllerComponents)
-                                      (implicit val ec: ExecutionContext)
-  extends FrontendController(controllerComponents) with BaseBarController with I18nSupport {
+class ConfirmationController @Inject() (
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val dataCacheConnector: DataCacheConnector,
+  reportStatusConnector: ReportStatusConnector,
+  reportConfirmation: views.html.govuk.confirmation,
+  confirmation: views.html.confirmation,
+  confirmationStatusPanel: confirmation_status_panel,
+  confirmationDetailPanel: confirmation_detail_panel,
+  val errorTemplate: views.html.error_template,
+  controllerComponents: MessagesControllerComponents
+)(implicit val ec: ExecutionContext
+) extends FrontendController(controllerComponents)
+  with BaseBarController
+  with I18nSupport {
 
   def onPageLoad(reference: String) = getData.async {
     implicit request =>
       (for {
-        login <- EitherT(cachedLogin(request.externalId))
+        login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield {
-        getCrSubmission(reportStatus) match {
-          case None => Ok(confirmation(login.username, reference))
-          case crSubmission@Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
-        }
+      } yield getCrSubmission(reportStatus) match {
+        case None                   => Ok(confirmation(login.username, reference))
+        case crSubmission @ Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
       }).valueOr(failPage => failPage)
   }
 
   def onPageRefresh(reference: String) = getData.async {
     implicit request =>
       (for {
-        login <- EitherT(cachedLogin(request.externalId))
+        login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield {
-        getCrSubmission(reportStatus) match {
-          case None => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
-          case crSubmission@Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
-        }
+      } yield getCrSubmission(reportStatus) match {
+        case None                   => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
+        case crSubmission @ Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
       }).valueOr(failPage => failPage)
   }
 
@@ -79,7 +78,7 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
     import ConfirmationPayload._
 
     (for {
-      login <- EitherT(cachedLogin(request.externalId))
+      login        <- EitherT(cachedLogin(request.externalId))
       reportStatus <- EitherT(getReportStatus(reference, login))
     } yield {
 
@@ -89,31 +88,26 @@ class ConfirmationController @Inject()(appConfig: FrontendAppConfig,
       val confirmationDetailPanelContent = confirmationDetailPanel(reportStatus.id, Option(reportStatus)).body
 
       Ok(Json.toJson(
-        ConfirmationPayload(reportStatus.status.getOrElse(Pending.value),
-          confirmationStatusPanelContent, confirmationDetailPanelContent)
+        ConfirmationPayload(reportStatus.status.getOrElse(Pending.value), confirmationStatusPanelContent, confirmationDetailPanelContent)
       ))
     }).valueOr(failPage => failPage)
   }
 
-  private def getReportStatus(reference: String, login: Login)(implicit request: Request[_]): Future[Either[Result, ReportStatus]] = {
+  private def getReportStatus(reference: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(reference, login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
       reportStatus => Right(reportStatus)
     ))
-  }
 
-  private def getCrSubmission(reportStatus: ReportStatus): Option[CrSubmission] = {
-
+  private def getCrSubmission(reportStatus: ReportStatus): Option[CrSubmission] =
     reportStatus.report
       .filter(x => x.keys.contains("type"))
       .flatMap { jsObject =>
         jsObject("type") match {
           case JsString("Cr01Cr03Submission") => jsObject.value.get("submission").flatMap(x => Cr01Cr03Submission.format.reads(x).asOpt)
-          case JsString("Cr05Submission") => jsObject.value.get("submission").flatMap(x => Cr05Submission.format.reads(x).asOpt)
-          case _ => None
+          case JsString("Cr05Submission")     => jsObject.value.get("submission").flatMap(x => Cr05Submission.format.reads(x).asOpt)
+          case _                              => None
         }
       }
-  }
-
 
 }

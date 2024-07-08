@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,28 +29,28 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DefaultUserReportUploadsConnector @Inject() (
-                                                    http: HttpClient,
-                                                    val configuration: Configuration
-                                                   )(implicit executionContext: ExecutionContext)
-  extends  UserReportUploadsConnector with BaseConnector {
+  http: HttpClient,
+  val configuration: Configuration
+)(implicit executionContext: ExecutionContext
+) extends UserReportUploadsConnector
+  with BaseConnector {
 
   val voaBarConfig = configuration.get[Configuration]("microservice.services.voa-bar")
-  val host = voaBarConfig.get[String]("host")
-  val port = voaBarConfig.get[String]("port")
-  val protocol = voaBarConfig.get[String]("protocol")
-  val serviceUrl = s"$protocol://$host:$port/voa-bar" //TODO - Refactor with services config
+  val host         = voaBarConfig.get[String]("host")
+  val port         = voaBarConfig.get[String]("port")
+  val protocol     = voaBarConfig.get[String]("protocol")
+  val serviceUrl   = s"$protocol://$host:$port/voa-bar" // TODO - Refactor with services config
 
-
-  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] = {
+  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
     http.PUT[UserReportUpload, HttpResponse](
       s"$serviceUrl/user-report-upload",
-      userReportUpload,defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
+      userReportUpload,
+      defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
     )
       .map(_ => Right(()))
       .recover {
         case e: Throwable => Left(Error(e.getMessage, Seq()))
       }
-  }
 
   override def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]] = {
     val headers = defaultHeaders(login.username, login.password)
