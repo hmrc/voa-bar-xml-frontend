@@ -54,7 +54,7 @@ object UniformJourney {
 
   object Cr01Cr03Submission { implicit val format: OFormat[Cr01Cr03Submission] = Json.format[Cr01Cr03Submission] }
 
-  case class Cr01Cr03Submission(
+  final case class Cr01Cr03Submission(
     reasonReport: ReasonReportType,
     removalReason: Option[RemovalReasonType],
     otherReason: Option[OtherReasonWrapper],
@@ -123,7 +123,7 @@ object UniformJourney {
     implicit val format: Format[Cr05Submission] = Json.format[Cr05Submission]
   }
 
-  case class Cr05Submission(
+  final case class Cr05Submission(
     baReport: String,
     baRef: String,
     effectiveDate: LocalDate,

@@ -322,7 +322,7 @@ class AutobarsInterpreter(
         items = radiosItems,
         name = fieldKey.head,
         errorMessage = errorMessage,
-        classes = if coproductValues.size == 2 then "govuk-radios--inline" else ""
+        classes = if coproductValues.sizeIs == 2 then "govuk-radios--inline" else ""
       )
     )
   }

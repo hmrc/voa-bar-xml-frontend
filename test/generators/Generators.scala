@@ -31,7 +31,7 @@ trait Generators {
     for {
       seq1 <- gen
       seq2 <- Gen.listOfN(seq1.length, genValue)
-    } yield seq1.toSeq.zip(seq2).foldRight("") {
+    } yield seq1.zip(seq2).foldRight("") {
       case ((n, Some(v)), m) =>
         m + n + v
       case ((n, _), m)       =>
@@ -51,7 +51,7 @@ trait Generators {
     arbitrary[BigInt] suchThat (x => x < Int.MinValue)
 
   def nonNumerics: Gen[String] =
-    alphaStr suchThat (_.size > 0)
+    alphaStr suchThat (_.nonEmpty)
 
   def decimals: Gen[String] =
     arbitrary[BigDecimal]
