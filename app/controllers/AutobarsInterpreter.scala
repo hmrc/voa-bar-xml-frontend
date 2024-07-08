@@ -379,7 +379,7 @@ class AutobarsInterpreter(
 
       override def decode(in: Input): Either[ErrorTree, A] = {
         val jsObject = JsObject(
-          in.map((key, value) => value.headOption.filter(_.trim.nonEmpty).fold(None)(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
+          in.map((key, value) => value.headOption.filter(_.trim.nonEmpty).flatMap(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
         )
         jsObject.validate[A].asEither.left.map {
           e => ErrorMsg(e.toString).toTree
