@@ -18,8 +18,8 @@ package controllers
 
 import cats.data.NonEmptyList
 import controllers.uniform.{Cr01Cr03SubmissionWebTell, Cr05AddPropertyWebTell, Cr05CommonWebTell, Cr05SubmissionBuilderWebTell}
-import journey.UniformJourney.{Address, ContactDetails, OtherReasonWrapper}
 import journey.*
+import journey.UniformJourney.{Address, ContactDetails, OtherReasonWrapper}
 import ltbs.uniform.*
 import ltbs.uniform.common.web.*
 import ltbs.uniform.interpreters.playframework.PlayInterpreter
@@ -51,10 +51,7 @@ class AutobarsInterpreter(
 ) extends PlayInterpreter[Html](results)
   with InferFormFieldProduct[Html]
   with InferFormFieldCoProduct[Html]
-  // with InferListingPages[Html]
   with Logging {
-
-  // override def blankTell: Html = Html("")
 
   override def messages(request: Request[AnyContent]): UniformMessages[Html] =
     new UniformMessages[Html] {
@@ -425,19 +422,5 @@ class AutobarsInterpreter(
       "postcode" -> stringField.render
     )
   )
-
-  // implicit val wmcReasonReportType: WMC[ReasonReportType]   = new SimplePostAndGetPage[ReasonReportType, Html](coproductField[ReasonReportType])
-  // implicit val wmcRemovalReasonType: WMC[RemovalReasonType] = new SimplePostAndGetPage[RemovalReasonType, Html](coproductField[RemovalReasonType])
-
-  // implicit val wmcNoPlanningReferenceType: WMC[NoPlanningReferenceType] = new SimplePostAndGetPage[NoPlanningReferenceType, Html](coproductField[NoPlanningReferenceType])
-  // implicit val wmcLocalDate: WMC[LocalDate]                             = new SimplePostAndGetPage[LocalDate, Html](dateFormField)
-  // implicit val wmcYesNoType: WMC[YesNoType]                             = new SimplePostAndGetPage[YesNoType, Html](coproductField[YesNoType])
-
-//   implicit val wmcContactDetails: WMC[ContactDetails] = new SimplePostAndGetPage[ContactDetails, Html](productField[ContactDetails])
-//   implicit val wmcAddress: WMC[Address] = new SimplePostAndGetPage[Address, Html](productField[Address])
-
-  // implicit val wmcOtherReasonWrapper: WMC[OtherReasonWrapper]           = new SimplePostAndGetPage[OtherReasonWrapper, Html](otherReasonField)
-  // implicit val wmcOptionString: WMC[Option[String]]                     = new SimplePostAndGetPage[Option[String], Html](stringOption)
-  // implicit val wmcString: WMC[String]                                   = new SimplePostAndGetPage[String, Html](stringField)
 
 }
