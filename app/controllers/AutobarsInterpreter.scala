@@ -351,7 +351,9 @@ class AutobarsInterpreter(
     override def decode(in: Input): Either[ErrorTree, A] =
       in.toStringField().toEither.flatMap(str =>
         JsString(str).validate[A].asEither.left.map {
-          e => ErrorMsg(e.toString).toTree
+          e =>
+            logger.warn(s"Decode coproduct $in failed. Errors: $e")
+            ErrorMsg("required").toTree
         }
       )
 
@@ -379,10 +381,13 @@ class AutobarsInterpreter(
 
       override def decode(in: Input): Either[ErrorTree, A] = {
         val jsObject = JsObject(
-          in.map((key, value) => value.headOption.filter(_.trim.nonEmpty).flatMap(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
+          in.map((key, value) => value.headOption.flatMap(v => Some(key.mkString(".") -> JsString(v)))).flatten.toSeq
         )
+
         jsObject.validate[A].asEither.left.map {
-          e => ErrorMsg(e.toString).toTree
+          e =>
+            logger.warn(s"Decode product $in failed. Errors: $e")
+            ErrorMsg("required").toTree
         }
       }
 
