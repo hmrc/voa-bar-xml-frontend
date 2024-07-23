@@ -33,8 +33,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val ec                   = injector.instanceOf[ExecutionContext]

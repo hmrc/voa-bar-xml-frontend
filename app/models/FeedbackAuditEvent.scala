@@ -19,8 +19,8 @@ package models
 import play.api.libs.json.{Json, Writes}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 case class FeedbackAuditEvent(rating: Int, comments: String, afterSubmission: Boolean, submissionId: Option[String])
 
 object FeedbackAuditEvent {

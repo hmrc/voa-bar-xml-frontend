@@ -30,8 +30,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 class Cr05AddPropertyWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTell[(Cr05AddProperty, PropertyType, Option[Int]), Html] {
 
   /**
-   * Not edit links.
-   */
+    * Not edit links.
+    */
   def confirmationSummary(in: Cr05AddProperty, messagess: UniformMessages[Html]): SummaryList = {
     val sum = summaryList(in, PropertyType.EXISTING, None, messagess) // Not important, links are removed
     SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")

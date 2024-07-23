@@ -20,8 +20,8 @@ import scala.compiletime.summonAll
 import scala.deriving.Mirror
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 object ReflectionUtil {
 
   inline def findAllSubTypeNames[A](using m: Mirror.SumOf[A]): Seq[String] =

@@ -6,8 +6,6 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
 val appName = "voa-bar-xml-frontend"
 
-ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always // Resolves versions conflict
-
 ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / majorVersion := 1
 ThisBuild / scalafmtFailOnErrors := true
@@ -34,4 +32,4 @@ excludeDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-parser-combinators_2.13"
 )
 
-addCommandAlias("scalastyle", ";scalafmtAll;scalafmtSbt;scalafixAll")
+addCommandAlias("scalastyle", "scalafmtAll;scalafmtSbt;scalafixAll")

@@ -24,8 +24,8 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 class RootRedirectControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with Injecting {
 
   private val fakeRequest = FakeRequest("GET", "/")
