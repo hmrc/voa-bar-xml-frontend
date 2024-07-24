@@ -3,9 +3,9 @@ import sbt.*
 
 object Dependencies {
 
-  private val bootstrapVersion        = "9.0.0"
-  private val hmrcMongoVersion        = "2.1.0"
-  private val playFrontendHmrcVersion = "10.3.0"
+  private val bootstrapVersion        = "9.1.0"
+  private val hmrcMongoVersion        = "2.2.0"
+  private val playFrontendHmrcVersion = "10.5.0"
   private val guiceUtilsVersion       = "6.0.0"
   private val pdfBoxVersion           = "2.0.31" // 3.0.2
   private val uniformVersion          = "4.10.0"

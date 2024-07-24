@@ -23,8 +23,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import javax.inject.{Inject, Singleton}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 @Singleton
 class RootRedirectController @Inject() (cc: MessagesControllerComponents) extends FrontendController(cc) {
 

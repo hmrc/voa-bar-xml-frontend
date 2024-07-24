@@ -26,8 +26,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 @Singleton
 class AuditService @Inject() (
   val auditingConfig: AuditingConfig,

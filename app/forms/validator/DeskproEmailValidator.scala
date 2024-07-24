@@ -19,10 +19,10 @@ package forms.validator
 import scala.util.matching.Regex
 
 /**
- * Copy of hmrc-deskpro DeskproEmailValidator.
- *
- * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/DeskproEmailValidator.scala
- */
+  * Copy of hmrc-deskpro DeskproEmailValidator.
+  *
+  * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/DeskproEmailValidator.scala
+  */
 case class DeskproEmailValidator() {
 
   // The regexes used in this validator are based on PCRE regexes provided by Deskpro via DDC Ops in December 2020

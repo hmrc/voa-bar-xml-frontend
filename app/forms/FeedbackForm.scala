@@ -21,8 +21,8 @@ import play.api.data.Form
 import play.api.data.Forms.{boolean, default, mapping, number, optional, text}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 case class FeedbackForm(
   rating: Int,
   name: String,

@@ -17,10 +17,10 @@
 package forms.validator
 
 /**
- * Copy of hmrc-deskpro NameValidator.
- *
- * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/NameValidator.scala
- */
+  * Copy of hmrc-deskpro NameValidator.
+  *
+  * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/NameValidator.scala
+  */
 case class NameValidator() {
 
   val nameRegex: String = """^[A-Za-z\-.,()'"\s]+$"""

@@ -30,8 +30,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * @author Yuriy Tumakha
- */
+  * @author Yuriy Tumakha
+  */
 @Singleton
 class FeedbackController @Inject() (
   servicesConfig: ServicesConfig,
