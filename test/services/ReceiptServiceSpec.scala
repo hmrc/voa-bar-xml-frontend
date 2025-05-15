@@ -16,16 +16,17 @@
 
 package services
 
-import java.io.ByteArrayInputStream
-import java.time.Instant
-import models._
+import models.*
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.common.PDRectangle
-import org.apache.pdfbox.pdmodel.font.PDType1Font
-import org.apache.pdfbox.pdmodel.{PDDocument, PDPage}
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts
+import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.text.PDFTextStripper
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.MessagesApi
+
+import java.time.Instant
 
 class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
@@ -44,7 +45,8 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       val data = service.producePDF(reportStatus)
 
-      val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
+      val pdf = Loader.loadPDF(data.get)
+
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
       new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
@@ -63,7 +65,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       val data = service.producePDF(reportStatus)
 
-      val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
+      val pdf = Loader.loadPDF(data.get)
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
@@ -83,7 +85,8 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
 
       val data = service.producePDF(reportStatus)
 
-      val pdf = PDDocument.load(new ByteArrayInputStream(data.get))
+      val pdf = Loader.loadPDF(data.get)
+
       pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
 
       new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
@@ -93,7 +96,7 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
 
     "have correct font" in {
-      service.font must be(PDType1Font.HELVETICA_BOLD)
+      service.font.getBaseFont must be(Standard14Fonts.FontName.HELVETICA_BOLD.getName)
     }
 
     "have correct margin, font size and leading" in {
