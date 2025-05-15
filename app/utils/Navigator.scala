@@ -36,8 +36,9 @@ class Navigator @Inject() () {
     CheckYourAnswersId         -> (_ => routes.UniformController.cr05CheckAnswerJourney())
   )
 
-  private val editRouteMap: Map[Identifier, UserAnswers => Call] = Map(
-  )
+  private val editRouteMap: Map[Identifier, UserAnswers => Call] =
+    Map(
+    )
 
   def nextPage(id: Identifier, mode: Mode): UserAnswers => Call = mode match {
     case NormalMode =>

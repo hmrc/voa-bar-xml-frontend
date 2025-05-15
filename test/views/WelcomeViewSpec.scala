@@ -29,7 +29,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val welcomeFakeRequest = fakeRequest
 
-  def createView = () => welcome(frontendAppConfig, username, cr05FeatureFlag)(welcomeFakeRequest, messages)
+  def createView = () => welcome(frontendAppConfig, username, cr05FeatureFlag)(using welcomeFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 
@@ -45,7 +45,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   // Welcome page containing form for navigation
 
-  def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser, cr05FeatureFlag)(welcomeFakeRequest, messages)
+  def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser, cr05FeatureFlag)(using welcomeFakeRequest, messages)
 
   def uploadLinkTest(ba: String, formDoc: Document) =
     s"The upload link to the goToCouncilTaxUploadPage method for $ba" in {
@@ -62,9 +62,8 @@ class WelcomeViewSpec extends ViewBehaviours {
   def runFormNavigationTests(ba: String) = {
     lazy val formDoc = asDocument(createFormView(ba)())
 
-    s"The webform link is not visible for $ba" in {
+    s"The webform link is not visible for $ba" in
       assertThrows[NullPointerException](formDoc.getElementById("create").attr("href"))
-    }
 
     uploadLinkTest(ba, formDoc)
     viewHistoryTest(ba, formDoc)

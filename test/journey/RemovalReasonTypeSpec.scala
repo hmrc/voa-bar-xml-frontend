@@ -30,7 +30,7 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
     ReflectionUtil.findAllSubTypeNames[RemovalReasonType] should contain theSameElementsAs RemovalReasonType.order
   }
 
-  it should "deserialize" in {
+  it should "deserialize" in
     List(
       "Demolition",
       "Disrepair",
@@ -47,9 +47,8 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
       val noPlanningReferenceType = jsResult.get
       noPlanningReferenceType.toString shouldBe removalReasonTypeString
     }
-  }
 
-  it should "serialize" in {
+  it should "serialize" in
     List(
       Demolition,
       Disrepair,
@@ -60,8 +59,7 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
       Duplicate,
       OtherReason
     ).foreach { removalReasonType =>
-      Json.toJson(removalReasonType)(RemovalReasonType.format) shouldBe JsString(removalReasonType.toString)
+      Json.toJson(removalReasonType)(using RemovalReasonType.format) shouldBe JsString(removalReasonType.toString)
     }
-  }
 
 }

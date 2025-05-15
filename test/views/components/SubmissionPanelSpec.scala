@@ -27,7 +27,7 @@ class SubmissionPanelSpec extends ViewBehaviours {
   val baCode        = "baCode"
   val reportStatus1 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
-  def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(messages)
+  def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(using messages)
 
   "Submission Panel" must {
 

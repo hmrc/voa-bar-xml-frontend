@@ -92,7 +92,7 @@ class CouncilTaxUploadController @Inject() (
       case _                   =>
         val errorMsg = s"Couldn't parse: \n${request.body}"
         log.warn(errorMsg)
-        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(request.asInstanceOf[Request[?]])))
+        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(using request.asInstanceOf[Request[?]])))
     }
 
   def onPageLoad(showEmptyError: Boolean): Action[AnyContent] = getData.async {

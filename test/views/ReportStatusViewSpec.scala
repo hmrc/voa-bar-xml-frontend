@@ -39,7 +39,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
   val reportStatusFakeRequest = fakeRequest
 
   def createView(reportStatuses: Seq[ReportStatus] = Seq()) =
-    () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(reportStatusFakeRequest, messages)
+    () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(using reportStatusFakeRequest, messages)
 
   def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
 

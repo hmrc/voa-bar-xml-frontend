@@ -27,7 +27,7 @@ trait FormSpec extends AnyWordSpec with OptionValues with should.Matchers {
     form.bind(data).fold(
       formWithErrors => {
         for (error <- expectedErrors) formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
-        formWithErrors.errors.size shouldBe expectedErrors.size
+        formWithErrors.errors.size                        shouldBe expectedErrors.size
       },
       form => fail(s"Expected a validation error when binding the form, but it was bound successfully. $form")
     )

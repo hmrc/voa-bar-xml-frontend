@@ -34,10 +34,10 @@ class ConfirmationViewSpec extends ViewBehaviours {
   )
 
   def createView =
-    () => confirmation(username, submissionId)(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId)(using confirmationFakeRequest, messages)
 
   def createViewWithStatus =
-    () => confirmation(username, submissionId, Some(reportStatus))(confirmationFakeRequest, messages)
+    () => confirmation(username, submissionId, Some(reportStatus))(using confirmationFakeRequest, messages)
 
   lazy val doc = asDocument(createView())
 

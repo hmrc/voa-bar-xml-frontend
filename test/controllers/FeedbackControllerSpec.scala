@@ -49,7 +49,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
     val http = mock[DefaultHttpClient](withSettings.strictness(Strictness.LENIENT))
 
     when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])(
-      any[HttpReads[HttpResponse]],
+      using any[HttpReads[HttpResponse]],
       any[HeaderCarrier],
       any[ExecutionContext]
     ))
@@ -63,7 +63,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       feedbackThxView,
       feedbackErrorView,
       controllerComponents
-    )(ec)
+    )(using ec)
   }
 
   "FeedbackController" should {
@@ -71,7 +71,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = feedbackController.onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe feedbackView(feedbackForm)(fakeRequest, messages).toString
+      contentAsString(result) mustBe feedbackView(feedbackForm)(using fakeRequest, messages).toString
     }
 
     "return 303 redirect for valid form data" in {
@@ -92,14 +92,14 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       val result = feedbackController.feedbackThx(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe feedbackThxView()(fakeRequest, messages).toString
+      contentAsString(result) mustBe feedbackThxView()(using fakeRequest, messages).toString
     }
 
     "be able to display error page" in {
       val result = feedbackController.feedbackError(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe feedbackErrorView()(fakeRequest, messages).toString
+      contentAsString(result) mustBe feedbackErrorView()(using fakeRequest, messages).toString
     }
   }
 

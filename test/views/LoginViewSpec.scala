@@ -30,9 +30,9 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
 
   override val form = new LoginFormProvider()()
 
-  def createView = () => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createView = () => login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages)
 
-  def createViewUsingForm = (form: Form[Login]) => login(frontendAppConfig, form, NormalMode)(fakeRequest, messages)
+  def createViewUsingForm = (form: Form[Login]) => login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages)
 
   "Login view" must {
 

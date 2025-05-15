@@ -78,7 +78,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     )
   }
 
-  def viewAsString(form: Form[Login] = form) = login(frontendAppConfig, form, NormalMode)(fakeRequest, messages).toString
+  def viewAsString(form: Form[Login] = form) = login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages).toString
 
   "Login Controller" must {
 

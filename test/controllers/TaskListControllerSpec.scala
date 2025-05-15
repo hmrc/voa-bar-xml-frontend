@@ -53,7 +53,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       taskList
-    )(ec)
+    )(using ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -67,10 +67,10 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       welcome
-    )(ec)
+    )(using ec)
   }
 
-  def viewAsString() = taskList(username)(fakeRequest, messages).toString
+  def viewAsString() = taskList(username)(using fakeRequest, messages).toString
 
   "Logging Controller" must {
 

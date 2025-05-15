@@ -1,12 +1,9 @@
-import com.typesafe.sbt.web.Import.*
-import net.ground5hark.sbt.concat.Import.*
-import com.typesafe.sbt.digest.Import.*
 import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
 val appName = "voa-bar-xml-frontend"
 
-ThisBuild / scalaVersion := "3.4.2"
+ThisBuild / scalaVersion := "3.7.0"
 ThisBuild / majorVersion := 1
 ThisBuild / scalafmtFailOnErrors := true
 ThisBuild / semanticdbEnabled := true
@@ -15,8 +12,11 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
+    maintainer := "voa.service.optimisation@digital.hmrc.gov.uk",
     scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
+    scalacOptions += "-Wconf:msg=Flag .* set repeatedly:s",
+    scalacOptions += "-Wconf:msg=Implicit parameters should be provided with a \\`using\\` clause&src=views/.*:s",
+    javaOptions += "-XX:+EnableDynamicAgentLoading",
     RoutesKeys.routesImport ++= Seq("models._"),
     PlayKeys.playDefaultPort := 8448,
     libraryDependencies ++= Dependencies.appDependencies

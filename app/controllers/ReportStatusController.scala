@@ -98,10 +98,10 @@ class ReportStatusController @Inject() (
   def onReceiptDownload(submissionId: String): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
-        login               <- EitherT(cachedLogin(request.externalId))
-        reportStatus        <- EitherT(getReportStatus(submissionId, login))
-        data                <- EitherT(getPDF(reportStatus))
-        date                 = reportStatus.formattedCreatedShort
+        login        <- EitherT(cachedLogin(request.externalId))
+        reportStatus <- EitherT(getReportStatus(submissionId, login))
+        data         <- EitherT(getPDF(reportStatus))
+        date          = reportStatus.formattedCreatedShort
       } yield Ok(data).withHeaders(
         HeaderNames.CONTENT_TYPE        -> withCharset("application/pdf"),
         HeaderNames.CONTENT_DISPOSITION ->
@@ -132,8 +132,8 @@ class ReportStatusController @Inject() (
   def onAllReceiptsDownload: Action[AnyContent] = getData.async {
     implicit request =>
       (for {
-        login                 <- EitherT(cachedLogin(request.externalId))
-        reportStatuses        <- EitherT(allReportStatuses(login))
+        login          <- EitherT(cachedLogin(request.externalId))
+        reportStatuses <- EitherT(allReportStatuses(login))
       } yield Ok(createCsv(reportStatuses)).withHeaders(
         HeaderNames.CONTENT_TYPE        -> withCharset("application/csv"),
         HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=all-submission-status-${Instant.now}.csv"""

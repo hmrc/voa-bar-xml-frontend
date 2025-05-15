@@ -46,20 +46,20 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
 
   def servicesConfig = app.injector.instanceOf[ServicesConfig]
 
-  when(httpMock.GET[Seq[ReportStatus]](any[String], any, any)(any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
+  when(httpMock.GET[Seq[ReportStatus]](any[String], any, any)(using any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
     .thenReturn(Future(Seq(rs)))
   when(httpMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus], any)(
-    any[Writes[ReportStatus]],
+    using any[Writes[ReportStatus]],
     any[HttpReads[HttpResponse]],
     any[HeaderCarrier],
     any[ExecutionContext]
   ))
     .thenReturn(Future(httpResponse))
   val httpFailMock = mock[HttpClient]
-  when(httpFailMock.GET[Seq[ReportStatus]](any[String], any, any)(any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
+  when(httpFailMock.GET[Seq[ReportStatus]](any[String], any, any)(using any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
     .thenReturn(Future.failed(exception))
   when(httpFailMock.PUT[ReportStatus, HttpResponse](any[String], any[ReportStatus], any)(
-    any[Writes[ReportStatus]],
+    using any[Writes[ReportStatus]],
     any[HttpReads[HttpResponse]],
     any[HeaderCarrier],
     any[ExecutionContext]
@@ -127,7 +127,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     "given submission id get reportstatus" in {
       implicit val hc = HeaderCarrier()
       val http        = mock[HttpClient]
-      when(http.GET[ReportStatus](any[String], any, any)(any[HttpReads[ReportStatus]], any[HeaderCarrier], any[ExecutionContext]))
+      when(http.GET[ReportStatus](any[String], any, any)(using any[HttpReads[ReportStatus]], any[HeaderCarrier], any[ExecutionContext]))
         .thenReturn(Future(rs))
       val connector   = new DefaultReportStatusConnector(configuration, http, servicesConfig)
       val login       = Login("AUser", "anyPass")
@@ -152,7 +152,7 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar {
     "get all reportstatus" in {
       implicit val hc = HeaderCarrier()
       val http        = mock[HttpClient]
-      when(http.GET[Seq[ReportStatus]](any[String], any, any)(any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
+      when(http.GET[Seq[ReportStatus]](any[String], any, any)(using any[HttpReads[Seq[ReportStatus]]], any[HeaderCarrier], any[ExecutionContext]))
         .thenReturn(Future(Seq(rs)))
       val connector   = new DefaultReportStatusConnector(configuration, http, servicesConfig)
       val login       = Login("AUser", "anyPass")

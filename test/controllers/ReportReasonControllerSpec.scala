@@ -47,7 +47,7 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   def reportReasonController() = {
 
-    val dataRetrievalAction = new DataRetrievalActionImpl(FakeDataCacheConnector2, inject[BodyParsers.Default])(ec)
+    val dataRetrievalAction = new DataRetrievalActionImpl(FakeDataCacheConnector2, inject[BodyParsers.Default])(using ec)
 
     FakeDataCacheConnector2.resetCaptures()
     FakeDataCacheConnector2.save[String](sessionId, VOAAuthorisedId.toString, username)
@@ -63,7 +63,7 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       inject[reportReason],
       inject[Configuration],
       inject[MessagesControllerComponents]
-    )(ec)
+    )(using ec)
   }
 
   def viewAsString() = inject[reportReason]
@@ -77,7 +77,7 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       status(result) mustBe OK
 
       val dataRequest = new DataRequest[AnyContent](req, sessionId, new UserAnswers(FakeDataCacheConnector2.fetchMap(sessionId)))
-      contentAsString(result) mustBe viewAsString()(ReportReasonController.form, true)(dataRequest, inject[MessagesApi].preferred(req)).toString()
+      contentAsString(result) mustBe viewAsString()(ReportReasonController.form, true)(using dataRequest, inject[MessagesApi].preferred(req)).toString()
     }
 
     "return redirect on successful form submission" in {

@@ -35,7 +35,7 @@ class AuthAction @Inject() (
   override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] =
     if (request.userAnswers.login.isEmpty) {
       val messages = cc.messagesApi.preferred(request)
-      Future.successful(Some(Unauthorized(unauthorised(appConfig)(request, messages))))
+      Future.successful(Some(Unauthorized(unauthorised(appConfig)(using request, messages))))
     } else {
       Future.successful(None)
     }

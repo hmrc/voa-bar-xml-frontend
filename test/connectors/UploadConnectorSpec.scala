@@ -70,7 +70,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
   def getHttpMock(returnedStatus: Int, returnedString: Option[String]) = {
     val httpMock = mock[HttpClient]
     when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
-      any[Writes[JsValue]],
+      using any[Writes[JsValue]],
       any[HttpReads[Any]],
       any[HeaderCarrier],
       any[ExecutionContext]
@@ -98,7 +98,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
         await(connector.sendXml(xmlUrl, login, submissionId))
         verify(httpMock)
           .POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
-            any[Writes[VoaBarUpload]],
+            using any[Writes[VoaBarUpload]],
             httpReadsNapper.capture,
             headerCarrierNapper.capture,
             any[ExecutionContext]
@@ -126,7 +126,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
       "return a failure if the upload call throws an exception" in {
         val httpMock  = mock[HttpClient]
         when(httpMock.POST(any[String], any[VoaBarUpload], any[Seq[(String, String)]])(
-          any[Writes[VoaBarUpload]],
+          using any[Writes[VoaBarUpload]],
           any[HttpReads[Any]],
           any[HeaderCarrier],
           any[ExecutionContext]
@@ -166,7 +166,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
         )
         val httpMock                     = mock[HttpClient]
         when(httpMock.POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(
-          jsonWritesNapper.capture,
+          using jsonWritesNapper.capture,
           httpReadsNapper.capture,
           headerCarrierNapper.capture,
           any[ExecutionContext]
@@ -179,7 +179,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers 
         response.map(_.reference mustBe reference)
         verify(httpMock, times(1))
           .POST[InitiateRequest, InitiateResponse](any[String], any[InitiateRequest], any[Seq[(String, String)]])(
-            jsonWritesNapper.capture,
+            using jsonWritesNapper.capture,
             httpReadsNapper.capture,
             headerCarrierNapper.capture,
             any[ExecutionContext]

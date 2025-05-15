@@ -26,7 +26,7 @@ class SubmissionBodySpec extends ViewBehaviours {
   val baCode       = "baCode"
   val reportStatus = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
-  def submission = () => submission_body(reportStatus)(messages)
+  def submission = () => submission_body(reportStatus)(using messages)
 
   lazy val doc = asDocument(submission())
 
