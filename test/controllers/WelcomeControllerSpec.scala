@@ -53,7 +53,7 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       welcome
-    )(ec)
+    )(using ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -67,10 +67,10 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       welcome
-    )(ec)
+    )(using ec)
   }
 
-  def viewAsString() = welcome(frontendAppConfig, username, cr05FeatureFlag)(fakeRequest, messages).toString
+  def viewAsString() = welcome(frontendAppConfig, username, cr05FeatureFlag)(using fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

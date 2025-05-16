@@ -39,16 +39,16 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
   "DefaultCr01Cr03ServiceSpec" should {
     "Create CR05 report and store in backend" in {
       val connector = mock[ReportStatusConnector]
-      when(connector.save(any[ReportStatus], any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
+      when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
       val service = new DefaultCr01Cr03Service(connector)
 
       val submission = Cr05Submission(BA_REF, "baRef", LocalDate.of(2020, 2, 2), Seq(), Seq(), Some("planningRef"), None, Some("comment"))
 
-      service.storeSubmission(submission, Login(BA_REF, "xxx", None))(HeaderCarrier())
+      service.storeSubmission(submission, Login(BA_REF, "xxx", None))(using HeaderCarrier())
 
-      verify(connector).save(captor, any[Login])(any[HeaderCarrier])
+      verify(connector).save(captor, any[Login])(using any[HeaderCarrier])
 
       captor.getValue must not be null
       captor.getValue.baCode.value mustBe BA_REF
@@ -58,7 +58,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
 
     "Create CR01 and CR03 report and store in backend" in {
       val connector = mock[ReportStatusConnector]
-      when(connector.save(any[ReportStatus], any[Login])(any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
+      when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
       val service = new DefaultCr01Cr03Service(connector)
@@ -81,9 +81,9 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
         Some("comment")
       )
 
-      service.storeSubmission(submission, Login(BA_REF, "xxx", None))(HeaderCarrier())
+      service.storeSubmission(submission, Login(BA_REF, "xxx", None))(using HeaderCarrier())
 
-      verify(connector).save(captor, any[Login])(any[HeaderCarrier])
+      verify(connector).save(captor, any[Login])(using any[HeaderCarrier])
 
       captor.getValue must not be null
       captor.getValue.baCode.value mustBe BA_REF

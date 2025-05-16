@@ -19,7 +19,7 @@ package services
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import models.{BillingAuthorities, ReportStatus}
 import org.apache.pdfbox.pdmodel.common.PDRectangle
-import org.apache.pdfbox.pdmodel.font.PDType1Font
+import org.apache.pdfbox.pdmodel.font.{PDType1Font, Standard14Fonts}
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory
 import org.apache.pdfbox.pdmodel.{PDDocument, PDDocumentInformation, PDPage, PDPageContentStream}
 import play.api.i18n.{Lang, MessagesApi}
@@ -35,10 +35,10 @@ import scala.util.Try
 class DefaultReceiptService @Inject() (
   messages: MessagesApi
 ) extends ReceiptService {
-  val font     = PDType1Font.HELVETICA_BOLD
-  val fontSize = 12f
-  val leading  = 1.5f * fontSize
-  val margin   = 72
+  val font: PDType1Font = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+  val fontSize          = 12f
+  val leading           = 1.5f * fontSize
+  val margin            = 72
 
   implicit val lang: Lang = Lang(Locale.UK)
 

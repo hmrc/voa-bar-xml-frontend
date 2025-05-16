@@ -65,7 +65,7 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
     encoding.decode(input).value shouldBe LocalDate.of(2020, 3, 30)
   }
 
-  it should "Fail validation for all invalidInput" in {
+  it should "Fail validation for all invalidInput" in
     forAll(invalidInputDate) { (_day: String, _month: String, _year: String) =>
       val input = Map(
         year  -> List(_year),
@@ -74,9 +74,8 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
       )
       encoding.decode(input).left.value shouldBe a[ErrorTree]
     }
-  }
 
-  it should "Validate input for all valid input dates" in {
+  it should "Validate input for all valid input dates" in
     forAll(validInputDate) { (_day: String, _month: String, _year: String) =>
       val input = Map(
         year  -> List(_year),
@@ -85,7 +84,6 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
       )
       encoding.decode(input).value shouldBe a[LocalDate]
     }
-  }
 
   it should "convert LocalDate to Input" in {
     encoding.encode(LocalDate.of(1900, 1, 1)) shouldBe (Map(

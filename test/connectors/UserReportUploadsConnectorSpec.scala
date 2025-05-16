@@ -48,7 +48,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       "return a successful result when valid arguments are provided" in {
         val httpMock                    = mock[HttpClient]
         when(httpMock.PUT(any[String], any[UserReportUpload], any[Seq[(String, String)]])(
-          any[Writes[UserReportUpload]],
+          using any[Writes[UserReportUpload]],
           any[HttpReads[HttpResponse]],
           any[HeaderCarrier],
           any[ExecutionContext]
@@ -63,7 +63,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       "return a failed result when the repository fails" in {
         val httpMock                    = mock[HttpClient]
         when(httpMock.PUT(any[String], any[UserReportUpload], any[Seq[(String, String)]])(
-          any[Writes[UserReportUpload]],
+          using any[Writes[UserReportUpload]],
           any[HttpReads[HttpResponse]],
           any[HeaderCarrier],
           any[ExecutionContext]
@@ -80,7 +80,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       "a successful result when a valid reference id is provided" in {
         val httpMock                    = mock[HttpClient]
         when(httpMock.GET[Option[UserReportUpload]](any[String], any, any)(
-          any[HttpReads[Option[UserReportUpload]]],
+          using any[HttpReads[Option[UserReportUpload]]],
           any[HeaderCarrier],
           any[ExecutionContext]
         ))
@@ -94,7 +94,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
       "return a failed result when the repository fails" in {
         val httpMock                    = mock[HttpClient]
         when(httpMock.GET[Option[UserReportUpload]](any[String], any, any)(
-          any[HttpReads[Option[UserReportUpload]]],
+          using any[HttpReads[Option[UserReportUpload]]],
           any[HeaderCarrier],
           any[ExecutionContext]
         ))

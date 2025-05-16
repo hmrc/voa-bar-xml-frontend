@@ -198,7 +198,7 @@ class UniformController @Inject() (
     import UniformJourney.*
     import interpreter.*
 
-    getCr05Submission(request).flatMap { submission =>
+    getCr05Submission(using request).flatMap { submission =>
       val addCommentsProgram = addComments(create[TellTypes, AskTypes](messages(request)), submission.comments)
       addCommentsProgram.run(targetId, purgeStateUponCompletion = true) { comments =>
         val cr05Submission = submission.copy(comments = comments)

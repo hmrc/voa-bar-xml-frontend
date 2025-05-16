@@ -33,7 +33,7 @@ class SessionExpiredControllerSpec extends ControllerSpecBase {
 
     "return the correct view for a GET" in {
       val result = new SessionExpiredController(frontendAppConfig, controllerComponents, session_expired).onPageLoad()(fakeRequest)
-      contentAsString(result) mustBe session_expired(frontendAppConfig)(fakeRequest, messages).toString
+      contentAsString(result) mustBe session_expired(frontendAppConfig)(using fakeRequest, messages).toString
     }
   }
 }

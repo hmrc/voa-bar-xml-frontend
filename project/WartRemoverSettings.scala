@@ -12,6 +12,7 @@ object WartRemoverSettings extends AutoPlugin {
     Warts.allBut(
       Wart.Equals,
       Wart.ImplicitParameter,
+      Wart.ImplicitConversion,
       Wart.DefaultArguments,
       Wart.Throw,
       Wart.Nothing,
@@ -25,6 +26,9 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.PlatformDefault,
       Wart.MutableDataStructures,
       Wart.SeqUpdated,
+      Wart.SeqApply,
+      Wart.SizeIs,
+      Wart.Null,
       Wart.While,
       Wart.Var,
       Wart.Any
@@ -35,12 +39,18 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.Equals,
       Wart.ToString,
       Wart.ImplicitParameter,
+      Wart.ImplicitConversion,
       Wart.DefaultArguments,
       Wart.Throw,
       Wart.Nothing,
       Wart.Overloading,
       Wart.FinalCaseClass,
       Wart.PlatformDefault,
+      Wart.SeqUpdated,
+      Wart.SeqApply,
+      Wart.SizeIs,
+      Wart.Null,
+      Wart.Any,
       Wart.While
     )
 
@@ -71,6 +81,9 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.ToString,
       Wart.GlobalExecutionContext,
       Wart.DefaultArguments,
+      Wart.AsInstanceOf,
+      Wart.Any,
+      Wart.Null,
       Wart.Nothing,
       Wart.Throw,
       Wart.Overloading,

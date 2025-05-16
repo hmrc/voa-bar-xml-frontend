@@ -51,7 +51,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       addToList
-    )(ec)
+    )(using ec)
   }
 
   def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -66,7 +66,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       addToList
-    )(ec)
+    )(using ec)
   }
 
   def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
@@ -79,11 +79,11 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       FakeDataCacheConnector,
       controllerComponents,
       addToList
-    )(ec)
+    )(using ec)
   }
 
   def viewAsString(submission: Cr05SubmissionBuilder): String =
-    addToList(Some(username), submission, models.YesNoForm.yesNoForm)(fakeRequest, messages).toString
+    addToList(Some(username), submission, models.YesNoForm.yesNoForm)(using fakeRequest, messages).toString
 
   def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")

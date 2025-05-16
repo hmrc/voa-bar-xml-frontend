@@ -29,7 +29,7 @@ class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with 
     ReflectionUtil.findAllSubTypeNames[NoPlanningReferenceType] should contain theSameElementsAs NoPlanningReferenceType.order
   }
 
-  it should "deserialize" in {
+  it should "deserialize" in
     List(
       "WithoutPlanningPermission",
       "NotApplicablePlanningPermission",
@@ -38,14 +38,13 @@ class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with 
       "NoPlanningApplicationSubmitted"
     ).foreach { planningPermission =>
       val json     = JsString(planningPermission)
-      val jsResult = Json.fromJson(json)(NoPlanningReferenceType.format)
+      val jsResult = Json.fromJson(json)(using NoPlanningReferenceType.format)
       jsResult.isSuccess shouldBe true
       val noPlanningReferenceType = jsResult.get
       noPlanningReferenceType.toString shouldBe planningPermission
     }
-  }
 
-  it should "serialize" in {
+  it should "serialize" in
     List(
       WithoutPlanningPermission,
       NotApplicablePlanningPermission,
@@ -53,8 +52,7 @@ class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with 
       PermittedDevelopment,
       NoPlanningApplicationSubmitted
     ).foreach { noPlanningPermission =>
-      Json.toJson(noPlanningPermission)(NoPlanningReferenceType.format) shouldBe JsString(noPlanningPermission.toString)
+      Json.toJson(noPlanningPermission)(using NoPlanningReferenceType.format) shouldBe JsString(noPlanningPermission.toString)
     }
-  }
 
 }

@@ -88,34 +88,34 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
   val error            = Error("error", Seq())
 
   val uploadConnector = mock[UploadConnector]
-  when(uploadConnector.sendXml(any[String], any[Login], any[String])(any[HeaderCarrier])).thenReturn(Future(Right(submissionId)))
-  when(uploadConnector.initiate(any[InitiateRequest])(any[HeaderCarrier])).thenReturn(Future(Right(initiateResponse)))
+  when(uploadConnector.sendXml(any[String], any[Login], any[String])(using any[HeaderCarrier])).thenReturn(Future(Right(submissionId)))
+  when(uploadConnector.initiate(any[InitiateRequest])(using any[HeaderCarrier])).thenReturn(Future(Right(initiateResponse)))
 
   val uploadConnectorF = mock[UploadConnector]
-  when(uploadConnectorF.sendXml(any[String], any[Login], any[String])(any[HeaderCarrier])).thenReturn(Future(Left(Error(
+  when(uploadConnectorF.sendXml(any[String], any[Login], any[String])(using any[HeaderCarrier])).thenReturn(Future(Left(Error(
     "SEND-XML-ERROR",
     Seq("Received exception from upstream service")
   ))))
-  when(uploadConnectorF.initiate(any[InitiateRequest])(any[HeaderCarrier])).thenReturn(Future(Left(Error(
+  when(uploadConnectorF.initiate(any[InitiateRequest])(using any[HeaderCarrier])).thenReturn(Future(Left(Error(
     "INITIATE-ERROR",
     Seq("Received exception from upscan service")
   ))))
 
   val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
-  when(userReportUploadsConnectorMock.save(any[UserReportUpload])(any[HeaderCarrier])).thenReturn(Future(Right(())))
-  when(userReportUploadsConnectorMock.getById(any[String], any[Login])(any[HeaderCarrier])).thenReturn(Future(Right(Some(userReport))))
+  when(userReportUploadsConnectorMock.save(any[UserReportUpload])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
+  when(userReportUploadsConnectorMock.getById(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(Some(userReport))))
 
   val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
-  when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])(any[HeaderCarrier])).thenReturn(Future(Left(error)))
-  when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])(any[HeaderCarrier])).thenReturn(Future(Left(error)))
+  when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
+  when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
 
   val reportStatusConnectorMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])).thenReturn(Future(Right(())))
-  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])).thenReturn(Future(Right(())))
+  when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
+  when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
 
   val reportStatusConnectorFailMock = mock[ReportStatusConnector]
-  when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])(any[HeaderCarrier])).thenReturn(Future(Left(error)))
-  when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[Login])(any[HeaderCarrier])).thenReturn(Future(Left(error)))
+  when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
+  when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
 
   def loggedInController(
     connector: UploadConnector,
@@ -167,7 +167,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     )
   }
 
-  def viewAsString(form: Form[?] = form) = councilTaxUpload(username, form, Some(initiateResponse))(fakeRequest, messages).toString
+  def viewAsString(form: Form[?] = form) = councilTaxUpload(username, form, Some(initiateResponse))(using fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 

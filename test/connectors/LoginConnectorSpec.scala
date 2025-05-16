@@ -49,7 +49,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
   def getHttpMock(returnedStatus: Int) = {
     val httpMock = mock[HttpClient]
     when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
-      any[Writes[JsValue]],
+      using any[Writes[JsValue]],
       any[HttpReads[Any]],
       any[HeaderCarrier],
       any[ExecutionContext]
@@ -73,7 +73,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
         await(connector.send(login))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
-          jsonWritesNapper.capture,
+          using jsonWritesNapper.capture,
           httpReadsNapper.capture,
           headerCarrierNapper.capture,
           any[ExecutionContext]
@@ -116,7 +116,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
         await(connector.sendJson(minimalJson))
 
         verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
-          jsonWritesNapper.capture,
+          using jsonWritesNapper.capture,
           httpReadsNapper.capture,
           headerCarrierNapper.capture,
           any[ExecutionContext]
@@ -144,7 +144,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
       "return a failure if the data transfer call throws an exception" in {
         val httpMock  = mock[HttpClient]
         when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
-          any[Writes[JsValue]],
+          using any[Writes[JsValue]],
           any[HttpReads[Any]],
           any[HeaderCarrier],
           any[ExecutionContext]

@@ -38,7 +38,7 @@
        <h2 class="govuk-heading-m">The property to be split</h2>
 
        @summaryList(
-       (new Cr05AddPropertyWebTell(summaryList)).confirmationSummary(cr05Submission.existingProperties(0), messages)
+       new Cr05AddPropertyWebTell(summaryList).confirmationSummary(cr05Submission.existingProperties(0), messages)
        )
      }
 
@@ -46,7 +46,7 @@
     <h2 class="govuk-heading-m">New property @(index + 1)</h2>
 
         @summaryList(
-            (new Cr05AddPropertyWebTell(summaryList)).confirmationSummary(property, messages)
+            new Cr05AddPropertyWebTell(summaryList).confirmationSummary(property, messages)
         )
     }
 

@@ -28,7 +28,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
 @Singleton
 class ReportDeleteController @Inject() (
@@ -49,7 +48,7 @@ class ReportDeleteController @Inject() (
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
     (for {
       login        <- EitherT(cachedLogin(request.externalId))
-      deleteStatus <- EitherT(reportStatusConnector.deleteByReference(reference, login)(hc))
+      deleteStatus <- EitherT(reportStatusConnector.deleteByReference(reference, login)(using hc))
     } yield Ok(
       s"""Response\n\n
          |Status code ${deleteStatus.status} \n

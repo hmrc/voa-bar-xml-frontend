@@ -73,7 +73,7 @@ class AutobarsInterpreter(
     messages: UniformMessages[Html],
     fieldStats: FormFieldStats
   ): Html =
-    page_chrome(key, errors, tell, ask, breadcrumbs, messages, fieldStats)(request, messagesApi.preferred(request))
+    page_chrome(key, errors, tell, ask, breadcrumbs, messages, fieldStats)(using request, messagesApi.preferred(request))
 
   implicit val ctTaxFormWebTell: Cr01Cr03SubmissionWebTell = new Cr01Cr03SubmissionWebTell(new GovukSummaryList())
 

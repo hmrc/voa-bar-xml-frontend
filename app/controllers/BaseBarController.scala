@@ -41,7 +41,7 @@ trait BaseBarController extends FrontendBaseController with Logging {
     errorTemplate(
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")
-    )(request, messages)
+    )(using request, messages)
 
   private[controllers] def cachedLogin(externalId: String): Future[Either[Result, Login]] =
     EitherT.fromOptionF(

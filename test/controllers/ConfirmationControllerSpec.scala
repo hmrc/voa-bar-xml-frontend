@@ -101,13 +101,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   }
 
   def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
-    reportConfirmationView(username, report, cr01cr03Report)(fakeRequest, messages).toString
+    reportConfirmationView(username, report, cr01cr03Report)(using fakeRequest, messages).toString
 
   def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
-    confirmationView(username, submissionId)(fakeRequest, messages).toString
+    confirmationView(username, submissionId)(using fakeRequest, messages).toString
 
   def refreshViewAsString() =
-    confirmationView(username, submissionId, Some(reportStatus))(fakeRequest, messages).toString
+    confirmationView(username, submissionId, Some(reportStatus))(using fakeRequest, messages).toString
 
   "Confirmation Controller" must {
 

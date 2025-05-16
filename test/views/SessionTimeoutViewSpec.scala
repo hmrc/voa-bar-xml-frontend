@@ -22,7 +22,7 @@ class SessionTimeoutViewSpec extends ViewBehaviours with ViewSpecBase {
 
   def sessionTimeout = app.injector.instanceOf[views.html.session_timeout]
 
-  def view = () => sessionTimeout()(fakeRequest, messages)
+  def view = () => sessionTimeout()(using fakeRequest, messages)
 
   "Session Timeout view" must {
 

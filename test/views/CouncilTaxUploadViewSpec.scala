@@ -54,9 +54,9 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
   private def createView(displayInitiateResponse: Boolean = true) =
     if (displayInitiateResponse) {
-      councilTaxUpload(username, form, Some(initiateResponse))(councilTaxUploadFakeRequest, messages)
+      councilTaxUpload(username, form, Some(initiateResponse))(using councilTaxUploadFakeRequest, messages)
     } else {
-      councilTaxUpload(username, form)(councilTaxUploadFakeRequest, messages)
+      councilTaxUpload(username, form)(using councilTaxUploadFakeRequest, messages)
     }
 
   lazy val doc = asDocument(createView())

@@ -30,7 +30,7 @@ class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDr
     ReflectionUtil.findAllSubTypeNames[ReasonReportType] should contain theSameElementsAs ReasonReportType.order
   }
 
-  it should "deserialize" in {
+  it should "deserialize" in
     List(
       "AddProperty",
       "RemoveProperty"
@@ -42,15 +42,13 @@ class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDr
       noPlanningReferenceType.toString shouldBe reasonTypeString
 
     }
-  }
 
-  it should "serialize" in {
+  it should "serialize" in
     List(
       AddProperty,
       RemoveProperty
     ).foreach { reasonReportType =>
-      Json.toJson(reasonReportType)(ReasonReportType.format) shouldBe JsString(reasonReportType.toString)
+      Json.toJson(reasonReportType)(using ReasonReportType.format) shouldBe JsString(reasonReportType.toString)
     }
-  }
 
 }
