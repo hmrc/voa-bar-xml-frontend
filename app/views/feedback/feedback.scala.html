@@ -1,5 +1,5 @@
 @*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,7 @@
 @this(
         main_template: views.html.govuk.main_template,
         feedbackFormTemplate: feedbackForm,
-        govukInput: GovukInput,
-        govukRadios: GovukRadios,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        formWithCSRF: FormWithCSRF
+        govukErrorSummary: GovukErrorSummary
 )
 
 @(form: Form[FeedbackForm])(implicit request: Request[?], messages: Messages)

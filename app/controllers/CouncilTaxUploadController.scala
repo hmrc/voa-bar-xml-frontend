@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class CouncilTaxUploadController @Inject() (
       case _                   =>
         val errorMsg = s"Couldn't parse: \n${request.body}"
         log.warn(errorMsg)
-        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(using request.asInstanceOf[Request[?]])))
+        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(using request)))
     }
 
   def onPageLoad(showEmptyError: Boolean): Action[AnyContent] = getData.async {
