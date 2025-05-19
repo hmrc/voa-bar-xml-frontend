@@ -1,5 +1,5 @@
 @*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 @import forms.FeedbackForm
 @import models.{Done, Failed, ReportStatus}
-@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components.confirmation_status_panel
 @import views.html.components.confirmation_detail_panel
 @import views.html.feedback.feedbackForm
@@ -25,8 +24,7 @@
     main_template: views.html.govuk.main_template,
     feedbackFormTemplate: feedbackForm,
     confirmationStatusPanel: confirmation_status_panel,
-    confirmationDetailPanel: confirmation_detail_panel,
-    govukSummaryList: GovukSummaryList
+    confirmationDetailPanel: confirmation_detail_panel
 )
 
 @(baCode: String, submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit request: Request[?], messages: Messages)

@@ -28,7 +28,7 @@ lazy val microservice = Project(appName, file("."))
     Assets / pipelineStages := Seq(concat, digest)
   )
 
-excludeDependencies ++= Seq(
+excludeDependencies ++= Seq( // Exclude dependencies added by com.luketebbs.uniform:interpreter-play28_2.13
   "org.scala-lang.modules" % "scala-parser-combinators_2.13"
 )
 
