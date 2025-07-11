@@ -3,9 +3,8 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
 val appName = "voa-bar-xml-frontend"
 
-ThisBuild / scalaVersion := "3.7.0"
+ThisBuild / scalaVersion := "3.7.1"
 ThisBuild / majorVersion := 1
-ThisBuild / scalafmtFailOnErrors := true
 ThisBuild / semanticdbEnabled := true
 
 lazy val microservice = Project(appName, file("."))
