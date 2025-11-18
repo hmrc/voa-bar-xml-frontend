@@ -190,7 +190,7 @@ object UniformJourney {
                               default = property.flatMap(_.contactAddress)
                             ) when (sameContactAddress == No)
       ctForm              = Cr05AddProperty(uprn, address, contactDetails, sameContactAddress == Yes, contactAddress)
-      _                  <- tell[(Cr05AddProperty, PropertyType, Option[Int])]("add-property-check-answers-property", ((ctForm, propertyType, index)))
+      _                  <- tell[(Cr05AddProperty, PropertyType, Option[Int])]("add-property-check-answers-property", (ctForm, propertyType, index))
     } yield ctForm
   }
 
