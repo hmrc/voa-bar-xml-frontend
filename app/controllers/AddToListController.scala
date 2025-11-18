@@ -72,7 +72,6 @@ class AddToListController @Inject() (
   }
 
   def removeProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
-
     val propertyIndex = request.body.asFormUrlEncoded.getOrElse(Map()).get("delete-index").map(_.head).flatMap { i =>
       Try {
         i.toInt

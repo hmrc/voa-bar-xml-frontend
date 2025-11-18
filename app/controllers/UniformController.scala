@@ -109,7 +109,6 @@ class UniformController @Inject() (
       import interpreter.*
 
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey).flatMap { maybeData =>
-
         val addCommonSectionProgram = addPropertyCommon[WM](create[TellTypes, AskTypes](messages(request)), maybeData.flatMap(_.cr05CommonSection))
         addCommonSectionProgram.run(targetId, purgeStateUponCompletion = true) { cr05CommonSection =>
           dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { savedCr05SubmissionBuilder =>
@@ -136,7 +135,6 @@ class UniformController @Inject() (
     (getData andThen requireData andThen auth).async {
       implicit request: DataRequest[AnyContent] =>
         getCr05Submission.flatMap { propertyBuilder =>
-
           val property = propertyType match {
             case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
             case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
