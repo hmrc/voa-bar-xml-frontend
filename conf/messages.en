@@ -2,9 +2,6 @@ checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
 checkYourAnswers.guidance = Guidance for check your answers
 
-date.day = Day
-date.month = Month
-date.year = Year
 file = File
 submission = Submission
 submission.view = View submission history
@@ -137,7 +134,6 @@ site.no = No
 site.yes = Yes
 site.submit = Submit
 site.continue = Continue
-site.service_name = Billing Authority Reports
 service.name = Billing Authority Reports
 service.title = {0} - Billing Authority Reports - GOV.UK
 service.homePageUrl = /voa-bar-xml-frontend/online-or-upload
@@ -223,8 +219,10 @@ header.links.upload = Upload
 header.links.confirmation = Submission
 header.links.status = History
 
-label.beta = BETA
-label.phase=This is a new service – your <a href="{0}" class="govuk-link" target="_blank" id="betaFeedback">feedback</a> will help us to improve it.
+# Phase banner
+phase.banner.before = This is a new service – your
+phase.banner.link = feedback
+phase.banner.after = will help us to improve it.
 
 heading.giveFeedback = Give feedback
 
@@ -418,9 +416,6 @@ contact-address.postcode.eror=Enter a real postcode
 
 effective-date.pageLabel=Effective date
 effective-date.hint=For example, 23 3 2020
-effective-date.day=Day
-effective-date.month=Month
-effective-date.year=Year
 effective-date.error.mandatory=Enter an effective date
 effective-date.error.mandatory.dayMonth=Effective date must include a day and month
 effective-date.error.mandatory.dayYear=Effective date must include a day and year
@@ -566,9 +561,6 @@ add-property-contact-address.postcode.eror=Enter a real postcode
 
 add-property-effective-date.pageLabel=Effective date
 add-property-effective-date.hint=For example, 23 3 2020
-add-property-effective-date.day=Day
-add-property-effective-date.month=Month
-add-property-effective-date.year=Year
 add-property-effective-date.error.mandatory=Enter an effective date
 add-property-effective-date.error.mandatory.dayMonth=Effective date must include a day and month
 add-property-effective-date.error.mandatory.dayYear=Effective date must include a day and year

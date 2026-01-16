@@ -28,7 +28,7 @@ trait ViewBehaviours extends ViewSpecBase {
           val doc  = asDocument(view())
           val nav  = doc.getElementsByClass("govuk-service-navigation__service-name").get(0)
           val span = nav.children.first
-          span.text mustBe messagesApi("site.service_name")
+          span.text mustBe messagesApi("service.name")
         }
 
         "display the correct browser title" in {
