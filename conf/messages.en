@@ -222,7 +222,7 @@ header.links.status = History
 # Phase banner
 phase.banner.before = This is a new service – your
 phase.banner.link = feedback
-phase.banner.after = will help us to improve it.
+phase.banner.after = ' will help us to improve it.
 
 heading.giveFeedback = Give feedback
 
