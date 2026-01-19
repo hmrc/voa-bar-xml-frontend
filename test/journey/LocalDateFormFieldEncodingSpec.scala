@@ -86,11 +86,12 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
     }
 
   it should "convert LocalDate to Input" in {
-    encoding.encode(LocalDate.of(1900, 1, 1)) shouldBe (Map(
-      year  -> List("1900"),
-      month -> List("1"),
-      day   -> List("1")
-    ))
+    encoding.encode(LocalDate.of(1900, 1, 1)) shouldBe
+      Map(
+        year  -> List("1900"),
+        month -> List("1"),
+        day   -> List("1")
+      )
 
   }
 
