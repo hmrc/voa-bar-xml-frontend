@@ -4,7 +4,7 @@ import sbt.*
 object Dependencies {
 
   private val bootstrapVersion        = "10.5.0"
-  private val hmrcMongoVersion        = "2.11.0"
+  private val hmrcMongoVersion        = "2.12.0"
   private val playFrontendHmrcVersion = "12.27.0"
   private val guiceUtilsVersion       = "6.0.0" // Use 6.0.0 because 7.0.0 is not compatible with play-guice:3.0.7
   private val pdfBoxVersion           = "3.0.6"
