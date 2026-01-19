@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,10 +131,9 @@ class CouncilTaxUploadController @Inject() (
     status: ReportStatusType
   )(implicit request: Request[?]
   ): Future[Either[Result, Unit]] =
-    saveReportStatus(reference, login, errors, status).map(_.fold(
-      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
-      _ => Right(())
-    ))
+    saveReportStatus(reference, login, errors, status).map(
+      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request), appConfig)))
+    )
 
   def onError(reference: String): Action[JsValue] = getData.async(parse.tolerantJson) {
     implicit request =>
@@ -150,11 +149,9 @@ class CouncilTaxUploadController @Inject() (
   }
 
   private def saveReportStatus(login: Login, reference: String)(implicit request: Request[?]): Future[Either[Result, Unit]] =
-    reportStatusConnector.saveUserInfo(reference, login)
-      .map(_.fold(
-        _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
-        _ => Right(())
-      ))
+    reportStatusConnector.saveUserInfo(reference, login).map(
+      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request), appConfig)))
+    )
 
   def onPrepareUpload(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
