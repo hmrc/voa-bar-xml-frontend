@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +56,10 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
   val loginConnector = mock[LoginConnector]
-  when(loginConnector.send(any[Login])).thenReturn(Future.successful(Success(OK)))
+  when(loginConnector.doLogin(any[Login])).thenReturn(Future.successful(Success(OK)))
 
   val loginConnectorF = mock[LoginConnector]
-  when(loginConnectorF.send(any[Login])).thenReturn(Future.successful(Failure(new RuntimeException("Received exception from upstream service"))))
+  when(loginConnectorF.doLogin(any[Login])).thenReturn(Future.successful(Failure(new RuntimeException("Received exception from upstream service"))))
 
   def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
