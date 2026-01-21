@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutures with RecoverMethods {
 
-  def bodyParser = app.injector.instanceOf[BodyParsers.Default]
+  def bodyParser = inject[BodyParsers.Default]
 
   class Harness(dataCacheConnector: DataCacheConnector) extends DataRetrievalActionImpl(dataCacheConnector, bodyParser) {
     def callTransform[A](request: Request[A]): Future[OptionalDataRequest[A]] = transform(request)

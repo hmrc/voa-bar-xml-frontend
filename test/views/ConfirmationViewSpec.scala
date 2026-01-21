@@ -21,7 +21,7 @@ import views.behaviours.ViewBehaviours
 
 class ConfirmationViewSpec extends ViewBehaviours {
 
-  def confirmation = app.injector.instanceOf[views.html.confirmation]
+  def confirmation = inject[views.html.confirmation]
 
   val username                = "BA0116"
   val submissionId            = "SId328473"

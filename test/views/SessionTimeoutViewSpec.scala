@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import views.behaviours.ViewBehaviours
 
 class SessionTimeoutViewSpec extends ViewBehaviours with ViewSpecBase {
 
-  def sessionTimeout = app.injector.instanceOf[views.html.session_timeout]
+  def sessionTimeout = inject[views.html.session_timeout]
 
   def view = () => sessionTimeout()(using fakeRequest, messages)
 

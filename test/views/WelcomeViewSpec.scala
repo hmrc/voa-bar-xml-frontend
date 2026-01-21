@@ -21,7 +21,7 @@ import views.behaviours.ViewBehaviours
 
 class WelcomeViewSpec extends ViewBehaviours {
 
-  def welcome = app.injector.instanceOf[views.html.welcome]
+  def welcome = inject[views.html.welcome]
 
   val username         = "BA0505"
   val messageKeyPrefix = "welcome"
@@ -71,9 +71,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val baCodes = Seq("BA0114", "BA5960")
 
-  baCodes.foreach(
-    runFormNavigationTests(_)
-  )
+  baCodes.foreach(runFormNavigationTests)
 
   def runPilotBATests(ba: String) = {
     lazy val formDoc = asDocument(createFormView(ba)())
@@ -89,9 +87,7 @@ class WelcomeViewSpec extends ViewBehaviours {
 
   val pilotBaCodes = Seq("BA1445", "BA3615", "BA3630", "BA3650", "BA3810")
 
-  pilotBaCodes.foreach(
-    runPilotBATests(_)
-  )
+  pilotBaCodes.foreach(runPilotBATests)
 
   // TODO https://jira.tools.tax.service.gov.uk/browse/VOA-2065 test link to upload page
 }

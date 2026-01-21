@@ -47,11 +47,11 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   val form         = formProvider()
   val validBACode  = "ba0114"
 
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  def ec                   = app.injector.instanceOf[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
 
-  def login         = app.injector.instanceOf[views.html.login]
-  val configuration = injector.instanceOf[Configuration]
+  def login         = inject[views.html.login]
+  val configuration = inject[Configuration]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 

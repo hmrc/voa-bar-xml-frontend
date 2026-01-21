@@ -33,10 +33,10 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   val cr05FeatureFlag = false
 
-  def welcome = app.injector.instanceOf[views.html.welcome]
+  def welcome = inject[views.html.welcome]
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
   val configuration        = Configuration("feature.cr05.enabled" -> cr05FeatureFlag)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)

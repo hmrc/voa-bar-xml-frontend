@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package services
 
+import base.SpecBase
 import models.*
 import org.apache.pdfbox.Loader
+import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts
-import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.text.PDFTextStripper
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -28,11 +29,10 @@ import play.api.i18n.MessagesApi
 
 import java.time.Instant
 
-class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
+class ReceiptServiceSpec extends SpecBase:
 
-  val messages = app.injector.instanceOf[MessagesApi]
-  val service  = new DefaultReceiptService(messages)
-  val date     = Instant.ofEpochMilli(0)
+  private val service = new DefaultReceiptService(messagesApi)
+  private val date    = Instant.ofEpochMilli(0)
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
@@ -119,4 +119,3 @@ class ReceiptServiceSpec extends PlaySpec with GuiceOneAppPerSuite {
       }
     }
   }
-}

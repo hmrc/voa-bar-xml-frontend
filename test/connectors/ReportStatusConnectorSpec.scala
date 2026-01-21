@@ -47,12 +47,12 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar:
   )
   val error = Error("Error", Seq())
 
-  val configuration = injector.instanceOf[Configuration]
-  val environment   = injector.instanceOf[Environment]
+  val configuration = inject[Configuration]
+  val environment   = inject[Environment]
   val exception     = new Exception
   val login         = Login("AUser", "anyPass")
 
-  def servicesConfig = app.injector.instanceOf[ServicesConfig]
+  def servicesConfig = inject[ServicesConfig]
 
   val httpMock = mock[HttpClientV2]
 

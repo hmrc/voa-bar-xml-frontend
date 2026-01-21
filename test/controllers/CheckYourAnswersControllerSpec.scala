@@ -25,9 +25,9 @@ import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersControllerSpec extends ControllerSpecBase {
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  def checkYourAnswerView  = app.injector.instanceOf[views.html.check_your_answers]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
+  def checkYourAnswerView  = inject[views.html.check_your_answers]
 
   def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     new CheckYourAnswersController(

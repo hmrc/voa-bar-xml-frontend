@@ -21,8 +21,8 @@ import play.api.test.Helpers._
 
 class TimeOutControllerSpec extends ControllerSpecBase {
 
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  def sessionTimeout       = app.injector.instanceOf[views.html.session_timeout]
+  def controllerComponents = inject[MessagesControllerComponents]
+  def sessionTimeout       = inject[views.html.session_timeout]
 
   "Timeout Controller" must {
     "return 200 for a GET /this-service-has-been-reset" in {

@@ -33,10 +33,10 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   val username = "AUser"
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
 
-  def addToList = app.injector.instanceOf[views.html.add_to_list]
+  def addToList = inject[views.html.add_to_list]
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 

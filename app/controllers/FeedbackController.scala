@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,16 @@ import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
 import play.api.Logging
 import play.api.i18n.I18nSupport
+import play.api.libs.ws.WSBodyWritables.writeableOf_urlEncodedForm
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.http.{HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HttpReads, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
+import java.net.URL
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class FeedbackController @Inject() (
   servicesConfig: ServicesConfig,
   auditService: AuditService,
-  http: HttpClient,
+  httpClientV2: HttpClientV2,
   feedbackView: feedback,
   feedbackThxView: feedbackThx,
   feedbackErrorView: feedbackError,
@@ -44,14 +48,12 @@ class FeedbackController @Inject() (
 )(implicit ec: ExecutionContext
 ) extends FrontendController(cc)
   with I18nSupport
-  with Logging {
+  with Logging:
 
-  private val serviceIdentifier              = "VOA_BAR"
-  private val contactFrontendBaseUrl         = servicesConfig.baseUrl("contact-frontend")
-  private val contactFrontendPostFeedbackUrl = s"$contactFrontendBaseUrl/contact/beta-feedback"
-
-  // The default HTTPReads will wrap the response in an exception and make the body inaccessible
-  implicit val readPartialsForm: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
+  private val serviceIdentifier: String           = "VOA_BAR"
+  private val contactFrontendBaseUrl: String      = servicesConfig.baseUrl("contact-frontend")
+  private val contactFrontendPostFeedbackUrl: URL = url"$contactFrontendBaseUrl/contact/beta-feedback"
+  private val csrfNocheckHeader                   = "Csrf-Token" -> "nocheck"
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(feedbackView(feedbackForm))
@@ -77,18 +79,20 @@ class FeedbackController @Inject() (
           "csrfToken"         -> ""
         ).view.mapValues(Seq(_)).toMap
 
-        val headers = Seq("Csrf-Token" -> "nocheck")
-
-        http.POSTForm[HttpResponse](contactFrontendPostFeedbackUrl, data, headers).map { res =>
-          res.status match {
-            case OK =>
-              logger.info(s"Feedback successful: ${res.status} response from $contactFrontendPostFeedbackUrl")
-              Redirect(routes.FeedbackController.feedbackThx)
-            case _  =>
-              logger.error(s"Feedback FAILED: ${res.status} response from $contactFrontendPostFeedbackUrl,\nparams: $data")
-              Redirect(routes.FeedbackController.feedbackError)
+        httpClientV2.post(contactFrontendPostFeedbackUrl)
+          .withBody(data)
+          .setHeader(csrfNocheckHeader)
+          .execute[HttpResponse]
+          .map { r =>
+            r.status match {
+              case OK =>
+                logger.info(s"Feedback successful: ${r.status} response from $contactFrontendPostFeedbackUrl")
+                Redirect(routes.FeedbackController.feedbackThx)
+              case _  =>
+                logger.error(s"Feedback FAILED: ${r.status} response from $contactFrontendPostFeedbackUrl,\nparams: $data")
+                Redirect(routes.FeedbackController.feedbackError)
+            }
           }
-        }
       }
     )
   }
@@ -100,5 +104,3 @@ class FeedbackController @Inject() (
   def feedbackError: Action[AnyContent] = Action { implicit request =>
     Ok(feedbackErrorView())
   }
-
-}

@@ -29,7 +29,6 @@ import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.libs.json.*
 import play.api.test.Helpers.*
-import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -38,7 +37,7 @@ import java.net.URL
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UploadConnectorSpec extends SpecBase with MockitoSugar with Injecting with must.Matchers:
+class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
 
   private val configuration: Configuration   = inject[Configuration]
   private val servicesConfig: ServicesConfig = inject[ServicesConfig]

@@ -39,8 +39,8 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   val username = "BA1445"
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
   val configuration        = Configuration("feature.cr05.enabled" -> false)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)

@@ -36,8 +36,8 @@ import scala.util.{Failure, Success}
 
 class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
 
-  private val configuration  = injector.instanceOf[Configuration]
-  private val servicesConfig = injector.instanceOf[ServicesConfig]
+  private val configuration  = inject[Configuration]
+  private val servicesConfig = inject[ServicesConfig]
 
   private val username = "user"
   private val password = "pass"

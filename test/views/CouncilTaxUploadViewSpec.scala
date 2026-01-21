@@ -22,7 +22,7 @@ import views.behaviours.ViewBehaviours
 
 class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
 
-  def councilTaxUpload = app.injector.instanceOf[views.html.councilTaxUpload]
+  def councilTaxUpload = inject[views.html.councilTaxUpload]
 
   val username         = "BA0345"
   val messageKeyPrefix = "councilTaxUpload"

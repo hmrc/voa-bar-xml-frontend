@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
   private val exception                  = new Exception(errorMessage)
   private val error                      = Error(exception.getMessage)
   private val httpResponse               = mock[HttpResponse]
-  private lazy val configuration         = injector.instanceOf(classOf[Configuration])
+  private val configuration              = inject[Configuration]
   private val login                      = Login("foo", "bar")
   implicit private val hc: HeaderCarrier = HeaderCarrier()
 

@@ -29,15 +29,15 @@ import scala.concurrent.ExecutionContext
 
 class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
-  def taskList = app.injector.instanceOf[views.html.task_list]
-  def welcome  = app.injector.instanceOf[views.html.welcome]
+  def taskList = inject[views.html.task_list]
+  def welcome  = inject[views.html.welcome]
 
   val username = "AUser"
 
   val cr05FeatureFlag = false
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
   val configuration        = Configuration("feature.cr05.enabled" -> false)
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)

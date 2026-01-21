@@ -40,11 +40,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
 
-  def ec                     = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents   = app.injector.instanceOf[MessagesControllerComponents]
-  def reportConfirmationView = app.injector.instanceOf[views.html.govuk.confirmation]
-  def confirmationView       = app.injector.instanceOf[views.html.confirmation]
-  def errorTemplateView      = app.injector.instanceOf[views.html.error_template]
+  def ec                     = inject[ExecutionContext]
+  def controllerComponents   = inject[MessagesControllerComponents]
+  def reportConfirmationView = inject[views.html.govuk.confirmation]
+  def confirmationView       = inject[views.html.confirmation]
+  def errorTemplateView      = inject[views.html.error_template]
 
   def confirmationStatusPanel = inject[confirmation_status_panel]
   def confirmationDetailPanel = inject[confirmation_detail_panel]

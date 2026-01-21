@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,30 @@ package base
 import config.FrontendAppConfig
 import models.{CacheMap, Login}
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice._
+import org.scalatestplus.play.guice.*
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
-import play.api.test.FakeRequest
+import play.api.mvc.AnyContent
+import play.api.test.{FakeRequest, Injecting}
 import play.filters.csrf.CSRF.{Token, TokenInfo}
 import utils.UserAnswers
 
-trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
+trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with Injecting:
 
-  def injector: Injector = app.injector
+  def frontendAppConfig: FrontendAppConfig = inject[FrontendAppConfig]
 
-  def frontendAppConfig: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
+  def messagesApi: MessagesApi = inject[MessagesApi]
 
-  def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-
-  def fakeRequest = {
+  def fakeRequest: FakeRequest[AnyContent] =
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
     val req       = FakeRequest("", "")
     req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))
-  }
 
   def messages: Messages = messagesApi.preferred(fakeRequest)
 
-  class FakeUserAnswers(loginValue: Login, cacheMap: CacheMap = new CacheMap("", Map())) extends UserAnswers(cacheMap) {
-
+  class FakeUserAnswers(
+    loginValue: Login,
+    cacheMap: CacheMap =
+      new CacheMap("", Map())
+  ) extends UserAnswers(cacheMap):
     override def login: Option[Login] = Some(loginValue)
-  }
-
-}
