@@ -99,16 +99,16 @@ class DefaultReportStatusConnector @Inject() (
 
   override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
     httpClientV2.put(saveSubmissionURL)
-      .withBody(Json.toJson(reportStatus))
       .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(reportStatus))
       .execute[HttpResponse]
       .map(checkResponseStatus("Couldn't save submission", _ => ()))
       .recover(logAndReturnError("Couldn't save submission"))
 
   override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
     httpClientV2.put(saveUserInfoURL)
-      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
       .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
       .execute[HttpResponse]
       .map(checkResponseStatus("Couldn't save user info for the submission", _ => ()))
       .recover(logAndReturnError("Couldn't save user info for the submission"))
@@ -117,8 +117,8 @@ class DefaultReportStatusConnector @Inject() (
     logger.warn(s"Deletion of submission report, reference: $reference, user ${login.username}")
 
     httpClientV2.delete(submissionByReferenceURL(reference))
-      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
       .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
       .execute[HttpResponse]
       .map(checkResponseStatus(s"Couldn't delete submission for reference $reference"))
       .recover(logAndReturnError(s"Couldn't delete submission for reference $reference"))
