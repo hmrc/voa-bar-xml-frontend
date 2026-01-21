@@ -24,8 +24,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts
 import org.apache.pdfbox.text.PDFTextStripper
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.MessagesApi
 
 import java.time.Instant
 
