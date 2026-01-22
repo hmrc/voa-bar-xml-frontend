@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,54 +17,64 @@
 package connectors
 
 import com.google.inject.ImplementedBy
-import javax.inject.{Inject, Singleton}
-import models.{Error, Login}
-import play.api.Configuration
-import models.UserReportUpload
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import models.{Error, Login, UserReportUpload}
+import play.api.libs.json.Json
+import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.{URI, URL}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class DefaultUserReportUploadsConnector @Inject() (
-  http: HttpClient,
-  val configuration: Configuration
+  httpClientV2: HttpClientV2,
+  servicesConfig: ServicesConfig
 )(implicit executionContext: ExecutionContext
 ) extends UserReportUploadsConnector
-  with BaseConnector {
+  with BaseConnector:
 
-  val voaBarConfig = configuration.get[Configuration]("microservice.services.voa-bar")
-  val host         = voaBarConfig.get[String]("host")
-  val port         = voaBarConfig.get[String]("port")
-  val protocol     = voaBarConfig.get[String]("protocol")
-  val serviceUrl   = s"$protocol://$host:$port/voa-bar" // TODO - Refactor with services config
+  private val backendBase: String      = servicesConfig.baseUrl("voa-bar")
+  private val userReportUploadURL: URL = url"$backendBase/voa-bar/user-report-upload"
+  private val userReportUploadURI: URI = userReportUploadURL.toURI
 
-  override def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
-    http.PUT[UserReportUpload, HttpResponse](
-      s"$serviceUrl/user-report-upload",
-      userReportUpload,
-      defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)
-    )
-      .map(_ => Right(()))
+  private def getUserReportUploadURL(id: String): URL = userReportUploadURI.resolve(s"/$id").toURL
+
+  override def save(userReportUpload: UserReportUpload)(using hc: HeaderCarrier): Future[Either[Error, Unit]] =
+    httpClientV2.put(userReportUploadURL)
+      .setHeader(defaultHeaders(userReportUpload.userId, userReportUpload.userPassword)*)
+      .withBody(Json.toJson(userReportUpload))
+      .execute[HttpResponse]
+      .map { r =>
+        r.status match {
+          case status if is2xx(status) => Right(())
+          case status                  => Left(Error(s"$status. Couldn't save UserReportUpload"))
+        }
+      }
       .recover {
-        case e: Throwable => Left(Error(e.getMessage, Seq()))
+        case e: Throwable => Left(Error(e.getMessage))
       }
 
-  override def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]] = {
-    val headers = defaultHeaders(login.username, login.password)
-
-    http.GET[Option[UserReportUpload]](s"$serviceUrl/user-report-upload/$id", Seq.empty, headers)
-      .map(Right(_))
-      .recover {
-        case e: Throwable => Left(Error(e.getMessage, Seq()))
+  override def getById(id: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]] =
+    httpClientV2.get(getUserReportUploadURL(id))
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .execute[HttpResponse]
+      .map { r =>
+        r.status match {
+          case status if is2xx(status) => Right(Try(Json.parse(r.body).asOpt[UserReportUpload]).getOrElse(None))
+          case status                  => Left(Error(s"$status. Couldn't get UserReportUpload"))
+        }
       }
-  }
-}
+      .recover {
+        case e: Throwable => Left(Error(e.getMessage))
+      }
 
 @ImplementedBy(classOf[DefaultUserReportUploadsConnector])
-trait UserReportUploadsConnector {
-  def save(userReportUpload: UserReportUpload)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
-  def getById(id: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]]
-}
+trait UserReportUploadsConnector:
+  def save(userReportUpload: UserReportUpload)(using hc: HeaderCarrier): Future[Either[Error, Unit]]
+  def getById(id: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Option[UserReportUpload]]]

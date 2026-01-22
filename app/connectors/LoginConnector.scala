@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,44 @@
 
 package connectors
 
-import javax.inject.Inject
-import play.api.Logging
-import play.api.libs.json._
 import models.Login
-
-import scala.util.{Failure, Success, Try}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpClient
-
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.Configuration
 import play.api.http.Status.OK
+import play.api.libs.json.*
+import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
+import play.api.Logging
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class LoginConnector @Inject() (http: HttpClient, val configuration: Configuration, val serviceConfig: ServicesConfig)(implicit ec: ExecutionContext)
-  extends Logging {
+import java.net.URL
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
-  val serviceUrl            = serviceConfig.baseUrl("voa-bar")
-  val baseSegment           = "/voa-bar/"
-  val jsonContentTypeHeader = ("Content-Type", "application/json")
+class LoginConnector @Inject() (
+  httpClientV2: HttpClientV2,
+  servicesConfig: ServicesConfig
+)(implicit ec: ExecutionContext
+) extends Logging:
 
-  def send(input: Login)(implicit hc: HeaderCarrier) = sendJson(Json.toJson(input))
+  private val backendBase: String = servicesConfig.baseUrl("voa-bar")
+  private val loginURL: URL       = url"$backendBase/voa-bar/login"
 
-  def sendJson(json: JsValue)(implicit hc: HeaderCarrier): Future[Try[Int]] =
-    http.POST[JsValue, HttpResponse](s"$serviceUrl${baseSegment}login", json, Seq(jsonContentTypeHeader))
-      .map {
-        response =>
-          response.status match {
-            case OK     => Success(OK)
-            case status =>
-              logger.warn("Received status of " + status + " from upstream service when logging in")
-              Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
-          }
-      } recover {
-      case e =>
-        logger.warn("Received exception " + e.getMessage + " from upstream service")
-        Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service"))
-    }
-
-}
+  def doLogin(login: Login)(implicit hc: HeaderCarrier): Future[Try[Int]] =
+    httpClientV2.post(loginURL)
+      .withBody(Json.toJson(login))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case OK     => Success(OK)
+          case status =>
+            logger.warn("Received status of " + status + " from upstream service when logging in")
+            Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
+        }
+      }
+      .recover {
+        case e =>
+          logger.warn("Received exception " + e.getMessage + " from upstream service")
+          Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service"))
+      }

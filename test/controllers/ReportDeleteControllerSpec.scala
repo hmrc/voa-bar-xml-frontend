@@ -35,13 +35,13 @@ import scala.concurrent.Future
 
 class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def controllerComponents = inject[MessagesControllerComponents]
 
-  def configuration = app.injector.instanceOf[Configuration]
+  def configuration = inject[Configuration]
 
-  def bodyParser = app.injector.instanceOf[BodyParsers.Default]
+  def bodyParser = inject[BodyParsers.Default]
 
-  def errorTemplateView = app.injector.instanceOf[views.html.error_template]
+  def errorTemplateView = inject[views.html.error_template]
 
   val login = Login("foo", "bar")
 

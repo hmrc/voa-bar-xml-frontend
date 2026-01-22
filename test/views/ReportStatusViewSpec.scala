@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import views.behaviours.ViewBehaviours
 
 class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
-  def reportStatus = app.injector.instanceOf[views.html.reportStatus]
+  def reportStatus = inject[views.html.reportStatus]
 
   val username           = "BA0350"
   val messageKeyPrefix   = "reportStatus"
@@ -33,7 +33,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
   val reportStatus3      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Failed.value))
   val reportStatus4      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Done.value))
   val reportStatus5      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Pending.value))
-  def servicesConfig     = injector.instanceOf[ServicesConfig]
+  def servicesConfig     = inject[ServicesConfig]
   val fakeTableFormatter = new TableFormatter(servicesConfig)
 
   val reportStatusFakeRequest = fakeRequest

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import views.html.session_expired
 
 class SessionExpiredControllerSpec extends ControllerSpecBase {
 
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val session_expired      = injector.instanceOf[session_expired]
+  def controllerComponents = inject[MessagesControllerComponents]
+  val session_expired      = inject[session_expired]
 
   "SessionExpired Controller" must {
     "return 200 for a GET" in {

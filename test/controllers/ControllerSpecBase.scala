@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeDataRetrievalAction
 import models.CacheMap
 
-trait ControllerSpecBase extends SpecBase {
+trait ControllerSpecBase extends SpecBase:
 
   val cacheMapId = "id"
 
@@ -29,4 +29,3 @@ trait ControllerSpecBase extends SpecBase {
   def getEmptyCacheMap = new FakeDataRetrievalAction(Some(emptyCacheMap))
 
   def dontGetAnyData = new FakeDataRetrievalAction(None)
-}

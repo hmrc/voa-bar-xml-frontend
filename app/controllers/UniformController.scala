@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,8 +103,8 @@ class UniformController @Inject() (
 
   }
 
-  def addCommonSectionJourney(targetId: String): Action[AnyContent] =
-    (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def addCommonSectionJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async {
+    implicit request: DataRequest[AnyContent] =>
       import UniformJourney.*
       import interpreter.*
 
@@ -122,7 +122,7 @@ class UniformController @Inject() (
           }
         }
       }
-    }
+  }
 
   def editPropertyJourney(targetId: String, propertyType: PropertyType, index: Int): Action[AnyContent] =
     propertyJourney(
@@ -131,18 +131,17 @@ class UniformController @Inject() (
       Option(index)
     )
 
-  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int]): Action[AnyContent] =
-    (getData andThen requireData andThen auth).async {
-      implicit request: DataRequest[AnyContent] =>
-        getCr05Submission.flatMap { propertyBuilder =>
-          val property = propertyType match {
-            case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
-            case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
-          }
-
-          runPropertyJourney(targetId, propertyType, property, index)
+  def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int]): Action[AnyContent] = (getData andThen requireData andThen auth).async {
+    implicit request: DataRequest[AnyContent] =>
+      getCr05Submission.flatMap { propertyBuilder =>
+        val property = propertyType match {
+          case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
+          case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
         }
-    }
+
+        runPropertyJourney(targetId, propertyType, property, index)
+      }
+  }
 
   private def runPropertyJourney(
     targetId: String,
@@ -208,8 +207,8 @@ class UniformController @Inject() (
 
   }
 
-  def cr05CheckAnswerJourney(targetId: String): Action[AnyContent] =
-    (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
+  def cr05CheckAnswerJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async {
+    implicit request: DataRequest[AnyContent] =>
       import UniformJourney.*
       import interpreter.*
 
@@ -229,6 +228,6 @@ class UniformController @Inject() (
           }
       }
 
-    }
+  }
 
 }

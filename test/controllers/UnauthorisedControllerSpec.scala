@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import views.html.unauthorised
 
 class UnauthorisedControllerSpec extends ControllerSpecBase {
 
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  val unauthorised         = injector.instanceOf[unauthorised]
+  def controllerComponents = inject[MessagesControllerComponents]
+  val unauthorised         = inject[unauthorised]
 
   "Unauthorised Controller" must {
     "return 200 for a GET" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,55 +16,48 @@
 
 package controllers
 
-import connectors.AuditService
+import connectors.{AuditService, RequestBuilderStub}
 import forms.FeedbackForm.feedbackForm
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{when, withSettings}
-import org.mockito.quality.Strictness
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import java.net.URL
+import scala.concurrent.ExecutionContext
 
 /**
   * @author Yuriy Tumakha
   */
-class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
+class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar:
 
-  val ec                   = injector.instanceOf[ExecutionContext]
-  val controllerComponents = injector.instanceOf[MessagesControllerComponents]
-  val servicesConfig       = injector.instanceOf[ServicesConfig]
-  val auditService         = injector.instanceOf[AuditService]
-  val feedbackView         = injector.instanceOf[feedback]
-  val feedbackThxView      = injector.instanceOf[feedbackThx]
-  val feedbackErrorView    = injector.instanceOf[feedbackError]
+  private val ec                   = inject[ExecutionContext]
+  private val controllerComponents = inject[MessagesControllerComponents]
+  private val servicesConfig       = inject[ServicesConfig]
+  private val auditService         = inject[AuditService]
+  private val feedbackView         = inject[feedback]
+  private val feedbackThxView      = inject[feedbackThx]
+  private val feedbackErrorView    = inject[feedbackError]
 
-  val feedbackController = {
-    val http = mock[DefaultHttpClient](withSettings.strictness(Strictness.LENIENT))
+  private val httpClientV2Mock = mock[HttpClientV2]
+  when(
+    httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
+  ).thenReturn(RequestBuilderStub(Right(OK), "OK"))
 
-    when(http.POSTForm[HttpResponse](any[String], any[Map[String, Seq[String]]], any[Seq[(String, String)]])(
-      using any[HttpReads[HttpResponse]],
-      any[HeaderCarrier],
-      any[ExecutionContext]
-    ))
-      .thenReturn(Future(HttpResponse(OK, "OK")))
-
-    new FeedbackController(
-      servicesConfig,
-      auditService,
-      http,
-      feedbackView,
-      feedbackThxView,
-      feedbackErrorView,
-      controllerComponents
-    )(using ec)
-  }
+  private val feedbackController = new FeedbackController(
+    servicesConfig,
+    auditService,
+    httpClientV2Mock,
+    feedbackView,
+    feedbackThxView,
+    feedbackErrorView,
+    controllerComponents
+  )(using ec)
 
   "FeedbackController" should {
     "return feedback page when requested" in {
@@ -102,5 +95,3 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar {
       contentAsString(result) mustBe feedbackErrorView()(using fakeRequest, messages).toString
     }
   }
-
-}

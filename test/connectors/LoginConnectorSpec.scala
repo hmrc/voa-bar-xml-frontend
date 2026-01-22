@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,137 +23,75 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.must
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.*
 import play.api.test.Helpers.*
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import play.api.Configuration
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers {
+class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
 
-  def configuration  = injector.instanceOf[Configuration]
-  def environment    = injector.instanceOf[Environment]
-  def minimalJson    = JsObject(Map[String, JsValue]())
-  def servicesConfig = injector.instanceOf[ServicesConfig]
+  private val configuration  = inject[Configuration]
+  private val servicesConfig = inject[ServicesConfig]
 
-  val username   = "user"
-  val password   = "pass"
-  lazy val login = Login(username, password).encrypt(configuration)
+  private val username = "user"
+  private val password = "pass"
+  private val login    = Login(username, password).encrypt(configuration)
 
-  implicit def hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  def getHttpMock(returnedStatus: Int) = {
-    val httpMock = mock[HttpClient]
-    when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
-      using any[Writes[JsValue]],
-      any[HttpReads[Any]],
-      any[HeaderCarrier],
-      any[ExecutionContext]
-    )).thenReturn(Future.successful(HttpResponse(returnedStatus, "")))
-    httpMock
-  }
-  "Login Connector" when {
+  private def getHttpMock(returnedStatus: Int): HttpClientV2 =
+    val httpClientV2Mock = mock[HttpClientV2]
+    when(
+      httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
+    ).thenReturn(RequestBuilderStub(Right(returnedStatus), "{}"))
+    httpClientV2Mock
 
-    "provided with a Contact Login Input" must {
+  "Login Connector" must {
 
-      "call the Microservice with the given JSON for username provided" in {
-        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
-        implicit val httpReadsNapper     = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
-        implicit val jsonWritesNapper    = ArgumentCaptor.forClass(classOf[Writes[JsValue]])
-        val urlCaptor                    = ArgumentCaptor.forClass(classOf[String])
-        val bodyCaptor                   = ArgumentCaptor.forClass(classOf[JsValue])
-        val headersCaptor                = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
-        val httpMock                     = getHttpMock(200)
-        val connector                    = new LoginConnector(httpMock, configuration, servicesConfig)
+    "call the Microservice with the given JSON for username provided" in {
+      val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
+      val urlCaptor           = ArgumentCaptor.forClass(classOf[URL])
 
-        await(connector.send(login))
+      val httpMock          = getHttpMock(OK)
+      val headerCarrierStub = HeaderCarrier()
 
-        verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
-          using jsonWritesNapper.capture,
-          httpReadsNapper.capture,
-          headerCarrierNapper.capture,
-          any[ExecutionContext]
-        )
+      val connector = new LoginConnector(httpMock, servicesConfig)
+      await(connector.doLogin(login)(using headerCarrierStub))
 
-        urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
-        bodyCaptor.getValue mustBe Json.toJson(login)
-        headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
-      }
+      verify(httpMock).post(urlCaptor.capture)(using headerCarrierNapper.capture)
 
-      "return a 200 status when the send method is successfull using login model" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig)
-        val result    = await(connector.send(login))
-        result match {
-          case Success(status) => status mustBe 200
-          case Failure(e)      => assert(false)
-        }
-      }
-
-      "return a failure representing the error when send method fails" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration, servicesConfig)
-        val result    = await(connector.send(login))
-        assert(result.isFailure)
-      }
-
+      urlCaptor.getValue.toString must endWith("/voa-bar/login")
+      headerCarrierNapper.getValue.nsStamp mustBe headerCarrierStub.nsStamp
     }
 
-    "provided with JSON directly" must {
+    "return a 200 status when the doLogin method is successfull" in {
+      val connector = new LoginConnector(getHttpMock(200), servicesConfig)
+      val result    = await(connector.doLogin(login))
+      result mustBe Success(200)
+    }
 
-      "call the Microservice with the given JSON" in {
-        implicit val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
-        implicit val httpReadsNapper     = ArgumentCaptor.forClass(classOf[HttpReads[Any]])
-        implicit val jsonWritesNapper    = ArgumentCaptor.forClass(classOf[Writes[JsValue]])
-        val urlCaptor                    = ArgumentCaptor.forClass(classOf[String])
-        val bodyCaptor                   = ArgumentCaptor.forClass(classOf[JsValue])
-        val headersCaptor                = ArgumentCaptor.forClass(classOf[Seq[(String, String)]])
-        val httpMock                     = getHttpMock(200)
-        val connector                    = new LoginConnector(httpMock, configuration, servicesConfig)
+    "return a failure representing the error when doLogin method fails" in {
+      val connector = new LoginConnector(getHttpMock(500), servicesConfig)
+      val result    = await(connector.doLogin(login))
+      result.isFailure mustBe true
+      result.toString mustBe Failure(RuntimeException("Received status of 500 from upstream service when logging in")).toString
+    }
 
-        await(connector.sendJson(minimalJson))
+    "return a failure if http call throws an exception" in {
+      val httpClientV2Mock = mock[HttpClientV2]
+      when(
+        httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
+      ).thenReturn(RequestBuilderStub(Left(RuntimeException("Login failed.")), "{}"))
 
-        verify(httpMock).POST(urlCaptor.capture, bodyCaptor.capture, headersCaptor.capture)(
-          using jsonWritesNapper.capture,
-          httpReadsNapper.capture,
-          headerCarrierNapper.capture,
-          any[ExecutionContext]
-        )
-        urlCaptor.getValue must endWith(s"${connector.baseSegment}login")
-        bodyCaptor.getValue mustBe minimalJson
-        headersCaptor.getValue mustBe Seq(connector.jsonContentTypeHeader)
-      }
-
-      "return a 200 status when the send method is successful" in {
-        val connector = new LoginConnector(getHttpMock(200), configuration, servicesConfig)
-        val result    = await(connector.sendJson(minimalJson))
-        result match {
-          case Success(status) => status mustBe 200
-          case Failure(e)      => assert(false)
-        }
-      }
-
-      "return failure respresenting the error if the backend service call fails using minimal Json" in {
-        val connector = new LoginConnector(getHttpMock(500), configuration, servicesConfig)
-        val result    = await(connector.sendJson(minimalJson))
-        assert(result.isFailure)
-      }
-
-      "return a failure if the data transfer call throws an exception" in {
-        val httpMock  = mock[HttpClient]
-        when(httpMock.POST(any[String], any[JsValue], any[Seq[(String, String)]])(
-          using any[Writes[JsValue]],
-          any[HttpReads[Any]],
-          any[HeaderCarrier],
-          any[ExecutionContext]
-        )).thenReturn(Future.successful(new RuntimeException))
-        val connector = new LoginConnector(httpMock, configuration, servicesConfig)
-        val result    = await(connector.sendJson(minimalJson))
-        assert(result.isFailure)
-      }
+      val connector = new LoginConnector(httpClientV2Mock, servicesConfig)
+      val result    = await(connector.doLogin(login))
+      result.isFailure mustBe true
     }
 
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class LoginController @Inject() (
   with I18nSupport
   with Logging {
 
-  val form = formProvider()
+  private val form: Form[Login] = formProvider()
 
   def onPageLoad(mode: Mode) = getData.async {
     implicit request =>
@@ -73,7 +73,7 @@ class LoginController @Inject() (
         value => {
           val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
-            loginConnector.send(encryptedLogin) flatMap {
+            loginConnector.doLogin(encryptedLogin) flatMap {
               case Success(status) =>
                 BillingAuthorities.find(value.username) match {
                   case Some(councilName) =>

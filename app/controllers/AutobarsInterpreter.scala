@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,17 +249,32 @@ class AutobarsInterpreter(
 
       val rootError = renderErrorMessage(pageKey, fieldKey, errors, messages)
 
-      val dayClass   = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "day").map(_ => " govuk-input--error")).getOrElse(""))
-      val monthClass = "govuk-input--width-2" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "month").map(_ => " govuk-input--error")).getOrElse(""))
-      val yearClass  = "govuk-input--width-4" + (errors.valueAtRoot.flatMap(x => x.find(_.msg == "year").map(_ => " govuk-input--error")).getOrElse(""))
+      val dayClass   = "govuk-input--width-2" + errors.valueAtRoot.flatMap(x => x.find(_.msg == "day").map(_ => " govuk-input--error")).getOrElse("")
+      val monthClass = "govuk-input--width-2" + errors.valueAtRoot.flatMap(x => x.find(_.msg == "month").map(_ => " govuk-input--error")).getOrElse("")
+      val yearClass  = "govuk-input--width-4" + errors.valueAtRoot.flatMap(x => x.find(_.msg == "year").map(_ => " govuk-input--error")).getOrElse("")
 
       govukDateInput(DateInput(
         id = (pageKey ++ fieldKey).mkString("."),
         items = Seq(
-          InputItem(name = (fieldKey ++ day).mkString("."), classes = dayClass, value = data.get(day).flatMap(_.headOption)),
-          InputItem(name = (fieldKey ++ month).mkString("."), classes = monthClass, value = data.get(month).flatMap(_.headOption)),
-          InputItem(name = (fieldKey ++ year).mkString("."), classes = yearClass, value = data.get(year).flatMap(_.headOption))
-        ).map(x => x.copy(label = Option(messages(x.name).toString()))),
+          InputItem(
+            name = (fieldKey ++ day).mkString("."),
+            label = Some(messages("date.input.day").body),
+            classes = dayClass,
+            value = data.get(day).flatMap(_.headOption)
+          ),
+          InputItem(
+            name = (fieldKey ++ month).mkString("."),
+            label = Some(messages("date.input.month").body),
+            classes = monthClass,
+            value = data.get(month).flatMap(_.headOption)
+          ),
+          InputItem(
+            name = (fieldKey ++ year).mkString("."),
+            label = Some(messages("date.input.year").body),
+            classes = yearClass,
+            value = data.get(year).flatMap(_.headOption)
+          )
+        ),
         hint = Option(Hint(content = HtmlContent(messages(pageKey.mkString(".") + ".hint")))),
         errorMessage = rootError
       ))

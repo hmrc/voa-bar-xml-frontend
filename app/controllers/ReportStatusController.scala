@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import views.TableFormatter
 import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class ReportStatusController @Inject() (
   appConfig: FrontendAppConfig,
@@ -53,7 +53,7 @@ class ReportStatusController @Inject() (
   with I18nSupport {
 
   def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
-    val reportStatuses = json.asOpt[Seq[ReportStatus]]
+    val reportStatuses = Try(json.asOpt[Seq[ReportStatus]]).getOrElse(None)
     reportStatuses match {
       case Some(response) => Right(response)
       case None           => Left("Unable to parse the response from the Report Status Connector")

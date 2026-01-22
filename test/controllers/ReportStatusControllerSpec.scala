@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,11 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     def normalize: Instant = Instant.ofEpochMilli(instant.toEpochMilli)
   }
 
-  def reportStatus  = app.injector.instanceOf[views.html.reportStatus]
-  def errorTemplate = app.injector.instanceOf[views.html.error_template]
+  def reportStatus  = inject[views.html.reportStatus]
+  def errorTemplate = inject[views.html.error_template]
 
-  val configuration = injector.instanceOf[Configuration]
-  val environment   = injector.instanceOf[Environment]
+  val configuration = inject[Configuration]
+  val environment   = inject[Environment]
   val username      = "AUser"
   val login         = Login("foo", "bar")
   val login2        = Login(username, "bar")
@@ -65,7 +65,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val fakeReports        = Seq(rs1, rs2, rs3)
   val fakeMapAsJson      = Json.toJson(fakeReports)
   val wrongJson          = Json.toJson("""{"someID": "hhewfwe777"}""")
-  def servicesConfig     = injector.instanceOf[ServicesConfig]
+  def servicesConfig     = inject[ServicesConfig]
   val fakeTableFormatter = new TableFormatter(servicesConfig)
 
   // implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
@@ -76,8 +76,8 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   val receiptServiceMock = mock[ReceiptService]
   when(receiptServiceMock.producePDF(any[ReportStatus])).thenReturn(Success(Array[Byte](1, 2, 3, 4)))
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
 
   def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))

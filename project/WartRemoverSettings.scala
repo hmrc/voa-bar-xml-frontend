@@ -31,7 +31,8 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.Null,
       Wart.While,
       Wart.Var,
-      Wart.Any
+      Wart.Any,
+      Wart.StringPlusAny
     )
 
   private val compileWarnOn: Seq[Wart] =
@@ -72,6 +73,7 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.OptionPartial,
       Wart.TryPartial,
       Wart.MutableDataStructures,
+      Wart.ImplicitParameter,
       Wart.PlatformDefault
     )
 

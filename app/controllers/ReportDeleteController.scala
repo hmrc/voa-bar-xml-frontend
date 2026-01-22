@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,10 @@ class ReportDeleteController @Inject() (
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
     (for {
       login        <- EitherT(cachedLogin(request.externalId))
-      deleteStatus <- EitherT(reportStatusConnector.deleteByReference(reference, login)(using hc))
+      deleteStatus <- EitherT(
+                        reportStatusConnector.deleteByReference(reference, login)
+                          .map(_.leftMap(error => InternalServerError(error.values.head)))
+                      )
     } yield Ok(
       s"""Response\n\n
          |Status code ${deleteStatus.status} \n

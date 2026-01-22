@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,99 +17,117 @@
 package connectors
 
 import com.google.inject.ImplementedBy
-
-import javax.inject.{Inject, Singleton}
-import models.ReportStatus._
+import models.ReportStatus.*
 import models.{Error, Login, ReportStatus}
-import play.api.mvc.Result
-import play.api.{Configuration, Logging}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.Logging
+import play.api.libs.json.{Json, Reads}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
 
+import java.net.URL
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DefaultReportStatusConnector @Inject() (
-  val configuration: Configuration,
-  http: HttpClient,
-  val serviceConfig: ServicesConfig
+  httpClientV2: HttpClientV2,
+  servicesConfig: ServicesConfig
 )(implicit ec: ExecutionContext
 ) extends ReportStatusConnector
   with BaseConnector
-  with Logging {
+  with Logging:
 
-  val serviceUrl = s"${serviceConfig.baseUrl("voa-bar")}/voa-bar"
+  private val backendBase: String       = servicesConfig.baseUrl("voa-bar")
+  private val getAllSubmissionsURL: URL = url"$backendBase/voa-bar/submissions/all"
+  private val saveSubmissionURL: URL    = url"$backendBase/voa-bar/submissions?upsert=true"
+  private val saveUserInfoURL: URL      = url"$backendBase/voa-bar/submissions/user-info"
 
-  override def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] = {
+  private def getSubmissionsURL(filter: Option[String]): URL =
     val filterParam = filter.fold("")(f => s"filter=$f")
+    url"$backendBase/voa-bar/submissions?$filterParam"
 
-    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions?$filterParam", Seq.empty, defaultHeaders(login.username, login.password))
-      .map(Right(_))
-      .recover {
-        case ex: Throwable =>
-          logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't get submissions")))
+  private def submissionByReferenceURL(reference: String): URL =
+    url"$backendBase/voa-bar/submissions/$reference"
+
+  private def parseResponse[T](errorMessage: String)(using reads: Reads[T]): HttpResponse => Either[Error, T] =
+    response =>
+      response.status match {
+        case status if is2xx(status) => Right(Json.parse(response.body).as[T])
+        case status                  =>
+          logger.error(s"$status. $errorMessage. ${response.body}")
+          Left(Error("", Seq(s"$status. $errorMessage")))
       }
-  }
+
+  private def checkResponseStatus[T](errorMessage: String, mapResponse: HttpResponse => T = identity): HttpResponse => Either[Error, T] =
+    response =>
+      response.status match {
+        case status if is2xx(status) => Right(mapResponse(response))
+        case status                  =>
+          logger.error(s"$status. $errorMessage. ${response.body}")
+          Left(Error("", Seq(s"$status. $errorMessage")))
+      }
+
+  private def logAndReturnError[T](errorMessage: String): PartialFunction[Throwable, Either[Error, T]] =
+    case ex: Throwable =>
+      logger.error(ex.getMessage)
+      Left(Error("", Seq(errorMessage)))
+
+  override def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
+    httpClientV2.get(getSubmissionsURL(filter))
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .execute[HttpResponse]
+      .map(parseResponse[Seq[ReportStatus]]("Couldn't get submissions"))
+      .recover(logAndReturnError("Couldn't get submissions"))
 
   override def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
-    http.GET[Seq[ReportStatus]](s"$serviceUrl/submissions/all", Seq.empty, defaultHeaders(login.username, login.password))
-      .map(Right(_))
-      .recover {
-        case ex: Throwable =>
-          logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't get submissions")))
-      }
+    httpClientV2.get(getAllSubmissionsURL)
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .execute[HttpResponse]
+      .map(parseResponse[Seq[ReportStatus]]("Couldn't get submissions"))
+      .recover(logAndReturnError("Couldn't get submissions"))
 
   override def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]] =
-    http.GET[ReportStatus](s"$serviceUrl/submissions/$reference", Seq.empty, defaultHeaders(login.username, login.password))
-      .map(Right(_))
-      .recover {
-        case ex: Throwable =>
-          logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't get submissions")))
-      }
+    httpClientV2.get(submissionByReferenceURL(reference))
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .execute[HttpResponse]
+      .map(parseResponse[ReportStatus]("Couldn't get submission"))
+      .recover(logAndReturnError("Couldn't get submission"))
 
   override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
-    http.PUT[ReportStatus, HttpResponse](s"$serviceUrl/submissions?upsert=true", reportStatus, defaultHeaders(login.username, login.password))
-      .map(_ => Right(()))
-      .recover {
-        case ex: Throwable =>
-          logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't save submission")))
-      }
+    httpClientV2.put(saveSubmissionURL)
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(reportStatus))
+      .execute[HttpResponse]
+      .map(checkResponseStatus("Couldn't save submission", _ => ()))
+      .recover(logAndReturnError("Couldn't save submission"))
 
   override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
-    http.PUT[ReportStatus, HttpResponse](
-      s"$serviceUrl/submissions/user-info",
-      ReportStatus(reference, baCode = Some(login.username)),
-      defaultHeaders(login.username, login.password)
-    )
-      .map(_ => Right(()))
-      .recover {
-        case ex: Throwable =>
-          logger.error(ex.getMessage)
-          Left(Error("", Seq("Couldn't save user info for the submission")))
-      }
+    httpClientV2.put(saveUserInfoURL)
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
+      .execute[HttpResponse]
+      .map(checkResponseStatus("Couldn't save user info for the submission", _ => ()))
+      .recover(logAndReturnError("Couldn't save user info for the submission"))
 
-  override def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Result, HttpResponse]] = {
+  override def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, HttpResponse]] =
     logger.warn(s"Deletion of submission report, reference: $reference, user ${login.username}")
 
-    http.DELETE[HttpResponse](s"$serviceUrl/submissions/$reference", defaultHeaders(login.username, login.password)).map { status =>
-      logger.warn(s"Status of deletion for reference ${status.status}, body: ${status.body}")
-      Right(status)
-    }
-  }
-}
+    httpClientV2.delete(submissionByReferenceURL(reference))
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
+      .execute[HttpResponse]
+      .map(checkResponseStatus(s"Couldn't delete submission for reference $reference"))
+      .recover(logAndReturnError(s"Couldn't delete submission for reference $reference"))
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
-trait ReportStatusConnector {
+trait ReportStatusConnector:
   def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
   def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
   def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
   def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
   def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]]
-  def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Result, HttpResponse]]
-}
+  def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, HttpResponse]]

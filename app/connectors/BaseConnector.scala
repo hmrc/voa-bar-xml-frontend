@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package connectors
 
-trait BaseConnector {
-  def generateUsernameHeader(username: String) = ("BA-Code", username)
+trait BaseConnector:
 
-  def generatePasswordHeader(password: String) = ("password", password)
+  def generateUsernameHeader(username: String): (String, String) = "BA-Code" -> username
 
-  def defaultHeaders(username: String, password: String) =
+  def generatePasswordHeader(password: String): (String, String) = "password" -> password
+
+  def defaultHeaders(username: String, password: String): Seq[(String, String)] =
     Seq(generateUsernameHeader(username), generatePasswordHeader(password))
-}

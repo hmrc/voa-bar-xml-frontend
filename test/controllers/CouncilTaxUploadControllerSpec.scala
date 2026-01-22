@@ -44,17 +44,17 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
   def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def ec                   = app.injector.instanceOf[ExecutionContext]
-  def controllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  def ec                   = inject[ExecutionContext]
+  def controllerComponents = inject[MessagesControllerComponents]
 
-  def councilTaxUpload = app.injector.instanceOf[views.html.councilTaxUpload]
-  def errorTemplate    = app.injector.instanceOf[views.html.error_template]
+  def councilTaxUpload = inject[views.html.councilTaxUpload]
+  def errorTemplate    = inject[views.html.error_template]
 
-  def configuration = app.injector.instanceOf[Configuration]
+  def configuration = inject[Configuration]
 
   val formProvider                      = new FileUploadDataFormProvider()
   val form                              = formProvider()
-  implicit val actorSystem: ActorSystem = app.injector.instanceOf[ActorSystem]
+  implicit val actorSystem: ActorSystem = inject[ActorSystem]
 
   val username              = "BA0114"
   val password              = "pass"

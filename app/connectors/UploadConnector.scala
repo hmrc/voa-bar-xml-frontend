@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,83 +16,81 @@
 
 package connectors
 
-import java.util.Locale
-
-import javax.inject.{Inject, Singleton}
-import models.UpScanRequests._
-import play.api.{Configuration, Logging}
-import play.mvc.Http.Status
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpClient
+import models.UpScanRequests.*
 import models.{Error, Login, VoaBarUpload}
+import play.api.Logging
+import play.api.http.Status.OK
 import play.api.i18n.{Lang, MessagesApi}
+import play.api.libs.json.Json
+import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.net.URL
+import java.util.Locale
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UploadConnector @Inject() (
-  http: HttpClient,
-  val configuration: Configuration,
+  httpClientV2: HttpClientV2,
   val servicesConfig: ServicesConfig,
   messages: MessagesApi
 )(implicit ec: ExecutionContext
-) extends Logging {
+) extends BaseConnector
+  with Logging:
 
-  private[connectors] val serviceUrl = servicesConfig.baseUrl("voa-bar")
-  private[connectors] val upscanUrl  = servicesConfig.baseUrl("upscan")
+  private val backendBase: String = servicesConfig.baseUrl("voa-bar")
+  private val uploadURL: URL      = url"$backendBase/voa-bar/upload"
 
-  private[connectors] val baseSegment          = "/voa-bar/"
-  private[connectors] val xmlContentTypeHeader = ("Content-Type", "text/plain")
+  private val upscanBase: String     = servicesConfig.baseUrl("upscan")
+  private val initiateUrl: String    = s"$upscanBase${servicesConfig.getConfString("upscan.initiate.url", "")}"
+  private val upscanInitiateURL: URL = url"$initiateUrl"
 
-  private[connectors] val upScanConfig = configuration.get[Configuration]("microservice.services.upscan")
-  private[connectors] val initiateUrl  = s"$upscanUrl${upScanConfig.get[String]("initiate.url")}"
+  given Lang = Lang(Locale.UK)
 
-  def generateUsernameHeader(username: String) = ("BA-Code", username)
-
-  def generatePasswordHeader(password: String) = ("password", password)
-
-  def sendXml(xmlUrl: String, loginDetails: Login, id: String)(implicit hc: HeaderCarrier): Future[Either[Error, String]] = {
-    val baCode   = loginDetails.username
-    val password = loginDetails.password
-    val headers  = Seq(generateUsernameHeader(baCode), generatePasswordHeader(password))
-
-    val uploadData = VoaBarUpload(id, xmlUrl)
-
-    http.POST[VoaBarUpload, HttpResponse](s"$serviceUrl${baseSegment}upload", uploadData, headers)
-      .map {
-        response =>
-          response.status match {
-            case Status.OK => Right(response.body)
-            case status    =>
-              handleSendXmlError(response.body)
-          }
-      } recover {
-      case e =>
-        handleSendXmlError(e.getMessage)
-    }
-  }
-
-  implicit val lang: Lang = Lang(Locale.UK)
-
-  private def handleSendXmlError(message: String) = {
+  private def handleSendXmlError(message: String): Either[Error, String] =
     val errorMsg = s"Error when uploading am xml file\n$message"
     logger.warn(errorMsg)
     Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
-  }
 
-  def initiate(request: InitiateRequest)(implicit hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] =
-    http.POST[InitiateRequest, InitiateResponse](initiateUrl, request, Seq.empty)
-      .map { initiateResponse =>
-        logger.debug(s"Upscan initiate response : $initiateResponse")
-        initiateResponse
-      }.map(Right(_))
+  def sendXml(xmlUrl: String, login: Login, id: String)(using hc: HeaderCarrier): Future[Either[Error, String]] =
+    val uploadData = VoaBarUpload(id, xmlUrl)
+
+    httpClientV2.post(uploadURL)
+      .setHeader(defaultHeaders(login.username, login.password)*)
+      .withBody(Json.toJson(uploadData))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case OK     => Right(response.body)
+          case status => handleSendXmlError(s"$status. ${response.body}")
+        }
+      }
       .recover {
-        case ex: Throwable =>
-          val errorMessage = "Failed to get UpScan file upload details"
-          logger.error(errorMessage, ex)
-          Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
+        case e => handleSendXmlError(e.getMessage)
       }
 
-}
+  def initiate(request: InitiateRequest)(using hc: HeaderCarrier): Future[Either[Error, InitiateResponse]] =
+    httpClientV2.post(upscanInitiateURL)
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case status if is2xx(status) =>
+            val initiateResponse = Json.parse(response.body).as[InitiateResponse]
+            logger.debug(s"Upscan initiate response : $initiateResponse")
+            Right(initiateResponse)
+          case status                  =>
+            logger.error(s"$status. Failed to get UpScan file upload details. ${response.body}")
+            Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
+        }
+      }
+      .recover {
+        case ex =>
+          logger.error("Failed to get UpScan file upload details", ex)
+          Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
+      }

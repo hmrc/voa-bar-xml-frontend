@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -300,15 +300,17 @@ object UniformJourney {
 
   def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] = {
 
-    val firstName = (lengthBetween(1, 35, "firstName.minLength", "firstName.maxLength")
-      .apply(contactDetails.firstName) andThen (
-      Rule.matchesRegex(restrictedStringTypeRegex, "firstName.allowedChars").apply(_)
-    )).leftMap(_.prefixWith("firstName"))
+    val firstName =
+      (lengthBetween(1, 35, "firstName.minLength", "firstName.maxLength")
+        .apply(contactDetails.firstName) andThen (
+        Rule.matchesRegex(restrictedStringTypeRegex, "firstName.allowedChars").apply(_)
+      )).leftMap(_.prefixWith("firstName"))
 
-    val lastName = (lengthBetween(1, 35, "lastName.minLength", "lastName.maxLength")
-      .apply(contactDetails.lastName) andThen (
-      Rule.matchesRegex(restrictedStringTypeRegex, "lastName.allowedChars").apply(_)
-    )).leftMap(_.prefixWith("lastName"))
+    val lastName =
+      (lengthBetween(1, 35, "lastName.minLength", "lastName.maxLength")
+        .apply(contactDetails.lastName) andThen (
+        Rule.matchesRegex(restrictedStringTypeRegex, "lastName.allowedChars").apply(_)
+      )).leftMap(_.prefixWith("lastName"))
 
     val emailAddress = (contactDetails.email match {
       case None        => Validated.valid(None)
@@ -331,15 +333,19 @@ object UniformJourney {
 
   def addressValidation(maxLen: Int, errorPrefix: String)(a: Address): Validated[ErrorTree, Address] = {
 
-    val line1 = (lengthBetween(1, maxLen, "line1.minLength", "line1.maxLength").apply(a.line1) andThen (Rule.matchesRegex(
-      restrictedStringTypeRegex,
-      "line1.allowedChars"
-    ).apply(_))).leftMap(_.prefixWith("line1"))
+    val line1 =
+      (lengthBetween(1, maxLen, "line1.minLength", "line1.maxLength").apply(a.line1) andThen
+        (Rule.matchesRegex(
+          restrictedStringTypeRegex,
+          "line1.allowedChars"
+        ).apply(_))).leftMap(_.prefixWith("line1"))
 
-    val line2 = (lengthBetween(1, maxLen, "line2.minLength", "line2.maxLength").apply(a.line2) andThen (Rule.matchesRegex(
-      restrictedStringTypeRegex,
-      "line2.allowedChars"
-    ).apply(_))).leftMap(_.prefixWith("line2"))
+    val line2 =
+      (lengthBetween(1, maxLen, "line2.minLength", "line2.maxLength").apply(a.line2) andThen
+        (Rule.matchesRegex(
+          restrictedStringTypeRegex,
+          "line2.allowedChars"
+        ).apply(_))).leftMap(_.prefixWith("line2"))
 
     val line3: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine(maxLen, "line3.maxLength", "line3.allowedChars")
       .apply(a.line3).leftMap(_.prefixWith("line3"))
@@ -366,10 +372,11 @@ object UniformJourney {
       v1 match {
         case None        => Validated.Valid(Option.empty[String])
         case Some(value) =>
-          val res                                        = maxLength[String](maxLen, maxLenMsg).apply(value) andThen (Rule.matchesRegex(
-            restrictedStringTypeRegex,
-            formatMsg
-          ).apply(_))
+          val res                                        = maxLength[String](maxLen, maxLenMsg).apply(value) andThen
+            (Rule.matchesRegex(
+              restrictedStringTypeRegex,
+              formatMsg
+            ).apply(_))
           val res2: Validated[ErrorTree, Option[String]] = res.map(x => Option(x))
           res2
       }
