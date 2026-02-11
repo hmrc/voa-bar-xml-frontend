@@ -33,7 +33,6 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.FakeNavigator
 import views.ViewSpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,31 +41,30 @@ import scala.io.Source
 
 class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
+  private def ec                   = inject[ExecutionContext]
+  private def controllerComponents = inject[MessagesControllerComponents]
 
-  def councilTaxUpload = inject[views.html.councilTaxUpload]
-  def errorTemplate    = inject[views.html.error_template]
+  private def councilTaxUpload = inject[views.html.councilTaxUpload]
+  private def errorTemplate    = inject[views.html.error_template]
 
-  def configuration = inject[Configuration]
+  private def configuration = inject[Configuration]
 
-  val formProvider                      = new FileUploadDataFormProvider()
-  val form                              = formProvider()
-  implicit val actorSystem: ActorSystem = inject[ActorSystem]
+  private val formProvider                      = new FileUploadDataFormProvider()
+  private val form                              = formProvider()
+  implicit private val actorSystem: ActorSystem = inject[ActorSystem]
 
-  val username              = "BA0114"
-  val password              = "pass"
-  lazy val login            = Login(username, password).encrypt(configuration)
-  lazy val pathForValidFile = getClass.getResource("/valid.xml")
+  private val username = "BA0114"
+  private val password = "pass"
+  private val login    = Login(username, password).encrypt(configuration)
 
-  val submissionId = "SID38273"
-  val reference    = submissionId
-  val uploadUrl    = "http://foo.bar"
-  val userReport   = UserReportUpload(reference, username, password)
+  private val submissionId = "SID38273"
+  private val reference    = submissionId
+  private val uploadUrl    = "http://foo.bar"
+  private val userReport   = UserReportUpload(reference, username, password)
 
-  val initiateResponse = InitiateResponse(
+  private val initiateResponse = InitiateResponse(
     reference = reference,
     uploadRequest = UploadRequest(
       href = uploadUrl,
@@ -85,13 +83,13 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       )
     )
   )
-  val error            = Error("error", Seq())
+  private val error            = Error("error", Seq())
 
-  val uploadConnector = mock[UploadConnector]
+  private val uploadConnector = mock[UploadConnector]
   when(uploadConnector.sendXml(any[String], any[Login], any[String])(using any[HeaderCarrier])).thenReturn(Future(Right(submissionId)))
   when(uploadConnector.initiate(any[InitiateRequest])(using any[HeaderCarrier])).thenReturn(Future(Right(initiateResponse)))
 
-  val uploadConnectorF = mock[UploadConnector]
+  private val uploadConnectorF = mock[UploadConnector]
   when(uploadConnectorF.sendXml(any[String], any[Login], any[String])(using any[HeaderCarrier])).thenReturn(Future(Left(Error(
     "SEND-XML-ERROR",
     Seq("Received exception from upstream service")
@@ -101,23 +99,23 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     Seq("Received exception from upscan service")
   ))))
 
-  val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
+  private val userReportUploadsConnectorMock = mock[UserReportUploadsConnector]
   when(userReportUploadsConnectorMock.save(any[UserReportUpload])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
   when(userReportUploadsConnectorMock.getById(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(Some(userReport))))
 
-  val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
+  private val userReportUploadsConnectorFailMock = mock[UserReportUploadsConnector]
   when(userReportUploadsConnectorFailMock.save(any[UserReportUpload])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
   when(userReportUploadsConnectorFailMock.getById(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
 
-  val reportStatusConnectorMock = mock[ReportStatusConnector]
+  private val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
 
-  val reportStatusConnectorFailMock = mock[ReportStatusConnector]
+  private val reportStatusConnectorFailMock = mock[ReportStatusConnector]
   when(reportStatusConnectorFailMock.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
   when(reportStatusConnectorFailMock.saveUserInfo(any[String], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Left(error)))
 
-  def loggedInController(
+  private def loggedInController(
     connector: UploadConnector,
     userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
     reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock
@@ -127,13 +125,11 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(
       configuration,
-      frontendAppConfig,
       messagesApi,
       getEmptyCacheMap,
       new DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
-      new FakeNavigator(desiredRoute = onwardRoute),
       connector,
       councilTaxUpload,
       errorTemplate,
@@ -143,7 +139,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     )
   }
 
-  def notLoggedInController(
+  private def notLoggedInController(
     connector: UploadConnector,
     userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
     reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock
@@ -151,13 +147,11 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     FakeDataCacheConnector.resetCaptures()
     new CouncilTaxUploadController(
       configuration,
-      frontendAppConfig,
       messagesApi,
       getEmptyCacheMap,
       new DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
-      new FakeNavigator(desiredRoute = onwardRoute),
       connector,
       councilTaxUpload,
       errorTemplate,
@@ -167,7 +161,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     )
   }
 
-  def viewAsString(form: Form[?] = form) = councilTaxUpload(username, form, Some(initiateResponse))(using fakeRequest, messages).toString
+  private def viewAsString(form: Form[?] = form) = councilTaxUpload(username, form, Some(initiateResponse))(using fakeRequest, messages).toString
 
   "CouncilTaxUpload Controller" must {
 

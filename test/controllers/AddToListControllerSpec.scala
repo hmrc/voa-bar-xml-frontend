@@ -31,20 +31,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
-  val username = "AUser"
+  private val username = "AUser"
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
+  private def ec                   = inject[ExecutionContext]
+  private def controllerComponents = inject[MessagesControllerComponents]
 
-  def addToList = inject[views.html.add_to_list]
+  private def addToList = inject[views.html.add_to_list]
 
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new AddToListController(
-      frontendAppConfig,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute),
@@ -54,12 +53,11 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     )(using ec)
   }
 
-  def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Cr05SubmissionBuilder]("", Cr05SubmissionBuilder.storageKey, submission)
     new AddToListController(
-      frontendAppConfig,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute),
@@ -69,10 +67,9 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     )(using ec)
   }
 
-  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new AddToListController(
-      frontendAppConfig,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute),
@@ -82,10 +79,10 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     )(using ec)
   }
 
-  def viewAsString(submission: Cr05SubmissionBuilder): String =
+  private def viewAsString(submission: Cr05SubmissionBuilder): String =
     addToList(Some(username), submission, models.YesNoForm.yesNoForm)(using fakeRequest, messages).toString
 
-  def formfakeRequest(formResponse: String) = {
+  private def formfakeRequest(formResponse: String) = {
     val csfrToken = Token("csrfToken", "FixedCSRFTOkenValueForTest")
     val req       = FakeRequest("POST", "").withFormUrlEncodedBody("add-another" -> formResponse)
     req.withAttrs(req.attrs.updated(Token.InfoAttr -> TokenInfo(csfrToken)))

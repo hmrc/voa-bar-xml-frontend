@@ -24,7 +24,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, withSettings}
 import org.mockito.quality.Strictness
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.Configuration
 import play.api.mvc.{BodyParsers, MessagesControllerComponents}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, SessionKeys}
@@ -35,15 +34,13 @@ import scala.concurrent.Future
 
 class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  def controllerComponents = inject[MessagesControllerComponents]
+  private def controllerComponents = inject[MessagesControllerComponents]
 
-  def configuration = inject[Configuration]
+  private def bodyParser = inject[BodyParsers.Default]
 
-  def bodyParser = inject[BodyParsers.Default]
+  private def errorTemplateView = inject[views.html.error_template]
 
-  def errorTemplateView = inject[views.html.error_template]
-
-  val login = Login("foo", "bar")
+  private val login = Login("foo", "bar")
 
   "ReportDeleteController" must {
     "Delete report " in {
@@ -53,7 +50,6 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller = new ReportDeleteController(
-        configuration,
         FakeDataCacheConnector,
         fakeReportStatusConnector(),
         controllerComponents,
@@ -67,7 +63,7 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
   }
 
-  def fakeReportStatusConnector() = {
+  private def fakeReportStatusConnector(): ReportStatusConnector = {
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
     when(reportStatusConnectorMock.deleteByReference(any[String], any[Login])(using any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(HttpResponse(OK, "OK"))))

@@ -21,12 +21,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction}
 import viewmodels.AnswerSection
 import views.html.check_your_answers
-import config.FrontendAppConfig
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 class CheckYourAnswersController @Inject() (
-  appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -37,7 +35,7 @@ class CheckYourAnswersController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     val sections = Seq(AnswerSection(None, Seq()))
-    Ok(checkYourAnswer(appConfig, sections))
+    Ok(checkYourAnswer(sections))
   }
 
 }

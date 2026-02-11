@@ -27,10 +27,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
-import play.api.{Configuration, Environment}
 import services.ReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.{TableFormatter, ViewSpecBase}
 
 import java.time.Instant
@@ -44,52 +42,41 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     def normalize: Instant = Instant.ofEpochMilli(instant.toEpochMilli)
   }
 
-  def reportStatus  = inject[views.html.reportStatus]
-  def errorTemplate = inject[views.html.error_template]
+  private val reportStatus  = inject[views.html.reportStatus]
+  private val errorTemplate = inject[views.html.error_template]
 
-  val configuration = inject[Configuration]
-  val environment   = inject[Environment]
-  val username      = "AUser"
-  val login         = Login("foo", "bar")
-  val login2        = Login(username, "bar")
+  private val username = "AUser"
+  private val login    = Login("foo", "bar")
+  private val login2   = Login(username, "bar")
 
-  val baCode        = "ba1221"
-  val submissionId1 = "1234-XX"
-  val submissionId2 = "1235-XX"
-  val submissionId3 = "1236-XX"
+  private val baCode        = "ba1221"
+  private val submissionId1 = "1234-XX"
 
-  val rs1 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Submitted.value), createdAt = Instant.now.normalize)
-  val rs2 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Verified.value), createdAt = Instant.now.normalize)
-  val rs3 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Done.value), createdAt = Instant.now.normalize)
+  private val rs1 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Submitted.value), createdAt = Instant.now.normalize)
+  private val rs2 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Verified.value), createdAt = Instant.now.normalize)
+  private val rs3 = ReportStatus(submissionId1, baCode = Some(baCode), status = Some(Done.value), createdAt = Instant.now.normalize)
 
-  val fakeReports        = Seq(rs1, rs2, rs3)
-  val fakeMapAsJson      = Json.toJson(fakeReports)
-  val wrongJson          = Json.toJson("""{"someID": "hhewfwe777"}""")
-  def servicesConfig     = inject[ServicesConfig]
-  val fakeTableFormatter = new TableFormatter(servicesConfig)
+  private val fakeReports        = Seq(rs1, rs2, rs3)
+  private val fakeMapAsJson      = Json.toJson(fakeReports)
+  private val wrongJson          = Json.toJson("""{"someID": "hhewfwe777"}""")
+  private val fakeTableFormatter = new TableFormatter()
 
-  // implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
-
-  val sortedReports       = fakeReports.sortBy(_.createdAt)
-  val sortedSubmissionIds = List(submissionId3, submissionId2, submissionId1)
-
-  val receiptServiceMock = mock[ReceiptService]
+  private val receiptServiceMock = mock[ReceiptService]
   when(receiptServiceMock.producePDF(any[ReportStatus])).thenReturn(Success(Array[Byte](1, 2, 3, 4)))
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
+  private val ec                   = inject[ExecutionContext]
+  private val controllerComponents = inject[MessagesControllerComponents]
 
-  def fakeReportStatusConnector() = {
+  private def fakeReportStatusConnector() = {
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
     when(reportStatusConnectorMock.get(any[Login], any[Option[String]])(using any[HeaderCarrier])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
   }
 
-  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login2)
     new ReportStatusController(
-      frontendAppConfig,
       messagesApi,
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
@@ -103,10 +90,9 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
   }
 
-  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ReportStatusController(
-      frontendAppConfig,
       messagesApi,
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
@@ -120,7 +106,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
   }
 
-  def viewAsString() = reportStatus(username, fakeReports, None, fakeTableFormatter)(using fakeRequest, messages).toString
+  private def viewAsString() = reportStatus(username, fakeReports, None, fakeTableFormatter)(using fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
@@ -144,7 +130,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).verifyResponse(fakeMapAsJson)
 
       result.isRight mustBe true
-      result.toOption.get == fakeReports mustBe true
+      result.toOption mustBe Some(fakeReports)
     }
 
     "Give some wrong Json, the verify response method returns a Left representing the exception to be thrown at Runtime" in {
@@ -166,7 +152,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val controller =
         new ReportStatusController(
-          frontendAppConfig,
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
@@ -193,7 +178,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val controller =
         new ReportStatusController(
-          frontendAppConfig,
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
@@ -219,7 +203,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val controller =
         new ReportStatusController(
-          frontendAppConfig,
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
@@ -245,7 +228,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val controller =
         new ReportStatusController(
-          frontendAppConfig,
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,

@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
 @import models.requests.DataRequest
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
@@ -24,8 +23,7 @@
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
         errorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        appConfig: FrontendAppConfig
+        govukRadios: GovukRadios
 )
 
 @(form: Form[?], cr05Enabled: Boolean)(implicit request: DataRequest[?], messages: Messages)
@@ -49,7 +47,7 @@
                 classes = "govuk-fieldset__legend--l")
             ))),
             items = journey.ReasonReportType.order.filter(x => cr05Enabled || (x != "SplitProperty")).map(x => RadioItem(id = Option(x),
-                    content = Text(messages(s"what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.${x}")), value = Option(x),
+                    content = Text(messages(s"what-is-the-reason-for-the-report.what-is-the-reason-for-the-report.$x")), value = Option(x),
                     checked = form("reportReason").value.contains(x)
                 )
             ), name = "reportReason", errorMessage = form.errors.asTextErrorMessageForField("reportReason")

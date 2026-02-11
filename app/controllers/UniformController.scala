@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions.{AuthAction, DataRequiredAction, DataRetrievalAction}
 import journey.UniformJourney.{Cr05AddProperty, Cr05SubmissionBuilder}
@@ -25,11 +24,11 @@ import ltbs.uniform.*
 import ltbs.uniform.interpreters.playframework.*
 import models.PropertyType
 import models.requests.DataRequest
-import play.api.i18n.{Messages as _, *}
+import play.api.i18n.MessagesApi
 import play.api.mvc.*
 import play.api.{Configuration, Logger, Logging}
 import services.Cr01Cr03Service
-import uk.gov.hmrc.govukfrontend.views.html.components.{Action as _, *}
+import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.govuk.{cr05SubmissionSummary, pageChrome}
 
@@ -48,7 +47,6 @@ class UniformController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   auth: AuthAction,
-  appConfig: FrontendAppConfig,
   cr01cr03Service: Cr01Cr03Service,
   cr05SubmissionSummary: cr05SubmissionSummary,
   cc: MessagesControllerComponents

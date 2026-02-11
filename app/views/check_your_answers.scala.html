@@ -14,14 +14,13 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
 @import viewmodels.{Section, AnswerSection, RepeaterAnswerSection}
 
 @this(
     main_template: views.html.govuk.main_template
 )
 
-@(appConfig: FrontendAppConfig, answerSections: Seq[Section])(implicit request: Request[?], messages: Messages)
+@(answerSections: Seq[Section])(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = messages("checkYourAnswers.title")

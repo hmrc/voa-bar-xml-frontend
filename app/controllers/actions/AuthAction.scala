@@ -17,7 +17,6 @@
 package controllers.actions
 
 import com.google.inject.Inject
-import config.FrontendAppConfig
 import models.requests.DataRequest
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc.{ActionFilter, MessagesControllerComponents, Result}
@@ -27,7 +26,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthAction @Inject() (
   cc: MessagesControllerComponents,
-  appConfig: FrontendAppConfig,
   unauthorised: unauthorised
 )(implicit val executionContext: ExecutionContext
 ) extends ActionFilter[DataRequest] {
@@ -35,7 +33,7 @@ class AuthAction @Inject() (
   override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] =
     if (request.userAnswers.login.isEmpty) {
       val messages = cc.messagesApi.preferred(request)
-      Future.successful(Some(Unauthorized(unauthorised(appConfig)(using request, messages))))
+      Future.successful(Some(Unauthorized(unauthorised()(using request, messages))))
     } else {
       Future.successful(None)
     }

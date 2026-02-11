@@ -19,28 +19,14 @@ package config
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
-import controllers.routes
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
+class FrontendAppConfig @Inject() (configuration: Configuration):
 
-  private def loadConfig(key: String) = configuration.get[String](key)
+  val baCodes: Seq[String] = configuration.get[String]("baCodes").split(",").toSeq
 
-  private lazy val contactHost             = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
-  private val contactFormServiceIdentifier = "voabarxmlfrontend"
-
-  lazy val baCodes                        = loadConfig("baCodes").split(",").toSeq
-  lazy val reportAProblemPartialUrl       = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  lazy val reportAProblemNonJSUrl         = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  lazy val betaFeedbackUrl                = s"$contactHost/contact/beta-feedback"
-  lazy val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated"
-
-  lazy val languageTranslationEnabled = configuration.getOptional[Boolean]("microservice.services.features.welsh-translation").getOrElse(true)
-
-  def languageMap: Map[String, Lang] = Map(
-    "english" -> Lang("en"),
-    "cymraeg" -> Lang("cy")
-  )
-  def routeToSwitchLanguage          = (lang: String) => routes.LanguageSwitchController.switchToLanguage(lang)
-}
+  def languageMap: Map[String, Lang] =
+    Map(
+      "english" -> Lang("en"),
+      "cymraeg" -> Lang("cy")
+    )

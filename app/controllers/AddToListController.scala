@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions.*
 import identifiers.{AddPropertyId, VOAAuthorisedId}
@@ -35,7 +34,6 @@ import models.YesNoForm.*
 import scala.util.Try
 
 class AddToListController @Inject() (
-  appConfig: FrontendAppConfig,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   navigator: Navigator,
@@ -72,7 +70,7 @@ class AddToListController @Inject() (
   }
 
   def removeProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
-    val propertyIndex = request.body.asFormUrlEncoded.getOrElse(Map()).get("delete-index").map(_.head).flatMap { i =>
+    val propertyIndex = request.body.asFormUrlEncoded.getOrElse(Map()).get("delete-index").flatMap(_.headOption).flatMap { i =>
       Try {
         i.toInt
       }.toOption

@@ -21,11 +21,11 @@ import play.api.test.Helpers._
 
 class SignOutControllerSpec extends ControllerSpecBase {
 
-  def controllerComponents = inject[MessagesControllerComponents]
+  private def controllerComponents = inject[MessagesControllerComponents]
 
   "Signout Controller" must {
     "return 303 for a GET" in {
-      val result = new SignOutController(controllerComponents, frontendAppConfig).signOut()(fakeRequest)
+      val result = new SignOutController(controllerComponents).signOut()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }

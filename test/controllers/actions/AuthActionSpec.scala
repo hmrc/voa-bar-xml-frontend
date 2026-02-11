@@ -17,7 +17,6 @@
 package controllers.actions
 
 import base.SpecBase
-import config.FrontendAppConfig
 import identifiers.LoginId
 import models.requests.DataRequest
 import models.{CacheMap, Login}
@@ -39,7 +38,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with I
   "AuthAction" should {
 
     "return unauthorised when user is not logged " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig], inject[unauthorised])
+      val action = new AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
 
       val req = DataRequest(fakeRequest, sessionId, new UserAnswers(new CacheMap(sessionId, Map())))
 
@@ -51,7 +50,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with I
     }
 
     "return content of action when user is authorised " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[FrontendAppConfig], inject[unauthorised])
+      val action = new AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
 
       val cacheMap = new CacheMap(sessionId, Map(LoginId.toString -> Login.format.writes(Login("username", "password", None))))
 

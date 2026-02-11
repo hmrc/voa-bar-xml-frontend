@@ -25,13 +25,12 @@ import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersControllerSpec extends ControllerSpecBase {
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
-  def checkYourAnswerView  = inject[views.html.check_your_answers]
+  private def ec                   = inject[ExecutionContext]
+  private def controllerComponents = inject[MessagesControllerComponents]
+  private def checkYourAnswerView  = inject[views.html.check_your_answers]
 
-  def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
+  private def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     new CheckYourAnswersController(
-      frontendAppConfig,
       messagesApi,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
@@ -43,7 +42,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase {
     "return 200 and the correct view for a GET" in {
       val result = controller().onPageLoad()(fakeRequest)
       status(result) mustBe OK
-      contentAsString(result) mustBe checkYourAnswerView(frontendAppConfig, Seq(AnswerSection(None, Seq())))(using fakeRequest, messages).toString
+      contentAsString(result) mustBe checkYourAnswerView(Seq(AnswerSection(None, Seq())))(using fakeRequest, messages).toString
     }
 
     "redirect to Session Expired for a GET if not existing data is found" in {

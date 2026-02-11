@@ -17,12 +17,11 @@
 package views
 
 import models.{Done, Failed, Pending, ReportStatus, Submitted, Verified}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.behaviours.ViewBehaviours
 
 class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
 
-  def reportStatus = inject[views.html.reportStatus]
+  private def reportStatus = inject[views.html.reportStatus]
 
   val username           = "BA0350"
   val messageKeyPrefix   = "reportStatus"
@@ -33,15 +32,14 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
   val reportStatus3      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Failed.value))
   val reportStatus4      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Done.value))
   val reportStatus5      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Pending.value))
-  def servicesConfig     = inject[ServicesConfig]
-  val fakeTableFormatter = new TableFormatter(servicesConfig)
+  val fakeTableFormatter = new TableFormatter()
 
-  val reportStatusFakeRequest = fakeRequest
+  private val reportStatusFakeRequest = fakeRequest
 
-  def createView(reportStatuses: Seq[ReportStatus] = Seq()) =
+  private def createView(reportStatuses: Seq[ReportStatus] = Seq()) =
     () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(using reportStatusFakeRequest, messages)
 
-  def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
+  private def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
 
   "ReportStatus view" must {
     behave like normalPage(createView(), messageKeyPrefix)

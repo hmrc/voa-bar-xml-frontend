@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.EitherT
 import cats.implicits.*
-import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.actions.*
 import models.{Login, Pending, ReportStatus}
@@ -36,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class ReportStatusController @Inject() (
-  appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   val dataCacheConnector: DataCacheConnector,
   reportStatusConnector: ReportStatusConnector,
@@ -62,19 +60,19 @@ class ReportStatusController @Inject() (
 
   private def reportStatuses(login: Login, filter: Option[String])(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.get(login, filter).map(_.fold(
-      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatuses => Right(reportStatuses)
     ))
 
   private def allReportStatuses(login: Login)(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.getAll(login).map(_.fold(
-      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatuses => Right(reportStatuses)
     ))
 
   private def getReportStatus(submissionId: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(submissionId, login).map(_.fold(
-      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatus => Right(reportStatus)
     ))
 
@@ -91,7 +89,7 @@ class ReportStatusController @Inject() (
     Future {
       receiptService.producePDF(reportStatus) match {
         case Success(content) => Right(content)
-        case Failure(_)       => Left(InternalServerError(error(messagesApi.preferred(request), appConfig)))
+        case Failure(_)       => Left(InternalServerError(error(messagesApi.preferred(request))))
       }
     }
 

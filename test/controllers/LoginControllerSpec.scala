@@ -39,32 +39,31 @@ import scala.util.{Failure, Success}
 
 class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
 
-  var captures = Map[String, Any]()
+  private var captures = Map[String, Any]()
 
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  val formProvider = new LoginFormProvider()
-  val form         = formProvider()
-  val validBACode  = "ba0114"
+  private val formProvider = new LoginFormProvider()
+  private val form         = formProvider()
+  private val validBACode  = "ba0114"
 
-  def controllerComponents = inject[MessagesControllerComponents]
-  def ec                   = inject[ExecutionContext]
+  private def controllerComponents = inject[MessagesControllerComponents]
+  private def ec                   = inject[ExecutionContext]
 
-  def login         = inject[views.html.login]
-  val configuration = inject[Configuration]
+  private def login         = inject[views.html.login]
+  private val configuration = inject[Configuration]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
-  val loginConnector = mock[LoginConnector]
+  private val loginConnector = mock[LoginConnector]
   when(loginConnector.doLogin(any[Login])).thenReturn(Future.successful(Success(OK)))
 
-  val loginConnectorF = mock[LoginConnector]
+  private val loginConnectorF = mock[LoginConnector]
   when(loginConnectorF.doLogin(any[Login])).thenReturn(Future.successful(Failure(new RuntimeException("Received exception from upstream service"))))
 
-  def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new LoginController(
-      frontendAppConfig,
       messagesApi,
       FakeDataCacheConnector,
       new FakeNavigator(desiredRoute = onwardRoute),
@@ -78,7 +77,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
     )
   }
 
-  def viewAsString(form: Form[Login] = form) = login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages).toString
+  private def viewAsString(form: Form[Login] = form) = login(form, NormalMode)(using fakeRequest, messages).toString
 
   "Login Controller" must {
 
