@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import identifiers.LoginId
 import models.{Error, Login, NormalMode}
@@ -37,7 +36,7 @@ trait BaseBarController extends FrontendBaseController with Logging {
 
   val errorTemplate: views.html.error_template
 
-  private[controllers] def error(messages: Messages, appConfig: FrontendAppConfig)(implicit request: Request[?]) =
+  private[controllers] def error(messages: Messages)(implicit request: Request[?]) =
     errorTemplate(
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")

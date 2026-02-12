@@ -21,12 +21,11 @@ import cats.data.EitherT
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import controllers.actions._
-import config.FrontendAppConfig
+import controllers.actions.*
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import models.{ConfirmationPayload, Login, Pending, ReportStatus}
-import play.api.mvc.{MessagesControllerComponents, Request, Result}
-import cats.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import cats.implicits.*
 import journey.UniformJourney.{Cr01Cr03Submission, Cr05Submission, CrSubmission}
 import play.api.libs.json.JsString
 import views.html.components.{confirmation_detail_panel, confirmation_status_panel}
@@ -34,7 +33,6 @@ import views.html.components.{confirmation_detail_panel, confirmation_status_pan
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject() (
-  appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -51,7 +49,7 @@ class ConfirmationController @Inject() (
   with BaseBarController
   with I18nSupport {
 
-  def onPageLoad(reference: String) = getData.async {
+  def onPageLoad(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login        <- EitherT(cachedLogin(request.externalId))
@@ -62,7 +60,7 @@ class ConfirmationController @Inject() (
       }).valueOr(failPage => failPage)
   }
 
-  def onPageRefresh(reference: String) = getData.async {
+  def onPageRefresh(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
       (for {
         login        <- EitherT(cachedLogin(request.externalId))
@@ -73,7 +71,7 @@ class ConfirmationController @Inject() (
       }).valueOr(failPage => failPage)
   }
 
-  def onStatusCheck(reference: String) = getData.async { implicit request =>
+  def onStatusCheck(reference: String): Action[AnyContent] = getData.async { implicit request =>
     import play.api.libs.json._
     import ConfirmationPayload._
 
@@ -95,7 +93,7 @@ class ConfirmationController @Inject() (
 
   private def getReportStatus(reference: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(reference, login).map(_.fold(
-      _ => Left(InternalServerError(error(messagesApi.preferred(request), appConfig))),
+      _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatus => Right(reportStatus)
     ))
 

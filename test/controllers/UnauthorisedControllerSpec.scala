@@ -22,18 +22,18 @@ import views.html.unauthorised
 
 class UnauthorisedControllerSpec extends ControllerSpecBase {
 
-  def controllerComponents = inject[MessagesControllerComponents]
-  val unauthorised         = inject[unauthorised]
+  private def controllerComponents = inject[MessagesControllerComponents]
+  private val unauthorised         = inject[unauthorised]
 
   "Unauthorised Controller" must {
     "return 200 for a GET" in {
-      val result = new UnauthorisedController(frontendAppConfig, controllerComponents, unauthorised).onPageLoad()(fakeRequest)
+      val result = new UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
       status(result) mustBe OK
     }
 
     "return the correct view for a GET" in {
-      val result = new UnauthorisedController(frontendAppConfig, controllerComponents, unauthorised).onPageLoad()(fakeRequest)
-      contentAsString(result) mustBe unauthorised(frontendAppConfig)(using fakeRequest, messages).toString
+      val result = new UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
+      contentAsString(result) mustBe unauthorised()(using fakeRequest, messages).toString
     }
   }
 }

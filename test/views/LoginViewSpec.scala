@@ -24,15 +24,15 @@ import views.behaviours.govuk.QuestionViewBehaviours
 
 class LoginViewSpec extends QuestionViewBehaviours[Login] {
 
-  def login = inject[views.html.login]
+  private def login = inject[views.html.login]
 
   val messageKeyPrefix = "login"
 
   override val form = new LoginFormProvider()()
 
-  def createView = () => login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages)
+  private def createView = () => login(form, NormalMode)(using fakeRequest, messages)
 
-  def createViewUsingForm = (form: Form[Login]) => login(frontendAppConfig, form, NormalMode)(using fakeRequest, messages)
+  private def createViewUsingForm = (form: Form[Login]) => login(form, NormalMode)(using fakeRequest, messages)
 
   "Login view" must {
 

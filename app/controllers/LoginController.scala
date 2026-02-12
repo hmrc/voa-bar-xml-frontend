@@ -21,20 +21,18 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import connectors.{DataCacheConnector, LoginConnector}
-import controllers.actions._
-import config.FrontendAppConfig
+import controllers.actions.*
 import forms.LoginFormProvider
 import identifiers.{LoginId, VOAAuthorisedId}
 import models.{BillingAuthorities, Login, Mode}
 import play.api.{Configuration, Logging}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{Navigator, UserAnswers}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class LoginController @Inject() (
-  appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   dataCacheConnector: DataCacheConnector,
   navigator: Navigator,
@@ -52,7 +50,7 @@ class LoginController @Inject() (
 
   private val form: Form[Login] = formProvider()
 
-  def onPageLoad(mode: Mode) = getData.async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = getData.async {
     implicit request =>
       val preparedForm = request.userAnswers.flatMap(_.login) match {
         case None        => form
@@ -61,15 +59,15 @@ class LoginController @Inject() (
           form.fill(loginWithBlankedPassword)
       }
       dataCacheConnector.remove(request.externalId, VOAAuthorisedId.toString) map {
-        result => Ok(login(appConfig, preparedForm, mode))
+        _ => Ok(login(preparedForm, mode))
       }
   }
 
-  def onSubmit(mode: Mode) = getData.async {
+  def onSubmit(mode: Mode): Action[AnyContent] = getData.async {
     implicit request =>
       form.bindFromRequest().fold(
         (formWithErrors: Form[Login]) =>
-          Future.successful(BadRequest(login(appConfig, formWithErrors, mode))),
+          Future.successful(BadRequest(login(formWithErrors, mode))),
         value => {
           val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
@@ -86,14 +84,14 @@ class LoginController @Inject() (
                       form
                         .withError("username", Messages("error.invalid_username"))
                         .withError("password", Messages("error.invalid_password"))
-                    Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
+                    Future.successful(BadRequest(login(formWithLoginErrors, mode)))
                 }
               case Failure(_)      =>
                 val formWithLoginErrors =
                   form
                     .withError("username", Messages("error.invalid_username"))
                     .withError("password", Messages("error.invalid_password"))
-                Future.successful(BadRequest(login(appConfig, formWithLoginErrors, mode)))
+                Future.successful(BadRequest(login(formWithLoginErrors, mode)))
             }
           }
         }

@@ -14,13 +14,11 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-
 @this(
         main_template: views.html.govuk.main_template
 )
 
-@(appConfig: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = messages("unauthorised.title"),

@@ -21,7 +21,6 @@ import cats.implicits.*
 import connectors.{DataCacheConnector, ReportStatusConnector}
 import controllers.ReportDeleteController.submissionId
 import controllers.actions.DataRetrievalAction
-import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -31,7 +30,6 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ReportDeleteController @Inject() (
-  configuration: Configuration,
   val dataCacheConnector: DataCacheConnector,
   reportStatusConnector: ReportStatusConnector,
   controllerComponents: MessagesControllerComponents,

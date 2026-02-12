@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.EitherT
 import cats.implicits.*
-import config.FrontendAppConfig
 import connectors.{DataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions.*
 import forms.FileUploadDataFormProvider
@@ -30,7 +29,6 @@ import play.api.libs.json.{JsSuccess, JsValue}
 import play.api.mvc.*
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import utils.Navigator
 
 import java.util.Locale
 import javax.inject.Inject
@@ -38,13 +36,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CouncilTaxUploadController @Inject() (
   configuration: Configuration,
-  appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val dataCacheConnector: DataCacheConnector,
   formProvider: FileUploadDataFormProvider,
-  navigator: Navigator,
   uploadConnector: UploadConnector,
   councilTaxUpload: views.html.councilTaxUpload,
   val errorTemplate: views.html.error_template,
@@ -92,7 +88,7 @@ class CouncilTaxUploadController @Inject() (
       case _                   =>
         val errorMsg = s"Couldn't parse: \n${request.body}"
         log.warn(errorMsg)
-        Left(InternalServerError(error(messagesApi.preferred(request), appConfig)(using request)))
+        Left(InternalServerError(error(messagesApi.preferred(request))(using request)))
     }
 
   def onPageLoad(showEmptyError: Boolean): Action[AnyContent] = getData.async {
@@ -132,7 +128,7 @@ class CouncilTaxUploadController @Inject() (
   )(implicit request: Request[?]
   ): Future[Either[Result, Unit]] =
     saveReportStatus(reference, login, errors, status).map(
-      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request), appConfig)))
+      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request))))
     )
 
   def onError(reference: String): Action[JsValue] = getData.async(parse.tolerantJson) {
@@ -150,7 +146,7 @@ class CouncilTaxUploadController @Inject() (
 
   private def saveReportStatus(login: Login, reference: String)(implicit request: Request[?]): Future[Either[Result, Unit]] =
     reportStatusConnector.saveUserInfo(reference, login).map(
-      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request), appConfig)))
+      _.leftMap(_ => InternalServerError(error(messagesApi.preferred(request))))
     )
 
   def onPrepareUpload(reference: String): Action[AnyContent] = getData.async {

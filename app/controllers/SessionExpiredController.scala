@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -24,13 +23,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.session_expired
 
 class SessionExpiredController @Inject() (
-  val appConfig: FrontendAppConfig,
   controllerComponents: MessagesControllerComponents,
   session_expired: session_expired
 ) extends FrontendController(controllerComponents)
   with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(session_expired(appConfig))
+    Ok(session_expired())
   }
 }

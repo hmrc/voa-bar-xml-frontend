@@ -23,9 +23,8 @@ import models.ReportStatus
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class TableFormatter @Inject() (serviceConfig: ServicesConfig) {
+class TableFormatter @Inject() () {
 
   def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(implicit messages: Messages) =
     s"<a href='${confirmationController.onPageRefresh(reportStatus.id)}'>${formatStatuslink(reportStatus.status)}</a>"
@@ -36,7 +35,11 @@ class TableFormatter @Inject() (serviceConfig: ServicesConfig) {
     case _                 => Messages("confirmation.heading.failed")
   }
 
-  def formatRows(reportStatuses: Seq[ReportStatus], confirmationController: ReverseConfirmationController)(implicit messages: Messages) =
+  def formatRows(
+    reportStatuses: Seq[ReportStatus],
+    confirmationController: ReverseConfirmationController
+  )(implicit messages: Messages
+  ): Seq[Seq[TableRow]] =
     reportStatuses.map(reportStatus =>
       Seq(
         TableRow(Text(reportStatus.formattedCreated)),

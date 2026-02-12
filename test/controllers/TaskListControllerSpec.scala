@@ -29,24 +29,23 @@ import scala.concurrent.ExecutionContext
 
 class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
-  def taskList = inject[views.html.task_list]
-  def welcome  = inject[views.html.welcome]
+  private def taskList = inject[views.html.task_list]
+  private def welcome  = inject[views.html.welcome]
 
-  val username = "AUser"
+  private val username = "AUser"
 
-  val cr05FeatureFlag = false
+  private val cr05FeatureFlag = false
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
-  val configuration        = Configuration("feature.cr05.enabled" -> false)
+  private def ec                   = inject[ExecutionContext]
+  private def controllerComponents = inject[MessagesControllerComponents]
+  private val configuration        = Configuration("feature.cr05.enabled" -> false)
 
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
     new TaskListController(
-      frontendAppConfig,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
       new FakeNavigator(desiredRoute = onwardRoute),
@@ -56,7 +55,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     )(using ec)
   }
 
-  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new WelcomeController(
       frontendAppConfig,
@@ -70,7 +69,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     )(using ec)
   }
 
-  def viewAsString() = taskList(username)(using fakeRequest, messages).toString
+  private def viewAsString() = taskList(username)(using fakeRequest, messages).toString
 
   "Logging Controller" must {
 

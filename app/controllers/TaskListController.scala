@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions.*
 import identifiers.*
@@ -31,7 +30,6 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class TaskListController @Inject() (
-  appConfig: FrontendAppConfig,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   navigator: Navigator,

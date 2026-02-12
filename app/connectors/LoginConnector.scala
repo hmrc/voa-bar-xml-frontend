@@ -48,8 +48,8 @@ class LoginConnector @Inject() (
         response.status match {
           case OK     => Success(OK)
           case status =>
-            logger.warn("Received status of " + status + " from upstream service when logging in")
-            Failure(new RuntimeException("Received status of " + status + " from upstream service when logging in"))
+            logger.warn(s"Received status of $status from upstream service when logging in")
+            Failure(new RuntimeException(s"Received status of $status from upstream service when logging in"))
         }
       }
       .recover {

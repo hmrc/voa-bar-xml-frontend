@@ -40,34 +40,32 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
 
-  def ec                     = inject[ExecutionContext]
-  def controllerComponents   = inject[MessagesControllerComponents]
-  def reportConfirmationView = inject[views.html.govuk.confirmation]
-  def confirmationView       = inject[views.html.confirmation]
-  def errorTemplateView      = inject[views.html.error_template]
+  private def ec                     = inject[ExecutionContext]
+  private def controllerComponents   = inject[MessagesControllerComponents]
+  private def reportConfirmationView = inject[views.html.govuk.confirmation]
+  private def confirmationView       = inject[views.html.confirmation]
+  private def errorTemplateView      = inject[views.html.error_template]
 
-  def confirmationStatusPanel = inject[confirmation_status_panel]
-  def confirmationDetailPanel = inject[confirmation_detail_panel]
+  private def confirmationStatusPanel = inject[confirmation_status_panel]
+  private def confirmationDetailPanel = inject[confirmation_detail_panel]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
-  val username                  = "AUser"
-  val submissionId              = "SID372463"
-  val login                     = Login("foo", "bar")
-  val login2                    = Login(username, "bar")
-  val reportStatus              = ReportStatus(submissionId, status = Some(Submitted.value))
-  val reportStatusConnectorMock = mock[ReportStatusConnector]
+  private val username                  = "AUser"
+  private val submissionId              = "SID372463"
+  private val login2                    = Login(username, "bar")
+  private val reportStatus              = ReportStatus(submissionId, status = Some(Submitted.value))
+  private val reportStatusConnectorMock = mock[ReportStatusConnector]
   when(reportStatusConnectorMock.saveUserInfo(any[String], any[Login])).thenReturn(Future(Right(())))
   when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])).thenReturn(Future(Right(())))
   when(reportStatusConnectorMock.getByReference(any[String], any[Login])).thenReturn(Future(Right(reportStatus)))
 
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
     new ConfirmationController(
-      frontendAppConfig,
       messagesApi,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
@@ -82,10 +80,9 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
   }
 
-  def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
     new ConfirmationController(
-      frontendAppConfig,
       messagesApi,
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
@@ -100,13 +97,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
   }
 
-  def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
+  private def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
     reportConfirmationView(username, report, cr01cr03Report)(using fakeRequest, messages).toString
 
-  def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
+  private def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
     confirmationView(username, submissionId)(using fakeRequest, messages).toString
 
-  def refreshViewAsString() =
+  private def refreshViewAsString() =
     confirmationView(username, submissionId, Some(reportStatus))(using fakeRequest, messages).toString
 
   "Confirmation Controller" must {
