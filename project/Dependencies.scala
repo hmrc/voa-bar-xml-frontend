@@ -1,9 +1,8 @@
-import play.core.PlayVersion
 import sbt.*
 
 object Dependencies {
 
-  private val bootstrapVersion        = "10.5.0"
+  private val bootstrapVersion        = "10.6.0"
   private val hmrcMongoVersion        = "2.12.0"
   private val playFrontendHmrcVersion = "12.31.0"
   private val guiceUtilsVersion       = "6.0.0" // Use 6.0.0 because 7.0.0 is not compatible with play-guice:3.0.7
@@ -11,11 +10,8 @@ object Dependencies {
   private val uniformVersion          = "4.10.0"
 
   // Test dependencies
-  private val scalaTestPlusPlayVersion       = "7.0.2"
-  private val scalatestVersion               = "3.2.19"
   private val scalatestPlusScalacheckVersion = "3.2.19.0"
   private val scalaTestPlusMockitoVersion    = "3.2.19.0"
-  private val flexMarkVersion                = "0.64.8"
 
   private val compileDependencies = Seq(
     "uk.gov.hmrc"           %% "bootstrap-frontend-play-30" % bootstrapVersion,
@@ -27,13 +23,9 @@ object Dependencies {
   )
 
   private val testDependencies = Seq(
-    "org.playframework"      %% "play-test"          % PlayVersion.current            % Test,
-    "org.apache.pekko"       %% "pekko-testkit"      % PlayVersion.pekkoVersion       % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlusPlayVersion       % Test,
-    "org.scalatest"          %% "scalatest"          % scalatestVersion               % Test,
-    "org.scalatestplus"      %% "scalacheck-1-18"    % scalatestPlusScalacheckVersion % Test,
-    "org.scalatestplus"      %% "mockito-5-12"       % scalaTestPlusMockitoVersion    % Test,
-    "com.vladsch.flexmark"    % "flexmark-all"       % flexMarkVersion                % Test // for scalatest 3.2.x
+    "uk.gov.hmrc"       %% "bootstrap-test-play-30" % bootstrapVersion               % Test,
+    "org.scalatestplus" %% "scalacheck-1-18"        % scalatestPlusScalacheckVersion % Test,
+    "org.scalatestplus" %% "mockito-5-12"           % scalaTestPlusMockitoVersion    % Test
   )
 
   val appDependencies: Seq[ModuleID] = compileDependencies ++ testDependencies
