@@ -86,7 +86,7 @@ class AutobarsInterpreter(
   private def doRenderStringField(
     pageKey: List[String],
     fieldKey: List[String],
-    breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
     data: Input,
     errors: ErrorTree,
     optional: Boolean,
@@ -138,7 +138,7 @@ class AutobarsInterpreter(
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -156,7 +156,7 @@ class AutobarsInterpreter(
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -171,7 +171,7 @@ class AutobarsInterpreter(
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -187,7 +187,7 @@ class AutobarsInterpreter(
     def doRender(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -241,7 +241,7 @@ class AutobarsInterpreter(
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      breadcrumbs: ltbs.uniform.common.web.Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -284,7 +284,7 @@ class AutobarsInterpreter(
   override def renderProduct[A](
     pageKey: List[String],
     fieldKey: List[String],
-    path: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    path: ltbs.uniform.common.web.Breadcrumbs,
     values: Input,
     errors: ErrorTree,
     messages: UniformMessages[Html],
@@ -300,7 +300,7 @@ class AutobarsInterpreter(
   override def renderCoproduct[A](
     pageKey: List[String],
     fieldKey: List[String],
-    path: _root_.ltbs.uniform.common.web.Breadcrumbs,
+    path: ltbs.uniform.common.web.Breadcrumbs,
     values: Input,
     errors: ErrorTree,
     messages: UniformMessages[Html],

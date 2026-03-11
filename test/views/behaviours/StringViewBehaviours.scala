@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
   val answer = "answer"
 
   def stringPage(
-    createView: (Form[String]) => HtmlFormat.Appendable,
+    createView: Form[String] => HtmlFormat.Appendable,
     messageKeyPrefix: String,
     expectedFormAction: String,
     expectedHintKey: Option[String] = None
-  ) =
+  ): Unit =
     "behave like a page with a string value field" when {
       "rendered" must {
 

@@ -17,7 +17,7 @@
 package connectors
 
 import models.UpScanRequests.*
-import models.{Error, Login, VoaBarUpload}
+import models.{Error, Login, VOBarUpload}
 import play.api.Logging
 import play.api.http.Status.OK
 import play.api.i18n.{Lang, MessagesApi}
@@ -58,7 +58,7 @@ class UploadConnector @Inject() (
     Left(Error(messages("councilTaxUpload.error.transferXml"), Seq(messages("status.failed.description"))))
 
   def sendXml(xmlUrl: String, login: Login, id: String)(using hc: HeaderCarrier): Future[Either[Error, String]] =
-    val uploadData = VoaBarUpload(id, xmlUrl)
+    val uploadData = VOBarUpload(id, xmlUrl)
 
     httpClientV2.post(uploadURL)
       .setHeader(defaultHeaders(login.username, login.password)*)

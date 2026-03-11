@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,15 @@
 
 package views.behaviours
 
+import org.scalatest.compatible.Assertion
 import play.twirl.api.HtmlFormat
 import views.ViewSpecBase
 
-trait ViewBehaviours extends ViewSpecBase {
+trait ViewBehaviours extends ViewSpecBase:
 
-  def normalPage(view: () => HtmlFormat.Appendable, messageKeyPrefix: String, expectedGuidanceKeys: String*) =
+  def normalPage(view: () => HtmlFormat.Appendable, messageKeyPrefix: String, expectedGuidanceKeys: String*): Unit =
     "behave like a normal page" when {
       "rendered" must {
-        // FIXME when unified design https://jira.tools.tax.service.gov.uk/browse/VOA-2066
-//        "have the correct banner title" in {
-//          val doc = asDocument(view())
-//          val nav = doc.getElementById("proposition-menu")
-//          val span = nav.children.first
-//          span.text mustBe messagesApi("service.name")
-//        }
-
         "display the correct browser title" in {
           val doc = asDocument(view())
           assertEqualsValue(doc, "title", messages("service.title", messages(s"$messageKeyPrefix.title")))
@@ -54,7 +47,7 @@ trait ViewBehaviours extends ViewSpecBase {
       }
     }
 
-  def pageWithBackLink(view: () => HtmlFormat.Appendable) =
+  def pageWithBackLink(view: () => HtmlFormat.Appendable): Unit =
     "behave like a page with a back link" must {
       "have a back link" in {
         val doc = asDocument(view())
@@ -62,10 +55,9 @@ trait ViewBehaviours extends ViewSpecBase {
       }
     }
 
-  def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable) = {
-    val doc   = asDocument(view())
+  def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable): Assertion =
+    val doc = asDocument(view())
     assert(messages.isDefinedAt(s"$prefix.$option"))
+
     val label = doc.select(s"label[for=$prefix.$option]")
-    assert(label.size() == 1)
-  }
-}
+    label.size mustBe 1

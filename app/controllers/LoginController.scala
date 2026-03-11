@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import connectors.{DataCacheConnector, LoginConnector}
 import controllers.actions.*
 import forms.LoginFormProvider
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.{LoginId, VOAuthorisedId}
 import models.{BillingAuthorities, Login, Mode}
 import play.api.{Configuration, Logging}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -58,7 +58,7 @@ class LoginController @Inject() (
           val loginWithBlankedPassword = Login(value.username, "")
           form.fill(loginWithBlankedPassword)
       }
-      dataCacheConnector.remove(request.externalId, VOAAuthorisedId.toString) map {
+      dataCacheConnector.remove(request.externalId, VOAuthorisedId.toString) map {
         _ => Ok(login(preparedForm, mode))
       }
   }
@@ -75,11 +75,11 @@ class LoginController @Inject() (
               case Success(status) =>
                 BillingAuthorities.find(value.username) match {
                   case Some(councilName) =>
-                    dataCacheConnector.save[String](request.externalId, VOAAuthorisedId.toString, value.username) map {
+                    dataCacheConnector.save[String](request.externalId, VOAuthorisedId.toString, value.username) map {
                       cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
                     }
                   case None              =>
-                    logger.warn("BA Code authorized by VOA but no valid Council Name can be found")
+                    logger.warn("BA Code authorized by VO but no valid Council Name can be found")
                     val formWithLoginErrors =
                       form
                         .withError("username", Messages("error.invalid_username"))

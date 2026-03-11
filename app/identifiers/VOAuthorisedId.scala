@@ -16,6 +16,5 @@
 
 package identifiers
 
-object VOAAuthorisedId {
-  override def toString: String = "VOAAUTH-XXX"
-}
+object VOAuthorisedId:
+  override def toString: String = "VO-AUTH-XXX"

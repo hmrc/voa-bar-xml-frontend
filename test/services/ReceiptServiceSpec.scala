@@ -45,11 +45,11 @@ class ReceiptServiceSpec extends SpecBase:
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
+      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
       new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
-      pdf.close
+      pdf.close()
       // DateTimeUtils.setCurrentMillisSystem()
     }
 
@@ -65,11 +65,11 @@ class ReceiptServiceSpec extends SpecBase:
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
+      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
       new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
-      pdf.close
+      pdf.close()
       // DateTimeUtils.setCurrentMillisSystem()
     }
 
@@ -85,11 +85,11 @@ class ReceiptServiceSpec extends SpecBase:
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office Agency")
+      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
       new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
-      pdf.close
+      pdf.close()
       // DateTimeUtils.setCurrentMillisSystem()
     }
 

@@ -19,7 +19,7 @@ package controllers
 import connectors.{FakeDataCacheConnector, LoginConnector}
 import controllers.actions.*
 import forms.LoginFormProvider
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.{LoginId, VOAuthorisedId}
 import models.{CacheMap, Login, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -111,7 +111,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
 
       val result = controller(loginConnector).onSubmit(NormalMode)(postRequest)
       status(result) mustBe SEE_OTHER
-      FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe Some(validBACode)
+      FakeDataCacheConnector.getCapture(VOAuthorisedId.toString) mustBe Some(validBACode)
     }
 
     "return a Bad Request and errors when invalid data is submitted" in {
@@ -146,7 +146,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe viewAsString(boundForm)
         redirectLocation(result) mustBe Some(onwardRoute.url)
-        FakeDataCacheConnector.getCapture(VOAAuthorisedId.toString) mustBe None
+        FakeDataCacheConnector.getCapture(VOAuthorisedId.toString) mustBe None
       }
     }
   }

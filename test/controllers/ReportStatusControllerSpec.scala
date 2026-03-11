@@ -117,7 +117,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       contentAsString(result) mustBe viewAsString()
     }
 
-    "if not authorized by VOA must go to the login page" in {
+    "if not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onPageLoad()(fakeRequest)
 
       def onwardRoute = routes.LoginController.onPageLoad(NormalMode)

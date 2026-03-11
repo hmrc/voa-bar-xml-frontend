@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,42 +22,39 @@ import play.api.libs.json.Format
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FakeDataCacheConnector extends DataCacheConnector {
-  var captures = Map[String, Any]()
+object FakeDataCacheConnector extends DataCacheConnector:
 
-  override def save[A](cacheId: String, key: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = {
+  private var captures = Map[String, Any]()
+
+  override def save[A](cacheId: String, key: String, value: A)(using fmt: Format[A]): Future[CacheMap] =
     captures = captures + (key -> value)
     Future(CacheMap(cacheId, Map()))
-  }
 
   def getCapture(key: String): Option[Any] = captures.get(key)
 
-  def resetCaptures() = captures = Map[String, Any]()
+  def resetCaptures(): Unit = captures = Map[String, Any]()
 
-  override def remove(cacheId: String, key: String): Future[Boolean] = {
+  override def remove(cacheId: String, key: String): Future[Boolean] =
     captures = captures - key
     Future.successful(true)
-  }
 
   override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, Map())))
 
-  override def getEntry[A](cacheId: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
-    captures.get(key) match {
+  override def getEntry[A](cacheId: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
+    captures.get(key) match
       case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
       case None    => Future.successful(None)
-    }
 
-  override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(implicit fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
-
-  override def removeFromCollection[A](cacheId: String, collectionKey: String, item: A)(implicit fmt: Format[A]): Future[CacheMap] =
+  override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(using fmt: Format[A]): Future[CacheMap] =
     Future(CacheMap(cacheId, Map()))
 
-  override def replaceInCollection[A](cacheId: String, collectionKey: String, index: Int, item: A)(implicit fmt: Format[A]): Future[CacheMap] =
+  override def removeFromCollection[A](cacheId: String, collectionKey: String, item: A)(using fmt: Format[A]): Future[CacheMap] =
     Future(CacheMap(cacheId, Map()))
 
-  override def getEntryByField[A](field: String, value: String, key: String)(implicit fmt: Format[A]): Future[Option[A]] =
-    captures.get(key) match {
+  override def replaceInCollection[A](cacheId: String, collectionKey: String, index: Int, item: A)(using fmt: Format[A]): Future[CacheMap] =
+    Future(CacheMap(cacheId, Map()))
+
+  override def getEntryByField[A](field: String, value: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
+    captures.get(key) match
       case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
       case None    => Future.successful(None)
-    }
-}

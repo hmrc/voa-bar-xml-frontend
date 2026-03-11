@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 
-class ErrorSpec extends PlaySpec {
+class ErrorSpec extends PlaySpec:
 
-  val code       = "code1"
-  val errorValue = Seq("testing error")
+  private val code       = "code1"
+  private val errorValue = Seq("testing error")
 
   val error = Error(code, errorValue)
 
@@ -29,5 +29,3 @@ class ErrorSpec extends PlaySpec {
     error.code mustBe code
     error.values mustBe errorValue
   }
-
-}

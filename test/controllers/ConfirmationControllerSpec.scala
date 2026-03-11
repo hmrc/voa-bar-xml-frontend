@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       contentAsString(result) mustBe viewAsString(verifiedReportStatus, submissionId = verifiedSubmissionId)
     }
 
-    "if not authorized by VOA must go to the login page" in {
+    "if not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onPageLoad(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
@@ -149,14 +149,14 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       contentAsJson(result).as[JsObject].keys.contains("statusPanel") mustBe true
     }
 
-    "if while refreshing not authorized by VOA must go to the login page" in {
+    "if while refreshing not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onPageRefresh(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(onwardRoute.url)
     }
 
-    "if while checking the status not authorized by VOA must go to the login page" in {
+    "if while checking the status not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onStatusCheck(submissionId)(fakeRequest)
 
       status(result) mustBe SEE_OTHER

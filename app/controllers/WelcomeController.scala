@@ -19,7 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import connectors.DataCacheConnector
 import controllers.actions.*
-import identifiers.{CouncilTaxStartId, TaskListId, VOAAuthorisedId}
+import identifiers.{CouncilTaxStartId, TaskListId, VOAuthorisedId}
 import models.NormalMode
 import play.api.Configuration
 import play.api.i18n.I18nSupport
@@ -47,7 +47,7 @@ class WelcomeController @Inject() (
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+      dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
         case Some(username) => Ok(welcome(appConfig, username, cr05FeatureEnabled))
         case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
