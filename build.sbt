@@ -24,7 +24,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(
     Concat.groups := Seq(
-      "javascripts/voabarxmlfrontend-app.js" -> group(Seq("javascripts/show-hide-content.js", "javascripts/voabarxmlfrontend.js"))
+      "javascripts/app.js" -> group(Seq("javascripts/show-hide-content.js", "javascripts/main.js"))
     ),
     Assets / pipelineStages := Seq(concat, digest)
   )
