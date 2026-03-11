@@ -27,6 +27,7 @@ import play.api.i18n.{Lang, MessagesApi}
 import java.io.{ByteArrayOutputStream, Closeable}
 import java.util.Locale
 import javax.imageio.ImageIO
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.reflectiveCalls
 import scala.util.Try
@@ -34,18 +35,20 @@ import scala.util.Try
 @Singleton
 class DefaultReceiptService @Inject() (
   messages: MessagesApi
-) extends ReceiptService {
-  val font: PDType1Font = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
-  val fontSize          = 12f
-  val leading           = 1.5f * fontSize
-  val margin            = 72
+) extends ReceiptService:
 
-  implicit val lang: Lang = Lang(Locale.UK)
+  val font: PDType1Font = PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+  val fontSize: Float   = 12f
+  val leading: Float    = 1.5f * fontSize
+  val margin: Int       = 72
 
-  def producePDF(reportStatus: ReportStatus) = {
+  private val author = "Valuation Office"
 
-    val document = new PDDocument
-    val page     = new PDPage(PDRectangle.A4)
+  given Lang = Lang(Locale.UK)
+
+  def producePDF(reportStatus: ReportStatus): Try[Array[Byte]] =
+    val document = PDDocument()
+    val page     = PDPage(PDRectangle.A4)
     document.addPage(page)
 
     val mediaBox = page.getMediaBox
@@ -54,9 +57,8 @@ class DefaultReceiptService @Inject() (
 
     setDocumentInformation(document, reportStatus)
 
-    val contentStream = new PDPageContentStream(document, page)
-
-    val outputStream = new ByteArrayOutputStream
+    val contentStream = PDPageContentStream(document, page)
+    val outputStream  = ByteArrayOutputStream()
 
     Try {
       forceClosing(
@@ -67,24 +69,23 @@ class DefaultReceiptService @Inject() (
             () => {
               val height = addImage(document, page, contentStream)
 
-              contentStream.beginText
+              contentStream.beginText()
               contentStream.newLineAtOffset(startX, startY - height - leading - 20)
 
               contentStream.setFont(font, fontSize + 10)
               BillingAuthorities.billingAuthorities
-                .find { case (key, _) => key == reportStatus.baCode.getOrElse("") } match {
+                .find { case (key, _) => key == reportStatus.baCode.getOrElse("") } match
                 case Some((key, name)) =>
                   contentStream.showText(s"$name - $key".toUpperCase)
                   contentStream.newLineAtOffset(0f, -leading)
                 case _                 =>
-              }
 
               contentStream.setFont(font, fontSize)
               wrap(page, body(reportStatus)) foreach { line =>
                 contentStream.newLineAtOffset(0f, -leading)
                 contentStream.showText(line)
               }
-              contentStream.endText
+              contentStream.endText()
             }
           )
 
@@ -94,88 +95,62 @@ class DefaultReceiptService @Inject() (
     } map { _ =>
       outputStream.toByteArray
     }
-  }
 
-  def forceClosing(obj: Closeable, f: () => Unit) =
+  private def forceClosing(obj: Closeable, f: () => Unit): Unit =
     try f()
     finally obj.close()
 
-  def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream) = {
+  private def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream) =
     val mediaBox = page.getMediaBox
     val startX   = mediaBox.getLowerLeftX + margin
     val startY   = mediaBox.getUpperRightY - margin
-
     val awtImage = ImageIO.read(getClass.getResourceAsStream("/logo.png"))
     val image    = LosslessFactory.createFromImage(document, awtImage)
-
     contentStream.drawImage(image, startX, startY - image.getHeight)
-
     image.getHeight
-  }
 
-  def body(reportStatus: ReportStatus) = {
+  private def body(reportStatus: ReportStatus): String =
     var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
-
     content += " "
-
-    reportStatus.status match {
+    reportStatus.status match
       case Some(s) => content += messages(s"report.pdf.details.summary.${s.toLowerCase}")
       case _       =>
-    }
-
     content
-  }
 
-  def wrap(page: PDPage, text: String) = {
-    val mediaBox = page.getMediaBox
-    val width    = mediaBox.getWidth - 2 * margin
-
-    val lines = ArrayBuffer[String]()
-
+  def wrap(page: PDPage, text: String): mutable.Seq[String] =
+    val mediaBox  = page.getMediaBox
+    val width     = mediaBox.getWidth - 2 * margin
+    val lines     = ArrayBuffer[String]()
     var textLeft  = text
     var lastSpace = -1
 
-    while (textLeft.nonEmpty) {
+    while (textLeft.nonEmpty)
       var spaceIndex = textLeft.indexOf(' ', lastSpace + 1)
-
       if (spaceIndex < 0) spaceIndex = textLeft.length
-
-      var subString = textLeft.substring(0, spaceIndex)
-
-      val size = fontSize * font.getStringWidth(subString) / 1000
-
-      if (size > width) {
-        if (lastSpace < 0) lastSpace = spaceIndex
-
+      var subString  = textLeft.substring(0, spaceIndex)
+      val size       = fontSize * font.getStringWidth(subString) / 1000
+      if size > width then
+        if lastSpace < 0 then lastSpace = spaceIndex
         subString = textLeft.substring(0, lastSpace)
         lines += subString
         textLeft = textLeft.substring(lastSpace).trim
         lastSpace = -1
-      } else if (spaceIndex == textLeft.length) {
+      else if spaceIndex == textLeft.length then
         lines += textLeft
         textLeft = ""
-      } else {
+      else
         lastSpace = spaceIndex
-      }
-    }
-
     lines
-  }
 
-  def author = "Valuation Office Agency"
-
-  def title(reportStatus: ReportStatus) =
+  private def title(reportStatus: ReportStatus) =
     s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${reportStatus.formattedCreatedLong}"
 
-  def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit = {
-    val info = new PDDocumentInformation
+  private def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit =
+    val info = PDDocumentInformation()
     info.setAuthor(author)
     info.setTitle(title(reportStatus))
     document.setDocumentInformation(info)
-  }
-}
 
 @ImplementedBy(classOf[DefaultReceiptService])
-trait ReceiptService {
+trait ReceiptService:
   def producePDF(reportStatus: ReportStatus): Try[Array[Byte]]
-}

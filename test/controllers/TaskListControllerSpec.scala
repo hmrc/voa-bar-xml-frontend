@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package controllers
 
 import connectors.FakeDataCacheConnector
 import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
-import identifiers.VOAAuthorisedId
+import identifiers.VOAuthorisedId
 import models.NormalMode
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
@@ -44,7 +44,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     new TaskListController(
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
@@ -80,7 +80,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       contentAsString(result) mustBe viewAsString()
     }
 
-    "if not authorized by VOA must go to the login page" in {
+    "if not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onPageLoad()(fakeRequest)
 
       status(result) mustBe SEE_OTHER

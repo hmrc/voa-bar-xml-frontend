@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
+class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar:
 
   val BA_REF = "BA2020"
 
@@ -42,7 +42,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
       when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
-      val service = new DefaultCr01Cr03Service(connector)
+      val service = DefaultCr01Cr03Service(connector)
 
       val submission = Cr05Submission(BA_REF, "baRef", LocalDate.of(2020, 2, 2), Seq(), Seq(), Some("planningRef"), None, Some("comment"))
 
@@ -52,8 +52,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
 
       captor.getValue must not be null
       captor.getValue.baCode.value mustBe BA_REF
-      captor.getValue.report.value.value.get("type").value mustBe (JsString("Cr05Submission"))
-
+      captor.getValue.report.value.value.get("type").value mustBe JsString("Cr05Submission")
     }
 
     "Create CR01 and CR03 report and store in backend" in {
@@ -61,7 +60,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
       when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
       val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
-      val service = new DefaultCr01Cr03Service(connector)
+      val service = DefaultCr01Cr03Service(connector)
 
       val submission = Cr01Cr03Submission(
         AddProperty,
@@ -87,8 +86,7 @@ class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar {
 
       captor.getValue must not be null
       captor.getValue.baCode.value mustBe BA_REF
-      captor.getValue.report.value.value.get("type").value mustBe (JsString("Cr01Cr03Submission"))
+      captor.getValue.report.value.value.get("type").value mustBe JsString("Cr01Cr03Submission")
     }
 
   }
-}

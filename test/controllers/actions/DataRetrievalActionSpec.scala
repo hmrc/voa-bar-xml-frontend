@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,12 @@ import uk.gov.hmrc.http.SessionKeys
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutures with RecoverMethods {
+class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutures with RecoverMethods:
 
-  def bodyParser = inject[BodyParsers.Default]
+  private val bodyParser = inject[BodyParsers.Default]
 
-  class Harness(dataCacheConnector: DataCacheConnector) extends DataRetrievalActionImpl(dataCacheConnector, bodyParser) {
+  class Harness(dataCacheConnector: DataCacheConnector) extends DataRetrievalActionImpl(dataCacheConnector, bodyParser):
     def callTransform[A](request: Request[A]): Future[OptionalDataRequest[A]] = transform(request)
-  }
 
   "Data Retrieval Action" when {
 
@@ -45,7 +44,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutur
       "set userAnswers to 'None' in the request" in {
         val dataCacheConnector = mock[DataCacheConnector]
         when(dataCacheConnector.fetch(any[String])).thenReturn(Future(None))
-        val action             = new Harness(dataCacheConnector)
+        val action             = Harness(dataCacheConnector)
 
         val futureResult = action.callTransform(fakeRequest.withSession(SessionKeys.sessionId -> "id"))
 
@@ -58,8 +57,8 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutur
     "there is data in the cache" must {
       "build a userAnswers object and add it to the request" in {
         val dataCacheConnector = mock[DataCacheConnector]
-        when(dataCacheConnector.fetch(any[String])).thenReturn(Future(Some(new CacheMap("id", Map()))))
-        val action             = new Harness(dataCacheConnector)
+        when(dataCacheConnector.fetch(any[String])).thenReturn(Future(Some(CacheMap("id", Map()))))
+        val action             = Harness(dataCacheConnector)
 
         val futureResult = action.callTransform(fakeRequest.withSession(SessionKeys.sessionId -> "id"))
 
@@ -72,12 +71,12 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutur
     "there is no session Id in the request" must {
       "throw an exception" in {
         val dataCacheConnector = mock[DataCacheConnector]
-        val action             = new Harness(dataCacheConnector)
+        val action             = Harness(dataCacheConnector)
 
         recoverToSucceededIf[IllegalStateException] {
           action.callTransform(fakeRequest)
         }
       }
     }
+
   }
-}

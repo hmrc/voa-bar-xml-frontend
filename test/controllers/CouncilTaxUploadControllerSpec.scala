@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package controllers
 import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
 import controllers.actions.*
 import forms.FileUploadDataFormProvider
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.{LoginId, VOAuthorisedId}
 import models.*
 import models.UpScanRequests.{InitiateRequest, InitiateResponse, UploadRequest}
 import org.apache.pekko.actor.ActorSystem
@@ -121,7 +121,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock
   ) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
     new CouncilTaxUploadController(
       configuration,
@@ -172,7 +172,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       contentAsString(result) mustBe viewAsString()
     }
 
-    "if not authorized by VOA must go to the login page" in {
+    "if not authorized by VO must go to the login page" in {
       val result = notLoggedInController(uploadConnector).onPageLoad(false)(fakeRequest)
 
       status(result) mustBe SEE_OTHER

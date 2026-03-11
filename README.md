@@ -22,10 +22,7 @@ Ensure that the following dependencies has been started with service manager:
 - DATASTREAM
 - UPSCAN_STUB
 - VOA-AUTOBARS-STUBS
-- VOA_AUTOBARS_LEGACY_EBARS
 - VOA_BAR_BACKEND
-
-
 
 You also must have a local Mongo Server running.
 

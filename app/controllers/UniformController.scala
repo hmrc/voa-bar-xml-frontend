@@ -65,7 +65,7 @@ class UniformController @Inject() (
     override def apply(
       request: DataRequest[AnyContent]
     )(
-      f: DB => Future[(_root_.ltbs.uniform.interpreters.playframework.DB, Result)]
+      f: DB => Future[(ltbs.uniform.interpreters.playframework.DB, Result)]
     ): Future[Result] =
       for
         db              <- load(request.externalId)
@@ -73,10 +73,10 @@ class UniformController @Inject() (
         _               <- save(request.externalId, newdb)
       yield result
 
-    def load(externalId: String): Future[_root_.ltbs.uniform.interpreters.playframework.DB] =
+    def load(externalId: String): Future[ltbs.uniform.interpreters.playframework.DB] =
       dataCacheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
 
-    def save(externalId: String, db: _root_.ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+    def save(externalId: String, db: ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
       logger.warn(s"externalID: $externalId, db: $db")
       dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
     }

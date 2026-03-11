@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package controllers
 
 import connectors.FakeDataCacheConnector
 import controllers.actions._
-import identifiers.VOAAuthorisedId
+import identifiers.VOAuthorisedId
 import journey.UniformJourney.{Address, ContactDetails, Cr05AddProperty, Cr05SubmissionBuilder}
 import models.NormalMode
 import play.api.mvc.{MessagesControllerComponents, Result}
@@ -42,7 +42,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     new AddToListController(
       dataRetrievalAction,
       new DataRequiredActionImpl(ec),
@@ -55,7 +55,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   private def loggedInControllerWithSubmission(submission: Cr05SubmissionBuilder, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
     FakeDataCacheConnector.resetCaptures()
-    FakeDataCacheConnector.save[String]("", VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Cr05SubmissionBuilder]("", Cr05SubmissionBuilder.storageKey, submission)
     new AddToListController(
       dataRetrievalAction,
@@ -132,7 +132,7 @@ class AddToListControllerSpec extends ControllerSpecBase with ViewSpecBase {
       status(result) mustBe SEE_OTHER
     }
 
-    "if not authorized by VOA must go to the login page" in {
+    "if not authorized by VO must go to the login page" in {
       val result = notLoggedInController().onPageLoad()(fakeRequest)
 
       status(result) mustBe SEE_OTHER

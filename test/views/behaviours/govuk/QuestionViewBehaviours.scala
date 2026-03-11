@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package views.behaviours.govuk
 
+import org.scalatest.compatible.Assertion
 import play.api.data.{Form, FormError}
 import play.twirl.api.HtmlFormat
 
-trait QuestionViewBehaviours[A] extends ViewBehaviours {
+trait QuestionViewBehaviours[A] extends ViewBehaviours:
 
   val errorKey     = "value"
   val errorMessage = "error.number"
@@ -57,10 +58,8 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
         }
     }
 
-  def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable) = {
+  def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable): Assertion =
     val doc   = asDocument(view())
     assert(messages.isDefinedAt(s"$prefix.$option"))
     val label = doc.select(s"label[for=$prefix.$option]")
     assert(label.size() == 1)
-  }
-}

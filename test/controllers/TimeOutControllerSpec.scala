@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,21 @@
 package controllers
 
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
-class TimeOutControllerSpec extends ControllerSpecBase {
+class TimeOutControllerSpec extends ControllerSpecBase:
 
-  def controllerComponents = inject[MessagesControllerComponents]
-  def sessionTimeout       = inject[views.html.session_timeout]
+  private def controllerComponents = inject[MessagesControllerComponents]
+  private def sessionTimeout       = inject[views.html.session_timeout]
 
   "Timeout Controller" must {
     "return 200 for a GET /this-service-has-been-reset" in {
-      val result = new TimeoutController(controllerComponents, sessionTimeout).onPageLoad()(fakeRequest)
+      val result = TimeoutController(controllerComponents, sessionTimeout).onPageLoad()(fakeRequest)
       status(result) mustBe OK
     }
 
     "return 303 for a GET /this-service-has-been-reset/redirect" in {
-      val result = new TimeoutController(controllerComponents, sessionTimeout).timeout()(fakeRequest)
+      val result = TimeoutController(controllerComponents, sessionTimeout).timeout()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }
-}

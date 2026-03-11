@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package controllers
 
 import connectors.FakeDataCacheConnector2
 import controllers.actions.{AuthAction, DataRequiredAction, DataRetrievalActionImpl}
-import identifiers.{LoginId, VOAAuthorisedId}
+import identifiers.{LoginId, VOAuthorisedId}
 import models.requests.DataRequest
 import models.{Login, NormalMode}
 import play.api.Configuration
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, BodyParsers, MessagesControllerComponents}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.http.SessionKeys
 import utils.UserAnswers
@@ -33,27 +33,24 @@ import views.html.{error_template, reportReason}
 
 import scala.concurrent.ExecutionContext
 
-class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase with Injecting {
+class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase with Injecting:
 
-  val sessionId = "session-id"
+  private val sessionId            = "session-id"
+  private val username             = "BA1445"
+  private val ec                   = inject[ExecutionContext]
+  private val controllerComponents = inject[MessagesControllerComponents]
+  private val configuration        = Configuration("feature.cr05.enabled" -> false)
 
-  val username = "BA1445"
+  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  def ec                   = inject[ExecutionContext]
-  def controllerComponents = inject[MessagesControllerComponents]
-  val configuration        = Configuration("feature.cr05.enabled" -> false)
-
-  def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
-
-  def reportReasonController() = {
-
-    val dataRetrievalAction = new DataRetrievalActionImpl(FakeDataCacheConnector2, inject[BodyParsers.Default])(using ec)
+  private def reportReasonController() =
+    val dataRetrievalAction = DataRetrievalActionImpl(FakeDataCacheConnector2, inject[BodyParsers.Default])(using ec)
 
     FakeDataCacheConnector2.resetCaptures()
-    FakeDataCacheConnector2.save[String](sessionId, VOAAuthorisedId.toString, username)
+    FakeDataCacheConnector2.save[String](sessionId, VOAuthorisedId.toString, username)
     FakeDataCacheConnector2.save[Login](sessionId, LoginId.toString, Login(username = username, password = username, reference = None))
 
-    new ReportReasonController(
+    ReportReasonController(
       inject[MessagesApi],
       FakeDataCacheConnector2,
       dataRetrievalAction,
@@ -64,9 +61,8 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       inject[Configuration],
       inject[MessagesControllerComponents]
     )(using ec)
-  }
 
-  def viewAsString() = inject[reportReason]
+  private def viewAsString() = inject[reportReason]
 
   "ReportReasonController" must {
 
@@ -76,8 +72,8 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = reportReasonController().onPageLoad()(req)
       status(result) mustBe OK
 
-      val dataRequest = new DataRequest[AnyContent](req, sessionId, new UserAnswers(FakeDataCacheConnector2.fetchMap(sessionId)))
-      contentAsString(result) mustBe viewAsString()(ReportReasonController.form, true)(using dataRequest, inject[MessagesApi].preferred(req)).toString()
+      val dataRequest = DataRequest[AnyContent](req, sessionId, UserAnswers(FakeDataCacheConnector2.fetchMap(sessionId)))
+      contentAsString(result) mustBe viewAsString()(ReportReasonController.form, true)(using dataRequest, inject[MessagesApi].preferred(req)).toString
     }
 
     "return redirect on successful form submission" in {
@@ -86,7 +82,5 @@ class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
       val result = reportReasonController().onPageSubmit(req)
       status(result) mustBe SEE_OTHER
-
     }
   }
-}

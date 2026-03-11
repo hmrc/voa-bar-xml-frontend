@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
   val form: Form[A]
 
-  def pageWithTextFields(createView: (Form[A]) => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String, fields: String*) =
+  def pageWithTextFields(createView: Form[A] => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String, fields: String*) =
     "behave like a question page" when {
       "rendered" must {
         for (field <- fields)

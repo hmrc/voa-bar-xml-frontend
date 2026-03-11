@@ -18,7 +18,7 @@ package controllers
 
 import connectors.DataCacheConnector
 import controllers.actions.*
-import identifiers.{AddPropertyId, VOAAuthorisedId}
+import identifiers.{AddPropertyId, VOAuthorisedId}
 
 import javax.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
@@ -47,7 +47,7 @@ class AddToListController @Inject() (
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
-        dataCacheConnector.getEntry[String](request.externalId, VOAAuthorisedId.toString) map {
+        dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
           case Some(username) => Ok(addToList(Option(username), maybeCr05Submission.get, yesNoForm))
           case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }

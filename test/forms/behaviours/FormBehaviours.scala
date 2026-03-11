@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,21 @@ package forms.behaviours
 
 import play.api.data.Form
 import forms.FormSpec
-import models._
+import models.*
 
-trait FormBehaviours extends FormSpec {
+trait FormBehaviours extends FormSpec:
 
   val validData: Map[String, String]
 
   val form: Form[?]
 
-  def questionForm[A](expectedResult: A) =
+  def questionForm[A](expectedResult: A): Unit =
     "bind valid values correctly" in {
       val boundForm = form.bind(validData)
       boundForm.get shouldBe expectedResult
     }
 
-  def formWithOptionalTextFields(fields: String*) =
+  def formWithOptionalTextFields(fields: String*): Unit =
     for (field <- fields)
       s"bind when $field is omitted" in {
         val data      = validData - field
@@ -40,8 +40,8 @@ trait FormBehaviours extends FormSpec {
         boundForm.errors.isEmpty shouldBe true
       }
 
-  def formWithMandatoryTextFields(fields: Field*) =
-    for (field <- fields) {
+  def formWithMandatoryTextFields(fields: Field*): Unit =
+    for (field <- fields)
       s"fail to bind when ${field.name} is omitted" in {
         val data          = validData - field.name
         val expectedError = error(field.name, field.errorKeys(Required))
@@ -53,9 +53,8 @@ trait FormBehaviours extends FormSpec {
         val expectedError = error(field.name, field.errorKeys(Required))
         checkForError(form, data, expectedError)
       }
-    }
 
-  def formWithConditionallyMandatoryField(booleanField: String, field: String) = {
+  def formWithConditionallyMandatoryField(booleanField: String, field: String): Unit =
     s"bind when $booleanField is false and $field is omitted" in {
       val data      = validData + (booleanField -> "false") - field
       val boundForm = form.bind(data)
@@ -67,10 +66,9 @@ trait FormBehaviours extends FormSpec {
       val expectedError = error(field, "error.required")
       checkForError(form, data, expectedError)
     }
-  }
 
-  def formWithBooleans(fields: String*) =
-    for (field <- fields) {
+  def formWithBooleans(fields: String*): Unit =
+    for (field <- fields)
       s"fail to bind when $field is omitted" in {
         val data          = validData - field
         val expectedError = error(field, "error.boolean")
@@ -82,9 +80,8 @@ trait FormBehaviours extends FormSpec {
         val expectedError = error(field, "error.boolean")
         checkForError(form, data, expectedError)
       }
-    }
 
-  def formWithOptionField(field: Field, validValues: String*) = {
+  def formWithOptionField(field: Field, validValues: String*): Unit =
     for (validValue <- validValues)
       s"bind when ${field.name} is set to $validValue" in {
         val data      = validData + (field.name -> validValue)
@@ -103,9 +100,8 @@ trait FormBehaviours extends FormSpec {
       val expectedError = error(field.name, field.errorKeys(Invalid))
       checkForError(form, data, expectedError)
     }
-  }
 
-  def formWithDateField(field: String) = {
+  def formWithDateField(field: String): Unit =
     s"fail to bind when $field day is omitted" in {
       val data          = validData - s"$field.day"
       val expectedError = error(s"$field.day", "error.date.day_blank")
@@ -201,6 +197,3 @@ trait FormBehaviours extends FormSpec {
       val expectedError = error("dateOfBirth", "error.invalid_date")
       checkForError(form, data, expectedError)
     }
-
-  }
-}

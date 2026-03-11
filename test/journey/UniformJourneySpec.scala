@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
 
   import UniformJourney._
 
-  val string226Char = ((1 to 22).map(_ => "1234567890").mkString("")) + "123456"
+  val string226Char = (1 to 22).map(_ => "1234567890").mkString("") + "123456"
   val string227Char = string226Char + "7"
 
   "UniformJourney" should "validate BAReport" in {
@@ -92,9 +92,9 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
   }
 
   it should "validate comments" in {
-    UniformJourney.commentsValidation(Option(string226Char)).toEither.value mustBe (Option(string226Char))
+    UniformJourney.commentsValidation(Option(string226Char)).toEither.value mustBe Option(string226Char)
     UniformJourney.commentsValidation(Option(string227Char)).toEither.left.value mustBe a[ErrorTree]
-    UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.value mustBe (Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ"))
+    UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.value mustBe Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
   }
 
 }

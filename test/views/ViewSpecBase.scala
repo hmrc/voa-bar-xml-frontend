@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import base.SpecBase
 import play.api.i18n.Lang
 import play.api.test.Injecting
 
-trait ViewSpecBase extends SpecBase with Injecting {
+trait ViewSpecBase extends SpecBase with Injecting:
 
   implicit def lang: Lang = Lang(Locale.UK)
 
@@ -79,15 +79,12 @@ trait ViewSpecBase extends SpecBase with Injecting {
   def assertElementHasClass(doc: Document, id: String, expectedClass: String) =
     assert(doc.getElementById(id).hasClass(expectedClass), s"\n\nElement $id does not have class $expectedClass")
 
-  def assertContainsRadioButton(doc: Document, id: String, name: String, value: String, isChecked: Boolean) = {
+  def assertContainsRadioButton(doc: Document, id: String, name: String, value: String, isChecked: Boolean) =
     assertRenderedById(doc, id)
     val radio = doc.getElementById(id)
     assert(radio.attr("name") == name, s"\n\nElement $id does not have name $name")
     assert(radio.attr("value") == value, s"\n\nElement $id does not have value $value")
-    isChecked match {
-      case true => assert(radio.attr("checked") == "checked", s"\n\nElement $id is not checked")
-      case _    => assert(!radio.hasAttr("checked") && radio.attr("checked") != "checked", s"\n\nElement $id is checked")
-    }
-  }
-
-}
+    if isChecked then
+      assert(radio.attr("checked") == "checked", s"\n\nElement $id is not checked")
+    else
+      assert(!radio.hasAttr("checked") && radio.attr("checked") != "checked", s"\n\nElement $id is checked")

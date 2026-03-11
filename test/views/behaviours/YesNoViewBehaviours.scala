@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package views.behaviours
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
-trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean] {
+trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean]:
 
-  def yesNoPage(createView: (Form[Boolean]) => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String) =
+  def yesNoPage(createView: Form[Boolean] => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String): Unit =
     "behave like a page with a Yes/No question" when {
       "rendered" must {
         "contain a legend for the question" in {
@@ -71,8 +71,7 @@ trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean] {
       }
     }
 
-  def answeredYesNoPage(createView: (Form[Boolean]) => HtmlFormat.Appendable, answer: Boolean) = {
-
+  def answeredYesNoPage(createView: Form[Boolean] => HtmlFormat.Appendable, answer: Boolean): Unit =
     "have only the correct value checked" in {
       val doc = asDocument(createView(form.fill(answer)))
       assert(doc.getElementById("value-yes").hasAttr("checked") == answer)
@@ -83,5 +82,3 @@ trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean] {
       val doc = asDocument(createView(form.fill(answer)))
       assertNotRenderedById(doc, "error-summary_header")
     }
-  }
-}
