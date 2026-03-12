@@ -6,6 +6,7 @@ object Dependencies {
   private val hmrcMongoVersion        = "2.12.0"
   private val playFrontendHmrcVersion = "12.32.0"
   private val guiceUtilsVersion       = "6.0.0" // Use 6.0.0 because 7.0.0 is not compatible with play-guice:3.0.7
+  private val jqueryVersion           = "2.2.4" // jQuery 2.2.4 includes .ajax() function
   private val pdfBoxVersion           = "3.0.7"
   private val uniformVersion          = "4.10.0"
 
@@ -19,6 +20,7 @@ object Dependencies {
     "uk.gov.hmrc.mongo"     %% "hmrc-mongo-play-30"         % hmrcMongoVersion,
     "net.codingwell"        %% "scala-guice"                % guiceUtilsVersion,
     "com.luketebbs.uniform" %% "interpreter-play28"         % uniformVersion cross CrossVersion.for3Use2_13,
+    "org.webjars"            % "jquery"                     % jqueryVersion,
     "org.apache.pdfbox"      % "pdfbox"                     % pdfBoxVersion
   )
 
