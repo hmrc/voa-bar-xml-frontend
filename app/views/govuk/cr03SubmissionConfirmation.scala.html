@@ -27,6 +27,5 @@
 @(cr01cr03Submission: Cr01Cr03Submission)(implicit messages: Messages)
 
 @summaryList(
- (new Cr01Cr03SubmissionWebTell(summaryList)).confirmationSummary(cr01cr03Submission, messages)
+  new Cr01Cr03SubmissionWebTell(summaryList).confirmationSummary(cr01cr03Submission, messages)
 )
-

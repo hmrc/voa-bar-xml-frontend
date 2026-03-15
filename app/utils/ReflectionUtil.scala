@@ -22,16 +22,14 @@ import scala.deriving.Mirror
 /**
   * @author Yuriy Tumakha
   */
-object ReflectionUtil {
+object ReflectionUtil:
 
   inline def findAllSubTypeNames[A](using m: Mirror.SumOf[A]): Seq[String] =
     findAllSubTypes.map(_.getClass.getSimpleName.stripSuffix("$"))
 
-  inline def findAllSubTypes[A](using m: Mirror.SumOf[A]): Seq[A] =
+  private inline def findAllSubTypes[A](using m: Mirror.SumOf[A]): Seq[A] =
     summonAll[Tuple.Map[m.MirroredElemTypes, ValueOf]]
       .productIterator
       .map {
         case v: ValueOf[A @unchecked] => v.value
       }.toSeq
-
-}

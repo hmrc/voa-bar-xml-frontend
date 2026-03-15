@@ -23,8 +23,6 @@ import play.api.data.{Form, FormError}
 
 class MappingsSpec extends AnyWordSpec with must.Matchers with OptionValues with Mappings:
 
-  import MappingsSpec.*
-
   "text" must {
 
     val testForm: Form[String] =

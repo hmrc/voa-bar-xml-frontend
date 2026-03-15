@@ -15,6 +15,7 @@
  *@
 
 @import utils.FormHelpers._
+
 @(reportStatus: ReportStatus)(implicit messages: Messages)
 <div class="submission-body">
     <p><b class="bold">@messages("submission")</b>: @reportStatus.id.split("-").head</p>
