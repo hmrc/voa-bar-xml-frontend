@@ -20,7 +20,7 @@ import cats.data.Validated
 import cats.implicits.*
 import ltbs.uniform.*
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
-import ltbs.uniform.validation.{Rule, quantString}
+import ltbs.uniform.validation.{Rule, Transformation, quantString}
 import models.PropertyType
 import play.api.libs.json.*
 
@@ -33,7 +33,7 @@ object UniformJourney:
 
   case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String):
 
-    def displayAddress =
+    def displayAddress: String =
       val addressList = List(line1, line2) ++ List(line3, line4).flatten ++ List(postcode)
       addressList.mkString(", ")
 
@@ -244,25 +244,25 @@ object UniformJourney:
       _ <- tell[Cr01Cr03Submission]("check-answers", ctForm)
     yield ctForm
 
-  def otherReasonValidation(a: OtherReasonWrapper) =
+  def otherReasonValidation(a: OtherReasonWrapper): Validated[ErrorTree, OtherReasonWrapper] =
     (lengthBetween(1, 32, "error.minLength", "error.maxLength").apply(a.value) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("other-reason")).map(OtherReasonWrapper.apply)
 
-  def baReportValidation(a: String) =
+  def baReportValidation(a: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("ba-report"))
 
-  def baReferenceValidation(a: String) =
+  def baReferenceValidation(a: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(a) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("ba-ref"))
 
-  def uprnValidation(a: Option[String]) =
+  def uprnValidation(a: Option[String]): Validated[ErrorTree, Option[String]] =
     (a match
       case None       => Validated.valid(None)
       case Some(uprn) =>
@@ -271,7 +271,7 @@ object UniformJourney:
         )).map(Option(_))
     ).leftMap(_.prefixWith("UPRN"))
 
-  def commentsValidation(a: Option[String]) =
+  def commentsValidation(a: Option[String]): Validated[ErrorTree, Option[String]] =
     (a match
       case None       => Validated.valid(None)
       case Some(uprn) =>
@@ -280,7 +280,7 @@ object UniformJourney:
         )).map(Option(_))
     ).leftMap(_.prefixWith("comments"))
 
-  def planningRefValidator(planningRef: String) =
+  def planningRefValidator(planningRef: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(planningRef) andThen (
       Iso558910Validator(_)
     )).leftMap(_.prefixWith("planning-ref"))
@@ -343,12 +343,12 @@ object UniformJourney:
 
     result.leftMap(_.prefixWith(errorPrefix))
 
-  def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage: String) =
+  private def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage: String) =
     new Rule[String]:
       override def apply(v1: String): Validated[ErrorTree, String] =
         minLength[String](min, minMessage).apply(v1) andThen (maxLength[String](max, maxMessage).apply(_))
 
-  def validateOptionalAddressLine(maxLen: Int, maxLenMsg: String, formatMsg: String) =
+  private def validateOptionalAddressLine(maxLen: Int, maxLenMsg: String, formatMsg: String) =
     new Rule[Option[String]]:
       override def apply(v1: Option[String]): Validated[ErrorTree, Option[String]] =
         v1 match

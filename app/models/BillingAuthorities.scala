@@ -18,9 +18,9 @@ package models
 
 object BillingAuthorities:
 
-  def find(baCode: String) = billingAuthorities.get(baCode.toUpperCase)
+  def find(baCode: String): Option[String] = billingAuthorities.get(baCode.toUpperCase)
 
-  val billingAuthorities = Map(
+  val billingAuthorities: Map[String, String] = Map(
     "BA0114" -> "Bath and North East Somerset",
     "BA0116" -> "Bristol",
     "BA0119" -> "South Gloucestershire",

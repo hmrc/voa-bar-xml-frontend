@@ -24,14 +24,14 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 
 class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
 
-  val invalidInputData = Table(
+  private val invalidInputData = Table(
     "Incorrect string",
     "½",
     "🤔",
     "Ω≈ç√∫˜µ≤"
   )
 
-  val validInputData = Table(
+  private val validInputData = Table(
     "Correct string",
     "€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ",
     "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"

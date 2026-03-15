@@ -27,7 +27,7 @@ object PropertyType:
 
   implicit val binder: PathBindable[PropertyType] =
     new PathBindable[PropertyType]:
-      val logger = Logger.apply(this.getClass)
+      private val logger = Logger.apply(this.getClass)
 
       override def bind(key: String, value: String): Either[String, PropertyType] =
         value match

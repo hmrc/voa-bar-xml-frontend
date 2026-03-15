@@ -22,33 +22,33 @@ import play.api.libs.json.{Format, JsValue}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object FakeDataCacheConnector2 extends DataCacheConnector {
-  var captures = Map[String, JsValue]()
+object FakeDataCacheConnector2 extends DataCacheConnector:
+  
+  private var captures = Map[String, JsValue]()
 
-  override def save[A](cacheId: String, key: String, value: A)(using fmt: Format[A]): Future[CacheMap] = {
+  override def save[A](cacheId: String, key: String, value: A)(using fmt: Format[A]): Future[CacheMap] =
     captures = captures + (key -> fmt.writes(value))
     Future(CacheMap(cacheId, captures))
-  }
 
   def getCapture(key: String): Option[Any] = captures.get(key)
 
-  def resetCaptures() = captures = Map[String, JsValue]()
+  def resetCaptures(): Unit = captures = Map[String, JsValue]()
 
-  override def remove(cacheId: String, key: String): Future[Boolean] = {
+  override def remove(cacheId: String, key: String): Future[Boolean] =
     captures = captures - key
     Future.successful(true)
-  }
 
   override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, captures)))
+
   def fetchMap(cacheId: String): CacheMap                       = CacheMap(cacheId, captures)
 
   override def getEntry[A](cacheId: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
-    captures.get(key) match {
+    captures.get(key) match
       case Some(x) => Future.successful(fmt.reads(x).asOpt)
       case None    => Future.successful(None)
-    }
 
-  override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(using fmt: Format[A]): Future[CacheMap] = Future(CacheMap(cacheId, Map()))
+  override def addToCollection[A](cacheId: String, collectionKey: String, value: A)(using fmt: Format[A]): Future[CacheMap] =
+    Future(CacheMap(cacheId, Map()))
 
   override def removeFromCollection[A](cacheId: String, collectionKey: String, item: A)(using fmt: Format[A]): Future[CacheMap] =
     Future(CacheMap(cacheId, Map()))
@@ -57,8 +57,6 @@ object FakeDataCacheConnector2 extends DataCacheConnector {
     Future(CacheMap(cacheId, Map()))
 
   override def getEntryByField[A](field: String, value: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
-    captures.get(key) match {
+    captures.get(key) match
       case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
       case None    => Future.successful(None)
-    }
-}
