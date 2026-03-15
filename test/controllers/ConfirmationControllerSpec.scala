@@ -164,7 +164,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "if CR03 report is present, it should render confirmation page with all details" in {
-      val submissionId     = UUID.randomUUID().toString
+      val submissionId     = UUID.randomUUID.toString
       val cr03Report       = aCr03Report
       val cr03Json         = Json.obj(
         "type"       -> "Cr01Cr03Submission",
@@ -201,7 +201,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
 
   "if CR01 report is present, it should render confirmation page with all details" in {
-    val submissionId     = UUID.randomUUID().toString
+    val submissionId     = UUID.randomUUID.toString
     val cr01Report       = aCr01Report
     val cr01Json         = Json.obj(
       "type"       -> "Cr01Cr03Submission",

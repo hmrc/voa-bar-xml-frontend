@@ -19,8 +19,7 @@ package utils
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-object DateFormatter {
+object DateFormatter:
 
-  def formatDate(dateTime: ZonedDateTime) =
+  def formatDate(dateTime: ZonedDateTime): String =
     dateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm"))
-}

@@ -37,17 +37,14 @@ class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with Eithe
     "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
   )
 
-  "Iso558910ValidatorSpec" should "Reject all non iso8859-15 characters" in {
+  "Iso558910ValidatorSpec" should "Reject all non iso8859-15 characters" in
     forAll(invalidInputData) { badString =>
       Iso558910Validator(badString).toEither.left.value shouldBe ErrorTree.oneErr(ErrorMsg("error.invalidIsoString"))
     }
-  }
 
-  it should "Allow all valid charactes in iso8859-15" in {
+  it should "Allow all valid charactes in iso8859-15" in
     forAll(validInputData) { goodString =>
       Iso558910Validator(goodString).toEither.value shouldBe goodString
     }
-
-  }
 
 }

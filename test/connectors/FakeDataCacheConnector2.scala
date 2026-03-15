@@ -23,7 +23,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object FakeDataCacheConnector2 extends DataCacheConnector:
-  
+
   private var captures = Map[String, JsValue]()
 
   override def save[A](cacheId: String, key: String, value: A)(using fmt: Format[A]): Future[CacheMap] =
@@ -40,7 +40,7 @@ object FakeDataCacheConnector2 extends DataCacheConnector:
 
   override def fetch(cacheId: String): Future[Option[CacheMap]] = Future(Some(CacheMap(cacheId, captures)))
 
-  def fetchMap(cacheId: String): CacheMap                       = CacheMap(cacheId, captures)
+  def fetchMap(cacheId: String): CacheMap = CacheMap(cacheId, captures)
 
   override def getEntry[A](cacheId: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
     captures.get(key) match

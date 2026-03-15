@@ -19,7 +19,7 @@ package models
 import java.time.OffsetDateTime
 import play.api.libs.json.{Json, OFormat}
 
-object UpScanRequests {
+object UpScanRequests:
   implicit val initiateRequest: OFormat[InitiateRequest]                 = Json.format
   implicit val uploadRequests: OFormat[UploadRequest]                    = Json.format
   implicit val initialResponse: OFormat[InitiateResponse]                = Json.format
@@ -67,4 +67,3 @@ object UpScanRequests {
     fileMimeType: String,
     fileName: String
   )
-}

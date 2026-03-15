@@ -21,17 +21,14 @@ import models.ReportStatus.{createdDateUIFormat, createdDateUILongFormat, dateSh
 import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import play.api.i18n.Messages
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 
-sealed trait ReportStatusType {
+sealed trait ReportStatusType:
 
-  val value: String = {
+  val value: String =
     val a: Class[? <: ReportStatusType] = getClass.asSubclass(getClass)
-    val u: String                       = a.getSimpleName.replace("$", "")
-    u
-  }
-}
+    a.getSimpleName.replace("$", "")
 
 case object Pending extends ReportStatusType
 case object Verified extends ReportStatusType
@@ -43,20 +40,17 @@ case object Done extends ReportStatusType
 
 case class ReportErrorDetail(errorCode: String, values: Seq[String] = Seq.empty[String])
 
-object ReportErrorDetail {
+object ReportErrorDetail:
   implicit val format: OFormat[ReportErrorDetail] = Json.format
-
-}
 
 case class ReportError(reportNumber: Option[String], baTransaction: Option[String], uprn: Seq[Long], errors: Seq[ReportErrorDetail])
 
-object ReportError {
+object ReportError:
   implicit val format: OFormat[ReportError] = Json.format
-}
 
-object ReportStatus {
+object ReportStatus:
 
-  import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits._
+  import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits.*
 
   implicit val format: Format[ReportStatus] = mongoEntity {
     Json.format
@@ -67,8 +61,6 @@ object ReportStatus {
   val createdDateUILongFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
 
   val dateShortFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
-
-}
 
 final case class ReportStatus(
   id: String,
@@ -84,7 +76,7 @@ final case class ReportStatus(
   totalReports: Option[Int] = None,
   report: Option[JsObject] = None,
   createdAt: Instant = Instant.now
-) {
+):
 
   def formattedCreated: String = createdAtFormatted(createdDateUIFormat)
 
@@ -99,9 +91,6 @@ final case class ReportStatus(
   private def createdAtFormatted(formatter: DateTimeFormatter): String =
     createdAt.atZone(ZoneOffset.UTC).format(formatter)
 
-  def title(messages: Messages): String = {
+  def title(messages: Messages): String =
     val defaultStatus = status.getOrElse(Pending.value).toLowerCase
     messages(s"confirmation.heading.$defaultStatus")
-  }
-
-}

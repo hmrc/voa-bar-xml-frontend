@@ -34,7 +34,7 @@ case class FeedbackForm(
 
 object FeedbackForm:
 
-  private val validRatings: Set[Int]                = (1 to 5).toSet
+  private val validRatings: Set[Int] = (1 to 5).toSet
 
   val feedbackForm: Form[FeedbackForm] = Form(
     mapping(

@@ -45,7 +45,7 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
   "ReportDeleteController" must {
     "Delete report " in {
 
-      val submissionId = UUID.randomUUID().toString
+      val submissionId = UUID.randomUUID.toString
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 

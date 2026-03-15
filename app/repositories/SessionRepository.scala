@@ -29,12 +29,10 @@ import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now) {
-
+case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now):
   def asCacheMap: CacheMap = CacheMap(id, data)
-}
 
-object DatedCacheMap {
+object DatedCacheMap:
 
   private val localDateTimeReads: Reads[LocalDateTime] =
     Reads.at[String](__ \ "$date" \ "$numberLong")
@@ -48,7 +46,6 @@ object DatedCacheMap {
   implicit val formats: OFormat[DatedCacheMap]   = Json.format
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
-}
 
 @Singleton
 class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(using ec: ExecutionContext)
@@ -66,7 +63,7 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
       Codecs.playFormatCodec(DatedCacheMap.dateFormat)
     )
   )
-  with Logging {
+  with Logging:
 
   def upsert(cm: CacheMap): Future[Boolean] = {
     val selector = equal("id", cm.id)
@@ -86,5 +83,3 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
 
   def getByField[A](key: String, value: String): Future[Option[CacheMap]] =
     collection.find(equal(key, value)).first().toFutureOption().map(_.map(_.asCacheMap))
-
-}
