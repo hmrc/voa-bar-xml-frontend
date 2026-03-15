@@ -39,12 +39,12 @@ class ReportReasonController @Inject() (
   report_reason: reportReason,
   config: Configuration,
   controllerComponents: MessagesControllerComponents
-)(implicit val ec: ExecutionContext
+)(using val ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
   with BaseBarController
-  with I18nSupport {
+  with I18nSupport:
 
-  val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+  private val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
   def onPageLoad: Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request =>
     dataCacheConnector.getEntry[ReasonReportType](request.externalId, STORAGE_KEY).map { maybeReportReason =>
@@ -58,30 +58,23 @@ class ReportReasonController @Inject() (
       formWithErrors => Future.successful(Ok(report_reason(formWithErrors, cr05FeatureEnabled))),
       reportReason =>
         dataCacheConnector.save(request.externalId, STORAGE_KEY, reportReason).map { _ =>
-          reportReason match {
+          reportReason match
             case AddProperty    => Redirect(routes.UniformController.myJourney("ba-report"))
             case RemoveProperty => Redirect(routes.UniformController.myJourney("why-should-it-be-removed"))
             case SplitProperty  => Redirect(routes.TaskListController.onPageLoad)
-          }
         }
     )
   }
 
-}
-
-object ReportReasonController {
+object ReportReasonController:
+  import play.api.data.*
+  import play.api.data.Forms.*
 
   val STORAGE_KEY = "ReportReason"
 
-  val form = {
-    import play.api.data._
-    import play.api.data.Forms._
-
+  val form: Form[ReasonReportType] =
     Form(
       single(
         "reportReason" -> of[ReasonReportType]
       )
     )
-  }
-
-}

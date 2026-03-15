@@ -23,18 +23,14 @@ sealed trait YesNoType
 case object Yes extends YesNoType
 case object No extends YesNoType
 
-object YesNoType {
+object YesNoType:
 
-  implicit val format: Format[YesNoType] = new Format[YesNoType] {
+  implicit val format: Format[YesNoType] =
+    new Format[YesNoType]:
+      override def reads(json: JsValue): JsResult[YesNoType] =
+        json match
+          case JsString("Yes") => JsSuccess(Yes)
+          case _               => JsSuccess(No)
 
-    override def reads(json: JsValue): JsResult[YesNoType] =
-      json match {
-        case JsString("Yes") => JsSuccess(Yes)
-        case _               => JsSuccess(No)
-      }
-
-    override def writes(o: YesNoType): JsValue =
-      JsString(if o == Yes then "Yes" else "No")
-  }
-
-}
+      override def writes(o: YesNoType): JsValue =
+        JsString(if o == Yes then "Yes" else "No")

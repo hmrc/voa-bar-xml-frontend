@@ -40,9 +40,9 @@ class AddToListController @Inject() (
   dataCacheConnector: DataCacheConnector,
   controllerComponents: MessagesControllerComponents,
   addToList: views.html.add_to_list
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
+  with I18nSupport:
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
@@ -61,11 +61,10 @@ class AddToListController @Inject() (
           Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))
         },
       success =>
-        if (success.value) {
+        if success.value then
           Future.successful(Redirect(navigator.nextPage(AddPropertyId, NormalMode)(request.userAnswers)))
-        } else {
+        else
           Future.successful(Redirect(routes.TaskListController.onPageLoad))
-        }
     )
   }
 
@@ -88,5 +87,3 @@ class AddToListController @Inject() (
       }
     }.getOrElse(Future.successful(Redirect(routes.AddToListController.onPageLoad)))
   }
-
-}

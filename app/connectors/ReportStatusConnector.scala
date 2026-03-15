@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class DefaultReportStatusConnector @Inject() (
   httpClientV2: HttpClientV2,
   servicesConfig: ServicesConfig
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends ReportStatusConnector
   with BaseConnector
   with Logging:
@@ -55,49 +55,47 @@ class DefaultReportStatusConnector @Inject() (
 
   private def parseResponse[T](errorMessage: String)(using reads: Reads[T]): HttpResponse => Either[Error, T] =
     response =>
-      response.status match {
+      response.status match
         case status if is2xx(status) => Right(Json.parse(response.body).as[T])
         case status                  =>
           logger.error(s"$status. $errorMessage. ${response.body}")
           Left(Error("", Seq(s"$status. $errorMessage")))
-      }
 
   private def checkResponseStatus[T](errorMessage: String, mapResponse: HttpResponse => T = identity): HttpResponse => Either[Error, T] =
     response =>
-      response.status match {
+      response.status match
         case status if is2xx(status) => Right(mapResponse(response))
         case status                  =>
           logger.error(s"$status. $errorMessage. ${response.body}")
           Left(Error("", Seq(s"$status. $errorMessage")))
-      }
 
   private def logAndReturnError[T](errorMessage: String): PartialFunction[Throwable, Either[Error, T]] =
     case ex: Throwable =>
       logger.error(ex.getMessage)
       Left(Error("", Seq(errorMessage)))
 
-  override def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
+  override def get(login: Login, filter: Option[String] = None)(using hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
     httpClientV2.get(getSubmissionsURL(filter))
       .setHeader(defaultHeaders(login.username, login.password)*)
       .execute[HttpResponse]
       .map(parseResponse[Seq[ReportStatus]]("Couldn't get submissions"))
       .recover(logAndReturnError("Couldn't get submissions"))
 
-  override def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
+  override def getAll(login: Login)(using hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]] =
     httpClientV2.get(getAllSubmissionsURL)
       .setHeader(defaultHeaders(login.username, login.password)*)
       .execute[HttpResponse]
       .map(parseResponse[Seq[ReportStatus]]("Couldn't get submissions"))
       .recover(logAndReturnError("Couldn't get submissions"))
 
-  override def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]] =
+  override def getByReference(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, ReportStatus]] =
     httpClientV2.get(submissionByReferenceURL(reference))
       .setHeader(defaultHeaders(login.username, login.password)*)
       .execute[HttpResponse]
       .map(parseResponse[ReportStatus]("Couldn't get submission"))
       .recover(logAndReturnError("Couldn't get submission"))
 
-  override def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
+  override def save(reportStatus: ReportStatus, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Unit]] =
     httpClientV2.put(saveSubmissionURL)
       .setHeader(defaultHeaders(login.username, login.password)*)
       .withBody(Json.toJson(reportStatus))
@@ -105,7 +103,7 @@ class DefaultReportStatusConnector @Inject() (
       .map(checkResponseStatus("Couldn't save submission", _ => ()))
       .recover(logAndReturnError("Couldn't save submission"))
 
-  override def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]] =
+  override def saveUserInfo(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Unit]] =
     httpClientV2.put(saveUserInfoURL)
       .setHeader(defaultHeaders(login.username, login.password)*)
       .withBody(Json.toJson(ReportStatus(reference, baCode = Some(login.username))))
@@ -113,7 +111,7 @@ class DefaultReportStatusConnector @Inject() (
       .map(checkResponseStatus("Couldn't save user info for the submission", _ => ()))
       .recover(logAndReturnError("Couldn't save user info for the submission"))
 
-  override def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, HttpResponse]] =
+  override def deleteByReference(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, HttpResponse]] =
     logger.warn(s"Deletion of submission report, reference: $reference, user ${login.username}")
 
     httpClientV2.delete(submissionByReferenceURL(reference))
@@ -125,9 +123,9 @@ class DefaultReportStatusConnector @Inject() (
 
 @ImplementedBy(classOf[DefaultReportStatusConnector])
 trait ReportStatusConnector:
-  def saveUserInfo(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
-  def save(reportStatus: ReportStatus, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Unit]]
-  def get(login: Login, filter: Option[String] = None)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
-  def getAll(login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
-  def getByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, ReportStatus]]
-  def deleteByReference(reference: String, login: Login)(implicit hc: HeaderCarrier): Future[Either[Error, HttpResponse]]
+  def saveUserInfo(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Unit]]
+  def save(reportStatus: ReportStatus, login: Login)(using hc: HeaderCarrier): Future[Either[Error, Unit]]
+  def get(login: Login, filter: Option[String] = None)(using hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
+  def getAll(login: Login)(using hc: HeaderCarrier): Future[Either[Error, Seq[ReportStatus]]]
+  def getByReference(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, ReportStatus]]
+  def deleteByReference(reference: String, login: Login)(using hc: HeaderCarrier): Future[Either[Error, HttpResponse]]

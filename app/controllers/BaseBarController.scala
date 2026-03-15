@@ -17,7 +17,7 @@
 package controllers
 
 import cats.data.EitherT
-import cats.implicits._
+import cats.implicits.*
 import connectors.DataCacheConnector
 import identifiers.LoginId
 import models.{Error, Login, NormalMode}
@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseBarController extends FrontendBaseController with Logging {
+trait BaseBarController extends FrontendBaseController with Logging:
 
   val dataCacheConnector: DataCacheConnector
 
@@ -36,7 +36,7 @@ trait BaseBarController extends FrontendBaseController with Logging {
 
   val errorTemplate: views.html.error_template
 
-  private[controllers] def error(messages: Messages)(implicit request: Request[?]) =
+  private[controllers] def error(messages: Messages)(using request: Request[?]) =
     errorTemplate(
       messages("error.internal_server_error.heading"),
       messages("error.internal_server_error.description")
@@ -69,4 +69,3 @@ trait BaseBarController extends FrontendBaseController with Logging {
           logger.error(s"$errorMessage\n${ex.getMessage}")
           Left(InternalServerError)
       }
-}

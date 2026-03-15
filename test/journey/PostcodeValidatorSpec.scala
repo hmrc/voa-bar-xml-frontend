@@ -23,7 +23,7 @@ import org.scalatest.EitherValues
 
 class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues {
 
-  val validator = new PostcodeValidator()
+  val validator = PostcodeValidator
 
   "Postcode validator" should "validate valid postcode" in {
     validator("BN12 4AX").toEither.value shouldBe "BN12 4AX"

@@ -20,14 +20,13 @@ import javax.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import models.FileUploadData
 
-class FileUploadDataFormProvider @Inject() extends Mappings {
+class FileUploadDataFormProvider @Inject() extends Mappings:
 
   def apply(): Form[FileUploadData] = Form(
     mapping(
       "xml" -> text("councilTaxUpload.error.xml.required")
     )(FileUploadData.apply)(o => Some(o.xml))
   )
-}

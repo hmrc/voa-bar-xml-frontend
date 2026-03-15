@@ -20,13 +20,9 @@ import ltbs.uniform.UniformMessages
 import play.api.i18n.Messages
 import play.twirl.api.Html
 
-object UniformMessageUtil {
+object UniformMessageUtil:
 
-  def getViewUniformMessages(implicit messages: Messages): UniformMessages[Html] =
-    new UniformMessages[Html] {
+  def getViewUniformMessages(using messages: Messages): UniformMessages[Html] =
+    new UniformMessages[Html]:
       override def get(key: String, args: Any*): Option[Html] = Option(Html(messages(key, args)))
-
-      override def list(key: String, args: Any*): List[Html] = Nil
-    }
-
-}
+      override def list(key: String, args: Any*): List[Html]  = Nil

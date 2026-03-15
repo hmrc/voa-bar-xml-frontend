@@ -26,7 +26,7 @@ import javax.inject.Inject
 class TimeoutController @Inject() (
   controllerComponents: MessagesControllerComponents,
   sessionTimeout: session_timeout
-) extends FrontendController(controllerComponents) {
+) extends FrontendController(controllerComponents):
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(sessionTimeout())
@@ -35,5 +35,3 @@ class TimeoutController @Inject() (
   def timeout: Action[AnyContent] = Action { _ =>
     Redirect(routes.LoginController.onPageLoad(NormalMode)).withNewSession
   }
-
-}

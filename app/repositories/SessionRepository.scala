@@ -45,13 +45,13 @@ object DatedCacheMap {
       .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
 
   implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
-  implicit val formats: OFormat[DatedCacheMap]   = Json.format[DatedCacheMap]
+  implicit val formats: OFormat[DatedCacheMap]   = Json.format
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
 }
 
 @Singleton
-class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(implicit ec: ExecutionContext)
+class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(using ec: ExecutionContext)
   extends PlayMongoRepository[DatedCacheMap](
     collectionName = config.get[String]("appName"),
     mongoComponent = mongo,

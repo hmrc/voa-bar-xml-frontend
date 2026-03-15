@@ -39,9 +39,9 @@ class WelcomeController @Inject() (
   dataCacheConnector: DataCacheConnector,
   controllerComponents: MessagesControllerComponents,
   welcome: views.html.welcome
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
+  with I18nSupport:
 
   private val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
 
@@ -60,4 +60,3 @@ class WelcomeController @Inject() (
   def goToTaskListLoadPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(TaskListId, NormalMode)(request.userAnswers))
   }
-}

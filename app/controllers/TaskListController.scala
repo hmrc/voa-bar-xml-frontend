@@ -36,9 +36,9 @@ class TaskListController @Inject() (
   dataCacheConnector: DataCacheConnector,
   controllerComponents: MessagesControllerComponents,
   taskList: views.html.task_list
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
+  with I18nSupport:
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
@@ -65,5 +65,3 @@ class TaskListController @Inject() (
   def goToCheckYourAnswersPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(CheckYourAnswersId, NormalMode)(request.userAnswers))
   }
-
-}

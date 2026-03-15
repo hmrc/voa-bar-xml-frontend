@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object CheckYourAnswersId extends Identifier {
+case object CheckYourAnswersId extends Identifier:
   override def toString: String = "checkyouranswer"
-}

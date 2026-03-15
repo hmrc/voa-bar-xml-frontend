@@ -30,14 +30,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[DefaultCr01Cr03Service])
 trait Cr01Cr03Service {
-  def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
-  def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
+  def storeSubmission(submission: Cr01Cr03Submission, login: Login)(using hc: HeaderCarrier): Future[UUID]
+  def storeSubmission(submission: Cr05Submission, login: Login)(using hc: HeaderCarrier): Future[UUID]
 }
 
 @Singleton
-class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr01Cr03Service {
+class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(using ec: ExecutionContext) extends Cr01Cr03Service {
 
-  override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
+  override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(using hc: HeaderCarrier): Future[UUID] = {
     val submissionId   = UUID.randomUUID()
     val cr01cr03Report = createReport(submission)
     val report         = ReportStatus(
@@ -68,7 +68,7 @@ class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(
     )
   }
 
-  override def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
+  override def storeSubmission(submission: Cr05Submission, login: Login)(using hc: HeaderCarrier): Future[UUID] = {
     val submissionId = UUID.randomUUID()
     val cr05Report   = createReport(submission)
     val report       = ReportStatus(

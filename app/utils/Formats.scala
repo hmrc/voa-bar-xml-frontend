@@ -16,32 +16,25 @@
 
 package utils
 
-object Formats {
+object Formats:
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
 
-  implicit val uniformDBFormat: Format[Map[List[String], String]] = new Format[Map[List[String], String]] {
+  implicit val uniformDBFormat: Format[Map[List[String], String]] =
+    new Format[Map[List[String], String]]:
+      override def writes(o: Map[List[String], String]): JsValue =
+        val data = o.map { case (key, value) =>
+          (key.mkString("."), JsString(value)) // Todo, maybe better delimiter
+        }
+        JsObject(data)
 
-    override def writes(o: Map[List[String], String]): JsValue = {
-      val data = o.map { case (key, value) =>
-        (key.mkString("."), JsString(value)) // Todo, maybe better delimiter
-      }
-      JsObject(data)
-    }
-
-    override def reads(json: JsValue): JsResult[Map[List[String], String]] = json match {
-      case JsObject(data) =>
-        val dataMap = data.map { case (key, value) =>
-          value match {
-            case JsString(stringValue) =>
-              (key.split('.').toList, stringValue)
-            case _                     =>
-              throw new RuntimeException(s"Unable to deserialize $value")
-          }
-        }.toMap
-        JsSuccess(dataMap)
-      case x              => JsError(s"unable to parse : $x")
-    }
-  }
-
-}
+      override def reads(json: JsValue): JsResult[Map[List[String], String]] =
+        json match
+          case JsObject(data) =>
+            val dataMap = data.map { case (key, value) =>
+              value match
+                case JsString(stringValue) => (key.split('.').toList, stringValue)
+                case _                     => throw RuntimeException(s"Unable to deserialize $value")
+            }.toMap
+            JsSuccess(dataMap)
+          case x              => JsError(s"unable to parse : $x")

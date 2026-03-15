@@ -32,11 +32,9 @@ case class FeedbackForm(
   submissionId: Option[String] = None
 )
 
-object FeedbackForm {
+object FeedbackForm:
 
-  val validRatings: Set[Int]                = (1 to 5).toSet
-  val emailValidator: DeskproEmailValidator = DeskproEmailValidator()
-  val nameValidator: NameValidator          = NameValidator()
+  private val validRatings: Set[Int]                = (1 to 5).toSet
 
   val feedbackForm: Form[FeedbackForm] = Form(
     mapping(
@@ -45,10 +43,10 @@ object FeedbackForm {
         .verifying("feedback.rating.error.invalid", num => num == 0 || validRatings(num)),
       "feedback-name"     -> default(text, "Anonymous user")
         .verifying("feedback.name.error.length", _.length <= 70)
-        .verifying("feedback.name.error.invalid", name => nameValidator.validate(name)),
+        .verifying("feedback.name.error.invalid", name => NameValidator.validate(name)),
       "feedback-email"    -> default(text, "anonymous@anonymous.com")
         .verifying("feedback.email.error.length", _.length <= 255)
-        .verifying("feedback.email.error.invalid", email => emailValidator.validate(email)),
+        .verifying("feedback.email.error.invalid", email => DeskproEmailValidator.validate(email)),
       "feedback-comments" -> default(text, "")
         .verifying("feedback.comments.error.length", _.length <= 2000),
       "afterSubmission"   -> default(boolean, false),
@@ -58,5 +56,3 @@ object FeedbackForm {
 
   def initFeedbackAfterSubmission(submissionId: String): Form[FeedbackForm] =
     feedbackForm.fill(FeedbackForm(0, "Anonymous user", "anonymous@anonymous.com", "", true, Option(submissionId)))
-
-}

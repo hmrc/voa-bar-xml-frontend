@@ -21,4 +21,4 @@ import play.api.libs.json.{Json, OFormat}
 case class VOBarUpload(reference: String, xmlUrl: String)
 
 object VOBarUpload:
-  implicit val format: OFormat[VOBarUpload] = Json.format[VOBarUpload]
+  implicit val format: OFormat[VOBarUpload] = Json.format

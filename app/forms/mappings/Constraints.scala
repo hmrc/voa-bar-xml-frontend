@@ -18,7 +18,7 @@ package forms.mappings
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-trait Constraints {
+trait Constraints:
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
     Constraint {
@@ -29,40 +29,37 @@ trait Constraints {
           .getOrElse(Valid)
     }
 
-  protected def minimumValue[A](minimum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
+  protected def minimumValue[A](minimum: A, errorKey: String)(using ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-        import ev._
+        import ev.*
 
-        if (input >= minimum) {
+        if input >= minimum then
           Valid
-        } else {
+        else
           Invalid(errorKey, minimum)
-        }
     }
 
-  protected def maximumValue[A](maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
+  protected def maximumValue[A](maximum: A, errorKey: String)(using ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-        import ev._
+        import ev.*
 
-        if (input <= maximum) {
+        if input <= maximum then
           Valid
-        } else {
+        else
           Invalid(errorKey, maximum)
-        }
     }
 
-  protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
+  protected def inRange[A](minimum: A, maximum: A, errorKey: String)(using ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
-        import ev._
+        import ev.*
 
-        if (input >= minimum && input <= maximum) {
+        if input >= minimum && input <= maximum then
           Valid
-        } else {
+        else
           Invalid(errorKey, minimum, maximum)
-        }
     }
 
   protected def regexp(regex: String, errorKey: String): Constraint[String] =
@@ -80,4 +77,3 @@ trait Constraints {
       case _                            =>
         Invalid(errorKey, maximum)
     }
-}

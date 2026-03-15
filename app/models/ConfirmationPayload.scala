@@ -20,6 +20,5 @@ import play.api.libs.json.{Json, OFormat}
 
 case class ConfirmationPayload(status: String, statusPanel: String, detailPanel: String)
 
-case object ConfirmationPayload {
-  implicit val format: OFormat[ConfirmationPayload] = Json.format[ConfirmationPayload]
-}
+case object ConfirmationPayload:
+  implicit val format: OFormat[ConfirmationPayload] = Json.format

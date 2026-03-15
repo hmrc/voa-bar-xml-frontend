@@ -35,7 +35,7 @@ import scala.util.Try
 class DefaultUserReportUploadsConnector @Inject() (
   httpClientV2: HttpClientV2,
   servicesConfig: ServicesConfig
-)(implicit executionContext: ExecutionContext
+)(using executionContext: ExecutionContext
 ) extends UserReportUploadsConnector
   with BaseConnector:
 
@@ -51,10 +51,9 @@ class DefaultUserReportUploadsConnector @Inject() (
       .withBody(Json.toJson(userReportUpload))
       .execute[HttpResponse]
       .map { r =>
-        r.status match {
+        r.status match
           case status if is2xx(status) => Right(())
           case status                  => Left(Error(s"$status. Couldn't save UserReportUpload"))
-        }
       }
       .recover {
         case e: Throwable => Left(Error(e.getMessage))
@@ -65,10 +64,9 @@ class DefaultUserReportUploadsConnector @Inject() (
       .setHeader(defaultHeaders(login.username, login.password)*)
       .execute[HttpResponse]
       .map { r =>
-        r.status match {
+        r.status match
           case status if is2xx(status) => Right(Try(Json.parse(r.body).asOpt[UserReportUpload]).getOrElse(None))
           case status                  => Left(Error(s"$status. Couldn't get UserReportUpload"))
-        }
       }
       .recover {
         case e: Throwable => Left(Error(e.getMessage))

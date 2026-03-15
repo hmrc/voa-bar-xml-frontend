@@ -23,11 +23,11 @@ import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 case class Login(username: String, password: String, reference: Option[String] = None) {
 
   def encrypt(configuration: Configuration): Login = {
-    val crypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
+    val crypto = ApplicationCrypto(configuration.underlying).JsonCrypto
     Login(username, crypto.encrypt(PlainText(password)).value)
   }
 }
 
 object Login {
-  implicit val format: OFormat[Login] = Json.format[Login]
+  implicit val format: OFormat[Login] = Json.format
 }

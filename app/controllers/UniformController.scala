@@ -50,40 +50,36 @@ class UniformController @Inject() (
   cr01cr03Service: Cr01Cr03Service,
   cr05SubmissionSummary: cr05SubmissionSummary,
   cc: MessagesControllerComponents
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(cc)
-  with Logging {
+  with Logging:
 
-  implicit val cr05FeatureEnabled: Boolean = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+  implicit val mongoPersistence: PersistenceEngine[DataRequest[AnyContent]] =
+    new PersistenceEngine[DataRequest[AnyContent]]():
+      val storageKey = "CR03"
 
-  implicit val mongoPersistance: PersistenceEngine[DataRequest[AnyContent]] = new PersistenceEngine[DataRequest[AnyContent]]() {
+      import utils.Formats.uniformDBFormat
 
-    val storageKey = "CR03"
+      override def apply(
+        request: DataRequest[AnyContent]
+      )(
+        f: DB => Future[(ltbs.uniform.interpreters.playframework.DB, Result)]
+      ): Future[Result] =
+        for
+          db              <- load(request.externalId)
+          (newDB, result) <- f(db)
+          _               <- save(request.externalId, newDB)
+        yield result
 
-    import utils.Formats.uniformDBFormat
+      def load(externalId: String): Future[ltbs.uniform.interpreters.playframework.DB] =
+        dataCacheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
 
-    override def apply(
-      request: DataRequest[AnyContent]
-    )(
-      f: DB => Future[(ltbs.uniform.interpreters.playframework.DB, Result)]
-    ): Future[Result] =
-      for
-        db              <- load(request.externalId)
-        (newdb, result) <- f(db)
-        _               <- save(request.externalId, newdb)
-      yield result
+      def save(externalId: String, db: ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
+        logger.warn(s"externalID: $externalId, db: $db")
+        dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
+      }
 
-    def load(externalId: String): Future[ltbs.uniform.interpreters.playframework.DB] =
-      dataCacheConnector.getEntry[DB](externalId, storageKey).map(_.getOrElse(Map[List[String], String]()))
-
-    def save(externalId: String, db: ltbs.uniform.interpreters.playframework.DB): Future[Unit] = {
-      logger.warn(s"externalID: $externalId, db: $db")
-      dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
-    }
-
-  }
-
-  val interpreter: AutobarsInterpreter = new AutobarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
+  val interpreter: AutoBarsInterpreter = AutoBarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
   def myJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import UniformJourney.*
@@ -98,7 +94,6 @@ class UniformController @Inject() (
         }
       }
     }.getOrElse(Future.successful(Redirect(routes.ReportReasonController.onPageLoad)))
-
   }
 
   def addCommonSectionJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async {
@@ -132,11 +127,9 @@ class UniformController @Inject() (
   def propertyJourney(targetId: String, propertyType: PropertyType, index: Option[Int]): Action[AnyContent] = (getData andThen requireData andThen auth).async {
     implicit request: DataRequest[AnyContent] =>
       getCr05Submission.flatMap { propertyBuilder =>
-        val property = propertyType match {
+        val property = propertyType match
           case PropertyType.EXISTING => index.flatMap(x => propertyBuilder.existingProperties.lift(x))
           case PropertyType.PROPOSED => index.flatMap(x => propertyBuilder.proposedProperties.lift(x))
-        }
-
         runPropertyJourney(targetId, propertyType, property, index)
       }
   }
@@ -146,25 +139,23 @@ class UniformController @Inject() (
     propertyType: PropertyType,
     property: Option[Cr05AddProperty],
     index: Option[Int]
-  )(implicit request: DataRequest[AnyContent]
-  ): Future[Result] = {
+  )(using request: DataRequest[AnyContent]
+  ): Future[Result] =
     import UniformJourney.*
     import interpreter.*
+
     val addPropertyProgram = addPropertyHelper[WM](create[TellTypes, AskTypes](messages(request)), property, propertyType, index)
     addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { cr05AddProperty =>
       updateProperty(propertyType, cr05AddProperty, index).map { _ =>
-        propertyType match {
+        propertyType match
           case PropertyType.EXISTING => Redirect(routes.TaskListController.onPageLoad)
           case PropertyType.PROPOSED => Redirect(routes.AddToListController.onPageLoad)
-        }
       }
     }
 
-  }
-
-  private def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(implicit request: DataRequest[?]): Future[Unit] = {
+  private def updateProperty(propertyType: PropertyType, property: Cr05AddProperty, index: Option[Int])(using request: DataRequest[?]): Future[Unit] =
     logger.debug(s"updating property : $propertyType, $index")
-    (propertyType, index) match {
+    (propertyType, index) match
       case (PropertyType.EXISTING, None)        =>
         getCr05Submission.map(x => x.copy(existingProperties = x.existingProperties :+ property)).flatMap(storeCr05Submission)
       case (PropertyType.EXISTING, Some(index)) =>
@@ -179,13 +170,11 @@ class UniformController @Inject() (
           val proposed = builder.proposedProperties.updated(index, property)
           builder.copy(proposedProperties = proposed)
         }.flatMap(storeCr05Submission)
-    }
-  }
 
-  private def storeCr05Submission(submission: Cr05SubmissionBuilder)(implicit request: DataRequest[?]): Future[Unit] =
+  private def storeCr05Submission(submission: Cr05SubmissionBuilder)(using request: DataRequest[?]): Future[Unit] =
     dataCacheConnector.save(request.externalId, Cr05SubmissionBuilder.storageKey, submission).map(_ => ())
 
-  private def getCr05Submission(implicit request: DataRequest[?]): Future[Cr05SubmissionBuilder] =
+  private def getCr05Submission(using request: DataRequest[?]): Future[Cr05SubmissionBuilder] =
     dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
       .map(_.getOrElse(Cr05SubmissionBuilder(None, List(), List(), None)))
 
@@ -202,7 +191,6 @@ class UniformController @Inject() (
         }
       }
     }
-
   }
 
   def cr05CheckAnswerJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async {
@@ -225,7 +213,4 @@ class UniformController @Inject() (
             }
           }
       }
-
   }
-
-}

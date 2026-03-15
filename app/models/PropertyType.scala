@@ -21,25 +21,23 @@ import play.api.mvc.PathBindable
 
 sealed trait PropertyType
 
-object PropertyType {
+object PropertyType:
   case object PROPOSED extends PropertyType
   case object EXISTING extends PropertyType
 
-  implicit val binder: PathBindable[PropertyType] = new PathBindable[PropertyType] {
-    val log = Logger.apply(this.getClass)
+  implicit val binder: PathBindable[PropertyType] =
+    new PathBindable[PropertyType]:
+      val logger = Logger.apply(this.getClass)
 
-    override def bind(key: String, value: String): Either[String, PropertyType] = value match {
-      case "proposed" => Right(PROPOSED)
-      case "existing" => Right(EXISTING)
-      case x          =>
-        log.warn(s"Unable to bind type or property : $x")
-        Left("Invalid request, Unable to bind type or property")
-    }
+      override def bind(key: String, value: String): Either[String, PropertyType] =
+        value match
+          case "proposed" => Right(PROPOSED)
+          case "existing" => Right(EXISTING)
+          case x          =>
+            logger.warn(s"Unable to bind type or property : $x")
+            Left("Invalid request, Unable to bind type or property")
 
-    override def unbind(key: String, value: PropertyType): String = value match {
-      case PROPOSED => "proposed"
-      case EXISTING => "existing"
-    }
-  }
-
-}
+      override def unbind(key: String, value: PropertyType): String =
+        value match
+          case PROPOSED => "proposed"
+          case EXISTING => "existing"

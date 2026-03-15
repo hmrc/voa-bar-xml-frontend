@@ -26,10 +26,10 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 
 class TableFormatter @Inject() () {
 
-  def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(implicit messages: Messages) =
+  def formatSummaryLink(reportStatus: ReportStatus, confirmationController: ReverseConfirmationController)(using messages: Messages) =
     s"<a href='${confirmationController.onPageRefresh(reportStatus.id)}'>${formatStatuslink(reportStatus.status)}</a>"
 
-  def formatStatuslink(value: Option[String])(implicit messages: Messages): String = value match {
+  def formatStatuslink(value: Option[String])(using messages: Messages): String = value match {
     case Some("Done")      => Messages("confirmation.heading.submitted")
     case Some("Submitted") => Messages("confirmation.heading.submitted")
     case _                 => Messages("confirmation.heading.failed")
@@ -38,7 +38,7 @@ class TableFormatter @Inject() () {
   def formatRows(
     reportStatuses: Seq[ReportStatus],
     confirmationController: ReverseConfirmationController
-  )(implicit messages: Messages
+  )(using messages: Messages
   ): Seq[Seq[TableRow]] =
     reportStatuses.map(reportStatus =>
       Seq(

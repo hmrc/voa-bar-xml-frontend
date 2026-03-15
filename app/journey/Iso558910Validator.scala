@@ -22,18 +22,13 @@ import cats.data.Validated
 import ltbs.uniform.{ErrorMsg, ErrorTree}
 import ltbs.uniform.validation.Rule
 
-object Iso558910Validator {
-  val isoCharser = Charset.forName("ISO-8859-15")
-}
+object Iso558910Validator extends Rule[String]:
 
-class Iso558910Validator extends Rule[String] {
+  private val isoCharset = Charset.forName("ISO-8859-15")
 
-  override def apply(v1: String): Validated[ErrorTree, String] = {
-    val encoder = Iso558910Validator.isoCharser.newEncoder()
-    if (v1.toCharArray.find(x => !encoder.canEncode(x)).isEmpty) {
+  override def apply(v1: String): Validated[ErrorTree, String] =
+    val encoder = isoCharset.newEncoder()
+    if v1.toCharArray.forall(x => encoder.canEncode(x)) then
       Validated.valid(v1)
-    } else {
+    else
       Validated.invalid(ErrorTree.oneErr(ErrorMsg("error.invalidIsoString")))
-    }
-  }
-}

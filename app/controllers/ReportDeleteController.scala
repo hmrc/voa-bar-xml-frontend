@@ -35,32 +35,27 @@ class ReportDeleteController @Inject() (
   controllerComponents: MessagesControllerComponents,
   val errorTemplate: views.html.error_template,
   getData: DataRetrievalAction
-)(implicit val ec: ExecutionContext
+)(using val ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
   with BaseBarController
-  with I18nSupport {
-
-  // private val enabled = configuration.getOptional[String]("feature.delete.enabled").exists(x => Try(x.toBoolean).getOrElse(false))
+  with I18nSupport:
 
   def onPageSubmit: Action[AnyContent] = getData.async { implicit request =>
     val reference = request.body.asFormUrlEncoded.get(submissionId).head
-    (for {
+    (for
       login        <- EitherT(cachedLogin(request.externalId))
       deleteStatus <- EitherT(
                         reportStatusConnector.deleteByReference(reference, login)
                           .map(_.leftMap(error => InternalServerError(error.values.head)))
                       )
-    } yield Ok(
+    yield Ok(
       s"""Response\n\n
          |Status code ${deleteStatus.status} \n
          |body: ${deleteStatus.body}\n
          |headers: ${deleteStatus.headers.mkString("\n  ", "\n  ", "")}
          | """.stripMargin
     )).valueOr(f => f)
-
   }
-}
 
-object ReportDeleteController {
+object ReportDeleteController:
   val submissionId = "submissionId"
-}

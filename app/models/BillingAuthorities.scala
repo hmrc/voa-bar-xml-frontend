@@ -16,7 +16,7 @@
 
 package models
 
-object BillingAuthorities {
+object BillingAuthorities:
 
   def find(baCode: String) = billingAuthorities.get(baCode.toUpperCase)
 
@@ -372,4 +372,3 @@ object BillingAuthorities {
     "BA3515" -> "Ipswich",
     "BA3520" -> "Mid Suffolk"
   )
-}

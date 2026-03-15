@@ -16,25 +16,21 @@
 
 package utils
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-trait Enumerable[A] {
+import scala.language.implicitConversions
 
+trait Enumerable[A]:
   def withName(str: String): Option[A]
-}
 
-object Enumerable {
+object Enumerable:
 
   def apply[A](entries: (String, A)*): Enumerable[A] =
-    new Enumerable[A] {
+    (str: String) => entries.toMap.get(str)
 
-      override def withName(str: String): Option[A] =
-        entries.toMap.get(str)
-    }
+  trait Implicits:
 
-  trait Implicits {
-
-    implicit def reads[A](implicit ev: Enumerable[A]): Reads[A] =
+    implicit def reads[A](using ev: Enumerable[A]): Reads[A] =
       Reads {
         case JsString(str) =>
           ev.withName(str).map {
@@ -46,5 +42,3 @@ object Enumerable {
 
     implicit def writes[A: Enumerable]: Writes[A] =
       Writes(value => JsString(value.toString))
-  }
-}

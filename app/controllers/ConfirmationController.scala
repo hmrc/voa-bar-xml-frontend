@@ -44,42 +44,41 @@ class ConfirmationController @Inject() (
   confirmationDetailPanel: confirmation_detail_panel,
   val errorTemplate: views.html.error_template,
   controllerComponents: MessagesControllerComponents
-)(implicit val ec: ExecutionContext
+)(using val ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
   with BaseBarController
-  with I18nSupport {
+  with I18nSupport:
 
   def onPageLoad(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
-      (for {
+      (for
         login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield getCrSubmission(reportStatus) match {
+      yield getCrSubmission(reportStatus) match
         case None                   => Ok(confirmation(login.username, reference))
         case crSubmission @ Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
-      }).valueOr(failPage => failPage)
+      ).valueOr(failPage => failPage)
   }
 
   def onPageRefresh(reference: String): Action[AnyContent] = getData.async {
     implicit request =>
-      (for {
+      (for
         login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(reference, login))
-      } yield getCrSubmission(reportStatus) match {
+      yield getCrSubmission(reportStatus) match
         case None                   => Ok(confirmation(login.username, reportStatus.id, Some(reportStatus)))
         case crSubmission @ Some(_) => Ok(reportConfirmation(login.username, reportStatus, crSubmission))
-      }).valueOr(failPage => failPage)
+      ).valueOr(failPage => failPage)
   }
 
   def onStatusCheck(reference: String): Action[AnyContent] = getData.async { implicit request =>
-    import play.api.libs.json._
-    import ConfirmationPayload._
+    import play.api.libs.json.*
+    import ConfirmationPayload.*
 
-    (for {
+    (for
       login        <- EitherT(cachedLogin(request.externalId))
       reportStatus <- EitherT(getReportStatus(reference, login))
-    } yield {
-
+    yield
       // I like this wicked trick, we render same html and send it via ajax and just paste with javascript to the page
       // It's not react, but at least we can be sure that both will render same page.
       val confirmationStatusPanelContent = confirmationStatusPanel(reportStatus.id, Option(reportStatus)).body
@@ -88,10 +87,10 @@ class ConfirmationController @Inject() (
       Ok(Json.toJson(
         ConfirmationPayload(reportStatus.status.getOrElse(Pending.value), confirmationStatusPanelContent, confirmationDetailPanelContent)
       ))
-    }).valueOr(failPage => failPage)
+    ).valueOr(failPage => failPage)
   }
 
-  private def getReportStatus(reference: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
+  private def getReportStatus(reference: String, login: Login)(using request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(reference, login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatus => Right(reportStatus)
@@ -101,11 +100,8 @@ class ConfirmationController @Inject() (
     reportStatus.report
       .filter(x => x.keys.contains("type"))
       .flatMap { jsObject =>
-        jsObject("type") match {
+        jsObject("type") match
           case JsString("Cr01Cr03Submission") => jsObject.value.get("submission").flatMap(x => Cr01Cr03Submission.format.reads(x).asOpt)
           case JsString("Cr05Submission")     => jsObject.value.get("submission").flatMap(x => Cr05Submission.format.reads(x).asOpt)
           case _                              => None
-        }
       }
-
-}

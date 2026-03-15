@@ -44,14 +44,14 @@ case object Done extends ReportStatusType
 case class ReportErrorDetail(errorCode: String, values: Seq[String] = Seq.empty[String])
 
 object ReportErrorDetail {
-  implicit val format: OFormat[ReportErrorDetail] = Json.format[ReportErrorDetail]
+  implicit val format: OFormat[ReportErrorDetail] = Json.format
 
 }
 
 case class ReportError(reportNumber: Option[String], baTransaction: Option[String], uprn: Seq[Long], errors: Seq[ReportErrorDetail])
 
 object ReportError {
-  implicit val format: OFormat[ReportError] = Json.format[ReportError]
+  implicit val format: OFormat[ReportError] = Json.format
 }
 
 object ReportStatus {
@@ -59,7 +59,7 @@ object ReportStatus {
   import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits._
 
   implicit val format: Format[ReportStatus] = mongoEntity {
-    Json.format[ReportStatus]
+    Json.format
   }
 
   val createdDateUIFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")

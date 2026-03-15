@@ -43,21 +43,20 @@ class LoginController @Inject() (
   controllerComponents: MessagesControllerComponents,
   login: views.html.login,
   configuration: Configuration
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
   with I18nSupport
-  with Logging {
+  with Logging:
 
   private val form: Form[Login] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = getData.async {
     implicit request =>
-      val preparedForm = request.userAnswers.flatMap(_.login) match {
+      val preparedForm = request.userAnswers.flatMap(_.login) match
         case None        => form
         case Some(value) =>
           val loginWithBlankedPassword = Login(value.username, "")
           form.fill(loginWithBlankedPassword)
-      }
       dataCacheConnector.remove(request.externalId, VOAuthorisedId.toString) map {
         _ => Ok(login(preparedForm, mode))
       }
@@ -68,15 +67,15 @@ class LoginController @Inject() (
       form.bindFromRequest().fold(
         (formWithErrors: Form[Login]) =>
           Future.successful(BadRequest(login(formWithErrors, mode))),
-        value => {
+        value =>
           val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.doLogin(encryptedLogin) flatMap {
               case Success(status) =>
-                BillingAuthorities.find(value.username) match {
+                BillingAuthorities.find(value.username) match
                   case Some(councilName) =>
                     dataCacheConnector.save[String](request.externalId, VOAuthorisedId.toString, value.username) map {
-                      cm => Redirect(navigator.nextPage(LoginId, mode)(new UserAnswers(cacheMap)))
+                      cm => Redirect(navigator.nextPage(LoginId, mode)(UserAnswers(cacheMap)))
                     }
                   case None              =>
                     logger.warn("BA Code authorized by VO but no valid Council Name can be found")
@@ -85,7 +84,6 @@ class LoginController @Inject() (
                         .withError("username", Messages("error.invalid_username"))
                         .withError("password", Messages("error.invalid_password"))
                     Future.successful(BadRequest(login(formWithLoginErrors, mode)))
-                }
               case Failure(_)      =>
                 val formWithLoginErrors =
                   form
@@ -94,7 +92,5 @@ class LoginController @Inject() (
                 Future.successful(BadRequest(login(formWithLoginErrors, mode)))
             }
           }
-        }
       )
   }
-}
