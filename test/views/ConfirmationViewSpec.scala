@@ -17,29 +17,29 @@
 package views
 
 import models.{Done, ReportStatus}
+import org.jsoup.nodes.Document
 import views.behaviours.ViewBehaviours
+import views.html.confirmation
 
-class ConfirmationViewSpec extends ViewBehaviours {
+class ConfirmationViewSpec extends ViewBehaviours:
 
-  def confirmation = inject[views.html.confirmation]
+  private def confirmation: confirmation = inject[views.html.confirmation]
 
-  val username                = "BA0116"
-  val submissionId            = "SId328473"
-  val messageKeyPrefix        = "confirmation"
-  val confirmationFakeRequest = fakeRequest
+  private val username                = "BA0116"
+  private val submissionId            = "SId328473"
+  private val messageKeyPrefix        = "confirmation"
+  private val confirmationFakeRequest = fakeRequest
 
-  val reportStatus = ReportStatus(
+  private val reportStatus = ReportStatus(
     submissionId,
     status = Some(Done.value)
   )
 
-  def createView =
-    () => confirmation(username, submissionId)(using confirmationFakeRequest, messages)
+  private def createView = () => confirmation(username, submissionId)(using confirmationFakeRequest, messages)
 
-  def createViewWithStatus =
-    () => confirmation(username, submissionId, Some(reportStatus))(using confirmationFakeRequest, messages)
+  private def createViewWithStatus = () => confirmation(username, submissionId, Some(reportStatus))(using confirmationFakeRequest, messages)
 
-  lazy val doc = asDocument(createView())
+  private val doc: Document = asDocument(createView())
 
   "Confirmation view" must {
     behave like normalPage(createViewWithStatus, messageKeyPrefix, "submission.details")
@@ -60,4 +60,3 @@ class ConfirmationViewSpec extends ViewBehaviours {
     }
 
   }
-}

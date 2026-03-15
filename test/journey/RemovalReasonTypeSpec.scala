@@ -23,7 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.libs.json.{JsString, Json}
 import utils.ReflectionUtil
 
-class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
+class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks:
 
   "RemovalReasonType" should "have all instance in Lister for to render radio buttons in order" in {
 
@@ -61,5 +61,3 @@ class RemovalReasonTypeSpec extends AnyFlatSpec with should.Matchers with TableD
     ).foreach { removalReasonType =>
       Json.toJson(removalReasonType)(using RemovalReasonType.format) shouldBe JsString(removalReasonType.toString)
     }
-
-}

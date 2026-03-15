@@ -16,24 +16,24 @@
 
 package controllers
 
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
 import play.api.mvc.MessagesControllerComponents
 import viewmodels.AnswerSection
 
 import scala.concurrent.ExecutionContext
 
-class CheckYourAnswersControllerSpec extends ControllerSpecBase {
+class CheckYourAnswersControllerSpec extends ControllerSpecBase:
 
   private def ec                   = inject[ExecutionContext]
   private def controllerComponents = inject[MessagesControllerComponents]
   private def checkYourAnswerView  = inject[views.html.check_your_answers]
 
   private def controller(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
-    new CheckYourAnswersController(
+    CheckYourAnswersController(
       messagesApi,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       checkYourAnswerView,
       controllerComponents
     )
@@ -52,4 +52,3 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase {
       redirectLocation(result) mustBe Some(routes.SessionExpiredController.onPageLoad.url)
     }
   }
-}

@@ -18,11 +18,11 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 
-class ReportStatusSpec extends PlaySpec {
+class ReportStatusSpec extends PlaySpec:
 
-  val baCode            = "ba1221"
-  val submissionId      = "sId999"
-  val reportStatusError = Seq(Error("BAD-CHAR"))
+  private val baCode                        = "ba1221"
+  private val submissionId                  = "sId999"
+  private val reportStatusError: Seq[Error] = Seq(Error("BAD-CHAR"))
 
   "ReportStatus model" must {
 
@@ -41,4 +41,3 @@ class ReportStatusSpec extends PlaySpec {
       result.errors mustBe reportStatusError
     }
   }
-}

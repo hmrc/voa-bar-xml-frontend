@@ -39,7 +39,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 
-class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar:
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -51,7 +51,7 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
   private def configuration = inject[Configuration]
 
-  private val formProvider                      = new FileUploadDataFormProvider()
+  private val formProvider                      = FileUploadDataFormProvider()
   private val form                              = formProvider()
   implicit private val actorSystem: ActorSystem = inject[ActorSystem]
 
@@ -119,15 +119,15 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     connector: UploadConnector,
     userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
     reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock
-  ) = {
+  ) =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
-    new CouncilTaxUploadController(
+    CouncilTaxUploadController(
       configuration,
       messagesApi,
       getEmptyCacheMap,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
       connector,
@@ -137,19 +137,18 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       reportStatusConnector,
       controllerComponents
     )
-  }
 
   private def notLoggedInController(
     connector: UploadConnector,
     userReportUploadsConnector: UserReportUploadsConnector = userReportUploadsConnectorMock,
     reportStatusConnector: ReportStatusConnector = reportStatusConnectorMock
-  ) = {
+  ) =
     FakeDataCacheConnector.resetCaptures()
-    new CouncilTaxUploadController(
+    CouncilTaxUploadController(
       configuration,
       messagesApi,
       getEmptyCacheMap,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
       connector,
@@ -159,7 +158,6 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       reportStatusConnector,
       controllerComponents
     )
-  }
 
   private def viewAsString(form: Form[?] = form) = councilTaxUpload(username, form, Some(initiateResponse))(using fakeRequest, messages).toString
 
@@ -221,4 +219,3 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
     }
 
   }
-}

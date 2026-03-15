@@ -18,7 +18,7 @@ package forms.behaviours
 
 import play.api.data.{Form, FormError}
 
-trait StringFieldBehaviours extends FieldBehaviours {
+trait StringFieldBehaviours extends FieldBehaviours:
 
   def fieldWithMaxLength(form: Form[?], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"not bind strings longer than $maxLength characters" in
@@ -27,4 +27,3 @@ trait StringFieldBehaviours extends FieldBehaviours {
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
           result.errors shouldEqual Seq(lengthError)
       }
-}

@@ -36,11 +36,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar:
 
-  implicit class NormalizedInstant(instant: Instant) {
+  implicit class NormalizedInstant(instant: Instant):
     def normalize: Instant = Instant.ofEpochMilli(instant.toEpochMilli)
-  }
 
   private val reportStatus  = inject[views.html.reportStatus]
   private val errorTemplate = inject[views.html.error_template]
@@ -59,7 +58,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   private val fakeReports        = Seq(rs1, rs2, rs3)
   private val fakeMapAsJson      = Json.toJson(fakeReports)
   private val wrongJson          = Json.toJson("""{"someID": "hhewfwe777"}""")
-  private val fakeTableFormatter = new TableFormatter()
+  private val fakeTableFormatter = TableFormatter()
 
   private val receiptServiceMock = mock[ReceiptService]
   when(receiptServiceMock.producePDF(any[ReportStatus])).thenReturn(Success(Array[Byte](1, 2, 3, 4)))
@@ -73,38 +72,36 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     reportStatusConnectorMock
   }
 
-  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login2)
-    new ReportStatusController(
+    ReportStatusController(
       messagesApi,
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       receiptServiceMock,
       reportStatus,
       errorTemplate,
       controllerComponents,
       fakeTableFormatter
     )
-  }
 
-  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
-    new ReportStatusController(
+    ReportStatusController(
       messagesApi,
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       receiptServiceMock,
       reportStatus,
       errorTemplate,
       controllerComponents,
       fakeTableFormatter
     )
-  }
 
   private def viewAsString() = reportStatus(username, fakeReports, None, fakeTableFormatter)(using fakeRequest, messages).toString
 
@@ -151,12 +148,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       when(reportStatusConnectorMock.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future(Right(())))
 
       val controller =
-        new ReportStatusController(
+        ReportStatusController(
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          new DataRequiredActionImpl(ec),
+          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -177,12 +174,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(
+        ReportStatusController(
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          new DataRequiredActionImpl(ec),
+          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -202,12 +199,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(
+        ReportStatusController(
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          new DataRequiredActionImpl(ec),
+          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -227,12 +224,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
       val controller =
-        new ReportStatusController(
+        ReportStatusController(
           messagesApi,
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          new DataRequiredActionImpl(ec),
+          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -245,4 +242,3 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       status(result) mustBe INTERNAL_SERVER_ERROR
     }
   }
-}

@@ -20,19 +20,19 @@ import models.{ReportStatus, Submitted}
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_body
 
-class SubmissionBodySpec extends ViewBehaviours {
+class SubmissionBodySpec extends ViewBehaviours:
 
-  val submissionId = "SId9324832"
-  val baCode       = "baCode"
-  val reportStatus = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
+  private val submissionId = "SId9324832"
+  private val baCode       = "baCode"
+  private val reportStatus = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
-  def submission = () => submission_body(reportStatus)(using messages)
-
-  lazy val doc = asDocument(submission())
+  private def submission = () => submission_body(reportStatus)(using messages)
 
   "Submission Body " must {
 
     "Contain the following keys" in {
+      val doc = asDocument(submission())
+
       assertContainsText(doc, messages("submission"))
       assertContainsText(doc, messages("status.type.title"))
       assertContainsText(doc, messages("status.created.para1"))
@@ -40,5 +40,3 @@ class SubmissionBodySpec extends ViewBehaviours {
       assertContainsText(doc, messages("site.print.button"))
     }
   }
-
-}

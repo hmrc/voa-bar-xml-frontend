@@ -29,13 +29,11 @@ import java.time.Instant
 
 class ReceiptServiceSpec extends SpecBase:
 
-  private val service = new DefaultReceiptService(messagesApi)
+  private val service = DefaultReceiptService(messagesApi)
   private val date    = Instant.ofEpochMilli(0)
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
-      // DateTimeUtils.setCurrentMillisFixed(0)
-
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
@@ -47,15 +45,12 @@ class ReceiptServiceSpec extends SpecBase:
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
-      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close()
-      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - FAILED" in {
-      // DateTimeUtils.setCurrentMillisFixed(0)
-
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
@@ -67,15 +62,12 @@ class ReceiptServiceSpec extends SpecBase:
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
-      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close()
-      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "produce a pdf - DONE" in {
-      // DateTimeUtils.setCurrentMillisFixed(0)
-
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
@@ -87,10 +79,9 @@ class ReceiptServiceSpec extends SpecBase:
 
       pdf.getDocumentInformation.getAuthor must be("Valuation Office")
 
-      new PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
       pdf.close()
-      // DateTimeUtils.setCurrentMillisSystem()
     }
 
     "have correct font" in {
@@ -104,7 +95,7 @@ class ReceiptServiceSpec extends SpecBase:
     }
 
     "wrap text" in {
-      val page = new PDPage(PDRectangle.A4)
+      val page = PDPage(PDRectangle.A4)
 
       val mediaBox = page.getMediaBox
       val width    = mediaBox.getWidth - 2 * service.margin

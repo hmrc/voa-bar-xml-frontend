@@ -17,11 +17,12 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
+import models.Login
+import play.api.data.{Form, FormError}
 
-class LoginFormProviderSpec extends StringFieldBehaviours {
+class LoginFormProviderSpec extends StringFieldBehaviours:
 
-  val form = new LoginFormProvider()()
+  private val form: Form[Login] = LoginFormProvider()()
 
   ".username" must {
 
@@ -76,4 +77,3 @@ class LoginFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
-}

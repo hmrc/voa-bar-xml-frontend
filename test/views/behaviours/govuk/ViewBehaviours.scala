@@ -19,7 +19,7 @@ package views.behaviours.govuk
 import play.twirl.api.HtmlFormat
 import views.ViewSpecBase
 
-trait ViewBehaviours extends ViewSpecBase {
+trait ViewBehaviours extends ViewSpecBase:
 
   def normalPage(view: () => HtmlFormat.Appendable, messageKeyPrefix: String, expectedGuidanceKeys: String*): Unit =
     "behave like a normal page" when {
@@ -60,4 +60,3 @@ trait ViewBehaviours extends ViewSpecBase {
         assertRenderedById(doc, "back-link")
       }
     }
-}

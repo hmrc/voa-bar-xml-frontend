@@ -21,7 +21,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.EitherValues
 
-class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues {
+class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues:
 
   private val validator = PostcodeValidator
 
@@ -35,15 +35,13 @@ class PostcodeValidatorSpec extends AnyFlatSpec with should.Matchers with Either
     validator("bn124ax:").toEither.value                shouldBe "BN12 4AX"
     validator("e2-6b J:").toEither.value                shouldBe "E2 6BJ"
     validator("e2-6b,. J:").toEither.value              shouldBe "E2 6BJ"
-    // bn12 4axx and bbn12 4ax
   }
 
   it should "reject invalid postcode" in {
-    validator("1112 4AX").toEither.left.value shouldBe a[ErrorTree]
+    validator("1112 4AX").toEither.left.value  shouldBe a[ErrorTree]
+    validator("bn12 4axx").toEither.left.value shouldBe a[ErrorTree]
   }
 
   it should "reject empty postcode" in {
     validator("").toEither.left.value shouldBe a[ErrorTree]
   }
-
-}

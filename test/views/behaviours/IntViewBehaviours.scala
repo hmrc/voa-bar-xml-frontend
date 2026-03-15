@@ -19,7 +19,7 @@ package views.behaviours
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
-trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
+trait IntViewBehaviours extends QuestionViewBehaviours[Int]:
 
   val number = 123
 
@@ -59,4 +59,3 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
         }
       }
     }
-}

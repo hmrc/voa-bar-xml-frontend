@@ -49,7 +49,7 @@ class FeedbackControllerSpec extends ControllerSpecBase with MockitoSugar:
     httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
   ).thenReturn(RequestBuilderStub(Right(OK), "OK"))
 
-  private val feedbackController = new FeedbackController(
+  private val feedbackController = FeedbackController(
     servicesConfig,
     auditService,
     httpClientV2Mock,

@@ -22,7 +22,7 @@ import org.scalatest.matchers.should
 import org.scalatest.EitherValues
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
+class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks:
 
   private val invalidInputData = Table(
     "Incorrect string",
@@ -42,9 +42,7 @@ class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with Eithe
       Iso558910Validator(badString).toEither.left.value shouldBe ErrorTree.oneErr(ErrorMsg("error.invalidIsoString"))
     }
 
-  it should "Allow all valid charactes in iso8859-15" in
+  it should "Allow all valid characters in iso8859-15" in
     forAll(validInputData) { goodString =>
       Iso558910Validator(goodString).toEither.value shouldBe goodString
     }
-
-}

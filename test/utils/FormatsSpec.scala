@@ -18,16 +18,16 @@ package utils
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must
-import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsObject, JsString, JsSuccess, Json}
 
-class FormatsSpec extends AnyFlatSpec with must.Matchers {
+class FormatsSpec extends AnyFlatSpec with must.Matchers:
 
-  val uniformData: Map[List[String], String] = Map(
+  private val uniformData: Map[List[String], String] = Map(
     List("simple", "path") -> "value in simple path",
     List("OneElementPath") -> "value in oneElementPath"
   )
 
-  val jsonData = Json.obj("simple.path" -> "value in simple path", "OneElementPath" -> "value in oneElementPath")
+  private val jsonData: JsObject = Json.obj("simple.path" -> "value in simple path", "OneElementPath" -> "value in oneElementPath")
 
   "uniformDBFormat" should "write uniform DB data to Json" in {
     Formats.uniformDBFormat.writes(uniformData) mustBe jsonData
@@ -41,5 +41,3 @@ class FormatsSpec extends AnyFlatSpec with must.Matchers {
     val data = JsString("value")
     Formats.uniformDBFormat.reads(data) mustBe a[JsError]
   }
-
-}

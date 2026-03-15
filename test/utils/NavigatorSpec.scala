@@ -23,14 +23,12 @@ import identifiers.*
 import models.*
 import org.mockito.Mockito.when
 
-class NavigatorSpec extends SpecBase with MockitoSugar {
+class NavigatorSpec extends SpecBase with MockitoSugar:
 
-  val navigator = new Navigator
-
-  val mockUserAnswers = mock[UserAnswers]
-
-  val formUserAnswers   = new FakeUserAnswers(Login("", ""))
-  val uploadUserAnswers = new FakeUserAnswers(Login("", ""))
+  private val navigator         = Navigator()
+  private val mockUserAnswers   = mock[UserAnswers]
+  private val formUserAnswers   = FakeUserAnswers(Login("", ""))
+  private val uploadUserAnswers = FakeUserAnswers(Login("", ""))
 
   "Navigator" when {
 
@@ -92,4 +90,3 @@ class NavigatorSpec extends SpecBase with MockitoSugar {
       }
     }
   }
-}

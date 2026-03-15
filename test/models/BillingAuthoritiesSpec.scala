@@ -18,15 +18,15 @@ package models
 
 import base.SpecBase
 
-class BillingAuthoritiesSpec extends SpecBase {
+class BillingAuthoritiesSpec extends SpecBase:
 
-  val existingBaCode    = "BA0230"
-  val nonExistingBaCode = "ba9999"
-  val ForestHeath       = "ba3510"
-  val StEdmundsbury     = "ba3525"
-  val SuffolkCoastal    = "ba3530"
-  val Waveney           = "ba3535"
-  val BAMapSize         = 350
+  private val existingBaCode    = "BA0230"
+  private val nonExistingBaCode = "ba9999"
+  private val ForestHeath       = "ba3510"
+  private val StEdmundsbury     = "ba3525"
+  private val SuffolkCoastal    = "ba3530"
+  private val Waveney           = "ba3535"
+  private val BAMapSize         = 350
 
   "BillingAuthorities" must {
 
@@ -58,4 +58,3 @@ class BillingAuthoritiesSpec extends SpecBase {
       BillingAuthorities.find(Waveney) mustBe None
     }
   }
-}

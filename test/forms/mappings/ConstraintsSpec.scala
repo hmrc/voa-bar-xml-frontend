@@ -20,7 +20,7 @@ import org.scalatest.matchers.must
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.validation.{Invalid, Valid}
 
-class ConstraintsSpec extends AnyWordSpec with must.Matchers with Constraints {
+class ConstraintsSpec extends AnyWordSpec with must.Matchers with Constraints:
 
   "firstError" must {
 
@@ -116,4 +116,3 @@ class ConstraintsSpec extends AnyWordSpec with must.Matchers with Constraints {
       result mustEqual Invalid("error.length", 10)
     }
   }
-}

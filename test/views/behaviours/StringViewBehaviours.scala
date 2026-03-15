@@ -19,7 +19,7 @@ package views.behaviours
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
-trait StringViewBehaviours extends QuestionViewBehaviours[String] {
+trait StringViewBehaviours extends QuestionViewBehaviours[String]:
 
   val answer = "answer"
 
@@ -65,4 +65,3 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
         }
       }
     }
-}

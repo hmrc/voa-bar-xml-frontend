@@ -22,12 +22,12 @@ import identifiers.VOAuthorisedId
 import models.NormalMode
 import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import utils.FakeNavigator
 import views.ViewSpecBase
 import scala.concurrent.ExecutionContext
 
-class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
+class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase:
 
   private def taskList = inject[views.html.task_list]
   private def welcome  = inject[views.html.welcome]
@@ -42,32 +42,30 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
-    new TaskListController(
+    TaskListController(
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute),
+      DataRequiredActionImpl(ec),
+      FakeNavigator(desiredRoute = onwardRoute),
       FakeDataCacheConnector,
       controllerComponents,
       taskList
     )(using ec)
-  }
 
-  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
-    new WelcomeController(
+    WelcomeController(
       frontendAppConfig,
       configuration,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
-      new FakeNavigator(desiredRoute = onwardRoute),
+      DataRequiredActionImpl(ec),
+      FakeNavigator(desiredRoute = onwardRoute),
       FakeDataCacheConnector,
       controllerComponents,
       welcome
     )(using ec)
-  }
 
   private def viewAsString() = taskList(username)(using fakeRequest, messages).toString
 
@@ -98,4 +96,3 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase {
     }
 
   }
-}

@@ -38,16 +38,15 @@ case class RequestBuilderStub(responseStatusOrFailure: Either[Throwable, Int], r
       case Left(failure)         => Future.failed(failure)
 
   override def stream[A: StreamHttpReads](using ec: ExecutionContext): Future[A] =
-    Future.failed(new NotImplementedError)
+    Future.failed(NotImplementedError())
 
   override def setHeader(header: (String, String)*): RequestBuilder = this
 
   override def withProxy: RequestBuilder = this
 
   override def withBody[B: {BodyWritable, Tag}](body: B)(using ec: ExecutionContext): RequestBuilder =
-    val bodyString = body match {
+    val bodyString = body match
       case json: JsValue => Json.stringify(json)
       case b             => b.toString
-    }
     logger.info(s"Request body: $bodyString")
     this

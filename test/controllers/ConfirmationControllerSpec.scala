@@ -38,7 +38,7 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
+class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting:
 
   private def ec                     = inject[ExecutionContext]
   private def controllerComponents   = inject[MessagesControllerComponents]
@@ -62,13 +62,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
-    new ConfirmationController(
+    ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -78,14 +78,13 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       errorTemplateView,
       controllerComponents
     )
-  }
 
-  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
-    new ConfirmationController(
+    ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -95,7 +94,6 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       errorTemplateView,
       controllerComponents
     )
-  }
 
   private def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
     reportConfirmationView(username, report, cr01cr03Report)(using fakeRequest, messages).toString
@@ -235,5 +233,3 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       None,
       Some("comment")
     )
-
-}

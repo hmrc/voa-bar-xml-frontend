@@ -22,12 +22,12 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must
 import org.scalatest.EitherValues
 
-class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValues {
+class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValues:
 
-  import UniformJourney._
+  import UniformJourney.*
 
-  val string226Char = (1 to 22).map(_ => "1234567890").mkString("") + "123456"
-  val string227Char = string226Char + "7"
+  private val string226Char: String = (1 to 22).map(_ => "1234567890").mkString("") + "123456"
+  private val string227Char: String = string226Char + "7"
 
   "UniformJourney" should "validate BAReport" in {
     baReportValidation("1234") mustBe Valid("1234")
@@ -96,5 +96,3 @@ class UniformJourneySpec extends AnyFlatSpec with must.Matchers with EitherValue
     UniformJourney.commentsValidation(Option(string227Char)).toEither.left.value mustBe a[ErrorTree]
     UniformJourney.commentsValidation(Option("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")).toEither.value mustBe Some("€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ")
   }
-
-}

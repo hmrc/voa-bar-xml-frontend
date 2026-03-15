@@ -39,7 +39,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
   private val password                   = "bar"
   private val userReportUpload           = UserReportUpload(reference, userName, password)
   private val errorMessage               = "error message :("
-  private val exception                  = new Exception(errorMessage)
+  private val exception                  = Exception(errorMessage)
   private val error                      = Error(exception.getMessage)
   private val servicesConfig             = inject[ServicesConfig]
   private val login                      = Login("foo", "bar")
@@ -53,7 +53,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2Mock.put(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Right(OK), "{}"))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
 
         val result = await(userReportUploadsRepository.save(userReportUpload))
 
@@ -66,7 +66,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2FailedMock.put(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Left(exception)))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2FailedMock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2FailedMock, servicesConfig)
 
         val result = await(userReportUploadsRepository.save(userReportUpload))
 
@@ -80,7 +80,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2Mock.get(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Right(OK), Json.toJson(userReportUpload).toString))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
 
         val result = await(userReportUploadsRepository.getById(reference, login))
 
@@ -93,7 +93,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2Mock.get(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Right(OK)))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
 
         val result = await(userReportUploadsRepository.getById(reference, login))
 
@@ -106,7 +106,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2Mock.get(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Right(OK), "{}"))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2Mock, servicesConfig)
 
         val result = await(userReportUploadsRepository.getById(reference, login))
 
@@ -119,7 +119,7 @@ class UserReportUploadsConnectorSpec extends PlaySpec with MockitoSugar with Spe
           httpClientV2FailedMock.get(any[URL])(using any[HeaderCarrier])
         ).thenReturn(RequestBuilderStub(Left(exception)))
 
-        val userReportUploadsRepository = new DefaultUserReportUploadsConnector(httpClientV2FailedMock, servicesConfig)
+        val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientV2FailedMock, servicesConfig)
 
         val result = await(userReportUploadsRepository.getById(reference, login))
 

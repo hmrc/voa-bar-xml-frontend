@@ -17,11 +17,12 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
+import models.FileUploadData
+import play.api.data.{Form, FormError}
 
-class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
+class FileUploadDataFormProviderSpec extends StringFieldBehaviours:
 
-  val form = new FileUploadDataFormProvider()()
+  private val form: Form[FileUploadData] = FileUploadDataFormProvider()()
 
   ".xml" must {
 
@@ -40,4 +41,3 @@ class FileUploadDataFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
-}

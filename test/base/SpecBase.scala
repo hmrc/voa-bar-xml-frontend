@@ -41,7 +41,6 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with Injecting:
 
   class FakeUserAnswers(
     loginValue: Login,
-    cacheMap: CacheMap =
-      new CacheMap("", Map())
+    cacheMap: CacheMap = CacheMap("", Map())
   ) extends UserAnswers(cacheMap):
     override def login: Option[Login] = Some(loginValue)

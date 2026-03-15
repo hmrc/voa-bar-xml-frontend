@@ -17,23 +17,22 @@
 package controllers
 
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.unauthorised
 
-class UnauthorisedControllerSpec extends ControllerSpecBase {
+class UnauthorisedControllerSpec extends ControllerSpecBase:
 
   private def controllerComponents = inject[MessagesControllerComponents]
   private val unauthorised         = inject[unauthorised]
 
   "Unauthorised Controller" must {
     "return 200 for a GET" in {
-      val result = new UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
+      val result = UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
       status(result) mustBe OK
     }
 
     "return the correct view for a GET" in {
-      val result = new UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
+      val result = UnauthorisedController(controllerComponents, unauthorised).onPageLoad()(fakeRequest)
       contentAsString(result) mustBe unauthorised()(using fakeRequest, messages).toString
     }
   }
-}

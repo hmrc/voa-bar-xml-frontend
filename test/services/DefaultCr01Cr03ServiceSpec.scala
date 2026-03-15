@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class DefaultCr01Cr03ServiceSpec extends PlaySpec with MockitoSugar:
 
-  val BA_REF = "BA2020"
+  private val BA_REF = "BA2020"
 
   "DefaultCr01Cr03ServiceSpec" should {
     "Create CR05 report and store in backend" in {

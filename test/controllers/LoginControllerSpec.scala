@@ -37,13 +37,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar {
+class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar:
 
   private var captures = Map[String, Any]()
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  private val formProvider = new LoginFormProvider()
+  private val formProvider = LoginFormProvider()
   private val form         = formProvider()
   private val validBACode  = "ba0114"
 
@@ -59,23 +59,22 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   when(loginConnector.doLogin(any[Login])).thenReturn(Future.successful(Success(OK)))
 
   private val loginConnectorF = mock[LoginConnector]
-  when(loginConnectorF.doLogin(any[Login])).thenReturn(Future.successful(Failure(new RuntimeException("Received exception from upstream service"))))
+  when(loginConnectorF.doLogin(any[Login])).thenReturn(Future.successful(Failure(RuntimeException("Received exception from upstream service"))))
 
-  private def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def controller(connector: LoginConnector, dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
-    new LoginController(
+    LoginController(
       messagesApi,
       FakeDataCacheConnector,
-      new FakeNavigator(desiredRoute = onwardRoute),
+      FakeNavigator(desiredRoute = onwardRoute),
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
+      DataRequiredActionImpl(ec),
       formProvider,
       connector,
       controllerComponents,
       login,
       configuration
     )
-  }
 
   private def viewAsString(form: Form[Login] = form) = login(form, NormalMode)(using fakeRequest, messages).toString
 
@@ -90,7 +89,7 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
 
     "populate the view correctly on a GET when the question has previously been answered" in {
       val validData       = Map(LoginId.toString -> Json.toJson(Login("username", "password")))
-      val getRelevantData = new FakeDataRetrievalAction(Some(CacheMap(cacheMapId, validData)))
+      val getRelevantData = FakeDataRetrievalAction(Some(CacheMap(cacheMapId, validData)))
 
       val result = controller(loginConnector, getRelevantData).onPageLoad(NormalMode)(fakeRequest)
 
@@ -150,4 +149,3 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
       }
     }
   }
-}
