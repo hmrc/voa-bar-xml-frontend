@@ -65,7 +65,7 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
   )
   with Logging:
 
-  def upsert(cm: CacheMap): Future[Boolean] = {
+  def upsert(cm: CacheMap): Future[Boolean] =
     val selector = equal("id", cm.id)
 
     collection.findOneAndReplace(selector, DatedCacheMap(cm), FindOneAndReplaceOptions().upsert(true))
@@ -76,7 +76,6 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
           logger.error("Error on saving to cache", ex)
           false
       }
-  }
 
   def get(id: String): Future[Option[CacheMap]] =
     collection.find(equal("id", id)).first().toFutureOption().map(_.map(_.asCacheMap))

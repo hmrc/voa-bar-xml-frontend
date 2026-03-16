@@ -38,7 +38,6 @@ class CouncilTaxUploadController @Inject() (
   configuration: Configuration,
   override val messagesApi: MessagesApi,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val dataCacheConnector: DataCacheConnector,
   formProvider: FileUploadDataFormProvider,
   uploadConnector: UploadConnector,

@@ -35,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val dataCacheConnector: DataCacheConnector,
   reportStatusConnector: ReportStatusConnector,
   reportConfirmation: views.html.govuk.confirmation,

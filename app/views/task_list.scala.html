@@ -21,7 +21,7 @@
 )
 
 
-@(baCode: String, cr05Submission: Option[Cr05SubmissionBuilder] = None)(implicit request: Request[?], messages: Messages)
+@(cr05Submission: Option[Cr05SubmissionBuilder] = None)(implicit request: Request[?], messages: Messages)
 
 @main_template(
     pageTitle = messages("welcome.heading"),

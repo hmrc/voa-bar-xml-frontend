@@ -20,7 +20,7 @@ import connectors.FakeDataCacheConnector2
 import controllers.actions.{AuthAction, DataRequiredAction, DataRetrievalActionImpl}
 import identifiers.{LoginId, VOAuthorisedId}
 import models.requests.DataRequest
-import models.{Login, NormalMode}
+import models.Login
 import play.api.Configuration
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, BodyParsers, MessagesControllerComponents}
@@ -35,13 +35,9 @@ import scala.concurrent.ExecutionContext
 
 class ReportReasonControllerSpec extends ControllerSpecBase with ViewSpecBase with Injecting:
 
-  private val sessionId            = "session-id"
-  private val username             = "BA1445"
-  private val ec                   = inject[ExecutionContext]
-  private val controllerComponents = inject[MessagesControllerComponents]
-  private val configuration        = Configuration("feature.cr05.enabled" -> false)
-
-  private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
+  private val sessionId = "session-id"
+  private val username  = "BA1445"
+  private val ec        = inject[ExecutionContext]
 
   private def reportReasonController() =
     val dataRetrievalAction = DataRetrievalActionImpl(FakeDataCacheConnector2, inject[BodyParsers.Default])(using ec)

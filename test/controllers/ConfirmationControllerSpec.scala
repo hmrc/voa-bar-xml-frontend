@@ -40,7 +40,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting:
 
-  private def ec                     = inject[ExecutionContext]
   private def controllerComponents   = inject[MessagesControllerComponents]
   private def reportConfirmationView = inject[views.html.govuk.confirmation]
   private def confirmationView       = inject[views.html.confirmation]
@@ -68,7 +67,6 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -84,7 +82,6 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -95,10 +92,10 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       controllerComponents
     )
 
-  private def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
+  private def cr01cr03ViewAsString(report: ReportStatus, cr01cr03Report: Option[Cr01Cr03Submission]) =
     reportConfirmationView(username, report, cr01cr03Report)(using fakeRequest, messages).toString
 
-  private def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
+  private def viewAsString(submissionId: String = submissionId) =
     confirmationView(username, submissionId)(using fakeRequest, messages).toString
 
   private def refreshViewAsString() =
@@ -122,7 +119,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = loggedInController().onPageLoad(verifiedSubmissionId)(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe viewAsString(verifiedReportStatus, submissionId = verifiedSubmissionId)
+      contentAsString(result) mustBe viewAsString(submissionId = verifiedSubmissionId)
     }
 
     "if not authorized by VO must go to the login page" in {

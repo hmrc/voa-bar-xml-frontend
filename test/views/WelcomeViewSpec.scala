@@ -25,13 +25,10 @@ class WelcomeViewSpec extends ViewBehaviours:
 
   private val username         = "BA0505"
   private val messageKeyPrefix = "welcome"
-  private val cr05FeatureFlag  = false
 
   private val welcomeFakeRequest = fakeRequest
 
-  private def createView = () => welcome(frontendAppConfig, username, cr05FeatureFlag)(using welcomeFakeRequest, messages)
-
-  private val doc = asDocument(createView())
+  private def createView = () => welcome(frontendAppConfig, username)(using welcomeFakeRequest, messages)
 
   "Welcome view" must {
     behave like normalPage(createView, messageKeyPrefix)
@@ -45,7 +42,7 @@ class WelcomeViewSpec extends ViewBehaviours:
 
   // Welcome page containing form for navigation
 
-  private def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser, cr05FeatureFlag)(using welcomeFakeRequest, messages)
+  private def createFormView(formUser: String) = () => welcome(frontendAppConfig, formUser)(using welcomeFakeRequest, messages)
 
   def uploadLinkTest(ba: String, formDoc: Document): Unit =
     s"The upload link to the goToCouncilTaxUploadPage method for $ba" in {

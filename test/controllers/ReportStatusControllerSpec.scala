@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, withSettings}
 import org.mockito.quality.Strictness
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
 import services.ReceiptService
@@ -63,16 +63,14 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
   private val receiptServiceMock = mock[ReceiptService]
   when(receiptServiceMock.producePDF(any[ReportStatus])).thenReturn(Success(Array[Byte](1, 2, 3, 4)))
 
-  private val ec                   = inject[ExecutionContext]
   private val controllerComponents = inject[MessagesControllerComponents]
 
-  private def fakeReportStatusConnector() = {
+  private def fakeReportStatusConnector() =
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
     when(reportStatusConnectorMock.get(any[Login], any[Option[String]])(using any[HeaderCarrier])).thenReturn(Future(Right(fakeReports)))
     reportStatusConnectorMock
-  }
 
-  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap, expectedJson: JsValue): ReportStatusController =
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction): ReportStatusController =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login]("", LoginId.toString, login2)
     ReportStatusController(
@@ -80,7 +78,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
       dataRetrievalAction,
-      DataRequiredActionImpl(ec),
       receiptServiceMock,
       reportStatus,
       errorTemplate,
@@ -95,7 +92,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       FakeDataCacheConnector,
       fakeReportStatusConnector(),
       dataRetrievalAction,
-      DataRequiredActionImpl(ec),
       receiptServiceMock,
       reportStatus,
       errorTemplate,
@@ -103,12 +99,12 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       fakeTableFormatter
     )
 
-  private def viewAsString() = reportStatus(username, fakeReports, None, fakeTableFormatter)(using fakeRequest, messages).toString
+  private def viewAsString() = reportStatus(username, fakeReports, fakeTableFormatter)(using fakeRequest, messages).toString
 
   "ReportStatus Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).onPageLoad()(fakeRequest)
+      val result = loggedInController(getEmptyCacheMap).onPageLoad()(fakeRequest)
 
       status(result) mustBe OK
       contentAsString(result) mustBe viewAsString()
@@ -124,14 +120,14 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "Given some Json representing a Report Status result, the verify response method creates a Right(Map[String, List[ReportStatus])" in {
-      val result = loggedInController(getEmptyCacheMap, fakeMapAsJson).verifyResponse(fakeMapAsJson)
+      val result = loggedInController(getEmptyCacheMap).verifyResponse(fakeMapAsJson)
 
       result.isRight mustBe true
       result.toOption mustBe Some(fakeReports)
     }
 
     "Give some wrong Json, the verify response method returns a Left representing the exception to be thrown at Runtime" in {
-      val result = loggedInController(getEmptyCacheMap, wrongJson).verifyResponse(wrongJson)
+      val result = loggedInController(getEmptyCacheMap).verifyResponse(wrongJson)
 
       result.isLeft mustBe true
       result mustBe Left("Unable to parse the response from the Report Status Connector")
@@ -139,7 +135,7 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
     "Throw a runtime exception when the received json value from the Report Status Connector cannot be parsed to a Map[String, List[ReportStatus]]" in
       intercept[Exception] {
-        val result = loggedInController(getEmptyCacheMap, wrongJson).onPageLoad()(fakeRequest)
+        val result = loggedInController(getEmptyCacheMap).onPageLoad()(fakeRequest)
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
 
@@ -153,7 +149,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -179,7 +174,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -204,7 +198,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,
@@ -229,7 +222,6 @@ class ReportStatusControllerSpec extends ControllerSpecBase with ViewSpecBase wi
           FakeDataCacheConnector,
           reportStatusConnectorMock,
           getEmptyCacheMap,
-          DataRequiredActionImpl(ec),
           receiptServiceMock,
           reportStatus,
           errorTemplate,

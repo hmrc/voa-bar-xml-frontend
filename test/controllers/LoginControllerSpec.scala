@@ -39,8 +39,6 @@ import scala.util.{Failure, Success}
 
 class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar:
 
-  private var captures = Map[String, Any]()
-
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
   private val formProvider = LoginFormProvider()
@@ -48,10 +46,8 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
   private val validBACode  = "ba0114"
 
   private def controllerComponents = inject[MessagesControllerComponents]
-  private def ec                   = inject[ExecutionContext]
-
-  private def login         = inject[views.html.login]
-  private val configuration = inject[Configuration]
+  private def login                = inject[views.html.login]
+  private val configuration        = inject[Configuration]
 
   implicit def hc: HeaderCarrier = any[HeaderCarrier]
 
@@ -68,7 +64,6 @@ class LoginControllerSpec extends ControllerSpecBase with ViewSpecBase with Mock
       FakeDataCacheConnector,
       FakeNavigator(desiredRoute = onwardRoute),
       dataRetrievalAction,
-      DataRequiredActionImpl(ec),
       formProvider,
       connector,
       controllerComponents,

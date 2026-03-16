@@ -37,7 +37,6 @@ class LoginController @Inject() (
   dataCacheConnector: DataCacheConnector,
   navigator: Navigator,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   formProvider: LoginFormProvider,
   loginConnector: LoginConnector,
   controllerComponents: MessagesControllerComponents,
@@ -71,20 +70,20 @@ class LoginController @Inject() (
           val encryptedLogin = value.encrypt(configuration)
           dataCacheConnector.save[Login](request.externalId, LoginId.toString, encryptedLogin) flatMap { cacheMap =>
             loginConnector.doLogin(encryptedLogin) flatMap {
-              case Success(status) =>
+              case Success(_) =>
                 BillingAuthorities.find(value.username) match
-                  case Some(councilName) =>
+                  case Some(_) =>
                     dataCacheConnector.save[String](request.externalId, VOAuthorisedId.toString, value.username) map {
-                      cm => Redirect(navigator.nextPage(LoginId, mode)(UserAnswers(cacheMap)))
+                      _ => Redirect(navigator.nextPage(LoginId, mode)(UserAnswers(cacheMap)))
                     }
-                  case None              =>
+                  case None    =>
                     logger.warn("BA Code authorized by VO but no valid Council Name can be found")
                     val formWithLoginErrors =
                       form
                         .withError("username", Messages("error.invalid_username"))
                         .withError("password", Messages("error.invalid_password"))
                     Future.successful(BadRequest(login(formWithLoginErrors, mode)))
-              case Failure(_)      =>
+              case Failure(_) =>
                 val formWithLoginErrors =
                   form
                     .withError("username", Messages("error.invalid_username"))

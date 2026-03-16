@@ -44,8 +44,8 @@ class TaskListController @Inject() (
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
-          case Some(username) => Ok(taskList(username, maybeCr05Submission))
-          case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
+          case Some(_) => Ok(taskList(maybeCr05Submission))
+          case None    => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }
       }
   }

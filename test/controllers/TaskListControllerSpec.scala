@@ -20,7 +20,6 @@ import connectors.FakeDataCacheConnector
 import controllers.actions.{DataRequiredActionImpl, DataRetrievalAction}
 import identifiers.VOAuthorisedId
 import models.NormalMode
-import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
 import utils.FakeNavigator
@@ -34,11 +33,8 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase:
 
   private val username = "AUser"
 
-  private val cr05FeatureFlag = false
-
   private def ec                   = inject[ExecutionContext]
   private def controllerComponents = inject[MessagesControllerComponents]
-  private val configuration        = Configuration("feature.cr05.enabled" -> false)
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -58,7 +54,6 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase:
     FakeDataCacheConnector.resetCaptures()
     WelcomeController(
       frontendAppConfig,
-      configuration,
       dataRetrievalAction,
       DataRequiredActionImpl(ec),
       FakeNavigator(desiredRoute = onwardRoute),
@@ -67,7 +62,7 @@ class TaskListControllerSpec extends ControllerSpecBase with ViewSpecBase:
       welcome
     )(using ec)
 
-  private def viewAsString() = taskList(username)(using fakeRequest, messages).toString
+  private def viewAsString() = taskList()(using fakeRequest, messages).toString
 
   "Logging Controller" must {
 

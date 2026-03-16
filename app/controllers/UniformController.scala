@@ -22,11 +22,11 @@ import journey.UniformJourney.{Cr05AddProperty, Cr05SubmissionBuilder}
 import journey.{ReasonReportType, UniformJourney}
 import ltbs.uniform.*
 import ltbs.uniform.interpreters.playframework.*
-import models.PropertyType
+import models.{Login, PropertyType}
 import models.requests.DataRequest
 import play.api.i18n.MessagesApi
 import play.api.mvc.*
-import play.api.{Configuration, Logger, Logging}
+import play.api.{Logger, Logging}
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -38,7 +38,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UniformController @Inject() (
   messagesApi: MessagesApi,
-  config: Configuration,
   pageChrome: pageChrome,
   govukInput: GovukInput,
   govukRadios: GovukRadios,
@@ -81,6 +80,8 @@ class UniformController @Inject() (
 
   val interpreter: AutoBarsInterpreter = AutoBarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
+  private def userLogin(using request: DataRequest[AnyContent]): Login = request.userAnswers.login.getOrElse(throw Exception("Session expired"))
+
   def myJourney(targetId: String): Action[AnyContent] = (getData andThen requireData andThen auth).async { implicit request: DataRequest[AnyContent] =>
     import UniformJourney.*
     import interpreter.*
@@ -89,7 +90,7 @@ class UniformController @Inject() (
       val playProgram = ctTaxJourney[WM](create[TellTypes, AskTypes](messages(request)), reportReason)
 
       playProgram.run(targetId, purgeStateUponCompletion = true) { cr01cr03Submission =>
-        cr01cr03Service.storeSubmission(cr01cr03Submission, request.userAnswers.login.get).map { submissionId =>
+        cr01cr03Service.storeSubmission(cr01cr03Submission, userLogin).map { submissionId =>
           Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString))
         }
       }
@@ -206,7 +207,7 @@ class UniformController @Inject() (
         case Some(cr05Submission) =>
           val addPropertyProgram = cr05CheckYourAnswers[WM](create[TellTypes, AskTypes](messages(request)))(cr05Submission)
           addPropertyProgram.run(targetId, purgeStateUponCompletion = true) { _ =>
-            cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, request.userAnswers.login.get) flatMap { submissionId =>
+            cr01cr03Service.storeSubmission(cr05Submission.toCr05Submission, userLogin) flatMap { submissionId =>
               dataCacheConnector.remove(request.externalId, Cr05SubmissionBuilder.storageKey).map { _ =>
                 Redirect(routes.ConfirmationController.onPageRefresh(submissionId.toString))
               }

@@ -37,6 +37,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import views.html.govuk.cr05SubmissionSummary
 
 import java.time.LocalDate
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
 class AutoBarsInterpreter(
@@ -78,6 +79,7 @@ class AutoBarsInterpreter(
   implicit val cr05CommonWebTell: Cr05CommonWebTell                = Cr05CommonWebTell(GovukSummaryList())
   implicit val cr05AddPropertyWebTell: Cr05AddPropertyWebTell      = Cr05AddPropertyWebTell(GovukSummaryList())
 
+  @nowarn("msg=unused explicit parameter")
   private def doRenderStringField(
     pageKey: List[String],
     fieldKey: List[String],
@@ -174,6 +176,7 @@ class AutoBarsInterpreter(
         messages
       )
 
+      @nowarn("msg=unused explicit parameter")
       def doRender(
         pageKey: List[String],
         fieldKey: List[String],

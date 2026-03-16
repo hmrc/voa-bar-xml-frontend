@@ -17,7 +17,6 @@
 package controllers
 
 import connectors.{FakeDataCacheConnector, ReportStatusConnector, UploadConnector, UserReportUploadsConnector}
-import controllers.actions.*
 import forms.FileUploadDataFormProvider
 import identifiers.{LoginId, VOAuthorisedId}
 import models.*
@@ -43,7 +42,6 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  private def ec                   = inject[ExecutionContext]
   private def controllerComponents = inject[MessagesControllerComponents]
 
   private def councilTaxUpload = inject[views.html.councilTaxUpload]
@@ -127,7 +125,6 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       configuration,
       messagesApi,
       getEmptyCacheMap,
-      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
       connector,
@@ -148,7 +145,6 @@ class CouncilTaxUploadControllerSpec extends ControllerSpecBase with ViewSpecBas
       configuration,
       messagesApi,
       getEmptyCacheMap,
-      DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       formProvider,
       connector,

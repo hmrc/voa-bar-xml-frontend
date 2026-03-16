@@ -20,7 +20,7 @@ import cats.data.Validated
 import cats.implicits.*
 import ltbs.uniform.*
 import ltbs.uniform.validation.Rule.{maxLength, minLength}
-import ltbs.uniform.validation.{Rule, Transformation, quantString}
+import ltbs.uniform.validation.{Rule, quantString}
 import models.PropertyType
 import play.api.libs.json.*
 
@@ -104,14 +104,15 @@ object UniformJourney:
   ):
 
     def toCr05Submission: Cr05Submission =
+      val cr05Common = cr05CommonSection.getOrElse(Cr05Common("", "", LocalDate.now, false, None, None))
       Cr05Submission(
-        cr05CommonSection.get.baReport,
-        cr05CommonSection.get.baRef,
-        cr05CommonSection.get.effectiveDate,
+        cr05Common.baReport,
+        cr05Common.baRef,
+        cr05Common.effectiveDate,
         existingProperties,
         proposedProperties,
-        cr05CommonSection.get.planningRef,
-        cr05CommonSection.get.noPlanningReference,
+        cr05Common.planningRef,
+        cr05Common.noPlanningReference,
         comments
       )
 

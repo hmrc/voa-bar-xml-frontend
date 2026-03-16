@@ -39,7 +39,6 @@ class ReportStatusController @Inject() (
   val dataCacheConnector: DataCacheConnector,
   reportStatusConnector: ReportStatusConnector,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   receiptService: ReceiptService,
   reportStatus: views.html.reportStatus,
   val errorTemplate: views.html.error_template,
@@ -79,7 +78,7 @@ class ReportStatusController @Inject() (
       (for
         login          <- EitherT(cachedLogin(request.externalId))
         reportStatuses <- EitherT(reportStatuses(login, filter))
-      yield Ok(reportStatus(login.username, reportStatuses, filter, formatter)))
+      yield Ok(reportStatus(login.username, reportStatuses, formatter)))
         .valueOr(f => f)
   }
 

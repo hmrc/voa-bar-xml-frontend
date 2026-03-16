@@ -16,8 +16,6 @@
 
 package utils
 
-import play.api.data.Form
-
 object FormHelpers:
 
   def getAlternativeText(s: Option[String], defaultText: String): String =

@@ -46,19 +46,20 @@ class AddToListController @Inject() (
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
-      dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
-        dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
-          case Some(username) => Ok(addToList(Option(username), maybeCr05Submission.get, yesNoForm))
-          case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
-        }
-      }
+      for
+        maybeCr05Submission <- dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey)
+        maybeUsername       <- dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString)
+      yield (maybeCr05Submission, maybeUsername) match
+        case (Some(cr05Submission), Some(_)) => Ok(addToList(maybeUsername, cr05Submission, yesNoForm))
+        case _                               => Redirect(routes.LoginController.onPageLoad(NormalMode))
   }
 
   def addProperty: Action[AnyContent] = (getData andThen requireData).async { implicit request =>
     yesNoForm.bindFromRequest().fold(
       formWithErrors =>
-        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map { maybeCr05Submission =>
-          Ok(addToList(request.userAnswers.login.map(_.username), maybeCr05Submission.get, formWithErrors))
+        dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) map {
+          case Some(cr05Submission) => Ok(addToList(request.userAnswers.login.map(_.username), cr05Submission, formWithErrors))
+          case _                    => Redirect(routes.LoginController.onPageLoad(NormalMode))
         },
       success =>
         if success.value then
