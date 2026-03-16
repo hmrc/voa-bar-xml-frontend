@@ -63,10 +63,10 @@ class DefaultReceiptService @Inject() (
     Try {
       forceClosing(
         document,
-        () => {
+        () =>
           forceClosing(
             contentStream,
-            () => {
+            () =>
               val height = addImage(document, page, contentStream)
 
               contentStream.beginText()
@@ -86,11 +86,9 @@ class DefaultReceiptService @Inject() (
                 contentStream.showText(line)
               }
               contentStream.endText()
-            }
           )
 
           document.save(outputStream)
-        }
       )
     } map { _ =>
       outputStream.toByteArray

@@ -21,7 +21,7 @@ import org.scalatest.matchers.must
 
 import java.time.{ZoneId, ZonedDateTime}
 
-class DateFormatterSpec extends AnyFlatSpec with must.Matchers {
+class DateFormatterSpec extends AnyFlatSpec with must.Matchers:
 
   "DateFormatter" should "format date" in {
     val dateTime = ZonedDateTime.of(
@@ -36,5 +36,3 @@ class DateFormatterSpec extends AnyFlatSpec with must.Matchers {
     )
     DateFormatter.formatDate(dateTime) mustBe "01 October 2020 at 10:00"
   }
-
-}

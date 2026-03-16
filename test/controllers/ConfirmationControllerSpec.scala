@@ -38,9 +38,8 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting {
+class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase with MockitoSugar with Injecting:
 
-  private def ec                     = inject[ExecutionContext]
   private def controllerComponents   = inject[MessagesControllerComponents]
   private def reportConfirmationView = inject[views.html.govuk.confirmation]
   private def confirmationView       = inject[views.html.confirmation]
@@ -62,13 +61,12 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
-  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def loggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
     FakeDataCacheConnector.save[Login](submissionId, LoginId.toString, login2)
-    new ConfirmationController(
+    ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -78,14 +76,12 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       errorTemplateView,
       controllerComponents
     )
-  }
 
-  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) = {
+  private def notLoggedInController(dataRetrievalAction: DataRetrievalAction = getEmptyCacheMap) =
     FakeDataCacheConnector.resetCaptures()
-    new ConfirmationController(
+    ConfirmationController(
       messagesApi,
       dataRetrievalAction,
-      new DataRequiredActionImpl(ec),
       FakeDataCacheConnector,
       reportStatusConnectorMock,
       reportConfirmationView,
@@ -95,12 +91,11 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       errorTemplateView,
       controllerComponents
     )
-  }
 
-  private def cr01cr03ViewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None) =
+  private def cr01cr03ViewAsString(report: ReportStatus, cr01cr03Report: Option[Cr01Cr03Submission]) =
     reportConfirmationView(username, report, cr01cr03Report)(using fakeRequest, messages).toString
 
-  private def viewAsString(report: ReportStatus = reportStatus, cr01cr03Report: Option[Cr01Cr03Submission] = None, submissionId: String = submissionId) =
+  private def viewAsString(submissionId: String = submissionId) =
     confirmationView(username, submissionId)(using fakeRequest, messages).toString
 
   private def refreshViewAsString() =
@@ -124,7 +119,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       val result = loggedInController().onPageLoad(verifiedSubmissionId)(fakeRequest)
 
       status(result) mustBe OK
-      contentAsString(result) mustBe viewAsString(verifiedReportStatus, submissionId = verifiedSubmissionId)
+      contentAsString(result) mustBe viewAsString(submissionId = verifiedSubmissionId)
     }
 
     "if not authorized by VO must go to the login page" in {
@@ -164,7 +159,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     }
 
     "if CR03 report is present, it should render confirmation page with all details" in {
-      val submissionId     = UUID.randomUUID().toString
+      val submissionId     = UUID.randomUUID.toString
       val cr03Report       = aCr03Report
       val cr03Json         = Json.obj(
         "type"       -> "Cr01Cr03Submission",
@@ -201,7 +196,7 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
     )
 
   "if CR01 report is present, it should render confirmation page with all details" in {
-    val submissionId     = UUID.randomUUID().toString
+    val submissionId     = UUID.randomUUID.toString
     val cr01Report       = aCr01Report
     val cr01Json         = Json.obj(
       "type"       -> "Cr01Cr03Submission",
@@ -235,5 +230,3 @@ class ConfirmationControllerSpec extends ControllerSpecBase with ViewSpecBase wi
       None,
       Some("comment")
     )
-
-}

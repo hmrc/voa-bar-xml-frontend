@@ -16,20 +16,7 @@
 
 package utils
 
-import play.api.data.Form
+object FormHelpers:
 
-object FormHelpers {
-
-  def getErrorByKey[A](form: Form[?], errorKey: String) =
-    form.error(errorKey) match {
-      case None        => ""
-      case Some(error) => error.message
-    }
-
-  def getAlternativeText(s: Option[String], text: String) =
-    if (s.isEmpty || s.get.isEmpty) {
-      text
-    } else {
-      s
-    }
-}
+  def getAlternativeText(s: Option[String], defaultText: String): String =
+    s.filter(_.nonEmpty).getOrElse(defaultText)

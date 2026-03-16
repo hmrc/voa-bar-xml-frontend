@@ -20,6 +20,5 @@ import play.api.libs.json.{Json, OFormat}
 
 case class FileUploadData(xml: String)
 
-object FileUploadData {
-  implicit val format: OFormat[FileUploadData] = Json.format[FileUploadData]
-}
+object FileUploadData:
+  implicit val format: OFormat[FileUploadData] = Json.format

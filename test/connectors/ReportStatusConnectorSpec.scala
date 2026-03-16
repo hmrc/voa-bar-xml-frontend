@@ -23,7 +23,6 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, Writes}
 import play.api.test.Helpers.*
-import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -39,16 +38,13 @@ class ReportStatusConnectorSpec extends SpecBase with MockitoSugar:
   private val userId       = "ba1221"
   private val submissionId = "1234-XX"
 
-  private val rs    = ReportStatus(
+  private val rs = ReportStatus(
     submissionId,
     baCode = Some(userId),
     status = Some(Submitted.value),
     createdAt = Instant.now.truncatedTo(ChronoUnit.SECONDS)
   )
-  private val error = Error("Error", Seq())
 
-  private val configuration  = inject[Configuration]
-  private val environment    = inject[Environment]
   private val exception      = Exception("failure")
   private val login          = Login("AUser", "anyPass")
   private val servicesConfig = inject[ServicesConfig]

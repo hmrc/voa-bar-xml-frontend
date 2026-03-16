@@ -21,9 +21,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.EitherValues
 
-class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues {
+class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues:
 
-  val validator = new PhoneNumberValidator()
+  private val validator = PhoneNumberValidator
 
   "validator" should "validate correct phone number" in {
     validator.apply("01632960110").toEither.value          shouldBe "01632960110"
@@ -41,5 +41,3 @@ class PhoneNumberValidatorSpec extends AnyFlatSpec with should.Matchers with Eit
     validator.apply("022333232333332211232").toEither.left.value shouldBe a[ErrorTree]
     validator.apply("").toEither.left.value                      shouldBe a[ErrorTree]
   }
-
-}

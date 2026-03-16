@@ -1,125 +1,126 @@
 # microservice specific routes
 
-->          /hmrc-frontend                        hmrcfrontend.Routes
+->          /hmrc-frontend                          hmrcfrontend.Routes
 
-GET         /                                     controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
+GET         /                                       controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 
-GET         /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
 
 
-GET         /what-is-the-reason-for-the-report    controllers.ReportReasonController.onPageLoad
-POST        /what-is-the-reason-for-the-report    controllers.ReportReasonController.onPageSubmit
+GET         /what-is-the-reason-for-the-report      controllers.ReportReasonController.onPageLoad
+POST        /what-is-the-reason-for-the-report      controllers.ReportReasonController.onPageSubmit
 
-GET         /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
-POST        /why-should-it-be-removed             controllers.UniformController.myJourney(id = "why-should-it-be-removed")
-GET         /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
-POST        /other-reason                         controllers.UniformController.myJourney(id = "other-reason")
-GET         /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
-POST        /ba-report                            controllers.UniformController.myJourney(id = "ba-report")
-GET         /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
-POST        /ba-ref                               controllers.UniformController.myJourney(id = "ba-ref")
-GET         /UPRN                                 controllers.UniformController.myJourney(id = "UPRN")
-POST        /UPRN                                 controllers.UniformController.myJourney(id = "UPRN")
-GET         /property-address                     controllers.UniformController.myJourney(id = "property-address")
-POST        /property-address                     controllers.UniformController.myJourney(id = "property-address")
-GET         /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
-POST        /check-answers                        controllers.UniformController.myJourney(id = "check-answers")
-GET         /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
-POST        /property-contact-details             controllers.UniformController.myJourney(id = "property-contact-details")
-GET         /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
-POST        /same-contact-address                 controllers.UniformController.myJourney(id = "same-contact-address")
-GET         /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
-POST        /contact-address                      controllers.UniformController.myJourney(id = "contact-address")
-GET         /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
-POST        /effective-date                       controllers.UniformController.myJourney(id = "effective-date")
-GET         /have-planning-ref                    controllers.UniformController.myJourney(id = "have-planning-ref")
-POST        /have-planning-ref                    controllers.UniformController.myJourney(id = "have-planning-ref")
-GET         /planning-ref                         controllers.UniformController.myJourney(id = "planning-ref")
-POST        /planning-ref                         controllers.UniformController.myJourney(id = "planning-ref")
-GET         /why-no-planning-ref                  controllers.UniformController.myJourney(id = "why-no-planning-ref")
-POST        /why-no-planning-ref                  controllers.UniformController.myJourney(id = "why-no-planning-ref")
-GET         /comments                             controllers.UniformController.myJourney(id = "comments")
-POST        /comments                             controllers.UniformController.myJourney(id = "comments")
+GET         /why-should-it-be-removed               controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+POST        /why-should-it-be-removed               controllers.UniformController.myJourney(id = "why-should-it-be-removed")
+GET         /other-reason                           controllers.UniformController.myJourney(id = "other-reason")
+POST        /other-reason                           controllers.UniformController.myJourney(id = "other-reason")
+GET         /ba-report                              controllers.UniformController.myJourney(id = "ba-report")
+POST        /ba-report                              controllers.UniformController.myJourney(id = "ba-report")
+GET         /ba-ref                                 controllers.UniformController.myJourney(id = "ba-ref")
+POST        /ba-ref                                 controllers.UniformController.myJourney(id = "ba-ref")
+GET         /UPRN                                   controllers.UniformController.myJourney(id = "UPRN")
+POST        /UPRN                                   controllers.UniformController.myJourney(id = "UPRN")
+GET         /property-address                       controllers.UniformController.myJourney(id = "property-address")
+POST        /property-address                       controllers.UniformController.myJourney(id = "property-address")
+GET         /check-answers                          controllers.UniformController.myJourney(id = "check-answers")
+POST        /check-answers                          controllers.UniformController.myJourney(id = "check-answers")
+GET         /property-contact-details               controllers.UniformController.myJourney(id = "property-contact-details")
+POST        /property-contact-details               controllers.UniformController.myJourney(id = "property-contact-details")
+GET         /same-contact-address                   controllers.UniformController.myJourney(id = "same-contact-address")
+POST        /same-contact-address                   controllers.UniformController.myJourney(id = "same-contact-address")
+GET         /contact-address                        controllers.UniformController.myJourney(id = "contact-address")
+POST        /contact-address                        controllers.UniformController.myJourney(id = "contact-address")
+GET         /effective-date                         controllers.UniformController.myJourney(id = "effective-date")
+POST        /effective-date                         controllers.UniformController.myJourney(id = "effective-date")
+GET         /have-planning-ref                      controllers.UniformController.myJourney(id = "have-planning-ref")
+POST        /have-planning-ref                      controllers.UniformController.myJourney(id = "have-planning-ref")
+GET         /planning-ref                           controllers.UniformController.myJourney(id = "planning-ref")
+POST        /planning-ref                           controllers.UniformController.myJourney(id = "planning-ref")
+GET         /why-no-planning-ref                    controllers.UniformController.myJourney(id = "why-no-planning-ref")
+POST        /why-no-planning-ref                    controllers.UniformController.myJourney(id = "why-no-planning-ref")
+GET         /comments                               controllers.UniformController.myJourney(id = "comments")
+POST        /comments                               controllers.UniformController.myJourney(id = "comments")
 # CR05
 
-GET         /task-list                                          controllers.TaskListController.onPageLoad
-GET         /start-add-property                                 controllers.TaskListController.goToAddPropertyPage
-GET         /start-add-property-report-details                  controllers.TaskListController.goToAddPropertyReportDetailPage
-GET         /start-add-comments                                 controllers.TaskListController.goToAddComments
-GET         /start-check-answers                                controllers.TaskListController.goToCheckYourAnswersPage
-GET         /add-to-list                                        controllers.AddToListController.onPageLoad
-POST        /confirm-add-property                               controllers.AddToListController.addProperty
-POST        /delete-property                                    controllers.AddToListController.removeProperty
+GET         /task-list                              controllers.TaskListController.onPageLoad
+GET         /start-add-property                     controllers.TaskListController.goToAddPropertyPage
+GET         /start-add-property-report-details      controllers.TaskListController.goToAddPropertyReportDetailPage
+GET         /start-add-comments                     controllers.TaskListController.goToAddComments
+GET         /start-check-answers                    controllers.TaskListController.goToCheckYourAnswersPage
+GET         /add-to-list                            controllers.AddToListController.onPageLoad
+POST        /confirm-add-property                   controllers.AddToListController.addProperty
+POST        /delete-property                        controllers.AddToListController.removeProperty
 
-GET         /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
-POST        /add-property-ba-report                             controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
-GET         /add-property-ba-ref                                controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-ref")
-POST        /add-property-ba-ref                                controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-ref")
-GET         /add-property-effective-date                        controllers.UniformController.addCommonSectionJourney(id = "add-property-effective-date")
-POST        /add-property-effective-date                        controllers.UniformController.addCommonSectionJourney(id = "add-property-effective-date")
-GET         /add-property-have-planning-ref                     controllers.UniformController.addCommonSectionJourney(id = "add-property-have-planning-ref")
-POST        /add-property-have-planning-ref                     controllers.UniformController.addCommonSectionJourney(id = "add-property-have-planning-ref")
-GET         /add-property-planning-ref                          controllers.UniformController.addCommonSectionJourney(id = "add-property-planning-ref")
-POST        /add-property-planning-ref                          controllers.UniformController.addCommonSectionJourney(id = "add-property-planning-ref")
-GET         /add-property-why-no-planning-ref                   controllers.UniformController.addCommonSectionJourney(id = "add-property-why-no-planning-ref")
-POST        /add-property-why-no-planning-ref                   controllers.UniformController.addCommonSectionJourney(id = "add-property-why-no-planning-ref")
-GET         /add-property-check-answers-common                  controllers.UniformController.addCommonSectionJourney(id = "add-property-check-answers-common")
-POST        /add-property-check-answers-common                  controllers.UniformController.addCommonSectionJourney(id = "add-property-check-answers-common")
+GET         /add-property-ba-report                 controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
+POST        /add-property-ba-report                 controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-report")
+GET         /add-property-ba-ref                    controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-ref")
+POST        /add-property-ba-ref                    controllers.UniformController.addCommonSectionJourney(id = "add-property-ba-ref")
+GET         /add-property-effective-date            controllers.UniformController.addCommonSectionJourney(id = "add-property-effective-date")
+POST        /add-property-effective-date            controllers.UniformController.addCommonSectionJourney(id = "add-property-effective-date")
+GET         /add-property-have-planning-ref         controllers.UniformController.addCommonSectionJourney(id = "add-property-have-planning-ref")
+POST        /add-property-have-planning-ref         controllers.UniformController.addCommonSectionJourney(id = "add-property-have-planning-ref")
+GET         /add-property-planning-ref              controllers.UniformController.addCommonSectionJourney(id = "add-property-planning-ref")
+POST        /add-property-planning-ref              controllers.UniformController.addCommonSectionJourney(id = "add-property-planning-ref")
+GET         /add-property-why-no-planning-ref       controllers.UniformController.addCommonSectionJourney(id = "add-property-why-no-planning-ref")
+POST        /add-property-why-no-planning-ref       controllers.UniformController.addCommonSectionJourney(id = "add-property-why-no-planning-ref")
+GET         /add-property-check-answers-common      controllers.UniformController.addCommonSectionJourney(id = "add-property-check-answers-common")
+POST        /add-property-check-answers-common      controllers.UniformController.addCommonSectionJourney(id = "add-property-check-answers-common")
 
-GET         /add-property/:propertyType/*key                    controllers.UniformController.propertyJourney(key, propertyType: PropertyType, index: Option[Int] = None)
-POST        /add-property/:propertyType/*key                    controllers.UniformController.propertyJourney(key, propertyType: PropertyType, index: Option[Int] = None)
+GET         /add-property/:propertyType/*key        controllers.UniformController.propertyJourney(key, propertyType: PropertyType, index: Option[Int] = None)
+POST        /add-property/:propertyType/*key        controllers.UniformController.propertyJourney(key, propertyType: PropertyType, index: Option[Int] = None)
+
 GET         /edit-property/:propertyType/$index<[0-4]>/*key     controllers.UniformController.editPropertyJourney(key, propertyType: PropertyType, index: Int)
 POST        /edit-property/:propertyType/$index<[0-4]>/*key     controllers.UniformController.editPropertyJourney(key, propertyType: PropertyType, index: Int)
 
-GET         /add-comments                                       controllers.UniformController.addCommentJourney(id = "add-comments")
-POST        /add-comments                                       controllers.UniformController.addCommentJourney(id = "add-comments")
+GET         /add-comments                           controllers.UniformController.addCommentJourney(id = "add-comments")
+POST        /add-comments                           controllers.UniformController.addCommentJourney(id = "add-comments")
 
-GET         /cr05-check-answers                                controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
-POST        /cr05-check-answers                                controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
+GET         /cr05-check-answers                     controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
+POST        /cr05-check-answers                     controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
 
 
 
-GET         /language/:lang                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                         controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /this-service-has-expired             controllers.SessionExpiredController.onPageLoad
+GET         /this-service-has-expired               controllers.SessionExpiredController.onPageLoad
 
-GET         /check-your-answers                   controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                     controllers.CheckYourAnswersController.onPageLoad
 
-GET         /unauthorised                         controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                           controllers.UnauthorisedController.onPageLoad
 
-GET         /council-tax/jobs                     controllers.ConfirmationController.onPageLoad(submissionId: String)
-GET         /council-tax/jobs/refresh             controllers.ConfirmationController.onPageRefresh(submissionId: String)
-GET         /council-tax/jobs/checkStatus         controllers.ConfirmationController.onStatusCheck(submissionId: String)
+GET         /council-tax/jobs                       controllers.ConfirmationController.onPageLoad(submissionId: String)
+GET         /council-tax/jobs/refresh               controllers.ConfirmationController.onPageRefresh(submissionId: String)
+GET         /council-tax/jobs/checkStatus           controllers.ConfirmationController.onStatusCheck(submissionId: String)
 
-GET         /council-tax/upload                   controllers.CouncilTaxUploadController.onPageLoad(showEmptyError: Boolean ?= false)
-POST        /council-tax/upload/:reference        controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
-POST        /council-tax/upload/error/:reference  controllers.CouncilTaxUploadController.onError(reference: String)
+GET         /council-tax/upload                     controllers.CouncilTaxUploadController.onPageLoad(showEmptyError: Boolean ?= false)
+POST        /council-tax/upload/:reference          controllers.CouncilTaxUploadController.onPrepareUpload(reference: String)
+POST        /council-tax/upload/error/:reference    controllers.CouncilTaxUploadController.onError(reference: String)
 
-GET         /online-or-upload                     controllers.WelcomeController.onPageLoad
-GET         /goToCouncilTaxUpload                 controllers.WelcomeController.goToCouncilTaxUploadPage
-GET         /goToTaskList                         controllers.WelcomeController.goToTaskListLoadPage
+GET         /online-or-upload                       controllers.WelcomeController.onPageLoad
+GET         /goToCouncilTaxUpload                   controllers.WelcomeController.goToCouncilTaxUploadPage
+GET         /goToTaskList                           controllers.WelcomeController.goToTaskListLoadPage
 
 GET         /sign-in                                controllers.LoginController.onPageLoad(mode: Mode = NormalMode)
 POST        /sign-in                                controllers.LoginController.onSubmit(mode: Mode = NormalMode)
-GET         /changeLogin                          controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeLogin                          controllers.LoginController.onSubmit(mode: Mode = CheckMode)
+GET         /changeLogin                            controllers.LoginController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeLogin                            controllers.LoginController.onSubmit(mode: Mode = CheckMode)
 
 ### SignOut Expired
 ### -----------------------
-GET        /sign-out                              controllers.SignOutController.signOut
+GET        /sign-out                                controllers.SignOutController.signOut
 
 ### Timeout
 ### -----------------------
-GET        /this-service-has-been-reset           controllers.TimeoutController.onPageLoad
-GET        /this-service-has-been-reset/redirect  controllers.TimeoutController.timeout
+GET        /this-service-has-been-reset             controllers.TimeoutController.onPageLoad
+GET        /this-service-has-been-reset/redirect    controllers.TimeoutController.timeout
 
 
-GET         /council-tax/history                  controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
-GET         /council-tax/history/print            controllers.ReportStatusController.onReceiptDownload(submissionId: String)
-POST        /council-tax/history/delete           controllers.ReportDeleteController.onPageSubmit
-GET         /all/10                               controllers.ReportStatusController.onAllReceiptsDownload
+GET         /council-tax/history                    controllers.ReportStatusController.onPageLoad(filter: Option[String] ?= None)
+GET         /council-tax/history/print              controllers.ReportStatusController.onReceiptDownload(submissionId: String)
+POST        /council-tax/history/delete             controllers.ReportDeleteController.onPageSubmit
+GET         /all/10                                 controllers.ReportStatusController.onAllReceiptsDownload
 
-GET         /feedback 		                      controllers.FeedbackController.onPageLoad
-POST 		/feedback                             controllers.FeedbackController.onPageSubmit
-GET         /feedback-error                       controllers.FeedbackController.feedbackError
-GET         /thankyou-for-your-feedback           controllers.FeedbackController.feedbackThx
+GET         /feedback 		                        controllers.FeedbackController.onPageLoad
+POST 		/feedback                               controllers.FeedbackController.onPageSubmit
+GET         /feedback-error                         controllers.FeedbackController.feedbackError
+GET         /thankyou-for-your-feedback             controllers.FeedbackController.feedbackThx

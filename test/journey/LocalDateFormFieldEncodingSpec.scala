@@ -24,13 +24,13 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
+class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks:
 
-  val encoding = new LocalDateFormFieldEncoding()
-  val tomorrow = LocalDate.now().plusDays(1)
-  val today    = LocalDate.now()
+  private val encoding = LocalDateFormFieldEncoding()
+  private val tomorrow = LocalDate.now().plusDays(1)
+  private val today    = LocalDate.now()
 
-  val invalidInputDate = Table(
+  private val invalidInputDate = Table(
     ("day", "month", "year"),
     ("", "", ""),
     ("1", "", ""),
@@ -49,7 +49,7 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
     ("1", "13", "2020")
   )
 
-  val validInputDate = Table(
+  private val validInputDate = Table(
     ("day", "month", "year"),
     ("23", "12", "1993"),
     ("1", "4", "1993"),
@@ -94,5 +94,3 @@ class LocalDateFormFieldEncodingSpec extends AnyFlatSpec with should.Matchers wi
       )
 
   }
-
-}

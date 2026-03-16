@@ -17,18 +17,17 @@
 package views
 
 import play.api.data.Form
-import controllers.routes
 import forms.LoginFormProvider
 import models.{Login, NormalMode}
 import views.behaviours.govuk.QuestionViewBehaviours
 
-class LoginViewSpec extends QuestionViewBehaviours[Login] {
+class LoginViewSpec extends QuestionViewBehaviours[Login]:
 
   private def login = inject[views.html.login]
 
-  val messageKeyPrefix = "login"
+  private val messageKeyPrefix = "login"
 
-  override val form = new LoginFormProvider()()
+  override val form: Form[Login] = LoginFormProvider()()
 
   private def createView = () => login(form, NormalMode)(using fakeRequest, messages)
 
@@ -37,8 +36,7 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
   "Login view" must {
 
     behave like normalPage(createView, messageKeyPrefix)
-
-    behave like pageWithTextFields(createViewUsingForm, messageKeyPrefix, routes.LoginController.onSubmit(NormalMode).url, "username", "password")
+    behave like pageWithTextFields(createViewUsingForm, "username", "password")
 
     "contain Login button with the value Login" in {
       val doc         = asDocument(createViewUsingForm(form))
@@ -46,4 +44,3 @@ class LoginViewSpec extends QuestionViewBehaviours[Login] {
       assert(loginButton == messages("site.login"))
     }
   }
-}

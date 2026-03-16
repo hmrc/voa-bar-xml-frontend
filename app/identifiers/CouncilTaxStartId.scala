@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object CouncilTaxStartId extends Identifier {
+case object CouncilTaxStartId extends Identifier:
   override def toString: String = "counciltaxstart"
-}

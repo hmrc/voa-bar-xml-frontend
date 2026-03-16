@@ -45,7 +45,7 @@ class FeedbackController @Inject() (
   feedbackThxView: feedbackThx,
   feedbackErrorView: feedbackError,
   cc: MessagesControllerComponents
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(cc)
   with I18nSupport
   with Logging:
@@ -65,7 +65,7 @@ class FeedbackController @Inject() (
         Future.successful {
           BadRequest(feedbackView(formWithErrors))
         },
-      form => {
+      form =>
         auditService.sendFeedback(form)
 
         val data: Map[String, Seq[String]] = Map(
@@ -84,16 +84,14 @@ class FeedbackController @Inject() (
           .setHeader(csrfNocheckHeader)
           .execute[HttpResponse]
           .map { r =>
-            r.status match {
+            r.status match
               case OK =>
                 logger.info(s"Feedback successful: ${r.status} response from $contactFrontendPostFeedbackUrl")
                 Redirect(routes.FeedbackController.feedbackThx)
               case _  =>
                 logger.error(s"Feedback FAILED: ${r.status} response from $contactFrontendPostFeedbackUrl,\nparams: $data")
                 Redirect(routes.FeedbackController.feedbackError)
-            }
           }
-      }
     )
   }
 

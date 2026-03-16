@@ -36,7 +36,7 @@
     <span class="govuk-panel__body govuk-!-font-size-24">@messages("confirmation.subheading.done")</span>
 }
 
-@if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
+@if(reportStatus.flatMap(_.status).contains(Done.value) || reportStatus.flatMap(_.status).contains(Submitted.value)) {
     @govukPanel(
         Panel(
             title = HtmlContent(panelTitle),

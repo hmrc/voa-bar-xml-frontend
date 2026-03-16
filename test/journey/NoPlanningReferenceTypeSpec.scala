@@ -22,7 +22,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.libs.json.{JsString, Json}
 import utils.ReflectionUtil
 
-class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
+class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks:
 
   "NoPlanningReferenceType" should "have all instance in Lister for to render radio buttons in order" in {
 
@@ -54,5 +54,3 @@ class NoPlanningReferenceTypeSpec extends AnyFlatSpec with should.Matchers with 
     ).foreach { noPlanningPermission =>
       Json.toJson(noPlanningPermission)(using NoPlanningReferenceType.format) shouldBe JsString(noPlanningPermission.toString)
     }
-
-}

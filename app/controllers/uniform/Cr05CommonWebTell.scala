@@ -23,19 +23,15 @@ import ltbs.uniform.common.web.GenericWebTell
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
-// TODO test
-// $COVERAGE-OFF$
-class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTell[Cr05Common, Html] {
+class Cr05CommonWebTell(govUkSummaryList: GovukSummaryList) extends GenericWebTell[Cr05Common, Html]:
 
-  def confirmationSummary(in: Cr05Common, messagess: UniformMessages[Html]): SummaryList = {
-    val sum = summaryList(in, messagess)
+  def confirmationSummary(in: Cr05Common, messages: UniformMessages[Html]): SummaryList =
+    val sum = summaryList(in, messages)
     SummaryList(sum.rows.map(x => x.copy(actions = None)), classes = "govuk-!-margin-bottom-9")
-  }
 
-  def summaryList(in: Cr05Common, messages: UniformMessages[Html]): SummaryList = {
-
+  def summaryList(in: Cr05Common, messages: UniformMessages[Html]): SummaryList =
     val baReport = SummaryListRow(
       key = Key(HtmlContent(messages("add-property-ba-report.pageLabel")), "govuk-!-width-one-half"),
       value = Value(Text(in.baReport)),
@@ -131,9 +127,6 @@ class Cr05CommonWebTell(govUkSumaryList: GovukSummaryList) extends GenericWebTel
         noPlanningRef
       ).flatten
     )
-  }
 
   override def render(in: Cr05Common, key: String, messages: UniformMessages[Html]): Html =
-    govUkSumaryList(summaryList(in, messages))
-}
-// $COVERAGE-ON$
+    govUkSummaryList(summaryList(in, messages))

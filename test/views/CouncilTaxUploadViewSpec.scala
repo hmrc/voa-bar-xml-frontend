@@ -17,22 +17,23 @@
 package views
 
 import forms.FileUploadDataFormProvider
+import models.FileUploadData
 import models.UpScanRequests.{InitiateResponse, UploadRequest}
+import play.api.data.Form
 import views.behaviours.ViewBehaviours
 
-class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
+class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase:
 
-  def councilTaxUpload = inject[views.html.councilTaxUpload]
+  private def councilTaxUpload = inject[views.html.councilTaxUpload]
 
-  val username         = "BA0345"
-  val messageKeyPrefix = "councilTaxUpload"
-  val submissionId     = "SId9324832"
+  private val username         = "BA0345"
+  private val messageKeyPrefix = "councilTaxUpload"
 
-  val form = new FileUploadDataFormProvider()()
+  private val form: Form[FileUploadData] = FileUploadDataFormProvider()()
 
-  val councilTaxUploadFakeRequest = fakeRequest
+  private val councilTaxUploadFakeRequest = fakeRequest
 
-  val initiateResponse = InitiateResponse(
+  private val initiateResponse = InitiateResponse(
     reference = "foo",
     uploadRequest = UploadRequest(
       href = "http://www.bar.foo",
@@ -53,13 +54,12 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
   )
 
   private def createView(displayInitiateResponse: Boolean = true) =
-    if (displayInitiateResponse) {
+    if displayInitiateResponse then
       councilTaxUpload(username, form, Some(initiateResponse))(using councilTaxUploadFakeRequest, messages)
-    } else {
+    else
       councilTaxUpload(username, form)(using councilTaxUploadFakeRequest, messages)
-    }
 
-  lazy val doc = asDocument(createView())
+  private val doc = asDocument(createView())
 
   "CouncilTaxUpload view" must {
     behave like normalPage(() => createView(), messageKeyPrefix, "title", "submit.button")
@@ -109,4 +109,3 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase {
       submitButton mustBe None
     }
   }
-}

@@ -18,10 +18,9 @@ package forms.behaviours
 
 import play.api.data.{Form, FormError}
 
-trait IntFieldBehaviours extends FieldBehaviours {
+trait IntFieldBehaviours extends FieldBehaviours:
 
-  def intField(form: Form[?], fieldName: String, nonNumericError: FormError, wholeNumberError: FormError): Unit = {
-
+  def intField(form: Form[?], fieldName: String, nonNumericError: FormError, wholeNumberError: FormError): Unit =
     "not bind non-numeric numbers" in
       forAll(nonNumerics -> "nonNumeric") {
         nonNumeric =>
@@ -49,7 +48,6 @@ trait IntFieldBehaviours extends FieldBehaviours {
           val result = form.bind(Map(fieldName -> num.toString)).apply(fieldName)
           result.errors shouldEqual Seq(nonNumericError)
       }
-  }
 
   def intFieldWithMinimum(form: Form[?], fieldName: String, minimum: Int, expectedError: FormError): Unit =
     s"not bind integers below $minimum" in
@@ -74,4 +72,3 @@ trait IntFieldBehaviours extends FieldBehaviours {
           val result = form.bind(Map(fieldName -> number.toString)).apply(fieldName)
           result.errors shouldEqual Seq(expectedError)
       }
-}

@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object WelcomeFormId extends Identifier {
+case object WelcomeFormId extends Identifier:
   override def toString: String = "welcomeForm"
-}

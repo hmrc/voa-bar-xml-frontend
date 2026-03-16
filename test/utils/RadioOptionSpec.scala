@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 
-class RadioOptionSpec extends SpecBase {
+class RadioOptionSpec extends SpecBase:
 
   "Radio Option" must {
     "build correctly from a key prefix and option" in {
@@ -28,4 +28,3 @@ class RadioOptionSpec extends SpecBase {
       radioOption.messageKey mustBe "prefix.option"
     }
   }
-}

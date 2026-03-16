@@ -19,14 +19,13 @@ package views.behaviours
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
-trait StringViewBehaviours extends QuestionViewBehaviours[String] {
+trait StringViewBehaviours extends QuestionViewBehaviours[String]:
 
   val answer = "answer"
 
   def stringPage(
     createView: Form[String] => HtmlFormat.Appendable,
     messageKeyPrefix: String,
-    expectedFormAction: String,
     expectedHintKey: Option[String] = None
   ): Unit =
     "behave like a page with a string value field" when {
@@ -65,4 +64,3 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
         }
       }
     }
-}

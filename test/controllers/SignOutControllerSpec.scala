@@ -17,16 +17,15 @@
 package controllers
 
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
-class SignOutControllerSpec extends ControllerSpecBase {
+class SignOutControllerSpec extends ControllerSpecBase:
 
   private def controllerComponents = inject[MessagesControllerComponents]
 
-  "Signout Controller" must {
+  "SignOut Controller" must {
     "return 303 for a GET" in {
-      val result = new SignOutController(controllerComponents).signOut()(fakeRequest)
+      val result = SignOutController(controllerComponents).signOut()(fakeRequest)
       status(result) mustBe SEE_OTHER
     }
   }
-}

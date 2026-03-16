@@ -19,11 +19,11 @@ package views.behaviours
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
-trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
+trait IntViewBehaviours extends QuestionViewBehaviours[Int]:
 
   val number = 123
 
-  def intPage(createView: Form[Int] => HtmlFormat.Appendable, messageKeyPrefix: String, expectedFormAction: String): Unit =
+  def intPage(createView: Form[Int] => HtmlFormat.Appendable, messageKeyPrefix: String): Unit =
     "behave like a page with an integer value field" when {
       "rendered" must {
 
@@ -59,4 +59,3 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
         }
       }
     }
-}

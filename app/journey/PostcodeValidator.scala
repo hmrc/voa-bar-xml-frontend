@@ -20,9 +20,9 @@ import cats.data.Validated
 import ltbs.uniform.ErrorTree
 import ltbs.uniform.validation.{Rule, quantString}
 
-class PostcodeValidator extends Rule[String] {
+object PostcodeValidator extends Rule[String]:
 
-  val allowedChars = """[^a-zA-Z0-9]""".r
+  private val allowedChars = """[^a-zA-Z0-9]""".r
 
   override def apply(v1: String): Validated[ErrorTree, String] =
     Rule.minLength[String](1, "postcode.minLength").apply(v1) andThen { validLength =>
@@ -31,5 +31,3 @@ class PostcodeValidator extends Rule[String] {
         validPostcode.substring(0, validPostcode.length - 3) + " " + validPostcode.substring(validPostcode.length - 3)
       }
     }
-
-}

@@ -19,7 +19,8 @@ package controllers.actions
 import com.google.inject.{ImplementedBy, Inject}
 import connectors.DataCacheConnector
 import models.requests.OptionalDataRequest
-import play.api.mvc._
+import play.api.mvc.*
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.UserAnswers
 
@@ -28,24 +29,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class DataRetrievalActionImpl @Inject() (
   val dataCacheConnector: DataCacheConnector,
   bodyParsers: BodyParsers.Default
-)(implicit val executionContext: ExecutionContext
-) extends DataRetrievalAction {
+)(using val executionContext: ExecutionContext
+) extends DataRetrievalAction:
 
-  override protected def transform[A](request: Request[A]): Future[OptionalDataRequest[A]] = {
-    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  override protected def transform[A](request: Request[A]): Future[OptionalDataRequest[A]] =
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    hc.sessionId match {
-      case None            => Future.failed(new IllegalStateException())
+    hc.sessionId match
+      case None            => Future.failed(IllegalStateException())
       case Some(sessionId) =>
         dataCacheConnector.fetch(sessionId.toString).map {
           case None       => OptionalDataRequest(request, sessionId.toString, None)
-          case Some(data) => OptionalDataRequest(request, sessionId.toString, Some(new UserAnswers(data)))
+          case Some(data) => OptionalDataRequest(request, sessionId.toString, Some(UserAnswers(data)))
         }
-    }
-  }
 
   override def parser: BodyParser[AnyContent] = bodyParsers
-}
 
 @ImplementedBy(classOf[DataRetrievalActionImpl])
 trait DataRetrievalAction extends ActionTransformer[Request, OptionalDataRequest] with ActionBuilder[OptionalDataRequest, AnyContent]

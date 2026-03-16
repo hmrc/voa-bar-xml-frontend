@@ -20,6 +20,5 @@ import play.api.libs.json.{Json, OFormat}
 
 final case class UserReportUpload(id: String, userId: String, userPassword: String)
 
-object UserReportUpload {
-  implicit val format: OFormat[UserReportUpload] = Json.format[UserReportUpload]
-}
+object UserReportUpload:
+  implicit val format: OFormat[UserReportUpload] = Json.format

@@ -21,12 +21,10 @@ package forms.validator
   *
   * @see https://github.com/hmrc/hmrc-deskpro/blob/main/app/model/deskpro/NameValidator.scala
   */
-case class NameValidator() {
+object NameValidator:
 
-  val nameRegex: String = """^[A-Za-z\-.,()'"\s]+$"""
+  private val nameRegex: String = """^[A-Za-z\-.,()'"\s]+$"""
 
   // Quick check that the string does not contain "http://" or "https://" before the full regex
   def validate(name: String): Boolean =
     !name.contains("http://") && !name.contains("https://") && name.matches(nameRegex)
-
-}

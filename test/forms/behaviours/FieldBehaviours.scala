@@ -22,7 +22,7 @@ import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.data.{Form, FormError}
 
-trait FieldBehaviours extends FormSpec with ScalaCheckDrivenPropertyChecks with Generators {
+trait FieldBehaviours extends FormSpec with ScalaCheckDrivenPropertyChecks with Generators:
 
   def fieldThatBindsValidData(form: Form[?], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "bind valid data" in
@@ -32,18 +32,13 @@ trait FieldBehaviours extends FormSpec with ScalaCheckDrivenPropertyChecks with 
           result.value.value shouldBe dataItem
       }
 
-  def mandatoryField(form: Form[?], fieldName: String, requiredError: FormError): Unit = {
-
+  def mandatoryField(form: Form[?], fieldName: String, requiredError: FormError): Unit =
     "not bind when key is not present at all" in {
-
-      val result = form.bind(emptyForm).apply(fieldName)
+      val result = form.bind(emptyFormData).apply(fieldName)
       result.errors shouldEqual Seq(requiredError)
     }
 
     "not bind blank values" in {
-
       val result = form.bind(Map(fieldName -> "")).apply(fieldName)
       result.errors shouldEqual Seq(requiredError)
     }
-  }
-}

@@ -29,12 +29,10 @@ import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now) {
-
+case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now):
   def asCacheMap: CacheMap = CacheMap(id, data)
-}
 
-object DatedCacheMap {
+object DatedCacheMap:
 
   private val localDateTimeReads: Reads[LocalDateTime] =
     Reads.at[String](__ \ "$date" \ "$numberLong")
@@ -45,13 +43,12 @@ object DatedCacheMap {
       .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
 
   implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
-  implicit val formats: OFormat[DatedCacheMap]   = Json.format[DatedCacheMap]
+  implicit val formats: OFormat[DatedCacheMap]   = Json.format
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
-}
 
 @Singleton
-class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(implicit ec: ExecutionContext)
+class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)(using ec: ExecutionContext)
   extends PlayMongoRepository[DatedCacheMap](
     collectionName = config.get[String]("appName"),
     mongoComponent = mongo,
@@ -66,9 +63,9 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
       Codecs.playFormatCodec(DatedCacheMap.dateFormat)
     )
   )
-  with Logging {
+  with Logging:
 
-  def upsert(cm: CacheMap): Future[Boolean] = {
+  def upsert(cm: CacheMap): Future[Boolean] =
     val selector = equal("id", cm.id)
 
     collection.findOneAndReplace(selector, DatedCacheMap(cm), FindOneAndReplaceOptions().upsert(true))
@@ -79,12 +76,9 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
           logger.error("Error on saving to cache", ex)
           false
       }
-  }
 
   def get(id: String): Future[Option[CacheMap]] =
     collection.find(equal("id", id)).first().toFutureOption().map(_.map(_.asCacheMap))
 
   def getByField[A](key: String, value: String): Future[Option[CacheMap]] =
     collection.find(equal(key, value)).first().toFutureOption().map(_.map(_.asCacheMap))
-
-}

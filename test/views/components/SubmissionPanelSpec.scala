@@ -16,27 +16,25 @@
 
 package views.components
 
-import models._
+import models.*
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import views.behaviours.ViewBehaviours
 import views.html.components.submission_panel
 
-class SubmissionPanelSpec extends ViewBehaviours {
+class SubmissionPanelSpec extends ViewBehaviours:
 
   val submissionId  = "SId9324832"
   val baCode        = "baCode"
   val reportStatus1 = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
 
-  def submission1 = () => submission_panel(reportStatus1, new GovukSummaryList())(using messages)
+  private def submission1 = () => submission_panel(reportStatus1, GovukSummaryList())(using messages)
 
   "Submission Panel" must {
 
     "Contain a submission ID equal to 'submissionId'" in {
-      lazy val doc = asDocument(submission1())
-      val status   = doc.select(s"#summary-list-${reportStatus1.id.split("-").head} > div:nth-child(1) > dd").text
+      val doc    = asDocument(submission1())
+      val status = doc.select(s"#summary-list-${reportStatus1.id.split("-").head} > div:nth-child(1) > dd").text
       status mustBe submissionId
     }
 
   }
-
-}

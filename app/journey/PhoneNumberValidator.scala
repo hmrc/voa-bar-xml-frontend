@@ -20,20 +20,11 @@ import cats.data.Validated
 import ltbs.uniform.ErrorTree
 import ltbs.uniform.validation.Rule
 
-class PhoneNumberValidator extends Rule[String] {
-  import PhoneNumberValidator._
+object PhoneNumberValidator extends Rule[String]:
 
-  val validationRegex = """[0-9 \-]{1,20}"""
+  private val allowedChars    = """[^0-9 \-]""".r
+  private val validationRegex = """[0-9 \-]{1,20}"""
 
-  override def apply(v1: String): Validated[ErrorTree, String] = {
+  override def apply(v1: String): Validated[ErrorTree, String] =
     val updatePhoneNumber = allowedChars.replaceAllIn(v1, "")
     Rule.matchesRegex(validationRegex, "phoneNumber.format").apply(updatePhoneNumber)
-  }
-}
-
-object PhoneNumberValidator {
-  val allowedChars = """[^0-9 \-]""".r
-
-  def apply(): PhoneNumberValidator = new PhoneNumberValidator
-
-}

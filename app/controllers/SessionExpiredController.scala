@@ -26,9 +26,8 @@ class SessionExpiredController @Inject() (
   controllerComponents: MessagesControllerComponents,
   session_expired: session_expired
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
+  with I18nSupport:
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(session_expired())
   }
-}

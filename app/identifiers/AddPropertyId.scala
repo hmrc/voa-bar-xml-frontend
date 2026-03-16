@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object AddPropertyId extends Identifier {
+case object AddPropertyId extends Identifier:
   override def toString: String = "addproperty"
-}

@@ -20,10 +20,10 @@ import javax.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import models.Login
 
-class LoginFormProvider @Inject() extends Mappings {
+class LoginFormProvider @Inject() extends Mappings:
 
   private val maxLen = 100
 
@@ -36,4 +36,3 @@ class LoginFormProvider @Inject() extends Mappings {
       "reference" -> optional(text())
     )(Login.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
-}

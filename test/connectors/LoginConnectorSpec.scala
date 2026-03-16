@@ -61,7 +61,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
       val httpMock          = getHttpMock(OK)
       val headerCarrierStub = HeaderCarrier()
 
-      val connector = new LoginConnector(httpMock, servicesConfig)
+      val connector = LoginConnector(httpMock, servicesConfig)
       await(connector.doLogin(login)(using headerCarrierStub))
 
       verify(httpMock).post(urlCaptor.capture)(using headerCarrierNapper.capture)
@@ -71,13 +71,13 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
     }
 
     "return a 200 status when the doLogin method is successfull" in {
-      val connector = new LoginConnector(getHttpMock(200), servicesConfig)
+      val connector = LoginConnector(getHttpMock(200), servicesConfig)
       val result    = await(connector.doLogin(login))
       result mustBe Success(200)
     }
 
     "return a failure representing the error when doLogin method fails" in {
-      val connector = new LoginConnector(getHttpMock(500), servicesConfig)
+      val connector = LoginConnector(getHttpMock(500), servicesConfig)
       val result    = await(connector.doLogin(login))
       result.isFailure mustBe true
       result.toString mustBe Failure(RuntimeException("Received status of 500 from upstream service when logging in")).toString
@@ -89,7 +89,7 @@ class LoginConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
         httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
       ).thenReturn(RequestBuilderStub(Left(RuntimeException("Login failed.")), "{}"))
 
-      val connector = new LoginConnector(httpClientV2Mock, servicesConfig)
+      val connector = LoginConnector(httpClientV2Mock, servicesConfig)
       val result    = await(connector.doLogin(login))
       result.isFailure mustBe true
     }

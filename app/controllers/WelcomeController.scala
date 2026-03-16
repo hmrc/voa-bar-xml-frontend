@@ -21,7 +21,6 @@ import connectors.DataCacheConnector
 import controllers.actions.*
 import identifiers.{CouncilTaxStartId, TaskListId, VOAuthorisedId}
 import models.NormalMode
-import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -32,23 +31,20 @@ import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject() (
   appConfig: FrontendAppConfig,
-  config: Configuration,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   navigator: Navigator,
   dataCacheConnector: DataCacheConnector,
   controllerComponents: MessagesControllerComponents,
   welcome: views.html.welcome
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
-
-  private val cr05FeatureEnabled = config.getOptional[Boolean]("feature.cr05.enabled").contains(true)
+  with I18nSupport:
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
-        case Some(username) => Ok(welcome(appConfig, username, cr05FeatureEnabled))
+        case Some(username) => Ok(welcome(appConfig, username))
         case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
       }
   }
@@ -60,4 +56,3 @@ class WelcomeController @Inject() (
   def goToTaskListLoadPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(TaskListId, NormalMode)(request.userAnswers))
   }
-}

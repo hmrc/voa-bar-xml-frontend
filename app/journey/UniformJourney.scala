@@ -26,33 +26,34 @@ import play.api.libs.json.*
 
 import java.time.LocalDate
 
-object UniformJourney {
+object UniformJourney:
 
-  object Address { implicit val format: OFormat[Address] = Json.format[Address] }
+  object Address:
+    implicit val format: OFormat[Address] = Json.format
 
-  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String) {
+  case class Address(line1: String, line2: String, line3: Option[String], line4: Option[String], postcode: String):
 
-    def displayAddress = {
+    def displayAddress: String =
       val addressList = List(line1, line2) ++ List(line3, line4).flatten ++ List(postcode)
       addressList.mkString(", ")
-    }
-  }
 
   case class OtherReasonWrapper(value: String)
 
-  object OtherReasonWrapper {
+  object OtherReasonWrapper:
     import play.api.libs.functional.syntax.*
 
     implicit val otherReasonWrapperFormat: Format[OtherReasonWrapper] =
       implicitly[Format[String]].inmap(OtherReasonWrapper.apply, _.value)
-  }
 
-  object ContactDetails { implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails] }
+  object ContactDetails:
+    implicit val format: OFormat[ContactDetails] = Json.format
+
   case class ContactDetails(firstName: String, lastName: String, email: Option[String], phoneNumber: Option[String])
 
   sealed trait CrSubmission
 
-  object Cr01Cr03Submission { implicit val format: OFormat[Cr01Cr03Submission] = Json.format[Cr01Cr03Submission] }
+  object Cr01Cr03Submission:
+    implicit val format: OFormat[Cr01Cr03Submission] = Json.format
 
   final case class Cr01Cr03Submission(
     reasonReport: ReasonReportType,
@@ -81,7 +82,8 @@ object UniformJourney {
     noPlanningReference: Option[NoPlanningReferenceType]
   )
 
-  object Cr05Common { implicit val format: OFormat[Cr05Common] = Json.format[Cr05Common] }
+  object Cr05Common:
+    implicit val format: OFormat[Cr05Common] = Json.format
 
   case class Cr05AddProperty(
     uprn: Option[String],
@@ -90,38 +92,37 @@ object UniformJourney {
     sameContactAddress: Boolean,
     contactAddress: Option[Address]
   )
-  object Cr05AddProperty { implicit val format: OFormat[Cr05AddProperty] = Json.format[Cr05AddProperty] }
+
+  object Cr05AddProperty:
+    implicit val format: OFormat[Cr05AddProperty] = Json.format
 
   case class Cr05SubmissionBuilder(
     cr05CommonSection: Option[Cr05Common],
     existingProperties: List[Cr05AddProperty],
     proposedProperties: List[Cr05AddProperty],
     comments: Option[String]
-  ) {
+  ):
 
     def toCr05Submission: Cr05Submission =
+      val cr05Common = cr05CommonSection.getOrElse(Cr05Common("", "", LocalDate.now, false, None, None))
       Cr05Submission(
-        cr05CommonSection.get.baReport,
-        cr05CommonSection.get.baRef,
-        cr05CommonSection.get.effectiveDate,
+        cr05Common.baReport,
+        cr05Common.baRef,
+        cr05Common.effectiveDate,
         existingProperties,
         proposedProperties,
-        cr05CommonSection.get.planningRef,
-        cr05CommonSection.get.noPlanningReference,
+        cr05Common.planningRef,
+        cr05Common.noPlanningReference,
         comments
       )
-  }
 
-  object Cr05SubmissionBuilder {
+  object Cr05SubmissionBuilder:
     val storageKey                                     = "ADD_PROPERTY"
-    implicit val format: Format[Cr05SubmissionBuilder] = Json.format[Cr05SubmissionBuilder]
-  }
+    implicit val format: Format[Cr05SubmissionBuilder] = Json.format
 
-  // $COVERAGE-OFF$
-  object Cr05Submission {
+  object Cr05Submission:
     val storageKey                              = "CR05"
-    implicit val format: Format[Cr05Submission] = Json.format[Cr05Submission]
-  }
+    implicit val format: Format[Cr05Submission] = Json.format
 
   final case class Cr05Submission(
     baReport: String,
@@ -132,7 +133,7 @@ object UniformJourney {
     planningRef: Option[String],
     noPlanningReference: Option[NoPlanningReferenceType],
     comments: Option[String]
-  ) extends CrSubmission {
+  ) extends CrSubmission:
 
     def asBuilder: Cr05SubmissionBuilder =
       Cr05SubmissionBuilder(
@@ -141,26 +142,23 @@ object UniformJourney {
         existingPropertis.toList,
         comments
       )
-  }
 
-  // $COVERAGE-ON$
-  type AskTypes  =
+  type AskTypes =
     ReasonReportType :: RemovalReasonType :: NoPlanningReferenceType :: LocalDate ::
       YesNoType :: ContactDetails :: Address :: OtherReasonWrapper :: Option[String] :: String :: NilTypes
+
   type TellTypes = Cr05Common :: (Cr05AddProperty, PropertyType, Option[Int]) :: Cr05SubmissionBuilder :: Cr01Cr03Submission :: NilTypes
 
   // RestrictedStringType
-  // [A-Za-z0-9\s~!&quot;@#$%&amp;'\(\)\*\+,\-\./:;&lt;=&gt;\?\[\\\]_\{\}\^&#xa3;&#x20ac;]*
   val restrictedStringTypeRegex = """[A-Za-z0-9\s\~!"@#\$%\+&;'\(\)\*,\-\./:;<=>\?\[\\\]_\{\}\^£€]*"""
 
   // More strict validation that in XML https://emailregex.com/
   val emailAddressRegex =
     """(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
 
-  // $COVERAGE-OFF$
-  def addPropertyCommon[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], cr05Common: Option[Cr05Common]): F[Cr05Common] = {
+  def addPropertyCommon[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], cr05Common: Option[Cr05Common]): F[Cr05Common] =
     import interpreter.*
-    for {
+    for
       baReport        <- ask[String]("add-property-ba-report", validation = baReportValidation, default = cr05Common.map(_.baReport))
       baRef           <- ask[String]("add-property-ba-ref", validation = baReferenceValidation, default = cr05Common.map(_.baRef))
       effectiveDate   <- ask[LocalDate]("add-property-effective-date", default = cr05Common.map(_.effectiveDate))
@@ -169,17 +167,16 @@ object UniformJourney {
       noPlanningRef   <- ask[NoPlanningReferenceType]("add-property-why-no-planning-ref", cr05Common.flatMap(_.noPlanningReference)) when (havePlanningRef == No)
       ctForm           = Cr05Common(baReport, baRef, effectiveDate, havePlanningRef == Yes, planningRef, noPlanningRef)
       _               <- tell[Cr05Common]("add-property-check-answers-common", ctForm)
-    } yield ctForm
-  }
+    yield ctForm
 
   def addPropertyHelper[F[_]: cats.Monad](
     interpreter: Language[F, TellTypes, AskTypes],
     property: Option[Cr05AddProperty],
     propertyType: PropertyType,
     index: Option[Int]
-  ): F[Cr05AddProperty] = {
+  ): F[Cr05AddProperty] =
     import interpreter.*
-    for {
+    for
       uprn               <- ask[Option[String]]("add-property-UPRN", validation = uprnValidation, default = property.map(_.uprn))
       address            <- ask[Address]("add-property-property-address", validation = longAddressValidation("property-address"), default = property.map(_.address))
       contactDetails     <- ask[ContactDetails]("add-property-property-contact-details", property.map(_.propertyContactDetails), propertyContactDetailValidator)
@@ -191,33 +188,26 @@ object UniformJourney {
                             ) when (sameContactAddress == No)
       ctForm              = Cr05AddProperty(uprn, address, contactDetails, sameContactAddress == Yes, contactAddress)
       _                  <- tell[(Cr05AddProperty, PropertyType, Option[Int])]("add-property-check-answers-property", (ctForm, propertyType, index))
-    } yield ctForm
-  }
+    yield ctForm
 
   def booleaToYesNo(value: Boolean): YesNoType =
-    if (value) {
-      Yes
-    } else {
-      No
-    }
+    if value then Yes else No
 
-  def addComments[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], default: Option[String]): F[Option[String]] = {
+  def addComments[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], default: Option[String]): F[Option[String]] =
     import interpreter.*
-    for {
+    for
       comments <- ask[Option[String]]("add-comments", validation = commentsValidation, default = Some(default))
-    } yield comments
-  }
+    yield comments
 
-  def cr05CheckYourAnswers[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] = {
+  def cr05CheckYourAnswers[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes])(cr05Submission: Cr05SubmissionBuilder): F[Cr05SubmissionBuilder] =
     import interpreter.*
-    for {
+    for
       _ <- tell[Cr05SubmissionBuilder]("cr05-check-answers", cr05Submission)
-    } yield cr05Submission
-  }
+    yield cr05Submission
 
-  def ctTaxJourney[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], reasonReport: ReasonReportType): F[Cr01Cr03Submission] = {
+  def ctTaxJourney[F[_]: cats.Monad](interpreter: Language[F, TellTypes, AskTypes], reasonReport: ReasonReportType): F[Cr01Cr03Submission] =
     import interpreter.*
-    for {
+    for
       removalReason          <- ask[RemovalReasonType]("why-should-it-be-removed") when reasonReport == RemoveProperty
       otherReason            <- ask[OtherReasonWrapper]("other-reason", validation = otherReasonValidation) when removalReason.contains(OtherReason)
       baReport               <- ask[String]("ba-report", validation = baReportValidation)
@@ -253,53 +243,50 @@ object UniformJourney {
                                 )
 
       _ <- tell[Cr01Cr03Submission]("check-answers", ctForm)
-    } yield ctForm
-  }
-  // $COVERAGE-ON$
+    yield ctForm
 
-  def otherReasonValidation(a: OtherReasonWrapper) =
+  def otherReasonValidation(a: OtherReasonWrapper): Validated[ErrorTree, OtherReasonWrapper] =
     (lengthBetween(1, 32, "error.minLength", "error.maxLength").apply(a.value) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("other-reason")).map(OtherReasonWrapper.apply)
 
-  def baReportValidation(a: String) =
+  def baReportValidation(a: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 12, "error.minLength", "error.maxLength").apply(a) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("ba-report"))
 
-  def baReferenceValidation(a: String) =
+  def baReferenceValidation(a: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(a) andThen (
       Rule.matchesRegex(restrictedStringTypeRegex, "error.allowedChars").apply(_)
     ))
       .leftMap(_.prefixWith("ba-ref"))
 
-  def uprnValidation(a: Option[String]) =
-    (a match {
+  def uprnValidation(a: Option[String]): Validated[ErrorTree, Option[String]] =
+    (a match
       case None       => Validated.valid(None)
       case Some(uprn) =>
         (lengthBetween(1, 12, "", "error.maxLength").apply(uprn) andThen (
           Rule.matchesRegex("""\d+""", "error.allowedChars").apply(_)
         )).map(Option(_))
-    }).leftMap(_.prefixWith("UPRN"))
+    ).leftMap(_.prefixWith("UPRN"))
 
-  def commentsValidation(a: Option[String]) =
-    (a match {
+  def commentsValidation(a: Option[String]): Validated[ErrorTree, Option[String]] =
+    (a match
       case None       => Validated.valid(None)
       case Some(uprn) =>
         (lengthBetween(1, 226, "", "error.maxLength").apply(uprn) andThen (
-          new journey.Iso558910Validator().apply(_)
+          Iso558910Validator(_)
         )).map(Option(_))
-    }).leftMap(_.prefixWith("comments"))
+    ).leftMap(_.prefixWith("comments"))
 
-  def planningRefValidator(planningRef: String) =
+  def planningRefValidator(planningRef: String): Validated[ErrorTree, String] =
     (lengthBetween(1, 25, "error.minLength", "error.maxLength").apply(planningRef) andThen (
-      new Iso558910Validator()(_)
+      Iso558910Validator(_)
     )).leftMap(_.prefixWith("planning-ref"))
 
-  def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] = {
-
+  def propertyContactDetailValidator(contactDetails: ContactDetails): Validated[ErrorTree, ContactDetails] =
     val firstName =
       (lengthBetween(1, 35, "firstName.minLength", "firstName.maxLength")
         .apply(contactDetails.firstName) andThen (
@@ -312,27 +299,25 @@ object UniformJourney {
         Rule.matchesRegex(restrictedStringTypeRegex, "lastName.allowedChars").apply(_)
       )).leftMap(_.prefixWith("lastName"))
 
-    val emailAddress = (contactDetails.email match {
+    val emailAddress = (contactDetails.email match
       case None        => Validated.valid(None)
       case Some(email) =>
         Rule.matchesRegex(emailAddressRegex, "email.format")(email).map(Option(_))
-    }).leftMap(_.prefixWith("email"))
+    ).leftMap(_.prefixWith("email"))
 
-    val phoneNumber = (contactDetails.phoneNumber match {
+    val phoneNumber = (contactDetails.phoneNumber match
       case None        => Validated.valid(None)
-      case Some(phone) => PhoneNumberValidator()(phone).map(Option(_))
-    }).leftMap(_.prefixWith("phoneNumber"))
+      case Some(phone) => PhoneNumberValidator(phone).map(Option(_))
+    ).leftMap(_.prefixWith("phoneNumber"))
 
     val result = (firstName, lastName, emailAddress, phoneNumber).mapN(ContactDetails.apply)
 
     result.leftMap(_.prefixWith("property-contact-details"))
-  }
 
   def shortAddressValidation(errorPrefix: String)(a: Address): Validated[ErrorTree, Address] = addressValidation(35, errorPrefix)(a)
   def longAddressValidation(errorPrefix: String)(a: Address): Validated[ErrorTree, Address]  = addressValidation(100, errorPrefix)(a)
 
-  def addressValidation(maxLen: Int, errorPrefix: String)(a: Address): Validated[ErrorTree, Address] = {
-
+  def addressValidation(maxLen: Int, errorPrefix: String)(a: Address): Validated[ErrorTree, Address] =
     val line1 =
       (lengthBetween(1, maxLen, "line1.minLength", "line1.maxLength").apply(a.line1) andThen
         (Rule.matchesRegex(
@@ -353,32 +338,27 @@ object UniformJourney {
     val line4: Validated[ErrorTree, Option[String]] = validateOptionalAddressLine(maxLen, "line4.maxLength", "line4.allowedChars")
       .apply(a.line4).leftMap(_.prefixWith("line4"))
 
-    val postcode = new PostcodeValidator().apply(a.postcode).leftMap(_.prefixWith("postcode"))
+    val postcode = PostcodeValidator(a.postcode).leftMap(_.prefixWith("postcode"))
 
     val result = (line1, line2, line3, line4, postcode).mapN(Address.apply)
 
     result.leftMap(_.prefixWith(errorPrefix))
-  }
 
-  def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage: String) = new Rule[String] {
+  private def lengthBetween(min: Int, max: Int, minMessage: String, maxMessage: String) =
+    new Rule[String]:
+      override def apply(v1: String): Validated[ErrorTree, String] =
+        minLength[String](min, minMessage).apply(v1) andThen (maxLength[String](max, maxMessage).apply(_))
 
-    override def apply(v1: String): Validated[ErrorTree, String] =
-      minLength[String](min, minMessage).apply(v1) andThen (maxLength[String](max, maxMessage).apply(_))
-  }
-
-  def validateOptionalAddressLine(maxLen: Int, maxLenMsg: String, formatMsg: String) = new Rule[Option[String]] {
-
-    override def apply(v1: Option[String]): Validated[ErrorTree, Option[String]] =
-      v1 match {
-        case None        => Validated.Valid(Option.empty[String])
-        case Some(value) =>
-          val res                                        = maxLength[String](maxLen, maxLenMsg).apply(value) andThen
-            (Rule.matchesRegex(
-              restrictedStringTypeRegex,
-              formatMsg
-            ).apply(_))
-          val res2: Validated[ErrorTree, Option[String]] = res.map(x => Option(x))
-          res2
-      }
-  }
-}
+  private def validateOptionalAddressLine(maxLen: Int, maxLenMsg: String, formatMsg: String) =
+    new Rule[Option[String]]:
+      override def apply(v1: Option[String]): Validated[ErrorTree, Option[String]] =
+        v1 match
+          case None        => Validated.Valid(Option.empty[String])
+          case Some(value) =>
+            val res                                        = maxLength[String](maxLen, maxLenMsg).apply(value) andThen
+              (Rule.matchesRegex(
+                restrictedStringTypeRegex,
+                formatMsg
+              ).apply(_))
+            val res2: Validated[ErrorTree, Option[String]] = res.map(x => Option(x))
+            res2

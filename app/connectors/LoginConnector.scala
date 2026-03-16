@@ -34,26 +34,25 @@ import scala.util.{Failure, Success, Try}
 class LoginConnector @Inject() (
   httpClientV2: HttpClientV2,
   servicesConfig: ServicesConfig
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends Logging:
 
   private val backendBase: String = servicesConfig.baseUrl("voa-bar")
   private val loginURL: URL       = url"$backendBase/voa-bar/login"
 
-  def doLogin(login: Login)(implicit hc: HeaderCarrier): Future[Try[Int]] =
+  def doLogin(login: Login)(using hc: HeaderCarrier): Future[Try[Int]] =
     httpClientV2.post(loginURL)
       .withBody(Json.toJson(login))
       .execute[HttpResponse]
       .map { response =>
-        response.status match {
+        response.status match
           case OK     => Success(OK)
           case status =>
             logger.warn(s"Received status of $status from upstream service when logging in")
-            Failure(new RuntimeException(s"Received status of $status from upstream service when logging in"))
-        }
+            Failure(RuntimeException(s"Received status of $status from upstream service when logging in"))
       }
       .recover {
         case e =>
           logger.warn("Received exception " + e.getMessage + " from upstream service")
-          Failure(new RuntimeException("Received exception " + e.getMessage + " from upstream service"))
+          Failure(RuntimeException("Received exception " + e.getMessage + " from upstream service"))
       }

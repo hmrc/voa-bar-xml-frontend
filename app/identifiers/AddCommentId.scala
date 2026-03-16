@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object AddCommentId extends Identifier {
+case object AddCommentId extends Identifier:
   override def toString: String = "addcomment"
-}

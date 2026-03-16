@@ -45,12 +45,17 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.Throw,
       Wart.Nothing,
       Wart.Overloading,
+      Wart.OptionPartial,
+      Wart.IterableOps,
+      Wart.ListAppend,
       Wart.FinalCaseClass,
       Wart.PlatformDefault,
+      Wart.MutableDataStructures,
       Wart.SeqUpdated,
       Wart.SeqApply,
       Wart.SizeIs,
       Wart.Null,
+      Wart.Var,
       Wart.Any,
       Wart.While
     )
@@ -88,8 +93,13 @@ object WartRemoverSettings extends AutoPlugin {
       Wart.Null,
       Wart.Nothing,
       Wart.Throw,
+      Wart.Var,
       Wart.Overloading,
       Wart.FinalCaseClass,
+      Wart.TryPartial,
+      Wart.OptionPartial,
+      Wart.MutableDataStructures,
+      Wart.ImplicitParameter,
       Wart.PlatformDefault
     )
 

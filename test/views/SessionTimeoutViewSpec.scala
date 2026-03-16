@@ -18,14 +18,13 @@ package views
 
 import views.behaviours.ViewBehaviours
 
-class SessionTimeoutViewSpec extends ViewBehaviours with ViewSpecBase {
+class SessionTimeoutViewSpec extends ViewBehaviours with ViewSpecBase:
 
-  def sessionTimeout = inject[views.html.session_timeout]
+  private def sessionTimeout = inject[views.html.session_timeout]
 
-  def view = () => sessionTimeout()(using fakeRequest, messages)
+  private def view = () => sessionTimeout()(using fakeRequest, messages)
 
   "Session Timeout view" must {
 
     behave like normalPage(view, "sessionTimeout", "heading", "copy", "link")
   }
-}

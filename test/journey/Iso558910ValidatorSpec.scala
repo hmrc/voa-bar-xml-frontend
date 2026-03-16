@@ -22,34 +22,27 @@ import org.scalatest.matchers.should
 import org.scalatest.EitherValues
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks {
+class Iso558910ValidatorSpec extends AnyFlatSpec with should.Matchers with EitherValues with TableDrivenPropertyChecks:
 
-  val invalidInputData = Table(
+  private val invalidInputData = Table(
     "Incorrect string",
     "½",
     "🤔",
     "Ω≈ç√∫˜µ≤"
   )
 
-  val validInputData = Table(
+  private val validInputData = Table(
     "Correct string",
     "€ \tŠ \tš \tŽ \tž \tŒ \tœ \tŸ",
     "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
   )
 
-  "Iso558910ValidatorSpec" should "Reject all non iso8859-15 characters" in {
-    val validator = new Iso558910Validator()
+  "Iso558910ValidatorSpec" should "Reject all non iso8859-15 characters" in
     forAll(invalidInputData) { badString =>
-      validator(badString).toEither.left.value shouldBe ErrorTree.oneErr(ErrorMsg("error.invalidIsoString"))
+      Iso558910Validator(badString).toEither.left.value shouldBe ErrorTree.oneErr(ErrorMsg("error.invalidIsoString"))
     }
-  }
 
-  it should "Allow all valid charactes in iso8859-15" in {
-    val validator = new Iso558910Validator()
+  it should "Allow all valid characters in iso8859-15" in
     forAll(validInputData) { goodString =>
-      validator(goodString).toEither.value shouldBe goodString
+      Iso558910Validator(goodString).toEither.value shouldBe goodString
     }
-
-  }
-
-}

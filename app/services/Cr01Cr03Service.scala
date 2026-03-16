@@ -29,16 +29,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[DefaultCr01Cr03Service])
-trait Cr01Cr03Service {
-  def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
-  def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID]
-}
+trait Cr01Cr03Service:
+  def storeSubmission(submission: Cr01Cr03Submission, login: Login)(using hc: HeaderCarrier): Future[UUID]
+  def storeSubmission(submission: Cr05Submission, login: Login)(using hc: HeaderCarrier): Future[UUID]
 
 @Singleton
-class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(implicit ec: ExecutionContext) extends Cr01Cr03Service {
+class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(using ec: ExecutionContext) extends Cr01Cr03Service:
 
-  override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
-    val submissionId   = UUID.randomUUID()
+  override def storeSubmission(submission: Cr01Cr03Submission, login: Login)(using hc: HeaderCarrier): Future[UUID] =
+    val submissionId   = UUID.randomUUID
     val cr01cr03Report = createReport(submission)
     val report         = ReportStatus(
       id = submissionId.toString,
@@ -48,28 +47,21 @@ class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(
       report = Option(cr01cr03Report)
     )
     reportConnector.save(report, login).map(_ => submissionId)
-  }
 
-  def createReport(submission: Cr01Cr03Submission): JsObject = {
-    val jsObj = Cr01Cr03Submission.format.writes(submission)
-
+  private def createReport(submission: Cr01Cr03Submission): JsObject =
     Json.obj(
       "type"       -> "Cr01Cr03Submission",
-      "submission" -> jsObj
+      "submission" -> Cr01Cr03Submission.format.writes(submission)
     )
-  }
 
-  def createReport(submission: Cr05Submission): JsObject = {
-    val jsObj = Cr05Submission.format.writes(submission)
-
+  private def createReport(submission: Cr05Submission): JsObject =
     Json.obj(
       "type"       -> "Cr05Submission",
-      "submission" -> jsObj
+      "submission" -> Cr05Submission.format.writes(submission)
     )
-  }
 
-  override def storeSubmission(submission: Cr05Submission, login: Login)(implicit hc: HeaderCarrier): Future[UUID] = {
-    val submissionId = UUID.randomUUID()
+  override def storeSubmission(submission: Cr05Submission, login: Login)(using hc: HeaderCarrier): Future[UUID] =
+    val submissionId = UUID.randomUUID
     val cr05Report   = createReport(submission)
     val report       = ReportStatus(
       id = submissionId.toString,
@@ -79,6 +71,3 @@ class DefaultCr01Cr03Service @Inject() (reportConnector: ReportStatusConnector)(
       report = Option(cr05Report)
     )
     reportConnector.save(report, login).map(_ => submissionId)
-
-  }
-}

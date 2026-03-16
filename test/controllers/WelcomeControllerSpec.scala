@@ -20,7 +20,6 @@ import connectors.FakeDataCacheConnector
 import controllers.actions.*
 import identifiers.VOAuthorisedId
 import models.NormalMode
-import play.api.Configuration
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
 import utils.FakeNavigator
@@ -30,11 +29,9 @@ import scala.concurrent.ExecutionContext
 class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase:
 
   private val username             = "AUser"
-  private val cr05FeatureFlag      = false
   private val welcome              = inject[views.html.welcome]
   private val ec                   = inject[ExecutionContext]
   private val controllerComponents = inject[MessagesControllerComponents]
-  private val configuration        = Configuration("feature.cr05.enabled" -> cr05FeatureFlag)
 
   private def onwardRoute = routes.LoginController.onPageLoad(NormalMode)
 
@@ -43,7 +40,6 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase:
     FakeDataCacheConnector.save[String]("", VOAuthorisedId.toString, username)
     WelcomeController(
       frontendAppConfig,
-      configuration,
       dataRetrievalAction,
       DataRequiredActionImpl(ec),
       FakeNavigator(desiredRoute = onwardRoute),
@@ -56,7 +52,6 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase:
     FakeDataCacheConnector.resetCaptures()
     WelcomeController(
       frontendAppConfig,
-      configuration,
       dataRetrievalAction,
       DataRequiredActionImpl(ec),
       FakeNavigator(desiredRoute = onwardRoute),
@@ -65,7 +60,7 @@ class WelcomeControllerSpec extends ControllerSpecBase with ViewSpecBase:
       welcome
     )(using ec)
 
-  private def viewAsString() = welcome(frontendAppConfig, username, cr05FeatureFlag)(using fakeRequest, messages).toString
+  private def viewAsString() = welcome(frontendAppConfig, username)(using fakeRequest, messages).toString
 
   "Welcome Controller" must {
 

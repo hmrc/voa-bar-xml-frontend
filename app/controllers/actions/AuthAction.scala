@@ -27,15 +27,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthAction @Inject() (
   cc: MessagesControllerComponents,
   unauthorised: unauthorised
-)(implicit val executionContext: ExecutionContext
-) extends ActionFilter[DataRequest] {
+)(using val executionContext: ExecutionContext
+) extends ActionFilter[DataRequest]:
 
   override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] =
-    if (request.userAnswers.login.isEmpty) {
+    if request.userAnswers.login.isEmpty then
       val messages = cc.messagesApi.preferred(request)
       Future.successful(Some(Unauthorized(unauthorised()(using request, messages))))
-    } else {
+    else
       Future.successful(None)
-    }
-
-}

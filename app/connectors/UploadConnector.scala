@@ -39,7 +39,7 @@ class UploadConnector @Inject() (
   httpClientV2: HttpClientV2,
   val servicesConfig: ServicesConfig,
   messages: MessagesApi
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends BaseConnector
   with Logging:
 
@@ -65,10 +65,9 @@ class UploadConnector @Inject() (
       .withBody(Json.toJson(uploadData))
       .execute[HttpResponse]
       .map { response =>
-        response.status match {
+        response.status match
           case OK     => Right(response.body)
           case status => handleSendXmlError(s"$status. ${response.body}")
-        }
       }
       .recover {
         case e => handleSendXmlError(e.getMessage)
@@ -79,7 +78,7 @@ class UploadConnector @Inject() (
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .map { response =>
-        response.status match {
+        response.status match
           case status if is2xx(status) =>
             val initiateResponse = Json.parse(response.body).as[InitiateResponse]
             logger.debug(s"Upscan initiate response : $initiateResponse")
@@ -87,7 +86,6 @@ class UploadConnector @Inject() (
           case status                  =>
             logger.error(s"$status. Failed to get UpScan file upload details. ${response.body}")
             Left(Error(messages("councilTaxUpload.error.fileUploadService"), Seq()))
-        }
       }
       .recover {
         case ex =>

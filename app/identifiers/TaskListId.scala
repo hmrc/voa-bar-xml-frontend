@@ -16,6 +16,5 @@
 
 package identifiers
 
-case object TaskListId extends Identifier {
+case object TaskListId extends Identifier:
   override def toString: String = "tasklist"
-}

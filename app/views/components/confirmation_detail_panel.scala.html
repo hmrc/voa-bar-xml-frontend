@@ -29,8 +29,7 @@
         @components.submission_panel(
             reportStatus = rs,
             govukSummaryList = govukSummaryList,
-            dlClass = "govuk-!-margin-bottom-0",
-            messagePrefix = "confirmation"
+            dlClass = "govuk-!-margin-bottom-0"
         )
         </div>
         @if(rs.reportErrors.nonEmpty) {
@@ -58,7 +57,7 @@
     </section>
 }
 
-@if(reportStatus.flatMap(_.status) == Some(Done.value) || reportStatus.flatMap(_.status) == Some(Submitted.value)) {
+@if(reportStatus.flatMap(_.status).contains(Done.value) || reportStatus.flatMap(_.status).contains(Submitted.value)) {
     <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@submissionId">@messages("feedback.email")</a></p>
     <p class="govuk-body">@messages("feedback.contact2")</p>
 }

@@ -69,7 +69,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
         val httpMock          = getHttpMock(OK)
         val headerCarrierStub = HeaderCarrier()
 
-        val connector = new UploadConnector(httpMock, servicesConfig, messagesApi)
+        val connector = UploadConnector(httpMock, servicesConfig, messagesApi)
         await(connector.sendXml(xmlUrl, login, submissionId)(using headerCarrierStub))
 
         verify(httpMock).post(urlCaptor.capture)(using headerCarrierNapper.capture)
@@ -81,7 +81,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         given HeaderCarrier = HeaderCarrier()
 
-        val connector = new UploadConnector(getHttpMock(Status.OK, submissionId), servicesConfig, messagesApi)
+        val connector = UploadConnector(getHttpMock(Status.OK, submissionId), servicesConfig, messagesApi)
         val result    = await(connector.sendXml(xmlUrl, login, submissionId))
 
         result mustBe Right(submissionId)
@@ -90,7 +90,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
       "return a failure representing the error when send method fails" in {
         given HeaderCarrier = HeaderCarrier()
 
-        val connector = new UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR), servicesConfig, messagesApi)
+        val connector = UploadConnector(getHttpMock(Status.INTERNAL_SERVER_ERROR), servicesConfig, messagesApi)
         val result    = await(connector.sendXml(xmlUrl, login, submissionId))
 
         result.isLeft mustBe true
@@ -105,9 +105,9 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
         val httpClientV2Mock = mock[HttpClientV2]
         when(
           httpClientV2Mock.post(any[URL])(using any[HeaderCarrier])
-        ).thenReturn(RequestBuilderStub(Left(new RuntimeException("Upload failed."))))
+        ).thenReturn(RequestBuilderStub(Left(RuntimeException("Upload failed."))))
 
-        val connector = new UploadConnector(httpClientV2Mock, servicesConfig, messagesApi)
+        val connector = UploadConnector(httpClientV2Mock, servicesConfig, messagesApi)
         val result    = await(connector.sendXml(xmlUrl, login, submissionId))
 
         result.isLeft mustBe true
@@ -148,7 +148,7 @@ class UploadConnectorSpec extends SpecBase with MockitoSugar with must.Matchers:
         val headerCarrierStub = HeaderCarrier()
 
         val httpMock  = getHttpMock(OK, Json.toJson(initiateResponse).toString)
-        val connector = new UploadConnector(httpMock, servicesConfig, messagesApi)
+        val connector = UploadConnector(httpMock, servicesConfig, messagesApi)
         val response  = await(connector.initiate(initiateRequest)(using headerCarrierStub))
 
         verify(httpMock, times(1))

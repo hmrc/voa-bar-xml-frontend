@@ -17,32 +17,26 @@
 package generators
 
 import org.scalacheck.{Arbitrary, Gen, Shrink}
-import Gen._
-import Arbitrary._
+import Gen.*
+import Arbitrary.*
 
-trait Generators {
+trait Generators:
 
   implicit val dontShrink: Shrink[String] = Shrink.shrinkAny
 
-  def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] = {
-
+  def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] =
     val genValue: Gen[Option[String]] = Gen.frequency(frequencyN -> None, frequencyV -> Gen.const(Some(value)))
-
-    for {
+    for
       seq1 <- gen
       seq2 <- Gen.listOfN(seq1.length, genValue)
-    } yield seq1.zip(seq2).foldRight("") {
-      case ((n, Some(v)), m) =>
-        m + n + v
-      case ((n, _), m)       =>
-        m + n
+    yield seq1.zip(seq2).foldRight("") {
+      case ((n, Some(v)), m) => s"$m$n$v"
+      case ((n, _), m)       => s"$m$n"
     }
-  }
 
-  def intsInRangeWithCommas(min: Int, max: Int): Gen[String] = {
+  def intsInRangeWithCommas(min: Int, max: Int): Gen[String] =
     val numberGen = choose[Int](min, max)
     genIntersperseString(numberGen.toString, ",")
-  }
 
   def intsLargerThanMaxValue: Gen[BigInt] =
     arbitrary[BigInt] suchThat (x => x > Int.MaxValue)
@@ -78,14 +72,13 @@ trait Generators {
     arbitrary[String] suchThat (_.nonEmpty)
 
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
-    for {
+    for
       length <- choose(1, maxLength)
       chars  <- listOfN(length, arbitrary[Char])
-    } yield chars.mkString
+    yield chars.mkString
 
   def stringsLongerThan(minLength: Int): Gen[String] =
     arbitrary[String] suchThat (_.length > minLength)
 
   def stringsExceptSpecificValues(excluded: Set[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
-}

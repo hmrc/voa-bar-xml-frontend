@@ -18,7 +18,7 @@ package models
 
 import base.SpecBase
 
-class FileUploadDataSpec extends SpecBase {
+class FileUploadDataSpec extends SpecBase:
 
   val xml = """<head><body>Some data</body></head>"""
 
@@ -27,4 +27,3 @@ class FileUploadDataSpec extends SpecBase {
 
     result.xml mustBe xml
   }
-}

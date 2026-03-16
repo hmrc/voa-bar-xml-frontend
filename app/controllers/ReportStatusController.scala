@@ -39,38 +39,35 @@ class ReportStatusController @Inject() (
   val dataCacheConnector: DataCacheConnector,
   reportStatusConnector: ReportStatusConnector,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   receiptService: ReceiptService,
   reportStatus: views.html.reportStatus,
   val errorTemplate: views.html.error_template,
   controllerComponents: MessagesControllerComponents,
   formatter: TableFormatter
-)(implicit val ec: ExecutionContext
+)(using val ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
   with BaseBarController
-  with I18nSupport {
+  with I18nSupport:
 
-  def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] = {
+  def verifyResponse(json: JsValue): Either[String, Seq[ReportStatus]] =
     val reportStatuses = Try(json.asOpt[Seq[ReportStatus]]).getOrElse(None)
-    reportStatuses match {
+    reportStatuses match
       case Some(response) => Right(response)
       case None           => Left("Unable to parse the response from the Report Status Connector")
-    }
-  }
 
-  private def reportStatuses(login: Login, filter: Option[String])(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
+  private def reportStatuses(login: Login, filter: Option[String])(using request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.get(login, filter).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatuses => Right(reportStatuses)
     ))
 
-  private def allReportStatuses(login: Login)(implicit request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
+  private def allReportStatuses(login: Login)(using request: Request[?]): Future[Either[Result, Seq[ReportStatus]]] =
     reportStatusConnector.getAll(login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatuses => Right(reportStatuses)
     ))
 
-  private def getReportStatus(submissionId: String, login: Login)(implicit request: Request[?]): Future[Either[Result, ReportStatus]] =
+  private def getReportStatus(submissionId: String, login: Login)(using request: Request[?]): Future[Either[Result, ReportStatus]] =
     reportStatusConnector.getByReference(submissionId, login).map(_.fold(
       _ => Left(InternalServerError(error(messagesApi.preferred(request)))),
       reportStatus => Right(reportStatus)
@@ -78,29 +75,28 @@ class ReportStatusController @Inject() (
 
   def onPageLoad(filter: Option[String] = None): Action[AnyContent] = getData.async {
     implicit request =>
-      (for {
+      (for
         login          <- EitherT(cachedLogin(request.externalId))
         reportStatuses <- EitherT(reportStatuses(login, filter))
-      } yield Ok(reportStatus(login.username, reportStatuses, filter, formatter)))
+      yield Ok(reportStatus(login.username, reportStatuses, formatter)))
         .valueOr(f => f)
   }
 
-  private def getPDF(reportStatus: ReportStatus)(implicit request: Request[?]): Future[Either[Result, Array[Byte]]] =
+  private def getPDF(reportStatus: ReportStatus)(using request: Request[?]): Future[Either[Result, Array[Byte]]] =
     Future {
-      receiptService.producePDF(reportStatus) match {
+      receiptService.producePDF(reportStatus) match
         case Success(content) => Right(content)
         case Failure(_)       => Left(InternalServerError(error(messagesApi.preferred(request))))
-      }
     }
 
   def onReceiptDownload(submissionId: String): Action[AnyContent] = getData.async {
     implicit request =>
-      (for {
+      (for
         login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(submissionId, login))
         data         <- EitherT(getPDF(reportStatus))
         date          = reportStatus.formattedCreatedShort
-      } yield Ok(data).withHeaders(
+      yield Ok(data).withHeaders(
         HeaderNames.CONTENT_TYPE        -> withCharset("application/pdf"),
         HeaderNames.CONTENT_DISPOSITION ->
           s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
@@ -108,11 +104,10 @@ class ReportStatusController @Inject() (
         .valueOr(f => f)
   }
 
-  private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] = {
+  private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] =
     val headerFields = Seq("Id", "Created", "BA Code", "Status", "File Name", "Total reports", "Error")
 
-    def errors = (r: ReportStatus) =>
-      s"${r.errors.map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
+    def errors = (r: ReportStatus) => s"${r.errors.map(e => s"${e.code}: ${e.values.mkString("\t")}").mkString("[", ";", "]")}"
 
     def status(r: ReportStatus) = r.status.getOrElse(Pending.value)
 
@@ -125,18 +120,15 @@ class ReportStatusController @Inject() (
     )
     val header = headerFields.mkString(",")
     s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")
-  }
 
   def onAllReceiptsDownload: Action[AnyContent] = getData.async {
     implicit request =>
-      (for {
+      (for
         login          <- EitherT(cachedLogin(request.externalId))
         reportStatuses <- EitherT(allReportStatuses(login))
-      } yield Ok(createCsv(reportStatuses)).withHeaders(
+      yield Ok(createCsv(reportStatuses)).withHeaders(
         HeaderNames.CONTENT_TYPE        -> withCharset("application/csv"),
         HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename=all-submission-status-${Instant.now}.csv"""
       ))
         .valueOr(f => f)
   }
-
-}

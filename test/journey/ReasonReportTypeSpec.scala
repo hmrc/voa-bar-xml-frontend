@@ -23,7 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.libs.json.{JsString, Json}
 import utils.ReflectionUtil
 
-class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks {
+class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDrivenPropertyChecks:
 
   "ReasonReportType" should "have all instance in Lister for to render radio buttons in order" in {
 
@@ -50,5 +50,3 @@ class ReasonReportTypeSpec extends AnyFlatSpec with should.Matchers with TableDr
     ).foreach { reasonReportType =>
       Json.toJson(reasonReportType)(using ReasonReportType.format) shouldBe JsString(reasonReportType.toString)
     }
-
-}

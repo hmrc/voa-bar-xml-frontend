@@ -30,11 +30,11 @@
      @cr05Submission.cr05CommonSection.map { cs =>
         <h2 class="govuk-heading-m">Report details</h2>
         @summaryList(
-            (new Cr05CommonWebTell(summaryList)).confirmationSummary(cs, messages)
+            new Cr05CommonWebTell(summaryList).confirmationSummary(cs, messages)
         )
      }
 
-     @cr05Submission.existingProperties.lift(0).map { pts =>
+     @cr05Submission.existingProperties.lift(0).map { _ =>
        <h2 class="govuk-heading-m">The property to be split</h2>
 
        @summaryList(
@@ -54,9 +54,5 @@
     <h2 class="govuk-heading-m">Comments</h2>
 
     @summaryList(
-        (new Cr05SubmissionBuilderWebTell(null)).confirmationSummary(cr05Submission, messages)
+        new Cr05SubmissionBuilderWebTell(null).confirmationSummary(cr05Submission, messages)
     )
-
-
-
-

@@ -32,7 +32,7 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
+class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar:
 
   private def controllerComponents = inject[MessagesControllerComponents]
 
@@ -45,30 +45,28 @@ class ReportDeleteControllerSpec extends ControllerSpecBase with MockitoSugar {
   "ReportDeleteController" must {
     "Delete report " in {
 
-      val submissionId = UUID.randomUUID().toString
+      val submissionId = UUID.randomUUID.toString
       FakeDataCacheConnector.resetCaptures()
       FakeDataCacheConnector.save[Login]("", LoginId.toString, login)
 
-      val controller = new ReportDeleteController(
+      val controller = ReportDeleteController(
         FakeDataCacheConnector,
         fakeReportStatusConnector(),
         controllerComponents,
         errorTemplateView,
-        new DataRetrievalActionImpl(FakeDataCacheConnector, bodyParser)
+        DataRetrievalActionImpl(FakeDataCacheConnector, bodyParser)
       )
       val request    = fakeRequest.withFormUrlEncodedBody("submissionId" -> submissionId).withSession(SessionKeys.sessionId -> "")
-      val respose    = controller.onPageSubmit.apply(request)
+      val response   = controller.onPageSubmit.apply(request)
 
-      status(respose) mustBe 200
+      status(response) mustBe 200
     }
   }
 
-  private def fakeReportStatusConnector(): ReportStatusConnector = {
+  private def fakeReportStatusConnector(): ReportStatusConnector =
     val reportStatusConnectorMock = mock[ReportStatusConnector](withSettings.strictness(Strictness.LENIENT))
+
     when(reportStatusConnectorMock.deleteByReference(any[String], any[Login])(using any[HeaderCarrier]))
       .thenReturn(Future.successful(Right(HttpResponse(OK, "OK"))))
 
     reportStatusConnectorMock
-  }
-
-}

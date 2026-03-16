@@ -16,28 +16,21 @@
 
 package views
 
-import models.{Done, Failed, Pending, ReportStatus, Submitted, Verified}
+import models.ReportStatus
 import views.behaviours.ViewBehaviours
 
-class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
+class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase:
 
   private def reportStatus = inject[views.html.reportStatus]
 
-  val username           = "BA0350"
-  val messageKeyPrefix   = "reportStatus"
-  val submissionId       = "SId9324832"
-  val baCode             = "baCode"
-  val reportStatus1      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Submitted.value))
-  val reportStatus2      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Verified.value))
-  val reportStatus3      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Failed.value))
-  val reportStatus4      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Done.value))
-  val reportStatus5      = ReportStatus(submissionId, baCode = Some(baCode), status = Some(Pending.value))
-  val fakeTableFormatter = new TableFormatter()
+  private val username           = "BA0350"
+  private val messageKeyPrefix   = "reportStatus"
+  private val fakeTableFormatter = TableFormatter()
 
   private val reportStatusFakeRequest = fakeRequest
 
   private def createView(reportStatuses: Seq[ReportStatus] = Seq()) =
-    () => reportStatus(username, reportStatuses, None, fakeTableFormatter)(using reportStatusFakeRequest, messages)
+    () => reportStatus(username, reportStatuses, fakeTableFormatter)(using reportStatusFakeRequest, messages)
 
   private def doc(reportStatuses: Seq[ReportStatus] = Seq()) = asDocument(createView(reportStatuses)())
 
@@ -55,4 +48,3 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase {
     }
 
   }
-}

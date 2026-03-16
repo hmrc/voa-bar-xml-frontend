@@ -36,16 +36,16 @@ class TaskListController @Inject() (
   dataCacheConnector: DataCacheConnector,
   controllerComponents: MessagesControllerComponents,
   taskList: views.html.task_list
-)(implicit ec: ExecutionContext
+)(using ec: ExecutionContext
 ) extends FrontendController(controllerComponents)
-  with I18nSupport {
+  with I18nSupport:
 
   def onPageLoad: Action[AnyContent] = getData.async {
     implicit request =>
       dataCacheConnector.getEntry[Cr05SubmissionBuilder](request.externalId, Cr05SubmissionBuilder.storageKey) flatMap { maybeCr05Submission =>
         dataCacheConnector.getEntry[String](request.externalId, VOAuthorisedId.toString) map {
-          case Some(username) => Ok(taskList(username, maybeCr05Submission))
-          case None           => Redirect(routes.LoginController.onPageLoad(NormalMode))
+          case Some(_) => Ok(taskList(maybeCr05Submission))
+          case None    => Redirect(routes.LoginController.onPageLoad(NormalMode))
         }
       }
   }
@@ -65,5 +65,3 @@ class TaskListController @Inject() (
   def goToCheckYourAnswersPage: Action[AnyContent] = (getData andThen requireData) { implicit request =>
     Redirect(navigator.nextPage(CheckYourAnswersId, NormalMode)(request.userAnswers))
   }
-
-}

@@ -31,30 +31,30 @@ import views.html.unauthorised
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with Injecting {
+class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with Injecting:
 
-  val sessionId = "session-ID"
+  private val sessionId = "session-ID"
 
   "AuthAction" should {
 
     "return unauthorised when user is not logged " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
+      val action = AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
 
-      val req = DataRequest(fakeRequest, sessionId, new UserAnswers(new CacheMap(sessionId, Map())))
+      val req = DataRequest(fakeRequest, sessionId, UserAnswers(CacheMap(sessionId, Map())))
 
       val res = action.invokeBlock(
         req,
-        _ => Future.failed(new RuntimeException("This code should not be executed"))
+        _ => Future.failed(RuntimeException("This code should not be executed"))
       )
       status(res) mustBe UNAUTHORIZED
     }
 
     "return content of action when user is authorised " in {
-      val action = new AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
+      val action = AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
 
-      val cacheMap = new CacheMap(sessionId, Map(LoginId.toString -> Login.format.writes(Login("username", "password", None))))
+      val cacheMap = CacheMap(sessionId, Map(LoginId.toString -> Login.format.writes(Login("username", "password", None))))
 
-      val req = DataRequest(fakeRequest, sessionId, new UserAnswers(cacheMap))
+      val req = DataRequest(fakeRequest, sessionId, UserAnswers(cacheMap))
 
       val res = action.invokeBlock(
         req,
@@ -65,4 +65,3 @@ class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with I
       contentAsString(res) mustBe "This is expected response"
     }
   }
-}

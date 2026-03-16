@@ -20,6 +20,5 @@ import play.api.libs.json.{JsObject, Json, OFormat}
 
 case class Error(code: String, values: Seq[String] = Seq(), errorDetail: Option[JsObject] = None)
 
-object Error {
-  implicit val format: OFormat[Error] = Json.format[Error]
-}
+object Error:
+  implicit val format: OFormat[Error] = Json.format

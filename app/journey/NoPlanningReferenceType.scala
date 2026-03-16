@@ -26,9 +26,9 @@ case object NotRequiredPlanningPermission extends NoPlanningReferenceType
 case object PermittedDevelopment extends NoPlanningReferenceType
 case object NoPlanningApplicationSubmitted extends NoPlanningReferenceType
 
-object NoPlanningReferenceType {
+object NoPlanningReferenceType:
 
-  val order = List[String](
+  val order: List[String] = List[String](
     "WithoutPlanningPermission",
     "NotApplicablePlanningPermission",
     "NotRequiredPlanningPermission",
@@ -36,26 +36,21 @@ object NoPlanningReferenceType {
     "NoPlanningApplicationSubmitted"
   )
 
-  implicit val format: Format[NoPlanningReferenceType] = new Format[NoPlanningReferenceType] {
+  implicit val format: Format[NoPlanningReferenceType] =
+    new Format[NoPlanningReferenceType]:
+      override def reads(json: JsValue): JsResult[NoPlanningReferenceType] =
+        json match
+          case JsString("WithoutPlanningPermission")       => JsSuccess(WithoutPlanningPermission)
+          case JsString("NotApplicablePlanningPermission") => JsSuccess(NotApplicablePlanningPermission)
+          case JsString("NotRequiredPlanningPermission")   => JsSuccess(NotRequiredPlanningPermission)
+          case JsString("PermittedDevelopment")            => JsSuccess(PermittedDevelopment)
+          case JsString("NoPlanningApplicationSubmitted")  => JsSuccess(NoPlanningApplicationSubmitted)
+          case x                                           => JsError(s"Unable to deserialize NoPlanningReferenceType $x")
 
-    override def reads(json: JsValue): JsResult[NoPlanningReferenceType] =
-      json match {
-        case JsString("WithoutPlanningPermission")       => JsSuccess(WithoutPlanningPermission)
-        case JsString("NotApplicablePlanningPermission") => JsSuccess(NotApplicablePlanningPermission)
-        case JsString("NotRequiredPlanningPermission")   => JsSuccess(NotRequiredPlanningPermission)
-        case JsString("PermittedDevelopment")            => JsSuccess(PermittedDevelopment)
-        case JsString("NoPlanningApplicationSubmitted")  => JsSuccess(NoPlanningApplicationSubmitted)
-        case x                                           => JsError(s"Unable to deserialize NoPlanningReferenceType $x")
-      }
-
-    override def writes(o: NoPlanningReferenceType): JsValue =
-      o match {
-        case WithoutPlanningPermission       => JsString("WithoutPlanningPermission")
-        case NotApplicablePlanningPermission => JsString("NotApplicablePlanningPermission")
-        case NotRequiredPlanningPermission   => JsString("NotRequiredPlanningPermission")
-        case PermittedDevelopment            => JsString("PermittedDevelopment")
-        case NoPlanningApplicationSubmitted  => JsString("NoPlanningApplicationSubmitted")
-      }
-  }
-
-}
+      override def writes(o: NoPlanningReferenceType): JsValue =
+        o match
+          case WithoutPlanningPermission       => JsString("WithoutPlanningPermission")
+          case NotApplicablePlanningPermission => JsString("NotApplicablePlanningPermission")
+          case NotRequiredPlanningPermission   => JsString("NotRequiredPlanningPermission")
+          case PermittedDevelopment            => JsString("PermittedDevelopment")
+          case NoPlanningApplicationSubmitted  => JsString("NoPlanningApplicationSubmitted")
