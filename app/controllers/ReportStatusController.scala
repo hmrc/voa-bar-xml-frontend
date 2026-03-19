@@ -97,11 +97,10 @@ class ReportStatusController @Inject() (
         data         <- EitherT(getPDF(reportStatus))
         date          = reportStatus.formattedCreatedShort
       yield Ok(data).withHeaders(
-        HeaderNames.CONTENT_TYPE        -> withCharset("application/pdf"),
         HeaderNames.CONTENT_DISPOSITION ->
           s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
       ))
-        .valueOr(f => f)
+        .valueOr(identity)
   }
 
   private def createCsv(reportStatuses: Seq[ReportStatus]): Array[Byte] =
