@@ -74,16 +74,12 @@ ul li:not(:first-child).breadcrumb-nav__item {
 }
 
 .submission-panel {
-  padding-left: 0px;
-  padding-top: 0px;
+  padding-left: 0;
+  padding-top: 0;
   > .submission-body {
     padding: 20px;
   }
 }
 .transaction-banner--complete {
   margin-top: 1em;
-}
-
-.voa-logo{
-  display: none;
 }

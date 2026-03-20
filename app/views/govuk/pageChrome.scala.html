@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import ltbs.uniform.common.web.FormFieldStats
 @import ltbs.uniform.{ErrorTree, UniformMessages, toTreeLikeOps}
 @import play.api.Configuration
 @import uk.gov.hmrc.govukfrontend.views.Aliases.ErrorLink
@@ -36,8 +35,7 @@
         tell: Html,
         ask: Html,
         breadcrumbs: List[String],
-        messages2: UniformMessages[Html],
-        fieldStats: FormFieldStats
+        messages2: UniformMessages[Html]
 )(implicit request: Request[?], messages: Messages)
 
 

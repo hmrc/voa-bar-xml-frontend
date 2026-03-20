@@ -25,7 +25,7 @@ import org.apache.pdfbox.pdmodel.{PDDocument, PDDocumentInformation, PDPage, PDP
 import play.api.i18n.{Lang, MessagesApi}
 
 import java.io.{ByteArrayOutputStream, Closeable}
-import java.util.Locale
+import java.util.{GregorianCalendar, Locale}
 import javax.imageio.ImageIO
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +42,13 @@ class DefaultReceiptService @Inject() (
   val leading: Float    = 1.5f * fontSize
   val margin: Int       = 72
 
-  private val author = "Valuation Office"
+  private val author     = "HMRC - Valuation Office"
+  private val creator    = "Billing Authority Reports"
+  private val logo       = "/HMRC-VO-logo.png"
+  private val logoWidth  = 352
+  private val logoHeight = 107
+
+  private val logoAwtImage = ImageIO.read(getClass.getResourceAsStream(logo))
 
   given Lang = Lang(Locale.UK)
 
@@ -98,14 +104,13 @@ class DefaultReceiptService @Inject() (
     try f()
     finally obj.close()
 
-  private def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream) =
-    val mediaBox = page.getMediaBox
-    val startX   = mediaBox.getLowerLeftX + margin
-    val startY   = mediaBox.getUpperRightY - margin
-    val awtImage = ImageIO.read(getClass.getResourceAsStream("/logo.png"))
-    val image    = LosslessFactory.createFromImage(document, awtImage)
-    contentStream.drawImage(image, startX, startY - image.getHeight)
-    image.getHeight
+  private def addImage(document: PDDocument, page: PDPage, contentStream: PDPageContentStream): Int =
+    val mediaBox    = page.getMediaBox
+    val startX      = mediaBox.getLowerLeftX + margin
+    val startY      = mediaBox.getUpperRightY - margin
+    val logoPDImage = LosslessFactory.createFromImage(document, logoAwtImage)
+    contentStream.drawImage(logoPDImage, startX, startY - logoHeight, logoWidth.toFloat, logoHeight.toFloat)
+    logoHeight
 
   private def body(reportStatus: ReportStatus): String =
     var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
@@ -141,12 +146,16 @@ class DefaultReceiptService @Inject() (
     lines
 
   private def title(reportStatus: ReportStatus) =
-    s"${messages("report.pdf.details.title")} ${reportStatus.baCode} - CT - ${reportStatus.formattedCreatedLong}"
+    s"${messages("report.pdf.details.title")} ${reportStatus.baCode.getOrElse("")} - CT - ${reportStatus.formattedCreatedLong}"
 
   private def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit =
-    val info = PDDocumentInformation()
+    val createdAt = GregorianCalendar.from(reportStatus.createdAtZoned)
+    val info      = PDDocumentInformation()
     info.setAuthor(author)
+    info.setCreator(creator)
     info.setTitle(title(reportStatus))
+    info.setCreationDate(createdAt)
+    info.setModificationDate(createdAt)
     document.setDocumentInformation(info)
 
 @ImplementedBy(classOf[DefaultReceiptService])

@@ -29,21 +29,23 @@ import java.time.Instant
 
 class ReceiptServiceSpec extends SpecBase:
 
-  private val service = DefaultReceiptService(messagesApi)
-  private val date    = Instant.ofEpochMilli(0)
+  private val service   = DefaultReceiptService(messagesApi)
+  private val createdAt = Instant.ofEpochMilli(1773945357000L)
 
   "Producing a pdf" should {
     "produce a pdf - Pending" in {
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Pending.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = createdAt, baCode = Some(baCode), status = Some(Pending.value))
 
       val data = service.producePDF(reportStatus)
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
+      pdf.getDocumentInformation.getAuthor mustBe "HMRC - Valuation Office"
+      pdf.getDocumentInformation.getCreator mustBe "Billing Authority Reports"
+      pdf.getDocumentInformation.getCreationDate.toInstant mustBe createdAt
 
       PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
@@ -54,13 +56,14 @@ class ReceiptServiceSpec extends SpecBase:
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Failed.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = createdAt, baCode = Some(baCode), status = Some(Failed.value))
 
       val data = service.producePDF(reportStatus)
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
+      pdf.getDocumentInformation.getAuthor mustBe "HMRC - Valuation Office"
+      pdf.getDocumentInformation.getCreationDate.toInstant mustBe createdAt
 
       PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
@@ -71,13 +74,14 @@ class ReceiptServiceSpec extends SpecBase:
       val baCode       = "ba1221"
       val submissionId = "1234-XX"
 
-      val reportStatus = ReportStatus(submissionId, createdAt = date, baCode = Some(baCode), status = Some(Done.value))
+      val reportStatus = ReportStatus(submissionId, createdAt = createdAt, baCode = Some(baCode), status = Some(Done.value))
 
       val data = service.producePDF(reportStatus)
 
       val pdf = Loader.loadPDF(data.get)
 
-      pdf.getDocumentInformation.getAuthor must be("Valuation Office")
+      pdf.getDocumentInformation.getAuthor mustBe "HMRC - Valuation Office"
+      pdf.getDocumentInformation.getCreationDate.toInstant mustBe createdAt
 
       PDFTextStripper().getText(pdf) must include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
 
