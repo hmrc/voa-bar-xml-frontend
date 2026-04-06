@@ -1,0 +1,73 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.AppConfig
+@import models.BillingAuthorities
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{ErrorSummary, ServiceNavigationItem, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.vo.service.model.AccountInfo
+@import uk.gov.hmrc.vo.service.view.html.*
+
+@this(
+        appConfig: AppConfig,
+        standardPage: StandardPage
+)
+
+@(
+        pageTitle: String,
+        theForm: Option[Form[?]] = None,
+        errorSummary: Option[ErrorSummary] = None,
+        backLinkUrl: Option[String] = None,
+        baCode: Option[String] = None,
+        fullWidth: Boolean = false
+)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+
+@accountInfo = @{
+    baCode.map(username => AccountInfo(username, BillingAuthorities.find(username)))
+}
+
+@pageErrorSummary = @{
+    errorSummary.orElse {
+        theForm.filter(_.hasErrors).map { form =>
+            ErrorSummary(
+                errorList = form.errors.asTextErrorLinks,
+                title = Text(messages("error.summary.title"))
+            )
+        }
+    }
+}
+
+@navigationItems = @{
+    if (appConfig.isTimeoutDialogEnabled) {
+        Seq(
+            ServiceNavigationItem(Text(messages("service.navigation.item1")), controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url),
+            ServiceNavigationItem(Text(messages("service.navigation.item2")), controllers.routes.ReportStatusController.onPageLoad().url)
+        )
+    } else {
+      Seq.empty
+    }
+}
+
+@standardPage(
+    pageTitle,
+    accountInfo,
+    backLinkUrl,
+    pageErrorSummary,
+    showH1 = false,
+    fullWidth = fullWidth,
+    additionalScriptsBlock = Scripts(),
+    serviceNavigationItems = navigationItems
+)(contentBlock)

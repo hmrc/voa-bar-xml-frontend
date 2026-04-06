@@ -78,10 +78,6 @@ POST        /add-comments                           controllers.UniformControlle
 GET         /cr05-check-answers                     controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
 POST        /cr05-check-answers                     controllers.UniformController.cr05CheckAnswerJourney(id = "cr05-check-answers")
 
-
-
-GET         /language/:lang                         controllers.LanguageSwitchController.switchToLanguage(lang: String)
-
 GET         /this-service-has-expired               controllers.SessionExpiredController.onPageLoad
 
 GET         /check-your-answers                     controllers.CheckYourAnswersController.onPageLoad

@@ -17,22 +17,17 @@
 package controllers.actions
 
 import com.google.inject.Inject
+import models.NormalMode
 import models.requests.DataRequest
-import play.api.mvc.Results.Unauthorized
-import play.api.mvc.{ActionFilter, MessagesControllerComponents, Result}
-import views.html.unauthorised
+import play.api.mvc.Results.TemporaryRedirect
+import play.api.mvc.{ActionFilter, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthAction @Inject() (
-  cc: MessagesControllerComponents,
-  unauthorised: unauthorised
-)(using val executionContext: ExecutionContext
-) extends ActionFilter[DataRequest]:
+class AuthAction @Inject() ()(using val executionContext: ExecutionContext) extends ActionFilter[DataRequest]:
 
   override protected def filter[A](request: models.requests.DataRequest[A]): Future[Option[Result]] =
     if request.userAnswers.login.isEmpty then
-      val messages = cc.messagesApi.preferred(request)
-      Future.successful(Some(Unauthorized(unauthorised()(using request, messages))))
+      Future.successful(Some(TemporaryRedirect(controllers.routes.LoginController.onPageLoad(NormalMode).url)))
     else
       Future.successful(None)

@@ -14,16 +14,17 @@
  * limitations under the License.
  *@
 
+@import views.html.components.PrimaryLayout
+
 @this(
-    main_template: views.html.govuk.main_template
+        layout: PrimaryLayout
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = messages("error.title.prefix") + messages("heading.giveFeedback"),
-    backLinkUrl = Some(routes.FeedbackController.onPageLoad.url),
-    showSignOut = false
+@layout(
+    pageTitle = s"${messages("error.prefix")} ${messages("heading.giveFeedback")}",
+    backLinkUrl = Some(routes.FeedbackController.onPageLoad.url)
 ) {
     <h1 class="govuk-heading-l">@messages("label.feedback.error")</h1>
 }

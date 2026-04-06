@@ -15,31 +15,21 @@
  *@
 
 @import forms.FeedbackForm
-@import play.api.data._
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import play.api.data.*
+@import views.html.components.PrimaryLayout
 @import views.html.feedback.feedbackForm
 
 @this(
-        main_template: views.html.govuk.main_template,
-        feedbackFormTemplate: feedbackForm,
-        govukErrorSummary: GovukErrorSummary
+        layout: PrimaryLayout,
+        feedbackFormTemplate: feedbackForm
 )
 
-@(form: Form[FeedbackForm])(implicit request: Request[?], messages: Messages)
+@(form: Form[FeedbackForm])(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
+@layout(
     pageTitle = messages("feedback.heading"),
-    showSignOut = false
+    theForm = Option(form)
 ) {
-
-    @if(form.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary(
-            errorList = form.errors.asTextErrorLinks,
-            title = Text(messages("error.summary.title"))
-        ))
-    }
 
     @feedbackFormTemplate(form)
 

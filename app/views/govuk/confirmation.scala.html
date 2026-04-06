@@ -18,6 +18,7 @@
 @import views.html.govuk.{cr03SubmissionConfirmation => cr03SubmissionConfirmationTemplate}
 @import views.html.govuk.{cr05SubmissionConfirmation => cr05SubmissionConfirmationTemplate}
 @import views.html.components.confirmation_status_panel
+@import views.html.components.PrimaryLayout
 @import views.html.feedback.feedbackForm
 @import journey.UniformJourney.CrSubmission
 @import journey.UniformJourney.Cr05Submission
@@ -25,11 +26,11 @@
 @import utils.UniformMessageUtil
 
 @this(
-    mainTemplate: views.html.govuk.main_template,
-    confirmationStatusPanel: confirmation_status_panel,
-    feedbackFormTemplate: feedbackForm,
-    cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate,
-    cr05SubmissionConfirmation:cr05SubmissionConfirmationTemplate
+        layout: PrimaryLayout,
+        confirmationStatusPanel: confirmation_status_panel,
+        feedbackFormTemplate: feedbackForm,
+        cr03SubmissionConfirmation:cr03SubmissionConfirmationTemplate,
+        cr05SubmissionConfirmation:cr05SubmissionConfirmationTemplate
 )
 
 
@@ -37,9 +38,9 @@
     baCode: String,
     report: ReportStatus,
     crSubmission: Option[CrSubmission],
-)(implicit request: Request[?], messages: Messages)
+)(implicit request: RequestHeader, messages: Messages)
 
-@mainTemplate(
+@layout(
     pageTitle = report.title(messages),
     baCode = Some(baCode)
 ) {
@@ -48,7 +49,6 @@
     @if(!Seq(Some(Done.value), Some(Failed.value), Some(Submitted.value)).contains(report.status)) {
         <input type="hidden" id="refreshUrl" value="@routes.ConfirmationController.onStatusCheck(report.id)" />
     }
-
 
     <div id="status" aria-live="polite">
         @confirmationStatusPanel(report.id, Some(report))

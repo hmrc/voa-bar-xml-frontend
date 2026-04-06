@@ -30,7 +30,7 @@ import play.api.{Logger, Logging}
 import services.Cr01Cr03Service
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInput, GovukRadios}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.govuk.{cr05SubmissionSummary, pageChrome}
+import views.html.govuk.{UniformLayout, cr05SubmissionSummary}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UniformController @Inject() (
   messagesApi: MessagesApi,
-  pageChrome: pageChrome,
+  uniformLayout: UniformLayout,
   govukInput: GovukInput,
   govukRadios: GovukRadios,
   govukDateInput: GovukDateInput,
@@ -78,7 +78,7 @@ class UniformController @Inject() (
         dataCacheConnector.save(externalId, storageKey, db).map(_ => ())
       }
 
-  val interpreter: AutoBarsInterpreter = AutoBarsInterpreter(this, messagesApi, pageChrome, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
+  val interpreter: AutoBarsInterpreter = AutoBarsInterpreter(this, messagesApi, uniformLayout, govukInput, govukRadios, govukDateInput, cr05SubmissionSummary)
 
   private def userLogin(using request: DataRequest[AnyContent]): Login = request.userAnswers.login.getOrElse(throw Exception("Session expired"))
 

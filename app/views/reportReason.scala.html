@@ -14,31 +14,28 @@
  * limitations under the License.
  *@
 
-@import models.requests.DataRequest
-@import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import views.html.components.PrimaryLayout
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 
 @this(
-        main_template: views.html.govuk.main_template,
+        layout: PrimaryLayout,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        errorSummary: GovukErrorSummary,
         govukRadios: GovukRadios
 )
 
-@(form: Form[?], cr05Enabled: Boolean)(implicit request: DataRequest[?], messages: Messages)
+@(form: Form[?], cr05Enabled: Boolean)(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("what-is-the-reason-for-the-report.pageLabel"),
+@layout(
+    pageTitle = messages("what-is-the-reason-for-the-report.pageLabel"),
+    theForm = Option(form),
     backLinkUrl = Some(controllers.routes.WelcomeController.onPageLoad.url)
 ) {
     @formWithCSRF(
         action = routes.ReportReasonController.onPageSubmit,
         Symbol("autoComplete") -> "off"
     ) {
-        @if(form.errors.nonEmpty) {
-            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
-        }
 
         @govukRadios(Radios(
             fieldset = Option(Fieldset(legend = Option(Legend(

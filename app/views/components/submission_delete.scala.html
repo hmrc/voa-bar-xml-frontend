@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import helper._
+@import helper.*
 @import controllers.ReportDeleteController
 
 @import play.api.Configuration
@@ -22,7 +22,7 @@
 
 @this(configuration: Configuration)
 
-@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: Request[?])
+@(reportStatus: ReportStatus, baCode: String)(implicit messages: Messages, request: RequestHeader)
 
 @renderDelete = @{
 
@@ -34,6 +34,7 @@
     delete.getOrElse(false)
 
 }
+
 @if(renderDelete) {
 
     @form(routes.ReportDeleteController.onPageSubmit) {

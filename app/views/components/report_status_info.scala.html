@@ -20,28 +20,26 @@
 @(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
 
 <div class="example info-box current-activity">
-    <h4 class="heading-small">@Messages("home.reports.current.progress")</h4>
+    <h4 class="heading-small">@messages("home.reports.current.progress")</h4>
 
     @if(activeReports.isEmpty) {
-        @Messages("home.reports.no.current.progress")
+        @messages("home.reports.no.current.progress")
     }
 
     @activeReports.map { report =>
-    <p class="current-activity-filename">
-        <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
-        @components.report_status_message(report)
-    </p>
+        <p class="current-activity-filename">
+            <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
+            @components.report_status_message(report)
+        </p>
     }
 
-    @if(lastReport.isDefined) {
-        @defining(lastReport.get) { report =>
-            <h4 class="heading-small">@Messages("home.reports.last")</h4>
-            <p class="current-activity-filename">
-                <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
-                    @components.report_status_message(report)
-            </p>
+    @lastReport.map { report =>
+        <h4 class="heading-small">@messages("home.reports.last")</h4>
+        <p class="current-activity-filename">
+            <a href="@routes.ReportStatusController.onPageLoad()/#@report.id">@getAlternativeText(report.filename, "filename unavailable")</a>
+                @components.report_status_message(report)
+        </p>
 
-            <p class="current-activity-info">@Messages("reports.active.timestamp", report.formattedCreatedLong)</p>
-        }
+        <p class="current-activity-info">@messages("reports.active.timestamp", report.formattedCreatedLong)</p>
     }
 </div>

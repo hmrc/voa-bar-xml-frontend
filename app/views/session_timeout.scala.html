@@ -14,22 +14,20 @@
  * limitations under the License.
  *@
 
-@import controllers._
+@import views.html.components.PrimaryLayout
 
 @this(
-    main_template: views.html.govuk.main_template
+    layout: PrimaryLayout
 )
 
+@()(implicit request: RequestHeader, messages: Messages)
 
-@()(implicit request: Request[?], messages: Messages)
-
-@main_template(
-    pageTitle = messages("sessionTimeout.heading"),
-    showSignOut = false
+@layout(
+    pageTitle = messages("sessionTimeout.heading")
 ) {
     <h1 class="govuk-heading-l">@Messages("sessionTimeout.heading")</h1>
 
     <p class="govuk-body">@Messages("sessionTimeout.copy")</p>
 
-    <p><a class="govuk-link" href="@routes.TimeoutController.timeout">@Messages("sessionTimeout.link")</a></p>
+    <p><a class="govuk-link" href="@controllers.routes.TimeoutController.timeout">@Messages("sessionTimeout.link")</a></p>
 }

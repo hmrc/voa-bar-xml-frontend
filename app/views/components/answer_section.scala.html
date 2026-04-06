@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.AnswerSection
-@import views.html._
+@import views.html.components.answer_row
 
 @(answerSection: AnswerSection)(implicit messages: Messages)
 
@@ -25,6 +25,6 @@
 
 <ul role="list" class="tabular-data tabular-data--list">
     @for(row <- answerSection.rows){
-        @components.answer_row(row)
+        @answer_row(row)
     }
 </ul>

@@ -15,26 +15,35 @@
  *@
 
 @import journey.UniformJourney.Cr05SubmissionBuilder
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components.PrimaryLayout
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichFormErrors
 
 
 @this(
-    main_template: views.html.govuk.main_template,
+    layout: PrimaryLayout,
     formWithCSRF: FormWithCSRF,
     govukButton: GovukButton,
-    govukRadios: GovukRadios,
-    errorSummary: GovukErrorSummary
+    govukRadios: GovukRadios
 )
 
 
-@(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: Request[?], messages: Messages)
+@(baCode: Option[String], cr05Submission: Cr05SubmissionBuilder, form: Form[AddAnother])(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
+@errorSummary = @{
+    Option.when(form.hasErrors)(
+        ErrorSummary(
+            errorList = form.errors.asTextErrorLinks,
+            classes = "govuk-!-margin-top-3 govuk-!-margin-bottom-0 govuk-!-width-two-thirds",
+            title = Text(messages("error.summary.title"))
+        )
+    )
+}
+
+@layout(
     pageTitle = messages("welcome.heading"),
-    baCode = baCode,
-    beforeContentBlock = form.errors.headOption.map(_ => errorSummary(ErrorSummary( classes = "govuk-!-margin-top-3 govuk-!-margin-bottom-0 govuk-!-width-two-thirds",
-        errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title")))))
+    errorSummary = errorSummary,
+    baCode = baCode
 ) {
 
       @cr05Submission.proposedProperties.headOption.map { _ =>

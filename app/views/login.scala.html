@@ -14,35 +14,32 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import controllers._
+@import views.html.components.PrimaryLayout
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import controllers.*
 @import models.Mode
 
 @this(
-        main_template: views.html.govuk.main_template,
+        layout: PrimaryLayout,
         formWithCSRF: FormWithCSRF,
         govukInput: GovukInput,
-        govukButton: GovukButton,
-        errorSummary: GovukErrorSummary
+        govukButton: GovukButton
 )
 
-@(form: Form[Login], mode: Mode)(implicit request: Request[?], messages: Messages)
+@(form: Form[Login], mode: Mode)(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = form.errors.headOption.fold("")(_ => messages("error.title.prefix")) + messages("login.heading"),
-    showSignOut = false
+@layout(
+    pageTitle = messages("login.heading"),
+    theForm = Option(form)
 ) {
-    <h1 class="govuk-heading-xl">@messages("login.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("login.heading")</h1>
 
     <div class="block-js-enabled">
     @formWithCSRF(
         action = routes.LoginController.onSubmit(mode),
         Symbol("autoComplete") -> "off"
     ) {
-        @if(form.errors.nonEmpty) {
-            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
-        }
 
         @govukInput(Input(
             id = "username", name = "username", value = form("username").value,
@@ -74,9 +71,6 @@
         action = routes.LoginController.onSubmit(mode),
         Symbol("autoComplete") -> "off"
     ) {
-        @if(form.errors.nonEmpty) {
-            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
-        }
 
         @govukInput(Input(
             id = "username2", name = "username", value = form("username").value,

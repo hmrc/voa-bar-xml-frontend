@@ -18,6 +18,8 @@ package views
 
 import models.{Done, ReportStatus}
 import org.jsoup.nodes.Document
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 import views.behaviours.ViewBehaviours
 import views.html.confirmation
 
@@ -25,10 +27,11 @@ class ConfirmationViewSpec extends ViewBehaviours:
 
   private def confirmation: confirmation = inject[views.html.confirmation]
 
-  private val username                = "BA0116"
-  private val submissionId            = "SId328473"
-  private val messageKeyPrefix        = "confirmation"
-  private val confirmationFakeRequest = fakeRequest
+  private val username         = "BA0116"
+  private val submissionId     = "SId328473"
+  private val messageKeyPrefix = "confirmation"
+
+  private val confirmationFakeRequest = FakeRequest(GET, "/service-root/some-page")
 
   private val reportStatus = ReportStatus(
     submissionId,
@@ -45,11 +48,12 @@ class ConfirmationViewSpec extends ViewBehaviours:
     behave like normalPage(createViewWithStatus, messageKeyPrefix, "submission.details")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
+      val user = doc.select("#account-info-header > li:nth-child(2) > span:nth-child(2)").text
       user mustBe "Bristol"
     }
 
     "Include a signout link which redirects the users to the signout page" in {
+      println(doc.html())
       val href = doc.getElementsByClass("hmrc-sign-out-nav__link").first.attr("href")
       href mustBe controllers.routes.SignOutController.signOut.url
     }

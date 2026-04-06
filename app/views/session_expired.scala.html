@@ -14,17 +14,17 @@
  * limitations under the License.
  *@
 
+@import views.html.components.PrimaryLayout
+
 @this(
-        main_template: views.html.govuk.main_template
+        layout: PrimaryLayout
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = messages("session_expired.title"),
-    showSignOut = false
+@layout(
+    pageTitle = messages("session_expired.title")
 ) {
-
     <h1 class="heading-xlarge">@messages("session_expired.heading")</h1>
 
     <p>@messages("session_expired.guidance")</p>

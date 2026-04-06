@@ -14,15 +14,16 @@
  * limitations under the License.
  *@
 
+@import views.html.components.PrimaryLayout
+
 @this(
-        main_template: views.html.govuk.main_template
+        layout: PrimaryLayout
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = messages("heading.giveFeedback"),
-    showSignOut = false
+@layout(
+    pageTitle = messages("heading.giveFeedback")
 ) {
     <h1 class="govuk-heading-l">@messages("copy.feedback.thankyou")</h1>
 

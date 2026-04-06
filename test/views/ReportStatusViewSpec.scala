@@ -17,6 +17,8 @@
 package views
 
 import models.ReportStatus
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 import views.behaviours.ViewBehaviours
 
 class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase:
@@ -27,7 +29,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase:
   private val messageKeyPrefix   = "reportStatus"
   private val fakeTableFormatter = TableFormatter()
 
-  private val reportStatusFakeRequest = fakeRequest
+  private val reportStatusFakeRequest = FakeRequest(GET, "/service-root/some-page")
 
   private def createView(reportStatuses: Seq[ReportStatus] = Seq()) =
     () => reportStatus(username, reportStatuses, fakeTableFormatter)(using reportStatusFakeRequest, messages)
@@ -38,7 +40,7 @@ class ReportStatusViewSpec extends ViewBehaviours with ViewSpecBase:
     behave like normalPage(createView(), messageKeyPrefix)
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc().select("body > div > dl > div:nth-child(2) > dd").text
+      val user = doc().select("#account-info-header > li:nth-child(2) > span:nth-child(2)").text
       user mustBe "Slough"
     }
 
