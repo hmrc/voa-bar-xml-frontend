@@ -17,7 +17,7 @@ object Dependencies {
   private val compileDependencies = Seq(
     "uk.gov.hmrc"           %% "bootstrap-frontend-play-30" % bootstrapVersion,
     "uk.gov.hmrc"           %% "play-frontend-hmrc-play-30" % playFrontendHmrcVersion,
-    "uk.gov.hmrc"           %% "vo-frontend-service"        % "0.4.0-SNAPSHOT",
+    "uk.gov.hmrc"           %% "vo-frontend-service"        % voServiceVersion,
     "uk.gov.hmrc.mongo"     %% "hmrc-mongo-play-30"         % hmrcMongoVersion,
     "net.codingwell"        %% "scala-guice"                % guiceUtilsVersion,
     "com.luketebbs.uniform" %% "interpreter-play28"         % uniformVersion cross CrossVersion.for3Use2_13,
@@ -27,7 +27,7 @@ object Dependencies {
 
   private val testDependencies = Seq(
     "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion % Test,
-    "uk.gov.hmrc" %% "vo-unit-test"           % "0.2.0"          % Test
+    "uk.gov.hmrc" %% "vo-unit-test"           % voTestVersion    % Test
   )
 
   val appDependencies: Seq[ModuleID] = compileDependencies ++ testDependencies
