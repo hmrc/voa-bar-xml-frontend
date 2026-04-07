@@ -14,15 +14,16 @@
  * limitations under the License.
  *@
 
+@import views.html.components.PrimaryLayout
+
 @this(
-        main_template: views.html.govuk.main_template
+        layout: PrimaryLayout
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
-    pageTitle = messages("unauthorised.title"),
-    showSignOut = false
+@layout(
+    pageTitle = messages("unauthorised.title")
 ) {
 
     <h1 class="heading-xlarge">@messages("unauthorised.heading")</h1>

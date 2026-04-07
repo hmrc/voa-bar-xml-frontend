@@ -14,21 +14,22 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import config.AppConfig
+@import views.html.components.PrimaryLayout
 
 @this(
-        main_template: views.html.govuk.main_template
+        layout: PrimaryLayout
 )
 
 
-@(appConfig: FrontendAppConfig, baCode: String)(implicit request: Request[?], messages: Messages)
+@(appConfig: AppConfig, baCode: String)(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
+@layout(
     pageTitle = messages("welcome.heading"),
     baCode = Some(baCode)
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("welcome.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("welcome.heading")</h1>
 
     <ul class="govuk-list">
         @if(appConfig.baCodes.contains(baCode.toUpperCase)) {

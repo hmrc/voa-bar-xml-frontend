@@ -20,6 +20,8 @@ import forms.FileUploadDataFormProvider
 import models.FileUploadData
 import models.UpScanRequests.{InitiateResponse, UploadRequest}
 import play.api.data.Form
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 import views.behaviours.ViewBehaviours
 
 class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase:
@@ -31,7 +33,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase:
 
   private val form: Form[FileUploadData] = FileUploadDataFormProvider()()
 
-  private val councilTaxUploadFakeRequest = fakeRequest
+  private val councilTaxUploadFakeRequest = FakeRequest(GET, "/service-root/some-page")
 
   private val initiateResponse = InitiateResponse(
     reference = "foo",
@@ -65,7 +67,7 @@ class CouncilTaxUploadViewSpec extends ViewBehaviours with ViewSpecBase:
     behave like normalPage(() => createView(), messageKeyPrefix, "title", "submit.button")
 
     "Include an username element displaying the BA name based on given BA Code" in {
-      val user = doc.select("body > div > dl > div:nth-child(2) > dd").text
+      val user = doc.select("#account-info-header > li:nth-child(2) > span:nth-child(2)").text
       user mustBe "Reading"
     }
 

@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this()
+package config
 
-@(contentBlock: Html)
+import config.AppConfig
+import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.vo.service.config.VOServiceConfig
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        @contentBlock
-    </div>
-</div>
+/**
+  * @author Yuriy Tumakha
+  */
+class BARModule extends Module:
+
+  override def bindings(env: Environment, conf: Configuration): Seq[Binding[?]] = Seq(
+    bind[VOServiceConfig].to[AppConfig]
+  )

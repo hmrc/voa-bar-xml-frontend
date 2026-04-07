@@ -15,14 +15,14 @@
  *@
 
 @import viewmodels.RepeaterAnswerSection
-@import views.html._
+@import views.html.components.answer_row
 
 @(answerSection: RepeaterAnswerSection)(implicit messages: Messages)
 
 <h2>@messages(answerSection.headingKey)</h2>
 
 <ul role="list" class="tabular-data tabular-data--list">
-    @components.answer_row(answerSection.relevanceRow)
+    @answer_row(answerSection.relevanceRow)
 @for(row <- answerSection.rows){
     <li class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
         <div class="tabular-data__data tabular-data__data--6-12">@row.answer</div>

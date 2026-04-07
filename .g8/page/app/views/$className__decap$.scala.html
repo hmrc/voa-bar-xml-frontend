@@ -1,8 +1,8 @@
-@import config.FrontendAppConfig
+@import config.AppConfig
 
-@(appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
+@(appConfig: AppConfig)(implicit request: Request[_], messages: Messages)
 
-@main_template(
+@layout(
     title = messages("$className;format="decap"$.title"),
     appConfig = appConfig,
     bodyClasses = None) {

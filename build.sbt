@@ -1,10 +1,11 @@
+import org.irundaia.sass.Minified
 import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings.targetJvm
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 
 val appName = "voa-bar-xml-frontend"
 
-ThisBuild / scalaVersion := "3.8.2"
+ThisBuild / scalaVersion := "3.8.3"
 ThisBuild / majorVersion := 1
 ThisBuild / semanticdbEnabled := true
 
@@ -23,9 +24,12 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= Dependencies.appDependencies
   )
   .settings(
+    SassKeys.cssStyle := Minified,
+    SassKeys.generateSourceMaps := false,
     Concat.groups := Seq(
       "javascripts/app.js" -> group(Seq("javascripts/show-hide-content.js", "javascripts/main.js"))
     ),
+    digest / includeFilter := GlobFilter("*.js") || GlobFilter("*.min.css"),
     Assets / pipelineStages := Seq(concat, digest)
   )
 

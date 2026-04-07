@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.FrontendAppConfig
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.actions.*
 import identifiers.{CouncilTaxStartId, TaskListId, VOAuthorisedId}
@@ -30,7 +30,7 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class WelcomeController @Inject() (
-  appConfig: FrontendAppConfig,
+  appConfig: AppConfig,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   navigator: Navigator,

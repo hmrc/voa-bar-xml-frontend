@@ -16,52 +16,48 @@
 
 package controllers.actions
 
-import base.SpecBase
 import identifiers.LoginId
 import models.requests.DataRequest
-import models.{CacheMap, Login}
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.{MessagesControllerComponents, Results}
+import models.{CacheMap, Login, NormalMode}
+import play.api.mvc.Results
 import play.api.test.Helpers.*
-import play.api.test.Injecting
+import uk.gov.hmrc.vo.unit.test.BaseAppSpec
 import utils.UserAnswers
-import views.html.unauthorised
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthActionSpec extends SpecBase with MockitoSugar with ScalaFutures with Injecting:
+class AuthActionSpec extends BaseAppSpec:
 
   private val sessionId = "session-ID"
 
   "AuthAction" should {
 
     "return unauthorised when user is not logged " in {
-      val action = AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
+      val action = AuthAction()
 
-      val req = DataRequest(fakeRequest, sessionId, UserAnswers(CacheMap(sessionId, Map())))
+      val req = DataRequest(getRequest, sessionId, UserAnswers(CacheMap(sessionId, Map())))
 
       val res = action.invokeBlock(
         req,
         _ => Future.failed(RuntimeException("This code should not be executed"))
       )
-      status(res) mustBe UNAUTHORIZED
+      status(res)           shouldBe TEMPORARY_REDIRECT
+      redirectLocation(res) shouldBe Some(controllers.routes.LoginController.onPageLoad(NormalMode).url)
     }
 
     "return content of action when user is authorised " in {
-      val action = AuthAction(inject[MessagesControllerComponents], inject[unauthorised])
+      val action = AuthAction()
 
       val cacheMap = CacheMap(sessionId, Map(LoginId.toString -> Login.format.writes(Login("username", "password", None))))
 
-      val req = DataRequest(fakeRequest, sessionId, UserAnswers(cacheMap))
+      val req = DataRequest(getRequest, sessionId, UserAnswers(cacheMap))
 
       val res = action.invokeBlock(
         req,
         _ => Future.successful(Results.Ok("This is expected response"))
       )
 
-      status(res) mustBe OK
-      contentAsString(res) mustBe "This is expected response"
+      status(res)          shouldBe OK
+      contentAsString(res) shouldBe "This is expected response"
     }
   }

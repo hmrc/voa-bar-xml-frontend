@@ -15,11 +15,12 @@
  *@
 
 @import models.{Done, ReportStatus}
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 
 @this(
         govukSummaryList: GovukSummaryList
 )
+
 @(submissionId: String, reportStatus: Option[ReportStatus] = None)(implicit messages: Messages)
 
 @reportStatus.map{ rs =>

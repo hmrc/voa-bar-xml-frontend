@@ -1,5 +1,6 @@
 # Add all the application routes to the app.routes file
-->         /voa-bar-xml-frontend      app.Routes
-->         /                          health.Routes
+->         /voa-bar-xml-frontend        app.Routes
 
-GET        /                          controllers.localroot.RootRedirectController.rootRedirect
+GET        /ping/ping                   uk.gov.hmrc.play.health.HealthController.ping
+
+GET        /                            uk.gov.hmrc.vo.service.controller.local.RootRedirectController.rootRedirect

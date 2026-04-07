@@ -16,7 +16,7 @@
 
 package base
 
-import config.FrontendAppConfig
+import config.AppConfig
 import models.{CacheMap, Login}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.*
@@ -28,7 +28,7 @@ import utils.UserAnswers
 
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with Injecting:
 
-  def frontendAppConfig: FrontendAppConfig = inject[FrontendAppConfig]
+  def frontendAppConfig: AppConfig = inject[AppConfig]
 
   def messagesApi: MessagesApi = inject[MessagesApi]
 

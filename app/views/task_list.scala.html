@@ -15,15 +15,16 @@
  *@
 
 @import journey.UniformJourney.Cr05SubmissionBuilder
+@import views.html.components.PrimaryLayout
 
 @this(
-    main_template: views.html.govuk.main_template
+    layout: PrimaryLayout
 )
 
 
-@(cr05Submission: Option[Cr05SubmissionBuilder] = None)(implicit request: Request[?], messages: Messages)
+@(cr05Submission: Option[Cr05SubmissionBuilder] = None)(implicit request: RequestHeader, messages: Messages)
 
-@main_template(
+@layout(
     pageTitle = messages("welcome.heading"),
     backLinkUrl = Some(controllers.routes.ReportReasonController.onPageLoad.url)
 ) {
@@ -62,7 +63,7 @@
                 <li class="app-task-list__item">
                 <span class="app-task-list__task-name">
                     @if(cr05Submission.exists(_.cr05CommonSection.isDefined)){
-                        @cr05Submission.flatMap(_.existingProperties.lift(0)).map{propertyToSplit =>
+                        @cr05Submission.flatMap(_.existingProperties.headOption).map{propertyToSplit =>
                             <a href="@routes.UniformController.editPropertyJourney("add-property-UPRN", PropertyType.EXISTING, 0)" aria-describedby="add-property-status">
                                 @(propertyToSplit.address.line1), @(propertyToSplit.address.line2), @propertyToSplit.address.postcode
                             </a>

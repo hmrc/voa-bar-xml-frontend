@@ -34,7 +34,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
-import views.html.govuk.cr05SubmissionSummary
+import views.html.govuk.{UniformLayout, cr05SubmissionSummary}
 
 import java.time.LocalDate
 import scala.annotation.nowarn
@@ -43,7 +43,7 @@ import scala.concurrent.ExecutionContext
 class AutoBarsInterpreter(
   results: Results,
   messagesApi: play.api.i18n.MessagesApi,
-  page_chrome: views.html.govuk.pageChrome,
+  uniformLayout: UniformLayout,
   govukInput: GovukInput,
   govukRadios: GovukRadios,
   govukDateInput: GovukDateInput,
@@ -72,7 +72,7 @@ class AutoBarsInterpreter(
     messages: UniformMessages[Html],
     fieldStats: FormFieldStats
   ): Html =
-    page_chrome(key, errors, tell, ask, breadcrumbs, messages)(using request, messagesApi.preferred(request))
+    uniformLayout(key, errors, tell, ask, breadcrumbs, messages)(using request, messagesApi.preferred(request))
 
   implicit val ctTaxFormWebTell: Cr01Cr03SubmissionWebTell         = Cr01Cr03SubmissionWebTell(GovukSummaryList())
   implicit val cr05SubmissionWebTell: Cr05SubmissionBuilderWebTell = Cr05SubmissionBuilderWebTell(cr05SubmissionSummary)
