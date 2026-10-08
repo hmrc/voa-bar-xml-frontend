@@ -24,6 +24,7 @@
 @import journey.UniformJourney.Cr05Submission
 @import journey.UniformJourney.Cr01Cr03Submission
 @import utils.UniformMessageUtil
+@import uk.gov.hmrc.vo.service.view.html.PrintLink
 
 @this(
         layout: PrimaryLayout,
@@ -65,7 +66,7 @@
     <p class="govuk-body">@messages("feedback.contact") <a class="govuk-link" href="mailto:@messages("feedback.email")?subject=@{report.id}">@messages("feedback.email")</a></p>
     <p class="govuk-body">@messages("feedback.contact2")</p>
 
-    <p class="govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
+    @PrintLink("report.link.print")
 
     <a href="@routes.WelcomeController.onPageLoad.url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
 

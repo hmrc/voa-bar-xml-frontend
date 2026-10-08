@@ -1,3 +1,5 @@
+@import 'lib/vo-frontend-service/stylesheets/frontend';
+
 @import 'partials/variables';
 @import 'partials/base';
 @import 'partials/forms';
@@ -9,10 +11,10 @@
 @import "partials/print";
 @import "partials/task-list";
 
-.block-js-enabled {
+.js-enabled-block {
   display: none;
 }
 
-.js-enabled .block-js-enabled {
+.js-enabled .js-enabled-block {
   display: block;
 }

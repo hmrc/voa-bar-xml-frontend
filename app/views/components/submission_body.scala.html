@@ -26,5 +26,5 @@
     }
     <p><i>@messages("status.created.para1") @reportStatus.createdAtZoned.toLocalDate @messages("status.created.para2")
         @reportStatus.createdAtZoned.toLocalTime</i></p>
-    @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.id).url, id = "print-button", className = "button print-hidden js-visible")
+    @components.button_link(messageKey = "site.print.button", href = routes.ReportStatusController.onReceiptDownload(reportStatus.id).url, id = "print-button")
 </div>

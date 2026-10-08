@@ -3,15 +3,15 @@ import sbt.*
 object AppDependencies {
 
   private val bootstrapVersion        = "10.8.0"
-  private val playFrontendHmrcVersion = "13.11.0"
-  private val voServiceVersion        = "0.12.0"
-  private val hmrcMongoVersion        = "2.13.0"
+  private val playFrontendHmrcVersion = "13.16.0"
+  private val voServiceVersion        = "0.15.0"
+  private val hmrcMongoVersion        = "2.14.0"
   private val jqueryVersion           = "2.2.4" // jQuery 2.2.4 includes .ajax() function
   private val pdfBoxVersion           = "3.0.8"
   private val uniformVersion          = "4.10.0"
 
   // Test dependencies
-  private val voTestVersion = "0.6.0"
+  private val voTestVersion = "0.9.0"
 
   private val compileDependencies = Seq(
     "uk.gov.hmrc"           %% "bootstrap-frontend-play-30" % bootstrapVersion,
