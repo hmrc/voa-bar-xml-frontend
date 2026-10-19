@@ -4,7 +4,7 @@ object AppDependencies {
 
   private val bootstrapVersion        = "10.8.0"
   private val playFrontendHmrcVersion = "13.16.0"
-  private val voServiceVersion        = "0.15.0"
+  private val voServiceVersion        = "0.19.0-SNAPSHOT"
   private val hmrcMongoVersion        = "2.14.0"
   private val jqueryVersion           = "2.2.4" // jQuery 2.2.4 includes .ajax() function
   private val pdfBoxVersion           = "3.0.8"

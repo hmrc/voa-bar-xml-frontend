@@ -22,28 +22,27 @@ import org.mongodb.scala.model.Filters.equal
 import play.api.libs.json.*
 import play.api.{Configuration, Logging}
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
+import java.time.temporal.ChronoUnit.MILLIS
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DatedCacheMap(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now):
-  def asCacheMap: CacheMap = CacheMap(id, data)
+case class DatedCacheMap(
+  _id: String,
+  data: Map[String, JsValue],
+  lastUpdated: Instant = Instant.now.truncatedTo(MILLIS)
+):
+  def asCacheMap: CacheMap = CacheMap(_id, data)
 
 object DatedCacheMap:
 
-  private val localDateTimeReads: Reads[LocalDateTime] =
-    Reads.at[String](__ \ "$date" \ "$numberLong")
-      .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
+  import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats.Implicits.jatInstantFormat
 
-  private val localDateTimeWrites: Writes[LocalDateTime] =
-    Writes.at[String](__ \ "$date" \ "$numberLong")
-      .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
-
-  implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
-  implicit val formats: OFormat[DatedCacheMap]   = Json.format
+  implicit val format: OFormat[DatedCacheMap] = Json.format
 
   def apply(cacheMap: CacheMap): DatedCacheMap = DatedCacheMap(cacheMap.id, cacheMap.data)
 
@@ -52,7 +51,7 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
   extends PlayMongoRepository[DatedCacheMap](
     collectionName = config.get[String]("appName"),
     mongoComponent = mongo,
-    domainFormat = DatedCacheMap.formats,
+    domainFormat = DatedCacheMap.format,
     indexes = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
@@ -60,15 +59,15 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
       )
     ),
     extraCodecs = Seq(
-      Codecs.playFormatCodec(DatedCacheMap.dateFormat)
+      Codecs.playFormatCodec(MongoJavatimeFormats.instantFormat)
     )
   )
   with Logging:
 
-  def upsert(cm: CacheMap): Future[Boolean] =
-    val selector = equal("id", cm.id)
+  private def byId(id: String) = equal("_id", id)
 
-    collection.findOneAndReplace(selector, DatedCacheMap(cm), FindOneAndReplaceOptions().upsert(true))
+  def upsert(cm: CacheMap): Future[Boolean] =
+    collection.findOneAndReplace(byId(cm.id), DatedCacheMap(cm), FindOneAndReplaceOptions().upsert(true))
       .toFutureOption()
       .map(_ => true)
       .recover {
@@ -78,7 +77,4 @@ class SessionRepository @Inject() (config: Configuration, mongo: MongoComponent)
       }
 
   def get(id: String): Future[Option[CacheMap]] =
-    collection.find(equal("id", id)).first().toFutureOption().map(_.map(_.asCacheMap))
-
-  def getByField[A](key: String, value: String): Future[Option[CacheMap]] =
-    collection.find(equal(key, value)).first().toFutureOption().map(_.map(_.asCacheMap))
+    collection.find(byId(id)).first().toFutureOption().map(_.map(_.asCacheMap))

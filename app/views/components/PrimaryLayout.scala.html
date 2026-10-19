@@ -53,7 +53,7 @@
 @navigationItems = @{
     if (appConfig.isTimeoutDialogEnabled) {
         Seq(
-            ServiceNavigationItem(Text(messages("service.navigation.item1")), controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url),
+            ServiceNavigationItem(Text(messages("service.navigation.item1")), controllers.routes.CouncilTaxUploadController.onPageLoad().url),
             ServiceNavigationItem(Text(messages("service.navigation.item2")), controllers.routes.ReportStatusController.onPageLoad().url)
         )
     } else {
