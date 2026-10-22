@@ -16,10 +16,10 @@
 
 package controllers
 
-import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
+import uk.gov.hmrc.vo.service.connectors.AuditService
 import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
 /**

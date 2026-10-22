@@ -36,11 +36,11 @@
 
     <logger name="application" level="INFO"/>
 
+    <logger name="uk.gov.hmrc.vo.service.connectors.AuditService" level="INFO" />
+
     <logger name="connector" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
-
-
 
     <root level="INFO">
         <appender-ref ref="FILE"/>
