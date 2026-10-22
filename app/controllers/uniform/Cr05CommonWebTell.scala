@@ -16,7 +16,6 @@
 
 package controllers.uniform
 
-import java.time.format.DateTimeFormatter
 import journey.UniformJourney.Cr05Common
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.GenericWebTell
@@ -24,6 +23,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 class Cr05CommonWebTell(govUkSummaryList: GovukSummaryList) extends GenericWebTell[Cr05Common, Html]:
 
@@ -54,11 +54,9 @@ class Cr05CommonWebTell(govUkSummaryList: GovukSummaryList) extends GenericWebTe
       ))
     )
 
-    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-
     val effectiveDate = SummaryListRow(
       key = Key(HtmlContent(messages("effective-date.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(Text(formatter.format(in.effectiveDate))),
+      value = Value(Text(in.effectiveDate.formatLongDate)),
       actions = Some(Actions(items =
         Seq(
           ActionItem(

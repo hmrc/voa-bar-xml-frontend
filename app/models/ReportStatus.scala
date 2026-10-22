@@ -16,13 +16,14 @@
 
 package models
 
-import models.ReportStatus.{createdDateUIFormat, createdDateUILongFormat, dateShortFormat}
+import models.ReportStatus.dateShortFilenameLabelFormat
 
 import java.time.{Instant, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import play.api.i18n.Messages
 import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 sealed trait ReportStatusType:
 
@@ -56,11 +57,7 @@ object ReportStatus:
     Json.format
   }
 
-  val createdDateUIFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
-
-  val createdDateUILongFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' kk:mm")
-
-  val dateShortFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
+  val dateShortFilenameLabelFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
 
 final case class ReportStatus(
   id: String,
@@ -76,18 +73,11 @@ final case class ReportStatus(
   createdAt: Instant = Instant.now
 ):
 
-  def formattedCreated: String = createdAtFormatted(createdDateUIFormat)
+  def createdAtShortFilenameLabel: String = createdAt.atZone(ZoneOffset.UTC).format(dateShortFilenameLabelFormat)
 
-  def formattedCreatedLong: String = createdAtFormatted(createdDateUILongFormat)
+  def createdAtInCSV: String = createdAt.formatIsoDateTimeUTC
 
-  def formattedCreatedShort: String = createdAtFormatted(dateShortFormat)
-
-  def createdInCSV: String = createdAtFormatted(DateTimeFormatter.ISO_DATE_TIME)
-
-  def createdAtZoned: ZonedDateTime = createdAt.atZone(ZoneOffset.UTC)
-
-  private def createdAtFormatted(formatter: DateTimeFormatter): String =
-    createdAt.atZone(ZoneOffset.UTC).format(formatter)
+  def createdAtZonedUTC: ZonedDateTime = createdAt.atZone(ZoneOffset.UTC)
 
   def title(messages: Messages): String =
     val defaultStatus = status.getOrElse(Pending.value).toLowerCase

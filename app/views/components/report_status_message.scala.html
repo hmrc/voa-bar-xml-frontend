@@ -16,6 +16,8 @@
 
 @import models.ReportStatus
 
+@import java.time.ZonedDateTime
+
 @(report: ReportStatus)(implicit messages: Messages)
 
 @report.status match {
@@ -23,7 +25,7 @@
     <i>(@Messages(s"report.status.failed"))</i>
     }
 
-    case Some(Pending.value) if(report.createdAtZoned.compareTo(java.time.ZonedDateTime.now.minusHours(3)) < 0) => {
+    case Some(Pending.value) if(report.createdAtZonedUTC.compareTo(ZonedDateTime.now.minusHours(3)) < 0) => {
     <i>(@Messages(s"report.status.failed"))</i>
     }
 

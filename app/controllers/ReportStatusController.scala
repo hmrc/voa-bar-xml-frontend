@@ -95,7 +95,7 @@ class ReportStatusController @Inject() (
         login        <- EitherT(cachedLogin(request.externalId))
         reportStatus <- EitherT(getReportStatus(submissionId, login))
         data         <- EitherT(getPDF(reportStatus))
-        date          = reportStatus.formattedCreatedShort
+        date          = reportStatus.createdAtShortFilenameLabel
       yield Ok(data).withHeaders(
         HeaderNames.CONTENT_DISPOSITION ->
           s"""attachment; filename=${reportStatus.filename.getOrElse("Submission")}_Report-${reportStatus.baCode.getOrElse("").toUpperCase}-$date.pdf"""
@@ -115,7 +115,7 @@ class ReportStatusController @Inject() (
     def totalReports(r: ReportStatus) = r.totalReports.getOrElse(0)
 
     val lines  = reportStatuses.map(r =>
-      s"${r.id},${r.createdInCSV},${r.baCode.getOrElse("")},${status(r)},${filename(r)},${totalReports(r)},${errors(r)}"
+      s"${r.id},${r.createdAtInCSV},${r.baCode.getOrElse("")},${status(r)},${filename(r)},${totalReports(r)},${errors(r)}"
     )
     val header = headerFields.mkString(",")
     s"$header\n${lines.mkString("\n")}".getBytes("UTF-8")

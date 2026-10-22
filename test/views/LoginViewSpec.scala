@@ -41,6 +41,6 @@ class LoginViewSpec extends QuestionViewBehaviours[Login]:
     "contain Login button with the value Login" in {
       val doc         = asDocument(createViewUsingForm(form))
       val loginButton = doc.getElementById("submit").text()
-      assert(loginButton == messages("site.login"))
+      loginButton shouldBe messages("site.login")
     }
   }

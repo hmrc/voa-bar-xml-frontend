@@ -38,7 +38,7 @@ class WelcomeViewSpec extends ViewBehaviours:
   "The Council Tax links to the goToCouncilTaxUploadPage method" in {
     val doc  = asDocument(createView())
     val href = doc.getElementById("councilTaxLink").attr("href")
-    assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url)
+    href shouldBe controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url
   }
 
   // Welcome page containing form for navigation
@@ -48,13 +48,13 @@ class WelcomeViewSpec extends ViewBehaviours:
   def uploadLinkTest(ba: String, formDoc: Document): Unit =
     s"The upload link to the goToCouncilTaxUploadPage method for $ba" in {
       val href = formDoc.getElementById("councilTaxLink").attr("href")
-      assert(href == controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url)
+      href shouldBe controllers.routes.WelcomeController.goToCouncilTaxUploadPage.url
     }
 
   def viewHistoryTest(ba: String, formDoc: Document): Unit =
     s"The view history link to the ReportStatusController.onPageLoad method for $ba" in {
       val href = formDoc.getElementById("submissions").attr("href")
-      assert(href == controllers.routes.ReportStatusController.onPageLoad().url)
+      href shouldBe controllers.routes.ReportStatusController.onPageLoad().url
     }
 
   def runFormNavigationTests(ba: String): Unit =
@@ -75,7 +75,7 @@ class WelcomeViewSpec extends ViewBehaviours:
 
     s"The webform link is visible for $ba" in {
       val href = formDoc.getElementById("create").attr("href")
-      assert(href == controllers.routes.ReportReasonController.onPageLoad.url)
+      href shouldBe controllers.routes.ReportReasonController.onPageLoad.url
     }
 
     uploadLinkTest(ba, formDoc)

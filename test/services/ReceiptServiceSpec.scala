@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts
 import org.apache.pdfbox.text.PDFTextStripper
 import uk.gov.hmrc.vo.unit.test.BaseAppSpec
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 import java.time.Instant
 
@@ -46,7 +47,7 @@ class ReceiptServiceSpec extends BaseAppSpec:
       pdf.getDocumentInformation.getCreator                shouldBe "Billing Authority Reports"
       pdf.getDocumentInformation.getCreationDate.toInstant shouldBe createdAt
 
-      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.createdAt.formatLongDateTime}.")
 
       pdf.close()
     }
@@ -64,7 +65,7 @@ class ReceiptServiceSpec extends BaseAppSpec:
       pdf.getDocumentInformation.getAuthor                 shouldBe "HMRC - Valuation Office"
       pdf.getDocumentInformation.getCreationDate.toInstant shouldBe createdAt
 
-      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.createdAt.formatLongDateTime}.")
 
       pdf.close()
     }
@@ -82,19 +83,19 @@ class ReceiptServiceSpec extends BaseAppSpec:
       pdf.getDocumentInformation.getAuthor                 shouldBe "HMRC - Valuation Office"
       pdf.getDocumentInformation.getCreationDate.toInstant shouldBe createdAt
 
-      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.formattedCreatedLong}.")
+      PDFTextStripper().getText(pdf) should include(s"Your file filename unavailable, was uploaded on ${reportStatus.createdAt.formatLongDateTime}.")
 
       pdf.close()
     }
 
     "have correct font" in {
-      service.font.getBaseFont should be(Standard14Fonts.FontName.HELVETICA_BOLD.getName)
+      service.font.getBaseFont shouldBe Standard14Fonts.FontName.HELVETICA_BOLD.getName
     }
 
     "have correct margin, font size and leading" in {
-      service.fontSize should be(12f)
-      service.leading  should be(18f)
-      service.margin   should be(72)
+      service.fontSize shouldBe 12f
+      service.leading  shouldBe 18f
+      service.margin   shouldBe 72
     }
 
     "wrap text" in {

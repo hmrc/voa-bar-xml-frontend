@@ -18,7 +18,6 @@ package connectors
 
 import models.*
 import models.UpScanRequests.*
-import org.mockito.ArgumentCaptor
 import play.api.Configuration
 import play.api.libs.json.*
 import play.api.test.Helpers.*
@@ -41,13 +40,12 @@ class UploadConnectorSpec extends BaseAppSpec:
 
     "provided with an encrypted Login Input and some xml content" should {
       "call the Microservice with the given xml and login details" in {
-        val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
-        val urlCaptor           = ArgumentCaptor.forClass(classOf[URL])
+        val headerCarrierNapper = captor[HeaderCarrier]
+        val urlCaptor           = captor[URL]
 
         val httpMock = httpClientMock(POST, responseBody = "{}")
 
-        val connector = UploadConnector(httpMock, servicesConfig, messagesApi)
-        await(connector.sendXml(xmlUrl, login, submissionId))
+        UploadConnector(httpMock, servicesConfig, messagesApi).sendXml(xmlUrl, login, submissionId).futureValue
 
         verify(httpMock).post(urlCaptor.capture)(using headerCarrierNapper.capture)
 
@@ -57,14 +55,14 @@ class UploadConnectorSpec extends BaseAppSpec:
 
       "return a String representing the submissionId Id when the send method is successfull using login model and xml content" in {
         val connector = UploadConnector(httpClientMock(POST, responseBody = submissionId), servicesConfig, messagesApi)
-        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = connector.sendXml(xmlUrl, login, submissionId).futureValue
 
         result shouldBe Right(Json.toJson(submissionId).toString)
       }
 
       "return a failure representing the error when send method fails" in {
         val connector = UploadConnector(httpClientMock(POST, responseStatus = INTERNAL_SERVER_ERROR, responseBody = "{}"), servicesConfig, messagesApi)
-        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = connector.sendXml(xmlUrl, login, submissionId).futureValue
 
         result.isLeft   shouldBe true
         result.toString shouldBe Left(
@@ -74,7 +72,7 @@ class UploadConnectorSpec extends BaseAppSpec:
 
       "return a failure if the upload call throws an exception" in {
         val connector = UploadConnector(httpClientFailedMock(POST, returnFailure = RuntimeException("Upload failed.")), servicesConfig, messagesApi)
-        val result    = await(connector.sendXml(xmlUrl, login, submissionId))
+        val result    = connector.sendXml(xmlUrl, login, submissionId).futureValue
 
         result.isLeft   shouldBe true
         result.toString shouldBe Left(
@@ -108,12 +106,12 @@ class UploadConnectorSpec extends BaseAppSpec:
           )
         )
 
-        val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
-        val urlCaptor           = ArgumentCaptor.forClass(classOf[URL])
+        val headerCarrierNapper = captor[HeaderCarrier]
+        val urlCaptor           = captor[URL]
 
         val httpMock  = httpClientMock(POST, responseBody = Json.toJson(initiateResponse))
         val connector = UploadConnector(httpMock, servicesConfig, messagesApi)
-        val response  = await(connector.initiate(initiateRequest))
+        val response  = connector.initiate(initiateRequest).futureValue
 
         verify(httpMock, times(1))
           .post(urlCaptor.capture)(using headerCarrierNapper.capture)
