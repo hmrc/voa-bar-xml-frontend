@@ -53,8 +53,3 @@ object FakeDataCacheConnector extends DataCacheConnector:
 
   override def replaceInCollection[A](cacheId: String, collectionKey: String, index: Int, item: A)(using fmt: Format[A]): Future[CacheMap] =
     Future(CacheMap(cacheId, Map()))
-
-  override def getEntryByField[A](field: String, value: String, key: String)(using fmt: Format[A]): Future[Option[A]] =
-    captures.get(key) match
-      case Some(x) => Future.successful(Some(x.asInstanceOf[A]))
-      case None    => Future.successful(None)

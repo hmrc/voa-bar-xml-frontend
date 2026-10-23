@@ -16,6 +16,7 @@
 
 package views.behaviours.govuk
 
+import org.scalatest.AppendedClues.convertToClueful
 import org.scalatest.compatible.Assertion
 import play.api.data.{Form, FormError}
 import play.twirl.api.HtmlFormat
@@ -59,7 +60,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours:
     }
 
   def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable): Assertion =
-    val doc   = asDocument(view())
-    assert(messages.isDefinedAt(s"$prefix.$option"))
+    val doc = asDocument(view())
+    messages.isDefinedAt(s"$prefix.$option") shouldBe true withClue s"Message '$prefix.$option' should be defined"
     val label = doc.select(s"label[for=$prefix.$option]")
-    assert(label.size() == 1)
+    label.size shouldBe 1

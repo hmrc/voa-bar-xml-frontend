@@ -24,9 +24,8 @@ import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryList, SummaryListRow, Value}
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 import utils.UniformMessageUtil
-
-import java.time.format.DateTimeFormatter
 
 class Cr01Cr03SubmissionWebTell(govUkSummaryList: GovukSummaryList) extends GenericWebTell[Cr01Cr03Submission, Html]:
 
@@ -199,11 +198,9 @@ class Cr01Cr03SubmissionWebTell(govUkSummaryList: GovukSummaryList) extends Gene
       )
     }
 
-    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-
     val effectiveDate = SummaryListRow(
       key = Key(HtmlContent(messages("effective-date.pageLabel")), "govuk-!-width-one-half"),
-      value = Value(Text(formatter.format(in.effectiveDate))),
+      value = Value(Text(in.effectiveDate.formatLongDate)),
       actions = Some(Actions(items =
         Seq(
           ActionItem(controllers.routes.UniformController.myJourney("effective-date").url, HtmlContent(messages("check-answers.changeLabel")))

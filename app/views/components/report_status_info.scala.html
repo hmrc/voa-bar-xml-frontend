@@ -16,6 +16,7 @@
 
 @import models.ReportStatus
 @import utils.FormHelpers.*
+@import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 @(activeReports: Seq[ReportStatus], lastReport: Option[ReportStatus])(implicit messages: Messages)
 
@@ -40,6 +41,6 @@
                 @components.report_status_message(report)
         </p>
 
-        <p class="current-activity-info">@messages("reports.active.timestamp", report.formattedCreatedLong)</p>
+        <p class="current-activity-info">@messages("reports.active.timestamp", report.createdAt.formatLongDateTime)</p>
     }
 </div>

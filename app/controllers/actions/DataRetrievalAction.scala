@@ -38,9 +38,9 @@ class DataRetrievalActionImpl @Inject() (
     hc.sessionId match
       case None            => Future.failed(IllegalStateException())
       case Some(sessionId) =>
-        dataCacheConnector.fetch(sessionId.toString).map {
-          case None       => OptionalDataRequest(request, sessionId.toString, None)
-          case Some(data) => OptionalDataRequest(request, sessionId.toString, Some(UserAnswers(data)))
+        dataCacheConnector.fetch(sessionId.value).map {
+          case None       => OptionalDataRequest(request, sessionId.value, None)
+          case Some(data) => OptionalDataRequest(request, sessionId.value, Some(UserAnswers(data)))
         }
 
   override def parser: BodyParser[AnyContent] = cc.parsers.default

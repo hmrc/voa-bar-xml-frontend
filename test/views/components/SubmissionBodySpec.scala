@@ -35,7 +35,6 @@ class SubmissionBodySpec extends ViewBehaviours:
       assertContainsText(doc, messages("submission"))
       assertContainsText(doc, messages("status.type.title"))
       assertContainsText(doc, messages("status.created.para1"))
-      assertContainsText(doc, messages("status.created.para1"))
       assertContainsText(doc, messages("site.print.button"))
     }
   }

@@ -23,6 +23,7 @@ import models.ReportStatus
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 class TableFormatter @Inject() () {
 
@@ -42,7 +43,7 @@ class TableFormatter @Inject() () {
   ): Seq[Seq[TableRow]] =
     reportStatuses.map(reportStatus =>
       Seq(
-        TableRow(Text(reportStatus.formattedCreated)),
+        TableRow(Text(reportStatus.createdAt.formatMediumDateTime)),
         TableRow(Text(reportStatus.id.split("-").head)),
         TableRow(Text(reportStatus.filename.getOrElse("Unknown"))),
         TableRow(HtmlContent(formatSummaryLink(reportStatus, confirmationController)))

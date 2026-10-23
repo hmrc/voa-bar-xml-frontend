@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit messages: Messages)
+package models.event
 
-<div class="js-visible">
-  <p><a id="back-link" class="link-back" href="#">@messages("site.back")</a></p>
-</div>
+import play.api.libs.json.Json
+import uk.gov.hmrc.vo.unit.test.{BaseSpec, JsonAssertions}
+
+/**
+  * @author Yuriy Tumakha
+  */
+class SurveySatisfactionSpec extends BaseSpec with JsonAssertions("event"):
+
+  "SurveySatisfaction" should {
+    "serialize to expected JSON" in {
+      val event     = SurveySatisfaction(5, "Satisfaction comments", "c0e461f6")
+      val eventJson = Json.toJson(event)
+
+      event.auditType shouldBe "SurveySatisfaction"
+
+      compareJson(eventJson, "SurveySatisfaction.json")
+    }
+  }

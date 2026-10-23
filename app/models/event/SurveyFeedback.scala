@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package models.event
 
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.vo.service.model.event.AuditEvent
 
 /**
   * @author Yuriy Tumakha
   */
-case class FeedbackAuditEvent(rating: Int, comments: String, afterSubmission: Boolean, submissionId: Option[String])
+case class SurveyFeedback(
+  rating: Int,
+  comments: String,
+  afterSubmission: Boolean = false
+) extends AuditEvent
 
-object FeedbackAuditEvent:
-  implicit val jsonWrites: Writes[FeedbackAuditEvent] = Json.writes
+object SurveyFeedback:
+  implicit val format: OFormat[SurveyFeedback] = Json.format

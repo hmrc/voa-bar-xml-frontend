@@ -20,6 +20,7 @@
 @import views.html.components.confirmation_detail_panel
 @import views.html.components.PrimaryLayout
 @import views.html.feedback.feedbackForm
+@import uk.gov.hmrc.vo.service.view.html.PrintLink
 
 @this(
     layout: PrimaryLayout,
@@ -58,7 +59,7 @@
 
     @confirmationDetailPanel(submissionId, reportStatus)
 
-    <p class="govuk-!-display-none-print"><a id="print-button" rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
+    @PrintLink("report.link.print")
 
     <a href="@routes.WelcomeController.onPageLoad.url" class="govuk-link govuk-!-display-none-print">@messages("report.link.start.again")</a>
 

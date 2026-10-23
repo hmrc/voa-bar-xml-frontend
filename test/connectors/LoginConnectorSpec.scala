@@ -17,7 +17,6 @@
 package connectors
 
 import models.*
-import org.mockito.ArgumentCaptor
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vo.unit.test.BaseAppSpec
@@ -33,13 +32,12 @@ class LoginConnectorSpec extends BaseAppSpec:
 
   "Login Connector" should {
     "call the Microservice with the given JSON for username provided" in {
-      val headerCarrierNapper = ArgumentCaptor.forClass(classOf[HeaderCarrier])
-      val urlCaptor           = ArgumentCaptor.forClass(classOf[URL])
+      val headerCarrierNapper = captor[HeaderCarrier]
+      val urlCaptor           = captor[URL]
 
       val httpMock = httpClientMock(POST, responseBody = "{}")
 
-      val connector = LoginConnector(httpMock, servicesConfig)
-      await(connector.doLogin(login))
+      LoginConnector(httpMock, servicesConfig).doLogin(login).futureValue
 
       verify(httpMock).post(urlCaptor.capture)(using headerCarrierNapper.capture)
 
@@ -49,20 +47,20 @@ class LoginConnectorSpec extends BaseAppSpec:
 
     "return a 200 status when the doLogin method is successfully" in {
       val connector = LoginConnector(httpClientMock(POST, responseBody = "{}"), servicesConfig)
-      val result    = await(connector.doLogin(login))
+      val result    = connector.doLogin(login).futureValue
       result shouldBe Success(200)
     }
 
     "return a failure representing the error when doLogin method fails" in {
       val connector = LoginConnector(httpClientMock(POST, responseStatus = INTERNAL_SERVER_ERROR, responseBody = "{}"), servicesConfig)
-      val result    = await(connector.doLogin(login))
+      val result    = connector.doLogin(login).futureValue
       result.isFailure shouldBe true
       result.toString  shouldBe Failure(RuntimeException("Received status of 500 from upstream service when logging in")).toString
     }
 
     "return a failure if http call throws an exception" in {
       val connector = LoginConnector(httpClientFailedMock(POST, returnFailure = RuntimeException("Login failed.")), servicesConfig)
-      val result    = await(connector.doLogin(login))
+      val result    = connector.doLogin(login).futureValue
       result.isFailure shouldBe true
     }
   }

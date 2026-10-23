@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.font.{PDType1Font, Standard14Fonts}
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory
 import org.apache.pdfbox.pdmodel.{PDDocument, PDDocumentInformation, PDPage, PDPageContentStream}
 import play.api.i18n.{Lang, MessagesApi}
+import uk.gov.hmrc.vo.service.conversion.DateConversion.*
 
 import java.io.{ByteArrayOutputStream, Closeable}
 import java.util.{GregorianCalendar, Locale}
@@ -113,7 +114,8 @@ class DefaultReceiptService @Inject() (
     logoHeight
 
   private def body(reportStatus: ReportStatus): String =
-    var content = messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), reportStatus.formattedCreatedLong)
+    var content =
+      messages("report.pdf.details.summary.first.line", reportStatus.filename.getOrElse("filename unavailable"), reportStatus.createdAt.formatLongDateTime)
     content += " "
     reportStatus.status match
       case Some(s) => content += messages(s"report.pdf.details.summary.${s.toLowerCase}")
@@ -146,10 +148,10 @@ class DefaultReceiptService @Inject() (
     lines
 
   private def title(reportStatus: ReportStatus) =
-    s"${messages("report.pdf.details.title")} ${reportStatus.baCode.getOrElse("")} - CT - ${reportStatus.formattedCreatedLong}"
+    s"${messages("report.pdf.details.title")} ${reportStatus.baCode.getOrElse("")} - CT - ${reportStatus.createdAt.formatLongDateTime}"
 
   private def setDocumentInformation(document: PDDocument, reportStatus: ReportStatus): Unit =
-    val createdAt = GregorianCalendar.from(reportStatus.createdAtZoned)
+    val createdAt = GregorianCalendar.from(reportStatus.createdAtZonedUTC)
     val info      = PDDocumentInformation()
     info.setAuthor(author)
     info.setCreator(creator)

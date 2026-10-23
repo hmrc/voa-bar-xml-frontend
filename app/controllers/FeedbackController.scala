@@ -16,8 +16,8 @@
 
 package controllers
 
-import connectors.AuditService
 import forms.FeedbackForm.feedbackForm
+import models.event.{SurveyFeedback, SurveySatisfaction}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSBodyWritables.writeableOf_urlEncodedForm
@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HttpReads, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.vo.service.connectors.AuditService
 import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
 import java.net.URL
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FeedbackController @Inject() (
   servicesConfig: ServicesConfig,
-  auditService: AuditService,
+  audit: AuditService,
   httpClientV2: HttpClientV2,
   feedbackView: feedback,
   feedbackThxView: feedbackThx,
@@ -66,7 +67,9 @@ class FeedbackController @Inject() (
           BadRequest(feedbackView(formWithErrors))
         },
       form =>
-        auditService.sendFeedback(form)
+        if form.afterSubmission then
+          audit.send(SurveySatisfaction(form.rating, form.comments, form.submissionId.getOrElse("")))
+        else audit.send(SurveyFeedback(form.rating, form.comments))
 
         val data: Map[String, Seq[String]] = Map(
           "feedback-rating"   -> form.rating.toString,

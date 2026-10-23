@@ -16,6 +16,7 @@
 
 package views.behaviours
 
+import org.scalatest.AppendedClues.convertToClueful
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 
@@ -39,8 +40,8 @@ trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean]:
 
         "have no values checked when rendered with no form" in {
           val doc = asDocument(createView(form))
-          assert(!doc.getElementById("value-yes").hasAttr("checked"))
-          assert(!doc.getElementById("value-no").hasAttr("checked"))
+          !doc.getElementById("value-yes").hasAttr("checked") shouldBe true withClue "'value-yes' should not be checked"
+          !doc.getElementById("value-no").hasAttr("checked")  shouldBe true withClue "'value-no' should not be checked"
         }
 
         "not render an error summary" in {
@@ -74,8 +75,8 @@ trait YesNoViewBehaviours extends QuestionViewBehaviours[Boolean]:
   def answeredYesNoPage(createView: Form[Boolean] => HtmlFormat.Appendable, answer: Boolean): Unit =
     "have only the correct value checked" in {
       val doc = asDocument(createView(form.fill(answer)))
-      assert(doc.getElementById("value-yes").hasAttr("checked") == answer)
-      assert(doc.getElementById("value-no").hasAttr("checked") != answer)
+      doc.getElementById("value-yes").hasAttr("checked") shouldBe answer withClue s"value-yes.checked should be $answer"
+      doc.getElementById("value-no").hasAttr("checked")  shouldBe answer withClue s"value-no.checked should not be $answer"
     }
 
     "not render an error summary" in {

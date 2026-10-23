@@ -16,6 +16,7 @@
 
 package views.behaviours
 
+import org.scalatest.AppendedClues.convertToClueful
 import org.scalatest.compatible.Assertion
 import play.twirl.api.HtmlFormat
 import views.ViewSpecBase
@@ -57,7 +58,7 @@ trait ViewBehaviours extends ViewSpecBase:
 
   def labelDefinedAndUsedOnce(option: String, prefix: String, view: () => HtmlFormat.Appendable): Assertion =
     val doc = asDocument(view())
-    assert(messages.isDefinedAt(s"$prefix.$option"))
+    messages.isDefinedAt(s"$prefix.$option") shouldBe true withClue s"Message '$prefix.$option' should be defined"
 
     val label = doc.select(s"label[for=$prefix.$option]")
     label.size shouldBe 1

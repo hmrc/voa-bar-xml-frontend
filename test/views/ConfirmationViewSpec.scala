@@ -58,7 +58,7 @@ class ConfirmationViewSpec extends ViewBehaviours:
     }
 
     "Include a print link when completed" in {
-      val downloadButton = asDocument(createViewWithStatus()).getElementById("print-button").text
-      downloadButton shouldBe messages("report.link.print")
+      val printLink = asDocument(createViewWithStatus()).selectFirst(".print-link")
+      printLink.text shouldBe messages("report.link.print")
     }
   }

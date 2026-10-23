@@ -37,7 +37,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "return a successful result when valid arguments are provided" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientMock(PUT, responseBody = "{}"), servicesConfig)
 
-        val result = await(userReportUploadsRepository.save(userReportUpload))
+        val result = userReportUploadsRepository.save(userReportUpload).futureValue
 
         result shouldBe Right(())
       }
@@ -45,7 +45,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "return a failed result when the repository fails" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientFailedMock(PUT, returnFailure = exception), servicesConfig)
 
-        val result = await(userReportUploadsRepository.save(userReportUpload))
+        val result = userReportUploadsRepository.save(userReportUpload).futureValue
 
         result shouldBe Left(error)
       }
@@ -55,7 +55,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "a successful result when a valid reference id is provided" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientMock(responseBody = Json.toJson(userReportUpload)), servicesConfig)
 
-        val result = await(userReportUploadsRepository.getById(reference, login))
+        val result = userReportUploadsRepository.getById(reference, login).futureValue
 
         result shouldBe Right(Some(userReportUpload))
       }
@@ -63,7 +63,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "handle empty response if user report doesn't exist" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientMock(responseBody = "{}"), servicesConfig)
 
-        val result = await(userReportUploadsRepository.getById(reference, login))
+        val result = userReportUploadsRepository.getById(reference, login).futureValue
 
         result shouldBe Right(None)
       }
@@ -71,7 +71,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "handle empty json response if user report doesn't exist" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientMock(responseBody = "{}"), servicesConfig)
 
-        val result = await(userReportUploadsRepository.getById(reference, login))
+        val result = userReportUploadsRepository.getById(reference, login).futureValue
 
         result shouldBe Right(None)
       }
@@ -79,7 +79,7 @@ class UserReportUploadsConnectorSpec extends BaseAppSpec:
       "return a failed result when the repository fails" in {
         val userReportUploadsRepository = DefaultUserReportUploadsConnector(httpClientFailedMock(returnFailure = exception), servicesConfig)
 
-        val result = await(userReportUploadsRepository.getById(reference, login))
+        val result = userReportUploadsRepository.getById(reference, login).futureValue
 
         result shouldBe Left(error)
       }

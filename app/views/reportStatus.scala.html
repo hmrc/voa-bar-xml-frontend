@@ -17,6 +17,7 @@
 @import views.html.components.PrimaryLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import views.TableFormatter
+@import uk.gov.hmrc.vo.service.view.html.PrintLink
 
 @this(
     layout: PrimaryLayout,
@@ -54,7 +55,7 @@
             )
         )
 
-        <p class="govuk-!-display-none-print"><a rel="nofollow" href="javascript:window.print()" class="govuk-link print-link">@messages("report.link.print")</a></p>
+        @PrintLink("report.link.print")
 
     }
 

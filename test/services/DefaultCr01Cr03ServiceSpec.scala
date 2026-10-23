@@ -20,7 +20,6 @@ import connectors.ReportStatusConnector
 import journey.AddProperty
 import journey.UniformJourney.{Address, ContactDetails, Cr01Cr03Submission, Cr05Submission}
 import models.{Login, ReportStatus}
-import org.mockito.ArgumentCaptor
 import play.api.libs.json.JsString
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.vo.unit.test.BaseSpec
@@ -38,26 +37,26 @@ class DefaultCr01Cr03ServiceSpec extends BaseSpec:
       val connector = mock[ReportStatusConnector]
       when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
-      val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
-      val service = DefaultCr01Cr03Service(connector)
+      val reportCaptor = captor[ReportStatus]
+      val service      = DefaultCr01Cr03Service(connector)
 
       val submission = Cr05Submission(BA_REF, "baRef", LocalDate.of(2020, 2, 2), Seq(), Seq(), Some("planningRef"), None, Some("comment"))
 
       service.storeSubmission(submission, Login(BA_REF, "xxx", None))(using HeaderCarrier())
 
-      verify(connector).save(captor, any[Login])(using any[HeaderCarrier])
+      verify(connector).save(reportCaptor, any[Login])(using any[HeaderCarrier])
 
-      captor.getValue                            should not be null
-      captor.getValue.baCode.get               shouldBe BA_REF
-      captor.getValue.report.get.value("type") shouldBe JsString("Cr05Submission")
+      reportCaptor.getValue                            should not be null
+      reportCaptor.getValue.baCode.get               shouldBe BA_REF
+      reportCaptor.getValue.report.get.value("type") shouldBe JsString("Cr05Submission")
     }
 
     "create CR01 and CR03 report and store in backend" in {
       val connector = mock[ReportStatusConnector]
       when(connector.save(any[ReportStatus], any[Login])(using any[HeaderCarrier])).thenReturn(Future.successful(Right(())))
 
-      val captor  = ArgumentCaptor.forClass(classOf[ReportStatus])
-      val service = DefaultCr01Cr03Service(connector)
+      val reportCaptor = captor[ReportStatus]
+      val service      = DefaultCr01Cr03Service(connector)
 
       val submission = Cr01Cr03Submission(
         AddProperty,
@@ -79,10 +78,10 @@ class DefaultCr01Cr03ServiceSpec extends BaseSpec:
 
       service.storeSubmission(submission, Login(BA_REF, "xxx", None))(using HeaderCarrier())
 
-      verify(connector).save(captor, any[Login])(using any[HeaderCarrier])
+      verify(connector).save(reportCaptor, any[Login])(using any[HeaderCarrier])
 
-      captor.getValue                            should not be null
-      captor.getValue.baCode.get               shouldBe BA_REF
-      captor.getValue.report.get.value("type") shouldBe JsString("Cr01Cr03Submission")
+      reportCaptor.getValue                            should not be null
+      reportCaptor.getValue.baCode.get               shouldBe BA_REF
+      reportCaptor.getValue.report.get.value("type") shouldBe JsString("Cr01Cr03Submission")
     }
   }
