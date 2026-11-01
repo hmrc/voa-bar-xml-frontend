@@ -18,7 +18,7 @@ package views
 
 import controllers.ReverseConfirmationController
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import models.ReportStatus
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}

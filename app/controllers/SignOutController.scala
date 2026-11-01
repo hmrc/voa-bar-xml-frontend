@@ -17,7 +17,7 @@
 package controllers
 
 import models.NormalMode
-import javax.inject.Inject
+import jakarta.inject.Inject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 

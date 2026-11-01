@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.TableFormatter
 
 import java.time.Instant
-import javax.inject.Inject
+import jakarta.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 

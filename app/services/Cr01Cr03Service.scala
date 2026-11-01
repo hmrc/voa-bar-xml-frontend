@@ -20,7 +20,7 @@ import java.util.UUID
 import com.google.inject.ImplementedBy
 import connectors.ReportStatusConnector
 
-import javax.inject.{Inject, Singleton}
+import jakarta.inject.{Inject, Singleton}
 import journey.UniformJourney.{Cr01Cr03Submission, Cr05Submission}
 import models.{Login, Pending, ReportStatus, Submitted}
 import play.api.libs.json.{JsObject, Json}

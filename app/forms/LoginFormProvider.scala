@@ -16,7 +16,7 @@
 
 package forms
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form

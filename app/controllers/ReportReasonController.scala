@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.reportReason
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import ReportReasonController.*
 import play.api.Configuration
