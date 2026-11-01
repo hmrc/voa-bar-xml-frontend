@@ -16,14 +16,12 @@
 
 package models
 
-import models.ReportStatus.dateShortFilenameLabelFormat
-
-import java.time.{Instant, ZoneOffset, ZonedDateTime}
-import java.time.format.DateTimeFormatter
 import play.api.i18n.Messages
 import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats.mongoEntity
 import uk.gov.hmrc.vo.service.conversion.DateConversion.*
+
+import java.time.{Instant, ZoneOffset, ZonedDateTime}
 
 sealed trait ReportStatusType:
 
@@ -57,8 +55,6 @@ object ReportStatus:
     Json.format
   }
 
-  val dateShortFilenameLabelFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
-
 final case class ReportStatus(
   id: String,
   url: Option[String] = None,
@@ -73,7 +69,7 @@ final case class ReportStatus(
   createdAt: Instant = Instant.now
 ):
 
-  def createdAtShortFilenameLabel: String = createdAt.atZone(ZoneOffset.UTC).format(dateShortFilenameLabelFormat)
+  def createdAtShortFilenameLabel: String = createdAt.formatIsoDateTimeUTC.filter(_.isDigit).take(12)
 
   def createdAtInCSV: String = createdAt.formatIsoDateTimeUTC
 
