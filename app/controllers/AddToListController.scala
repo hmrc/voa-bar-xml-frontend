@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.*
 import identifiers.{AddPropertyId, VOAuthorisedId}
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import journey.UniformJourney.Cr05SubmissionBuilder
 import models.NormalMode
 import play.api.i18n.I18nSupport

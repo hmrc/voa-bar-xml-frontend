@@ -18,7 +18,7 @@ package utils
 
 import models.CacheMap
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import play.api.libs.json.*
 
 @Singleton

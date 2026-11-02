@@ -39,6 +39,8 @@ class ReceiptServiceSpec extends BaseAppSpec:
 
       val reportStatus = ReportStatus(submissionId, createdAt = createdAt, baCode = Some(baCode), status = Some(Pending.value))
 
+      reportStatus.createdAtShortFilenameLabel shouldBe "202603191835" // "yyyyMMddHHmm"
+
       val data = service.producePDF(reportStatus)
 
       val pdf = Loader.loadPDF(data.get)

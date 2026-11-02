@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.session_timeout
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 class TimeoutController @Inject() (
   controllerComponents: MessagesControllerComponents,

@@ -31,7 +31,7 @@ import uk.gov.hmrc.vo.service.connectors.AuditService
 import views.html.feedback.{feedback, feedbackError, feedbackThx}
 
 import java.net.URL
-import javax.inject.{Inject, Singleton}
+import jakarta.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

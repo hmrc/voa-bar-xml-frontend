@@ -32,7 +32,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components.{GovukDateInput, GovukInp
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.govuk.{UniformLayout, cr05SubmissionSummary}
 
-import javax.inject.{Inject, Singleton}
+import jakarta.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

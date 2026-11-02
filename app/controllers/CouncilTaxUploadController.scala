@@ -31,7 +31,7 @@ import play.api.{Configuration, Logging}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import java.util.Locale
-import javax.inject.Inject
+import jakarta.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CouncilTaxUploadController @Inject() (

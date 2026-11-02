@@ -28,7 +28,7 @@ import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import java.time.Instant
 import java.time.temporal.ChronoUnit.MILLIS
 import java.util.concurrent.TimeUnit.SECONDS
-import javax.inject.{Inject, Singleton}
+import jakarta.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class DatedCacheMap(
